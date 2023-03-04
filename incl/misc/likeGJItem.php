@@ -35,6 +35,10 @@ switch($type){
 		$table = "acccomments";
 		$column = "commentID";
 		break;
+	case 4:
+		$table = "announcements";
+		$column = "commentID";
+		break;
 }
 
 $query=$db->prepare("SELECT likes FROM $table WHERE $column = :itemID LIMIT 1");

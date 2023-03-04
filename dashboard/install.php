@@ -11,6 +11,8 @@ if(!$installed) {
       ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardAddMod INT NOT NULL DEFAULT '0' AFTER dashboardLevelPackCreate;
       ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardAddMod;
       ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardForceChangePassNick INT NOT NULL DEFAULT '0' AFTER dashboardManageSongs;
+	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS actionCreateAnnouncement INT NOT NULL DEFAULT '0' AFTER actionDeleteComment;
+	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS actionDeleteAnnouncement INT NOT NULL DEFAULT '0' AFTER actionCreateAnnouncement;
       ALTER TABLE songs ADD COLUMN IF NOT EXISTS reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS banReason varchar(255) NOT NULL DEFAULT 'none' AFTER isCreatorBanned;
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth varchar(16) NOT NULL DEFAULT 'none' AFTER isActive;
