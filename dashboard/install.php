@@ -96,8 +96,8 @@ if(!$installed) {
 		 `secret` varchar(10) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'unused',
 		 `commentID` int(11) NOT NULL DEFAULT '' AUTO_INCREMENT,
 		 `timestamp` int(11) NOT NULL DEFAULT '',
-		 `likes` int(11) NOT NULL DEFAULT 0,
-		 `isSpam` int(11) NOT NULL DEFAULT 0,
+		 `likes` int(11) NOT NULL DEFAULT '0',
+		 `isSpam` int(11) NOT NULL DEFAULT '0',
 		 PRIMARY KEY (`commentID`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"); 
 		$db->query("ALTER TABLE `announcements` ADD INDEX(`userID`)");
