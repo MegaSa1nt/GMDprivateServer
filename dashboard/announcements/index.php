@@ -11,6 +11,11 @@ include "../".$dbPath."incl/lib/connection.php";
 $dl->title($dl->getLocalizedString("announcements"));
 $dl->printFooter('../');
 
+$dl->printSong("<div class='form'>
+  <h1>".$dl->getLocalizedString("announcements")."</h1>
+  <p>Not finished yet.</p>
+</div>");
+
 if(isset($_GET["page"]) AND is_numeric($_GET["page"]) AND $_GET["page"] > 0){
 	$page = ($_GET["page"] - 1) * 10;
 	$actualpage = $_GET["page"];
