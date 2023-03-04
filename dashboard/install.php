@@ -85,6 +85,22 @@ if(!$installed) {
 			 `approve` int(11) NOT NULL DEFAULT 0,
 			 PRIMARY KEY (`ID`)
 			) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+	$check = $db->query("SHOW TABLES LIKE 'announcements'");
+      	$exist = $check->fetchAll();
+      	if(empty($exist)) { $db->query("CREATE TABLE `announcements` (
+		 `userID` int(11) NOT NULL DEFAULT None,
+		 `userName` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT None,
+		 `comment` longtext CHARACTER SET utf8mb4 NOT NULL,
+		 `secret` varchar(10) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'unused',
+		 `commentID` int(11) NOT NULL DEFAULT None AUTO_INCREMENT,
+		 `timestamp` int(11) NOT NULL DEFAULT None,
+		 `likes` int(11) NOT NULL DEFAULT 0,
+		 `isSpam` int(11) NOT NULL DEFAULT 0,
+		 PRIMARY KEY (`commentID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"); 
+		$db->query("ALTER TABLE `announcements` ADD INDEX(`userID`)");
+		$db->query("ALTER TABLE `announcements` ADD INDEX(`timestamp`)");
+		}
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);
