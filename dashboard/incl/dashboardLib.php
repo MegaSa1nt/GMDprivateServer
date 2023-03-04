@@ -117,7 +117,7 @@ class dashboardLib {
       	include __DIR__."/../".$dbPath."incl/lib/connection.php";
 		$gs = new mainLib();
 		if($enableCaptcha) Captcha::displayCaptcha('no');
-		$homeActive = $accountActive = $browseActive = $modActive = $reuploadActive = $statsActive = $msgActive = $profileActive = "";
+		$homeActive = $accountActive = $browseActive = $modActive = $reuploadActive = $statsActive = $announcementsActive = $msgActive = $profileActive = "";
 		switch($active){
 			case "home":
 				$homeActive = "active tooactive";
@@ -136,6 +136,9 @@ class dashboardLib {
 				break;
 			case "stats":
 				$statsActive = "active tooactive";
+				break;
+			case "announcements":
+				$announcementsActive = "active tooactive";
 				break;
            	case "msg":
 				$msgActive = "active tooactive";
@@ -280,6 +283,10 @@ class dashboardLib {
 						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'messenger\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
 							<i class="fa-solid fa-comments" aria-hidden="true"></i> '.$this->getLocalizedString("messenger").'</button>'.$new;
                     }
+					echo '<li class="nav-item dropdown">
+						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'announcements\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
+							<i class="fa-solid fa-bullhorn" aria-hidden="true"></i> '.$this->getLocalizedString("announcements").'</button>'.$new;
+					
       				echo '
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
