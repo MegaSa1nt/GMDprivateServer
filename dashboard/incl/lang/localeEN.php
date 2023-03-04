@@ -18,6 +18,8 @@ $string["cronSuccess"] = "Success!";
 $string["cronError"] = "Error!";
 
 $string["announcements"] = "Announcements";
+$string["announcement"] = "Announcement";
+$string["announcementID"] = "Announcement ID";
 $string["likes"] = "Likes";
 
 $string["profile"] = "Profile";
