@@ -10,5 +10,8 @@ $gs = new mainLib();
 include "../".$dbPath."incl/lib/connection.php";
 $dl->title($dl->getLocalizedString("announcements"));
 $dl->printFooter('../');
-echo "Not finished yet.";
+$dl->printSong("<div class="form">
+  <h1>".$dl->getLocalizedString("announcements")."</h1>
+  <p>Not finished yet.</p>
+</div>");
 ?>
