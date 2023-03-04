@@ -91,9 +91,9 @@ if(!$installed) {
       	$exist = $check->fetchAll();
       	if(empty($exist)) { $db->query("CREATE TABLE `announcements` (
 		 `userID` int(11) NOT NULL,
-		 `userName` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '',
-		 `comment` longtext CHARACTER SET utf8mb4 NOT NULL,
-		 `secret` varchar(10) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'unused',
+		 `userName` varchar(50) CHARACTER SET utf8mb4_unicode_ci NOT NULL,
+		 `comment` longtext CHARACTER SET utf8mb4_unicode_ci NOT NULL,
+		 `secret` varchar(10) CHARACTER SET utf8mb4_unicode_ci NOT NULL DEFAULT 'unused',
 		 `commentID` int(11) NOT NULL AUTO_INCREMENT,
 		 `timestamp` int(11) NOT NULL,
 		 `likes` int(11) NOT NULL DEFAULT 0,
