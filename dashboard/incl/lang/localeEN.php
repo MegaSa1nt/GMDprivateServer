@@ -17,6 +17,8 @@ $string["tryCron"] = "Run Cron";
 $string["cronSuccess"] = "Success!";
 $string["cronError"] = "Error!";
 
+$string["announcements"] = "Announcements";
+
 $string["profile"] = "Profile";
 $string["empty"] = "Empty...";
 $string["writeSomething"] = "Write something!";  
