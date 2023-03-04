@@ -91,15 +91,15 @@ if(!$installed) {
       	$exist = $check->fetchAll();
       	if(empty($exist)) { $db->query("CREATE TABLE `announcements` (
 		 `userID` int(11) NOT NULL,
-		 `userName` varchar(50) CHARACTER SET utf8mb4_unicode_ci NOT NULL,
-		 `comment` longtext CHARACTER SET utf8mb4_unicode_ci NOT NULL,
-		 `secret` varchar(10) CHARACTER SET utf8mb4_unicode_ci NOT NULL DEFAULT 'unused',
+		 `userName` varchar(50) NOT NULL,
+		 `comment` longtext NOT NULL,
+		 `secret` varchar(10) NOT NULL DEFAULT 'unused',
 		 `commentID` int(11) NOT NULL AUTO_INCREMENT,
 		 `timestamp` int(11) NOT NULL,
-		 `likes` int(11) NOT NULL DEFAULT 0,
-		 `isSpam` int(11) NOT NULL DEFAULT 0,
+		 `likes` int(11) NOT NULL DEFAULT '0',
+		 `isSpam` int(11) NOT NULL DEFAULT '0',
 		 PRIMARY KEY (`commentID`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"); 
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"); 
 		$db->query("ALTER TABLE `announcements` ADD INDEX(`userID`)");
 		$db->query("ALTER TABLE `announcements` ADD INDEX(`timestamp`)");
 		}
