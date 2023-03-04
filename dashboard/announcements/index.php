@@ -56,7 +56,7 @@ $x = $page + 1;
 foreach($result as &$action){
   $username = '<form style="margin:0" method="post" action="profile/"><button style="margin:0" class="accbtn" name="accountID" value="'.$action["accountID"].'">'.$action["userName"].'</button></form>';
   $announcement = $action["comment"];
-	$time = date("F j, Y, g:i:s a", $action["timestamp"]);
+	$time = date("g:i:s a, F j, Y", $action["timestamp"]);
   $likes = $action["likes"];
 	$table .= "<tr><th scope='row'>".$x."</th><td>".$username."</td><td>".$announcement."</td><td>".$time."</td><td>".$likes."</td></tr>";
 	$x++;
