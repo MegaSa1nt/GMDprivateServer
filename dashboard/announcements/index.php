@@ -17,7 +17,7 @@ if(isset($_GET["page"]) AND is_numeric($_GET["page"]) AND $_GET["page"] > 0){
 	$page = 0;
 	$actualpage = 1;
 }
-$table = '<table class="table table-inverse"><tr><th>#</th><th>'.$dl->getLocalizedString("username").'</th><th>'.$dl->getLocalizedString("announcement").'</th><th>'.$dl->getLocalizedString("likes").'</th><th>'.$dl->getLocalizedString("time").'</th></tr>';
+$table = '<table class="table table-inverse"><tr><th>#</th><th>'.$dl->getLocalizedString("username").'</th><th>'.$dl->getLocalizedString("announcement").'</th><th>'.$dl->getLocalizedString("time").'</th><th>'.$dl->getLocalizedString("likes").'</th></tr>';
 if(!isset($_GET["search"])) $_GET["search"] = "";
 if(!isset($_GET["type"])) $_GET["type"] = "";
 if(!isset($_GET["ng"])) $_GET["ng"] = "";
