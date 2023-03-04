@@ -90,12 +90,12 @@ if(!$installed) {
 	$check = $db->query("SHOW TABLES LIKE 'announcements'");
       	$exist = $check->fetchAll();
       	if(empty($exist)) { $db->query("CREATE TABLE `announcements` (
-		 `userID` int(11) NOT NULL DEFAULT None,
-		 `userName` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT None,
+		 `userID` int(11) NOT NULL DEFAULT '',
+		 `userName` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '',
 		 `comment` longtext CHARACTER SET utf8mb4 NOT NULL,
 		 `secret` varchar(10) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'unused',
-		 `commentID` int(11) NOT NULL DEFAULT None AUTO_INCREMENT,
-		 `timestamp` int(11) NOT NULL DEFAULT None,
+		 `commentID` int(11) NOT NULL DEFAULT '' AUTO_INCREMENT,
+		 `timestamp` int(11) NOT NULL DEFAULT '',
 		 `likes` int(11) NOT NULL DEFAULT 0,
 		 `isSpam` int(11) NOT NULL DEFAULT 0,
 		 PRIMARY KEY (`commentID`)
