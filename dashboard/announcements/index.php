@@ -54,45 +54,11 @@ if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::remove($_GET["search"])))
 }
 $x = $page + 1;
 foreach($result as &$action){
-	$isAdmin = $action["isAdmin"];
-	$accountID = $action["accountID"].' <text style="color:gray">|</text> '.$gs->getUserID($action["accountID"]);
-  	if($action["accountID"] == $gs->getUserID($action["accountID"])) $accountID = $action["accountID"];
-  	$username = '<form style="margin:0" method="post" action="profile/"><button style="margin:0" class="accbtn" name="accountID" value="'.$action["accountID"].'">'.$action["userName"].'</button></form>';
-  	$query = $db->prepare("SELECT lastPlayed FROM users WHERE extID=:id");
-  	$query->execute([':id' => $action["accountID"]]);
-  	$lastseen = $query->fetch();
-  	$lastPlayed = $dl->convertToDate($lastseen["lastPlayed"]);
-  	if($lastseen["lastPlayed"] == 0 OR empty($lastseen)) $lastPlayed = '<div style="color:gray">'.$dl->getLocalizedString("never").'</div>';
-	$query = $db->prepare("SELECT roleID FROM roleassign WHERE accountID =:accid");
-	$query->execute([':accid' => $accountID]);
-	$resultPls = $query->fetch();
-	if(!$resultPls) $resultRole = $dl->getLocalizedString("player");
-	else {
-		$resultRole = $resultPls["roleID"];
-		if(empty($resultRole)){
-			$resultRole = $dl->getLocalizedString("player");
-		} else {
-			switch($resultRole) {
-				case 1:
-					$resultRole = $dl->getLocalizedString("admin");
-					break;
-				case 2:
-					$resultRole = $dl->getLocalizedString("elder");
-					break;
-				case 3:
-					$resultRole = $dl->getLocalizedString("moder");
-					break;
-				default:
-					$query = $db->prepare("SELECT roleName FROM roles WHERE roleID = :id");
-					$query->execute([':id' => $resultRole]);
-					$resultRole = $query->fetch()["roleName"];
-					break;
-			}
-			$resultRole = '<div style="color:rgb('.$gs->getAccountCommentColor($action["accountID"]).')">'.$resultRole.'</div>';
-		}
-	}
-	$registerDate = date("d.m.Y", $action["registerDate"]);
-	$table .= "<tr><th scope='row'>".$x."</th><td>".$username."</td><td>".$accountID."</td><td>".$registerDate."</td><td>".$resultRole."</td><td>".$lastPlayed."</td></tr>";
+  $username = '<form style="margin:0" method="post" action="profile/"><button style="margin:0" class="accbtn" name="accountID" value="'.$action["accountID"].'">'.$action["userName"].'</button></form>';
+  $announcement = $action["comment"];
+	$time = date("d.m.Y", $action["timestamp"]);
+  $likes = $action["likes"];
+	$table .= "<tr><th scope='row'>".$x."</th><td>".$username."</td><td>".$announcement."</td><td>".$time."</td><td>".$likes."</td></tr>";
 	$x++;
 }
 $table .= '</table><form method="get" class="form__inner">
@@ -106,8 +72,8 @@ $table .= '</table><form method="get" class="form__inner">
 	bottom row
 */
 //getting count
-if(empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM accounts WHERE isActive = 1 ");
-else $query = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' AND isActive = 1");
+if(empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM announcements");
+else $query = $db->prepare("SELECT count(*) FROM announcements WHERE userName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'");
 $query->execute();
 $packcount = $query->fetchColumn();
 $pagecount = ceil($packcount / 10);
