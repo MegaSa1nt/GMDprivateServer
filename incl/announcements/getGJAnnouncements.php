@@ -9,16 +9,16 @@ $commentstring = "";
 $accountid = ExploitPatch::remove($_POST["accountID"]);
 $page = ExploitPatch::remove($_POST["page"]);
 $commentpage = $page*10;
-$userID = $gs->getUserID($accountid);
-$query = "SELECT comment, userID, likes, isSpam, commentID, timestamp FROM announcements WHERE userID = :userID ORDER BY timestamp DESC LIMIT 10 OFFSET $commentpage";
+$userID = -1;
+$query = "SELECT comment, userID, likes, isSpam, commentID, timestamp FROM announcements WHERE userID = -1 ORDER BY timestamp DESC LIMIT 10 OFFSET $commentpage";
 $query = $db->prepare($query);
-$query->execute([':userID' => $userID]);
+$query->execute([':userID' => -1]);
 $result = $query->fetchAll();
 if($query->rowCount() == 0){
 	exit("#0:0:0");
 }
 $countquery = $db->prepare("SELECT count(*) FROM announcements WHERE userID = :userID");
-$countquery->execute([':userID' => $userID]);
+$countquery->execute([':userID' => -1]);
 $commentcount = $countquery->fetchColumn();
 foreach($result as &$comment1) {
 	if($comment1["commentID"]!=""){
