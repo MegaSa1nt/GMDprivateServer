@@ -19,6 +19,7 @@ $string["cronError"] = "Error!";
 
 $string["announcements"] = "Announcements";
 $string["announcement"] = "Announcement";
+$string["createAnnouncement"] = "Create Announcement";
 $string["announcementID"] = "Announcement ID";
 $string["likes"] = "Likes";
 
