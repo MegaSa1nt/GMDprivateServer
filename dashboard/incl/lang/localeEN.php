@@ -21,6 +21,8 @@ $string["announcements"] = "Announcements";
 $string["announcement"] = "Announcement";
 $string["createAnnouncement"] = "Create Announcement";
 $string["announcementID"] = "Announcement ID";
+$string["enterAnnouncement"] = "Enter announcement";
+$string["post"] = "Post";
 $string["likes"] = "Likes";
 
 $string["profile"] = "Profile";

@@ -12,9 +12,31 @@ $dl->title($dl->getLocalizedString("announcements"));
 $dl->printFooter('../');
 if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0 AND $gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
 	$dl->printSong("<div class='form'>
-  <h1>".$dl->getLocalizedString("announcements")."</h1>
+  <h1>".$dl->getLocalizedString("announcements").'</h1>
   <p>Not finished yet.</p>
-</div>");
+  <form class="field" action="" method="post">
+    <div class="form-group">
+      <input type="text" class="form-control login-input" id="p1" name="announcement" placeholder="'.$dl->getLocalizedString("enterAnnouncement").'">
+    </div>
+    <button type="submit" class="btn-primary btn-block" id="post" disabled>'.$dl->getLocalizedString("post").'</button>
+  </form>
+  <script>
+    $(document).on("keyup keypress change keydown",function(){
+      const p1 = document.getElementById("announcement");
+      const btn = document.getElementById("post");
+      if(!p1.value.trim().length) {
+                    btn.disabled = true;
+                    btn.classList.add("btn-block");
+                    btn.classList.remove("btn-primary");
+      } else {
+                btn.removeAttribute("disabled");
+                    btn.classList.remove("btn-block");
+                    btn.classList.remove("btn-size");
+                    btn.classList.add("btn-primary");
+      }
+    });
+  </script>
+</div>');
 } else {
 	$dl->printSong('<div class="form">
     <h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
