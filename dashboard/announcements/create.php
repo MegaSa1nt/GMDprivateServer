@@ -18,8 +18,13 @@ if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0 AND $gs->checkP
     $timestamp = time();
     $db->query("INSERT INTO `announcements` (`userID`, `userName`, `comment`, `timestamp`) VALUES (".$userID.", '".$userName."', '".$announcement."', '".$timestamp."')");
     header('Location: ../');
-    $dl->printSong('h1>'.$dl->getLocalizedString("announcements").'</h1>
-    <p>'.$dl->getLocalizedString("announcementPosted").'<button type="submit" class="btn-primary" >'.$dl->getLocalizedString("postAnother").'</button></p>');
+    $dl->printSong('<div class="form">
+    <h1>'.$dl->getLocalizedString("createAnnouncement").'</h1>
+    <form class="form__inner" method="post" action=".">
+		<p>'.$dl->getLocalizedString("announcementPosted").'</p>
+	        <button type="submit" class="btn-primary">'.$dl->getLocalizedString("postAnother").'</button>
+    </form>
+</div>', 'mod');
   } else {
     $dl->printSong("<div class='form'>
     <h1>".$dl->getLocalizedString("announcements").'</h1>
