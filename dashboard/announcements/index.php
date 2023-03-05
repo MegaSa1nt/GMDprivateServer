@@ -23,7 +23,7 @@ if(!isset($_GET["type"])) $_GET["type"] = "";
 if(!isset($_GET["ng"])) $_GET["ng"] = "";
 $srcbtn = "";
 if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::remove($_GET["search"])))) {
-	$query = $db->prepare("SELECT * FROM announcements ORDER BY commentID ASC LIMIT 10 OFFSET $page");
+	$query = $db->prepare("SELECT * FROM announcements ORDER BY 0 - commentID ASC LIMIT 10 OFFSET $page");
 	$query->execute();
 	$result = $query->fetchAll();
 	if(empty($result)) {
@@ -52,14 +52,15 @@ if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::remove($_GET["search"])))
 		die();
 	} 
 }
-$x = $page + 1;
+$packcount = $query->fetchColumn();
+$x = $packcount - $page;
 foreach($result as &$action){
   $username = '<form style="margin:0" method="post" action="profile/"><button style="margin:0" class="accbtn" name="accountID" value="'.$action["accountID"].'">'.$action["userName"].'</button></form>';
   $announcement = $action["comment"];
 	$time = $dl->convertToDate($action["timestamp"]);
   $likes = $action["likes"];
 	$table .= "<tr><th scope='row'>".$x."</th><td>".$username."</td><td>".$announcement."</td><td>".$time."</td><td>".$likes."</td></tr>";
-	$x++;
+	$x--;
 }
 $table .= '</table><form method="get" class="form__inner">
 	<div class="field" style="display:flex">
@@ -75,7 +76,6 @@ $table .= '</table><form method="get" class="form__inner">
 if(empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM announcements");
 else $query = $db->prepare("SELECT count(*) FROM announcements WHERE userName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'");
 $query->execute();
-$packcount = $query->fetchColumn();
 $pagecount = ceil($packcount / 10);
 $bottomrow = $dl->generateBottomRow($pagecount, $actualpage);
 $dl->printPage($table . $bottomrow, true, "browse");
