@@ -20,15 +20,14 @@ if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0 AND $gs->checkP
     header('Location: ../');
     $dl->printSong('<div class="form">
     <h1>'.$dl->getLocalizedString("createAnnouncement").'</h1>
-    <form class="form__inner" method="post" action=".">
+    <form class="form__inner" method="post" action="">
 		<p>'.$dl->getLocalizedString("announcementPosted").'</p>
-	        <button type="submit" class="btn-primary">'.$dl->getLocalizedString("postAnother").'</button>
+	        <button type="submit" class="btn-song">'.$dl->getLocalizedString("postAnother").'</button>
     </form>
-</div>', 'mod');
+</div>', 'announcements/create.php');
   } else {
     $dl->printSong("<div class='form'>
     <h1>".$dl->getLocalizedString("announcements").'</h1>
-    <p>Not finished yet.</p>
     <form class="field" action="" method="post">
       <div class="form-group">
         <input type="text" class="form-control login-input" id="announcement" name="announcement" placeholder="'.$dl->getLocalizedString("enterAnnouncement").'">
