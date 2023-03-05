@@ -16,7 +16,7 @@ if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0 AND $gs->checkP
   <p>Not finished yet.</p>
   <form class="field" action="" method="post">
     <div class="form-group">
-      <input type="text" class="form-control login-input" id="p1" name="announcement" placeholder="'.$dl->getLocalizedString("enterAnnouncement").'">
+      <input type="text" class="form-control login-input" id="announcement" name="announcement" placeholder="'.$dl->getLocalizedString("enterAnnouncement").'">
     </div>
     <button type="submit" class="btn-primary btn-block" id="post" disabled>'.$dl->getLocalizedString("post").'</button>
   </form>
