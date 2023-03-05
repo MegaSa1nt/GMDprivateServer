@@ -371,6 +371,8 @@ $string["suggestFeatured"] = "Featured?";
 $string["whoAdded"] = "Who added?";
 //modActionsList
 $string["banDesc"] = "Here you can ban a player from leaderboard!";
+$string["playerTop"] = 'Top of players';
+$string["creatorTop"] = 'Top of creators';
 
 $string["admin"] = "Administrator";
 $string["elder"] = "Elder moderator";

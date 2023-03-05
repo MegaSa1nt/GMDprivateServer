@@ -361,6 +361,8 @@ $string["suggestFeatured"] = "Featured?";
 $string["whoAdded"] = "Хто додав?";
 //modActionsList
 $string["banDesc"] = "Тут ви можете заблокувати користувача з лідерборду!";
+$string["playerTop"] = 'Топ игроков';
+$string["creatorTop"] = 'Топ строителей';
 
 $string["admin"] = "Адміністратор";
 $string["elder"] = "Старший модератор";

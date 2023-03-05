@@ -361,6 +361,8 @@ $string["suggestFeatured"] = "En vedette?";
 $string["whoAdded"] = "Qui l'a ajouté?";
 //modActionsList
 $string["banDesc"] = "Ici vous pouvez bannir un joueur du classement!";
+$string["playerTop"] = 'Top of players';
+$string["creatorTop"] = 'Top of creators';
 
 $string["admin"] = "Administrateur";
 $string["elder"] = "Ancien Modérateur";

@@ -360,6 +360,8 @@ $string["suggestFeatured"] = "Tavsiye et?";
 $string["whoAdded"] = "Kim ekledi?";
 //modActionsList
 $string["banDesc"] = "Burada bir kullanıcıyı sıralamadan yasaklayabilirsin!";
+$string["playerTop"] = 'Top of players';
+$string["creatorTop"] = 'Top of creators';
 
 $string["admin"] = "Yönetici";
 $string["elder"] = "Büyük moderatör";
