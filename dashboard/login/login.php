@@ -11,9 +11,6 @@ $gs = new mainLib();
 if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0){
 	header('Location: ../');
 	exit();
-} else {
-	header('Location: ../');
-	exit();
 }
 if(isset($_POST["userName"]) AND isset($_POST["password"])){
 	$userName = $_POST["userName"];
