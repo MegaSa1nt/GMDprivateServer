@@ -248,6 +248,8 @@ class dashboardLib {
 							echo '<button onclick="a(\'levels/shareCP.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-share" aria-hidden="false"></i></div>'.$this->getLocalizedString("shareCPTitle").'</button>';}
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardForceChangePassNick")) {
 							echo '<button onclick="a(\'account/forceChange.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-gavel" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("changePassOrNick").'   </button>';}
+							if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
+							echo '<button onclick="a(\'announcements/create.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-bullhorn" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("createAnnouncement").'   </button>';}
 							echo '</div>
 					</li>';
 			}
