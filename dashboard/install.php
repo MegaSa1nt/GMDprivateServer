@@ -87,20 +87,19 @@ if(!$installed) {
 			) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$check = $db->query("SHOW TABLES LIKE 'announcements'");
       	$exist = $check->fetchAll();
-      	if(empty($exist)) { $db->query("CREATE TABLE `announcements` (
+      	if(empty($exist)) $db->query("CREATE TABLE `announcements` (
 		 `userID` int(11) NOT NULL,
-		 `userName` varchar(50) NOT NULL,
-		 `comment` longtext NOT NULL,
-		 `secret` varchar(10) NOT NULL DEFAULT 'unused',
+		 `userName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+		 `comment` longtext COLLATE utf8_unicode_ci NOT NULL,
+		 `secret` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'unused',
 		 `commentID` int(11) NOT NULL AUTO_INCREMENT,
 		 `timestamp` int(11) NOT NULL,
 		 `likes` int(11) NOT NULL DEFAULT '0',
-		 `isSpam` int(11) NOT NULL DEFAULT '0',
-		 PRIMARY KEY (`commentID`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"); 
-		$db->query("ALTER TABLE `announcements` ADD INDEX(`userID`)");
-		$db->query("ALTER TABLE `announcements` ADD INDEX(`timestamp`)");
-		}
+		 `picture` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		 PRIMARY KEY (`commentID`),
+		 KEY `userID` (`userID`),
+		 KEY `timestamp` (`timestamp`)
+		) ENGINE=InnoDB AUTO_INCREMENT DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
 	$check = $db->query("SHOW TABLES LIKE 'favsongs'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("CREATE TABLE `favsongs` (
