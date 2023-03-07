@@ -101,6 +101,15 @@ if(!$installed) {
 		$db->query("ALTER TABLE `announcements` ADD INDEX(`userID`)");
 		$db->query("ALTER TABLE `announcements` ADD INDEX(`timestamp`)");
 		}
+	$check = $db->query("SHOW TABLES LIKE 'favsongs'");
+      		$exist = $check->fetchAll();
+      		if(empty($exist)) $db->query("CREATE TABLE `favsongs` (
+			 `ID` int(20) NOT NULL AUTO_INCREMENT,
+			 `songID` int(20) NOT NULL DEFAULT '0',
+			 `accountID` int(20) NOT NULL DEFAULT '0',
+			 `timestamp` int(20) NOT NULL DEFAULT '0',
+			 PRIMARY KEY (`ID`)
+			) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);
