@@ -123,7 +123,7 @@ class dashboardLib {
 			Captcha::displayCaptcha('no');
 			echo "</div>";
 		}
-		$homeActive = $accountActive = $browseActive = $modActive = $reuploadActive = $statsActive = $announcementsActive = $msgActive = $profileActive = "";
+		$homeActive = $accountActive = $browseActive = $modActive = $reuploadActive = $statsActive = $msgActive = $profileActive = "";
 		switch($active){
 			case "home":
 				$homeActive = "active tooactive";
@@ -142,9 +142,6 @@ class dashboardLib {
 				break;
 			case "stats":
 				$statsActive = "active tooactive";
-				break;
-			case "announcements":
-				$announcementsActive = "active tooactive";
 				break;
            	case "msg":
 				$msgActive = "active tooactive";
@@ -255,8 +252,6 @@ class dashboardLib {
 							echo '<button onclick="a(\'levels/shareCP.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-share" aria-hidden="false"></i></div>'.$this->getLocalizedString("shareCPTitle").'</button>';}
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardForceChangePassNick")) {
 							echo '<button onclick="a(\'account/forceChange.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-gavel" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("changePassOrNick").'   </button>';}
-							if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
-							echo '<button onclick="a(\'announcements/create.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-bullhorn" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("createAnnouncement").'   </button>';}
 							echo '</div>
 					</li>';
 			}
@@ -292,10 +287,6 @@ class dashboardLib {
 						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'messenger\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
 							<i class="fa-solid fa-comments" aria-hidden="true"></i> '.$this->getLocalizedString("messenger").'</button>'.$new;
                     }
-					echo '<li class="nav-item dropdown">
-						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'announcements\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
-							<i class="fa-solid fa-bullhorn" aria-hidden="true"></i> '.$this->getLocalizedString("announcements").'</button>'.$new;
-					
       				echo '
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -439,6 +430,7 @@ $(document).change(function(){
 			pg.open(method, page + sendget, true);
 			pg.responseType = "document";
 			htmlpage = document.querySelector("#htmlpage");
+			navbar = document.querySelector("#navbarepta");
 			htmtitle = document.querySelectorAll("title")[0];
 			pg.onload = function (){
 				if(pg.response.getElementById("htmlpage") != null) {
@@ -446,6 +438,7 @@ $(document).change(function(){
 					title = pg.response.querySelectorAll("title")[0];
 					scripts = pg.response.querySelectorAll("body script");
 					scripts = scripts[scripts.length-1];
+					newnavbar = pg.response.querySelector("#navbarepta");
 					if((typeof document.querySelectorAll("div.playing")[0] != "undefined" && typeof htmlpage.querySelectorAll("div.playing")[0] != "undefined") && pg.response.getElementById(document.querySelectorAll("div.playing")[0].id) != null) {
 						audiopls = document.querySelectorAll("div.playing")[0];
 						if(typeof pg.response.getElementById(audiopls.id) != "undefined" && pg.response.getElementById(audiopls.id) != null) song = pg.response.getElementById(audiopls.id);
@@ -469,6 +462,7 @@ $(document).change(function(){
 					}
 					child = pg.response.querySelector("#htmlpage");
 					htmlpage.replaceWith(child);
+					navbar.replaceWith(newnavbar);
 					if(typeof song != "undefined" && song != null) {
 						deleteDuplicates = $("#"+song.id+".audio").not(".playing");
 						for(var i=0; i<deleteDuplicates.length; i++) deleteDuplicates[i].remove();
@@ -502,8 +496,9 @@ $(document).change(function(){
 						document.body.appendChild(base2);
 					}
 					if(typeof coolcaptcha != "undefined") { 
-						coolcaptcha.replaceWith(cptch);
-						document.getElementsByClassName("h-captcha")[0].style.display = "block";
+						if(cptch == null) coolcaptcha.replaceWith(captch);
+						else coolcaptcha.replaceWith(cptch);
+						$(".h-captcha").not("#captchadiv > #verycoolcaptcha")[0].style.display = "block";
 					}
 				} else {
 					document.getElementById("loadingloool").innerHTML = \'<i class="fa-solid fa-xmark" style="color:#ffb1ab;padding: 0px 8px;"></i>\';
@@ -533,6 +528,7 @@ $(document).change(function(){
 		backpage = goback[goback.length-2]+"/"+goback[goback.length-1];
 		a(backpage, true, false, "GET", false, "", true);
 	}, false);
+	setTimeout(function () {captch = cptch.cloneNode(true)}, 1);
 </script>';
 	}
 	public function printPage($content, $isSubdirectory = true, $navbar = "home"){
