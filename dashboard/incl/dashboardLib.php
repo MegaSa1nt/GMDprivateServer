@@ -143,6 +143,9 @@ class dashboardLib {
 			case "stats":
 				$statsActive = "active tooactive";
 				break;
+			case "announcements":
+				$announcementsActive = "active tooactive";
+				break;
            	case "msg":
 				$msgActive = "active tooactive";
 				break;
@@ -252,6 +255,8 @@ class dashboardLib {
 							echo '<button onclick="a(\'levels/shareCP.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-share" aria-hidden="false"></i></div>'.$this->getLocalizedString("shareCPTitle").'</button>';}
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardForceChangePassNick")) {
 							echo '<button onclick="a(\'account/forceChange.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-gavel" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("changePassOrNick").'   </button>';}
+							if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
+							echo '<button onclick="a(\'announcements/create.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-bullhorn" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("createAnnouncement").'   </button>';}
 							echo '</div>
 					</li>';
 			}
@@ -287,6 +292,9 @@ class dashboardLib {
 						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'messenger\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
 							<i class="fa-solid fa-comments" aria-hidden="true"></i> '.$this->getLocalizedString("messenger").'</button>'.$new;
                     }
+					echo '<li class="nav-item dropdown">
+						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'announcements\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
+							<i class="fa-solid fa-bullhorn" aria-hidden="true"></i> '.$this->getLocalizedString("announcements").'</button>'.$new;
       				echo '
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
