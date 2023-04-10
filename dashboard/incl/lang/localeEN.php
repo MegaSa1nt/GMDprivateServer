@@ -278,6 +278,11 @@ $string["status"] = 'Status';
 $string["checkRecord"] = 'Check record';
 $string["record"] = 'Record';
 $string["recordDeleted"] = 'Record was deleted!';
+$string["changeDemon"] = 'Change demon';
+$string["demonDeleted"] = 'Demon was deleted!';
+$string["changedDemon"] = 'You replaced <b>%s</b> to <b>%d</b> place!';
+$string["changeDemonDesc"] = 'Here you can change a demon!<br>
+If you want to delete demon, set place to 0.';
 
 $string["didntActivatedEmail"] = 'You didn\'t activated your account through email!';
 $string["checkMail"] = 'You should check your email...';

@@ -69,7 +69,7 @@ $string["forwindows"] = "Windows";
 $string["forandroid"] = "Android";
 $string["formac"] = "Mac";
 $string["forios"] = "iOS";
-$string["third-party"] = "ÜÇüncü taraf";
+$string["third-party"] = "Üçüncü taraf";
 $string["thanks"] = "Bu insanlara teşekkürler!";
 $string["language"] = "Dil";
 
@@ -267,6 +267,11 @@ $string["status"] = 'Durum';
 $string["checkRecord"] = 'Rekoru kontrol et';
 $string["record"] = 'Rekor';
 $string["recordDeleted"] = 'Rekor silindi!';
+$string["changeDemon"] = 'Change demon';
+$string["demonDeleted"] = 'Demon was deleted!';
+$string["changedDemon"] = 'You replaced <b>%s</b> to <b>%d</b> place!';
+$string["changeDemonDesc"] = 'Here you can change a demon!<br>
+If you want to delete demon, set place to 0.';
 
 $string["didntActivatedEmail"] = 'Hesabını e-posta üzerinden aktive etmedin!';
 $string["checkMail"] = 'E-postanı kontrol etmelisin...';

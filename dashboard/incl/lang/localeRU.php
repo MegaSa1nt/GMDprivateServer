@@ -268,6 +268,11 @@ $string["status"] = 'Статус';
 $string["checkRecord"] = 'Проверить рекорд';
 $string["record"] = 'Рекорд';
 $string["recordDeleted"] = 'Рекорд был удалён!';
+$string["changeDemon"] = 'Изменить демон';
+$string["demonDeleted"] = 'Демон был удалён!';
+$string["changedDemon"] = 'Вы переставили <b>%s</b> на <b>%d</b> место!';
+$string["changeDemonDesc"] = 'Здесь вы можете изменить демон в демонлисте!<br>
+Если вы хотите удалить демон, укажите 0 место.';
 
 $string["didntActivatedEmail"] = 'Вы не подтвердили вашу почту!';
 $string["checkMail"] = 'Вам следует проверить ваш почтовый ящик...';
