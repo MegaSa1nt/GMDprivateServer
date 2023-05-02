@@ -12,6 +12,22 @@ $string["tipsAfterInstalling"] = "Kontrol paneline hoş geldin! Kurulumdan sonra
 1. SQL içerisinde 'roles' tablosunda yeni izinler belirmiş gibi gözüküyor! Bunlara baksan çok iyi olur...<br>
 2. 'dashboard' klasörüne 'icon.png' koyarsan, ikonun en sol köşede belirir!<br>
 3. config/dashboard.php dosyanısı configüre et!";
+$string["wwygdt"] = "Bugün ne yapacaksın?";
+$string["game"] = "Oyun";
+$string["guest"] = "ziyaterçi";
+$string["account"] = "Hesap";
+$string["levelsOptDesc"] = "Seviye listesini göster";
+$string["songsOptDesc"] = "Şarkı listesini göster";
+$string["yourClanOptDesc"] = "\"%s\" klanını göster";
+$string["clanOptDesc"] = "Klan listesini göster";
+$string["yourProfile"] = "Profilin";
+$string["profileOptDesc"] = "Profilini göster";
+$string["messengerOptDesc"] ="Messenger'ı aç";
+$string["addSongOptDesc"] = "Sunucuya şarkı ekle";
+$string["loginOptDesc"] = "Hesapa giriş yap";
+$string["createAcc"] = "Hesap oluştur";
+$string["registerOptDesc"] = "%s sunucusuna kayıt ol";
+$string["downloadOptDesc"] = "%s için indir";
 
 $string["tryCron"] = "Cron çalıştır";
 $string["cronSuccess"] = "Başarılı!";
@@ -84,6 +100,7 @@ $string["loginAlready"] = "Zaten giriş yaptın!";
 $string["clickHere"] = "Dashboard";
 $string["enterUsername"] = "Kullanıcı adı gir";
 $string["enterPassword"] = "Şifre gir";
+$string["loginDesc"] = "Burada hesabına giriş yapabilirsin!";
 
 $string["register"] = "Kayıt ol";
 $string["registerAcc"] = "Hesap kaydı";
