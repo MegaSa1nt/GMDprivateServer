@@ -150,9 +150,6 @@ class dashboardLib {
 			case "stats":
 				$statsActive = "active tooactive";
 				break;
-			case "announcements":
-				$announcementsActive = "active tooactive";
-				break;
            	case "msg":
 				$msgActive = "active tooactive";
 				break;
@@ -261,9 +258,7 @@ class dashboardLib {
 							if($gs->checkPermission($_SESSION["accountID"], "commandSharecpAll")) {
 							echo '<a type="button" href="levels/shareCP.php" onclick="a(\'levels/shareCP.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-share" aria-hidden="false"></i></div>'.$this->getLocalizedString("shareCPTitle").'</a>';}
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardForceChangePassNick")) {
-              echo '<a type="button" href="account/forceChange.php" onclick="a(\'account/forceChange.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-gavel" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("changePassOrNick").'   </a>';}
-							if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
-							echo '<button onclick="a(\'announcements/create.php\')"class="dropdown-item" href=""><div class="icon"><i class="fa-solid fa-bullhorn" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("createAnnouncement").'   </button>';}
+							echo '<a type="button" href="account/forceChange.php" onclick="a(\'account/forceChange.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-gavel" aria-hidden="false"></i></i></div>'.$this->getLocalizedString("changePassOrNick").'   </a>';}
 							echo '</div>
 					</li>';
 			}
@@ -299,9 +294,6 @@ class dashboardLib {
 						<div style="display:flex"><a type="button" href="messenger" style="background: none;border: none;" onclick="a(\'messenger\')"class="nav-link '.$msgActive.'" id="navbarDropdownMenuLink">
 							<i class="fa-solid fa-comments" aria-hidden="true"></i> '.$this->getLocalizedString("messenger").'</a>'.$new;
                     }
-					echo '<li class="nav-item dropdown">
-						<div style="display:flex"><button style="background: none;border: none;" onclick="a(\'announcements\')"class="nav-link '.$msgActive.'" href="" id="navbarDropdownMenuLink">
-							<i class="fa-solid fa-bullhorn" aria-hidden="true"></i> '.$this->getLocalizedString("announcements").'</button>'.$new;
       				echo '
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

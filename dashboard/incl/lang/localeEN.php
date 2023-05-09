@@ -33,17 +33,6 @@ $string["tryCron"] = "Run Cron";
 $string["cronSuccess"] = "Success!";
 $string["cronError"] = "Error!";
 
-$string["announcements"] = "Announcements";
-$string["announcement"] = "Announcement";
-$string["viewAnnouncements"] = "View Announcements";
-$string["announcementPosted"] = "Announcement posted.";
-$string["postAnother"] = "Post another?";
-$string["createAnnouncement"] = "Create Announcement";
-$string["announcementID"] = "Announcement ID";
-$string["enterAnnouncement"] = "Enter announcement";
-$string["post"] = "Post";
-$string["likes"] = "Likes";
-
 $string["profile"] = "Profile";
 $string["empty"] = "Empty...";
 $string["writeSomething"] = "Write something!";  
