@@ -7,14 +7,15 @@ if(!$installed) {
 	$server  = strtok($info['version_comment']," ");
   	$ver = $info['version'];
   	if($server == 'MariaDB' AND $ver > 10) {
-      $db->query("ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools;
-      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardAddMod INT NOT NULL DEFAULT '0' AFTER dashboardLevelPackCreate;
-      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardAddMod;
-      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardForceChangePassNick INT NOT NULL DEFAULT '0' AFTER dashboardManageSongs;
+      $db->query("ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools; 
+      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardAddMod INT NOT NULL DEFAULT '0' AFTER dashboardLevelPackCreate; 
+      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardAddMod; 
+      ALTER TABLE roles ADD COLUMN IF NOT EXISTS dashboardForceChangePassNick INT NOT NULL DEFAULT '0' AFTER dashboardManageSongs; 
+      
+      ALTER TABLE songs ADD COLUMN IF NOT EXISTS reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime; 
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS banReason varchar(255) NOT NULL DEFAULT 'none' AFTER isCreatorBanned;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS actionCreateAnnouncement INT NOT NULL DEFAULT '0' AFTER actionDeleteComment;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS actionDeleteAnnouncement INT NOT NULL DEFAULT '0' AFTER actionCreateAnnouncement;
-      ALTER TABLE songs ADD COLUMN IF NOT EXISTS reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime;
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS banReason varchar(255) NOT NULL DEFAULT 'none' AFTER isCreatorBanned;
 	  ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth varchar(16) NOT NULL DEFAULT 'none' AFTER isActive;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS demonlistAdd INT NOT NULL DEFAULT '0' AFTER dashboardForceChangePassNick;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS demonlistApprove INT NOT NULL DEFAULT '0' AFTER demonlistAdd;
@@ -48,12 +49,6 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistApprove'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD demonlistApprove INT NOT NULL DEFAULT '0' AFTER demonlistAdd");
-		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'actionCreateAnnouncement'");
-      		$exist = $check->fetchAll();
-      		if(empty($exist)) $db->query("ALTER TABLE roles ADD actionCreateAnnouncement INT NOT NULL DEFAULT '0' AFTER actionDeleteComment");
-		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'actionDeleteAnnouncement'");
-      		$exist = $check->fetchAll();
-      		if(empty($exist)) $db->query("ALTER TABLE roles ADD actionDeleteAnnouncement INT NOT NULL DEFAULT '0' AFTER actionCreateAnnouncement");
 		$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'clan'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE users ADD clan INT NOT NULL DEFAULT '0' AFTER userName");
@@ -94,20 +89,20 @@ if(!$installed) {
 			 PRIMARY KEY (`ID`)
 			) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$check = $db->query("SHOW TABLES LIKE 'announcements'");
-      	$exist = $check->fetchAll();
-      	if(empty($exist)) $db->query("CREATE TABLE `announcements` (
-		 `userID` int(11) NOT NULL,
-		 `userName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-		 `comment` longtext COLLATE utf8_unicode_ci NOT NULL,
-		 `secret` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'unused',
-		 `commentID` int(11) NOT NULL AUTO_INCREMENT,
-		 `timestamp` int(11) NOT NULL,
-		 `likes` int(11) NOT NULL DEFAULT '0',
-		 `picture` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-		 PRIMARY KEY (`commentID`),
-		 KEY `userID` (`userID`),
-		 KEY `timestamp` (`timestamp`)
-		) ENGINE=InnoDB AUTO_INCREMENT DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      		$exist = $check->fetchAll();
+      		if(empty($exist)) $db->query("CREATE TABLE `announcements` (
+			 `commentID` int(11) NOT NULL AUTO_INCREMENT,
+			 `userID` int(11) NOT NULL,
+			 `userName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+			 `comment` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+			 `secret` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'unused',
+			 `timestamp` int(11) NOT NULL,
+			 `likes` int(11) NOT NULL DEFAULT '0',
+			 `picture` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+			 KEY `userID` (`userID`),
+			 PRIMARY KEY (`commentID`),
+			 KEY `timestamp` (`timestamp`)
+			) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$check = $db->query("SHOW TABLES LIKE 'favsongs'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("CREATE TABLE `favsongs` (
