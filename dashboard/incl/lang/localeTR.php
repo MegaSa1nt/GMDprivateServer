@@ -527,5 +527,9 @@ $string["noPermission"] = "İznin yok!";
 $string["noLogin?"] = "Hesabına giriş yapmadın!";
 $string["LoginBtn"] = "Hesaba giriş yap";
 $string["dashboard"] = "Dashboard";
+
+//announcements
+$string["announcements"] = "Duyurular";
+
 //errors
 $string["errorNoAccWithPerm"] = "HATA: '%s' izni hiçbir hesapta bulunamadı.";

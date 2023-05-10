@@ -528,5 +528,9 @@ $string["noPermission"] = "Vous n'avez pas la permission!";
 $string["noLogin?"] = "Vous n'êtes pas connecté à votre compte!";
 $string["LoginBtn"] = "Se connecter au compte";
 $string["dashboard"] = "Tableau de bord";
+
+//announcements
+$string["announcements"] = "annonces";
+
 //errors
 $string["errorNoAccWithPerm"] = "Erreur: Aucun compte avec la permission '%s' a été trouvé";

@@ -89,5 +89,9 @@ $string["modAction12"] = "Des/publicou";
 $string["modAction13"] = "Mudou a descrição do nível";
 $string["modAction14"] = "Des/abilitou LDM";
 $string["modAction15"] = "Des/banido do ranking";
+
+//announcements
+$string["announcements"] = "Anúncios";
+
 //errors
 $string["errorNoAccWithPerm"] = "Erro: Nenhuma conta com a permissão '%s' foi encontrada";

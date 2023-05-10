@@ -89,5 +89,9 @@ $string["modAction12"] = "Des/Publicado";
 $string["modAction13"] = "Cambió la descripción del nivel";
 $string["modAction14"] = "Activó/Desactivó la opción LDM";
 $string["modAction15"] = "Des/baneado de las tablas de clasificación";
+
+//announcements
+$string["announcements"] = "Advisos";
+
 //errors
 $string["errorNoAccWithPerm"] = "Error: ninguna cuenta se ha encontrado con el permiso '%s'";

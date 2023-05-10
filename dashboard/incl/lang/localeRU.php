@@ -527,5 +527,9 @@ $string["noPermission"] = "У вас нет прав!";
 $string["noLogin?"] = "Вы не вошли в аккаунт!";
 $string["LoginBtn"] = "Войти в аккаунт";
 $string["dashboard"] = "Панель сервера";
+
+//announcements
+$string["announcements"] = "анонсы";
+
 //errors
 $string["errorNoAccWithPerm"] = "Ошибка: аккаунтов с правом '%s' не было найдено";

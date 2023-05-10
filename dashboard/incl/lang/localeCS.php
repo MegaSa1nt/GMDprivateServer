@@ -90,5 +90,9 @@ $string["modAction13"] = "Změna popisu levelu";
 $string["modAction14"] = "Zapnutí/vypnutí LDM";
 $string["modAction15"] = "Leaderboard ban";
 $string["modAction16"] = "Změna ID songu";
+
+//announcements
+$string["announcements"] = "Oznámení";
+
 //errors
 $string["errorNoAccWithPerm"] = "Chyba: Žádné účty s oprávněním '%s' nebyly nalezeny";

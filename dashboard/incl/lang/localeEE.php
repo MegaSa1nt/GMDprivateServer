@@ -89,5 +89,9 @@ $string["modAction12"] = "Mitte/Avaldas";
 $string["modAction13"] = "Vahetas leveli kirjeldust";
 $string["modAction14"] = "Lubas/Keelas LDM'i";
 $string["modAction15"] = "Edetabel Mitte unbannitud/bannitud";
+
+//announcements
+$string["announcements"] = "Teadaanded";
+
 //errors
 $string["errorNoAccWithPerm"] = "Error: Mitte ühtegi kontot' %s' lubadega on leitud.";

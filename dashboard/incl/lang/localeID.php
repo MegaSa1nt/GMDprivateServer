@@ -81,5 +81,9 @@ $string["modAction12"] = "Mengganti visibilitas level";
 $string["modAction13"] = "Mengganti deskripsi level";
 $string["modAction14"] = "Menambah/Menghapus LDM";
 $string["modAction15"] = "Menetapkan/Mencabut Tangguhan pada Akun";
+
+//announcements
+$string["announcements"] = "Pengumumans";
+
 //errors
 $string["errorNoAccWithPerm"] = "Error: Tidak ada akun yang mempunyai izin '%s'.";

@@ -89,5 +89,9 @@ $string["modAction12"] = "Un/published";
 $string["modAction13"] = "Changed level description";
 $string["modAction14"] = "Enabled/disabled LDM";
 $string["modAction15"] = "Leaderboard un/banned";
+
+//announcements
+$string["announcements"] = "Sciigoj";
+
 //errors
 $string["errorNoAccWithPerm"] = "Error: No accounts with the '%s' permission have been found";
