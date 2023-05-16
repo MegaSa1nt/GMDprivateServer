@@ -174,6 +174,7 @@ class dashboardLib {
 							<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> '.$this->getLocalizedString("browse").'
 						</a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+							<a type="button" href="announcements" onclick="a(\'announcements\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-bullhorn" style="margin-top: 1px;"></i></div>'.$this->getLocalizedString("announcements").'</a>
 							<a type="button" href="stats/accountsList.php" onclick="a(\'stats/accountsList.php\')" class="dropdown-item"><div class="icon"><i class="fa-solid fa-user" aria-hidden="false"></i></div>'.$this->getLocalizedString("accounts").'</a>
 							<a type="button" href="stats/levelsList.php" onclick="a(\'stats/levelsList.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-gamepad" style="margin-top: 1px;"></i></div>'.$this->getLocalizedString("levels").'</a>
 							<a type="button" href="stats/packTable.php" onclick="a(\'stats/packTable.php\')"class="dropdown-item"><div class="icon"><i class="fa-regular fa-folder-open" aria-hidden="false"></i></div>'.$this->getLocalizedString("packTable").'</a>
@@ -255,6 +256,8 @@ class dashboardLib {
 							echo '<a type="button" href="stats/reportMod.php" onclick="a(\'stats/reportMod.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-exclamation" aria-hidden="false"></i></div>'.$this->getLocalizedString("reportMod").'</a>';
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardAddMod")) {
 							echo '<a type="button" href="account/addMod.php" onclick="a(\'account/addMod.php\')"class="dropdown-item"><i class="fa-solid fa-plus" style="position: absolute;font-size: 10px;margin: 5px 5px 5px -5px;" aria-hidden="false"></i><div class="icon"><i class="fa-solid fa-id-badge" aria-hidden="false"></i></div>'.$this->getLocalizedString("addMod").'</a>';}
+							if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")) {
+							echo '<a type="button" href="announcements/create.php" onclick="a(\'announcements/create.php\')"class="dropdown-item"><i class="fa-solid fa-plus" style="position: absolute;font-size: 10px;margin: 5px 5px 5px -5px;" aria-hidden="false"></i><div class="icon"><i class="fa-solid fa-bullhorn" aria-hidden="false"></i></div>'.$this->getLocalizedString("createAnnouncement").'</a>';}
 							if($gs->checkPermission($_SESSION["accountID"], "commandSharecpAll")) {
 							echo '<a type="button" href="levels/shareCP.php" onclick="a(\'levels/shareCP.php\')"class="dropdown-item"><div class="icon"><i class="fa-solid fa-share" aria-hidden="false"></i></div>'.$this->getLocalizedString("shareCPTitle").'</a>';}
 							if($gs->checkPermission($_SESSION["accountID"], "dashboardForceChangePassNick")) {

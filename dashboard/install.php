@@ -16,6 +16,7 @@ if(!$installed) {
 	  ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth varchar(16) NOT NULL DEFAULT 'none' AFTER isActive;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS demonlistAdd INT NOT NULL DEFAULT '0' AFTER dashboardForceChangePassNick;
 	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS demonlistApprove INT NOT NULL DEFAULT '0' AFTER demonlistAdd;
+	  ALTER TABLE roles ADD COLUMN IF NOT EXISTS announcementCreate INT NOT NULL DEFAULT '0' AFTER demonlistApprove;
 	  ALTER TABLE users ADD COLUMN IF NOT EXISTS clan INT NOT NULL DEFAULT '0' AFTER userName;
 	  ALTER TABLE users ADD COLUMN IF NOT EXISTS joinedAt INT NOT NULL DEFAULT '0' AFTER clan");
 	} else {
