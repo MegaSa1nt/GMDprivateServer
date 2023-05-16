@@ -2,6 +2,9 @@
 include "incl/dashboardLib.php";
 include $dbPath."incl/lib/connection.php";
 include $dbPath."config/dashboard.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if(!$installed) {
 	$info = $db->query("SHOW VARIABLES like '%version%'")->fetchAll(PDO::FETCH_KEY_PAIR);
 	$server  = strtok($info['version_comment']," ");
@@ -116,6 +119,17 @@ if(!$installed) {
 			 `timestamp` int(11) NOT NULL DEFAULT '0',
 			 PRIMARY KEY (`ID`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+	$check = $db->query("SHOW TABLES LIKE 'announcements'");
+      		$exist = $check->fetchAll();
+      		if(empty($exist)) $db->query("CREATE TABLE `announcements` (
+			 `announcementID` int(11) NOT NULL AUTO_INCREMENT,
+			 `announcement` longtext CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT '',
+			 `imageID` int(11) NOT NULL DEFAULT '0',
+			 `authorID` int(11) NOT NULL DEFAULT '0',
+			 `authorName` varchar(50) CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT '',
+			 `timestamp` int(11) NOT NULL DEFAULT '0',
+			 PRIMARY KEY (`announcementID`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);
