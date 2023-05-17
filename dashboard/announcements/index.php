@@ -63,13 +63,13 @@ try {
     $time = date("F j, Y, g:i:s a", $action["timestamp"]);
     header('Content-Type: image/png');
     $image = '../images/'.$action["imageID"].'.png';
-    if(file_exists($image)) $image = '<img src="./images/'.$action["imageID"].'.png"></img>'; else $image = "";
+    if(file_exists($image)) $image = '<img style="position:relative;width:100%;max-width:100;" src="./images/'.$action["imageID"].'.png"></img>'; else $image = "";
     $announcements .= '<div style="width: 100%; height: auto; display: flex;flex-wrap: wrap;justify-content: center;">
     <div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$a.'\', true, true, \'GET\')"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
       <h2 style="margin: 0px;font-size: 27px;margin-left:5px;display: flex;align-items: center;" class="profilenick">'.$authorName.'</h2>
     </div></button></div>
     <div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;"><h2>'.$announcement.'</h2></div>
-    <div style="width: max-content;height: max-content;align-items: center;"><h2>'.$image.'</h2></div>
+    <div style="width: max-content;height: max-content;align-items: center;">'.$image.'</div>
     <div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" style="margin: 0px;width: max-content;"></h3><h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">: <b>'.$time.'</b></h3></div>
   </div></div>';
     $x++;
