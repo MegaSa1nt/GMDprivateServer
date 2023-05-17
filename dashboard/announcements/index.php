@@ -26,7 +26,7 @@ try {
   if(!isset($_GET["ng"])) $_GET["ng"] = "";
   $srcbtn = $announcements = "";
   if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::remove($_GET["search"])))) {
-    $query = $db->prepare("SELECT * FROM announcements ORDER BY announcementID ASC LIMIT 10 OFFSET $page");
+    $query = $db->prepare("SELECT * FROM announcements ORDER BY announcementID DESC LIMIT 10 OFFSET $page");
     $query->execute();
     $result = $query->fetchAll();
     if(empty($result)) {
@@ -41,7 +41,7 @@ try {
     } 
   } else {
     $srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
-    $query = $db->prepare("SELECT * FROM announcements WHERE announcement LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' ORDER BY announcementID ASC LIMIT 10 OFFSET $page");
+    $query = $db->prepare("SELECT * FROM announcements WHERE announcement LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' ORDER BY announcementID DESC LIMIT 10 OFFSET $page");
     $query->execute();
     $result = $query->fetchAll();
     if(empty($result)) {
@@ -63,13 +63,13 @@ try {
     $time = date("F j, Y, g:i:s a", $action["timestamp"]);
     header('Content-Type: image/png');
     $image = '../images/'.$action["imageID"].'.png';
-    if(file_exists($image)) $image = '<img style="position:relative;width:100%;max-width:100;" src="./images/'.$action["imageID"].'.png"></img>'; else $image = "";
+    if(file_exists($image)) $image = '<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;border-radius: 0px;background-color: transparent;border: 0px transparent;"><img style="position:relative;width:100%;max-width:100%;" src="./images/'.$action["imageID"].'.png"></img></div>'; else $image = "";
     $announcements .= '<div style="width: 100%; height: auto; display: flex;flex-wrap: wrap;justify-content: center;">
     <div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$a.'\', true, true, \'GET\')"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
       <h2 style="margin: 0px;font-size: 27px;margin-left:5px;display: flex;align-items: center;" class="profilenick">'.$authorName.'</h2>
     </div></button></div>
     <div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;"><h2>'.$announcement.'</h2></div>
-    <div style="width: max-content;height: max-content;align-items: center;">'.$image.'</div>
+    '.$image.'
     <div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" style="margin: 0px;width: max-content;"></h3><h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">: <b>'.$time.'</b></h3></div>
   </div></div>';
     $x++;
