@@ -70,7 +70,7 @@ try {
     </div></button></div>
     <div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;"><h2>'.$announcement.'</h2></div>
     '.$image.'
-    <div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" style="margin: 0px;width: max-content;"></h3><h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">: <b>'.$time.'</b></h3></div>
+    <div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" style="margin: 0px;width: max-content;"></h3><h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;"><b>'.$time.'</b></h3></div>
   </div></div>';
     $x++;
   }
