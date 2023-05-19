@@ -531,6 +531,12 @@ $string["dashboard"] = "Dashboard";
 //announcements
 $string["announcements"] = "Announcements";
 $string["createAnnouncement"] = "Create Announcement";
+$string["createdAnnouncement"] = "Successfully created announcement!";
+$string["addOneMoreAnnouncement"] = "One more announcement?";
+$string["viewAllAnnouncements"] = "View All Announcements?";
+$string["announcement"] = "Announcement";
+$string["createAnnouncementDesc"] = "Here you can create an announcement!";
+$string["create"] = "Create";
 
 //errors
 $string["errorNoAccWithPerm"] = "Error: No accounts with the '%s' permission have been found";
