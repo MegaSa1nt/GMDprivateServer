@@ -131,6 +131,13 @@ if(!$installed) {
 			 `timestamp` int(11) NOT NULL DEFAULT '0',
 			 PRIMARY KEY (`announcementID`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+	$check = $db->query("SHOW TABLES LIKE 'images'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("CREATE TABLE `images` (
+	   `id` int(11) NOT NULL AUTO_INCREMENT,
+	   `filetype` varchar(5) CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT '',
+	   PRIMARY KEY (`id`)
+	  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

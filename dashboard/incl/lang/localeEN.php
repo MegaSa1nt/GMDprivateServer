@@ -537,6 +537,9 @@ $string["viewAllAnnouncements"] = "View All Announcements?";
 $string["announcement"] = "Announcement";
 $string["createAnnouncementDesc"] = "Here you can create an announcement!";
 $string["create"] = "Create";
+$string["chooseImage"] = "Choose an Image (optional)";
+$string["imageUploadError"] = "Image size is higher than $imageSize megabytes";
+$string["notImageError"] = "File is not an image or isn't supported!";
 
 //errors
 $string["errorNoAccWithPerm"] = "Error: No accounts with the '%s' permission have been found";
