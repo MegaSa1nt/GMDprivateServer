@@ -65,7 +65,7 @@ try {
     $image = '../images/'.$action["imageID"].'.'.$action["imageType"];
     if(file_exists($image)) $image = '<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;border-radius: 0px;background-color: transparent;border: 0px transparent;"><img style="position:relative;width:100%;max-width:100%;" src="./images/'.$action["imageID"].'.png"></img></div>'; else $image = "";
     $announcements .= '<div style="width: 100%; height: auto; display: flex;flex-wrap: wrap;justify-content: center;">
-    <div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$a.'\', true, true, \'GET\')"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
+    <div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><button style="display:contents;cursor:pointer"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
       <h2 style="margin: 0px;font-size: 27px;margin-left:5px;display: flex;align-items: center;" class="profilenick">'.$authorName.'</h2>
     </div></button></div>
     <div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;"><h2>'.$announcement.'</h2></div>

@@ -10,15 +10,12 @@ try {
     include "../".$dbPath."incl/lib/connection.php";
     include "../".$dbPath."incl/lib/exploitPatch.php";
     $ep = new exploitPatch();
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
     $dl->title($dl->getLocalizedString("createAnnouncement"));
     $dl->printFooter('../');
     if($gs->checkPermission($_SESSION["accountID"], "announcementCreate")){
         $accountID = $_SESSION["accountID"];
         $accountName = $gs->getAccountName($accountID);
-        if(!empty($_POST["user"])) {
+        if(!empty($_POST["announcement"])) {
             if(!Captcha::validateCaptcha()) {
                 $dl->printSong('<div class="form">
                     <h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
@@ -40,9 +37,9 @@ try {
             </div>', 'announcement');
             die();
             }
-            $query = db-> prepare("INSERT INTO announcements (announcement, authorID, authorName, timestamp) VALUES (".$announcement.", ".$accountID.", ".$accountName.", ".time().")");
-            $query->execute();
-            $success = $dl->getLocalizedString("createdAnnouncement").' <b>'.$mod."</b>!";
+            $query = $db->prepare("INSERT INTO announcements (announcement, authorID, authorName, timestamp) VALUES (:announce, :aid, :aname, :timest)");
+	        $query->execute([':announce' => $announcement, ':aid' => $accountID,':aname' => $accountName, ':timest'=> time()]);
+            $success = $dl->getLocalizedString("createdAnnouncement");
             $dl->printSong('<div class="form">
             <h1>'.$dl->getLocalizedString("createAnnouncement").'</h1>
             <form class="form__inner" method="post" action="">
@@ -56,14 +53,14 @@ try {
             <h1>'.$dl->getLocalizedString("createAnnouncement").'</h1>
             <form class="form__inner" method="post" action="" enctype="multipart/form-data">
                 <p>'.$dl->getLocalizedString("createAnnouncementDesc").'</p>
-                <div class="field"><input type="text" name="announcement" id="announcement-bar" placeholder="'.$dl->getLocalizedString("announcement").'"></div>', 'announcement');
+                <div class="field"><input type="text" name="announcement" id="announcement" placeholder="'.$dl->getLocalizedString("announcement").'"></div>', 'announcement');
             Captcha::displayCaptcha();
             echo '<button type="button" onclick="a(\'announcements/create.php\', true, false, \'POST\');" style="margin-top:5px;margin-bottom:5px" type="submit" id="submit" class="btn-song btn-block" disabled>'.$dl->getLocalizedString("create").'</button>
             </form>
             </div>
             <script>
             $(document).on("keyup keypress change keydown",function(){
-                const announcebar = document.getElementById("announcement-bar");
+                const announcebar = document.getElementById("announcement");
                 const btn = document.getElementById("submit");
                 if(!announcebar.value.trim().length) {
                              btn.disabled = true;
@@ -77,9 +74,8 @@ try {
                  }
              })</script>';
         }
-
     }
 } catch (Exception $e) {
-    echo "<script>console.log('".$e->getMessage()."')</script>";
+    echo '<script>console.log("'.$e->getMessage().'")</script>';
 }
 ?>
