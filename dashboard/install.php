@@ -50,6 +50,9 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistApprove'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD demonlistApprove INT NOT NULL DEFAULT '0' AFTER demonlistAdd");
+		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'announcementCreate'");
+      		$exist = $check->fetchAll();
+      		if(empty($exist)) $db->query("ALTER TABLE roles ADD announcementCreate INT NOT NULL DEFAULT '0' AFTER demonlistApprove");
 		$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'clan'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE users ADD clan INT NOT NULL DEFAULT '0' AFTER userName");
@@ -125,7 +128,6 @@ if(!$installed) {
 			 `announcementID` int(11) NOT NULL AUTO_INCREMENT,
 			 `announcement` longtext CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT '',
 			 `imageID` int(11) NOT NULL DEFAULT '0',
-			 `imageType` varchar(5) CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT 'png',
 			 `authorID` int(11) NOT NULL DEFAULT '0',
 			 `authorName` varchar(50) CHARACTER SET utf8mb4 collate utf8mb4_general_ci NOT NULL DEFAULT '',
 			 `timestamp` int(11) NOT NULL DEFAULT '0',
