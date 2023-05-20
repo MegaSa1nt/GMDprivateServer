@@ -80,7 +80,7 @@ try {
   <div class="form-control new-form-control">
       '.$announcements.'
     </div></div><form name="searchform" class="form__inner">
-    <div class="field" style="display:flex">
+    <div class="field" style="display:flex;width:50%;max-width:50%;">
       <input id="searchinput" style="border-top-right-radius: 0;border-bottom-right-radius: 0;" type="text" name="search" value="'.$_GET["search"].'" placeholder="'.$dl->getLocalizedString("search").'">
       <button id="searchbutton" type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\', 69)" style="width: 6%;border-top-left-radius:0px !important;border-bottom-left-radius:0px !important" type="submit" class="btn-primary" title="'.$dl->getLocalizedString("search").'"><i class="fa-solid fa-magnifying-glass"></i></button>
       '.$srcbtn.'
