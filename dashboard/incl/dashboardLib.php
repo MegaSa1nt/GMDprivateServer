@@ -17,7 +17,7 @@ class dashboardLib {
 						<meta charset="utf-8">
 						<meta name="color-scheme" content="dark">
 						<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit="no">';
-          	if($isSubdirectory) echo '<base href="../">';
+          	if($isSubdirectory) echo '<base href="../">'; else echo '<base href=".">';
 				echo '<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
                           <script src="https://kit.fontawesome.com/10e18026cb.js" crossorigin="anonymous"></script>
                           <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
@@ -124,12 +124,37 @@ class dashboardLib {
 		include_once __DIR__."/../".$dbPath."config/security.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
       	include __DIR__."/../".$dbPath."incl/lib/connection.php";
+		if($enableCaptcha) switch($captchaType) {
+      	    case 1:
+      	        $captchaUsed = 'hcaptcha';
+      	        $captchaScript = 'if(typeof hcaptcha != "object") {
+    						cptscr = document.createElement("script");
+    						cptscr.id = "captchascript";
+    						cptscr.setAttribute("src", captchascript.getAttribute("src"));
+    						document.body.append(cptscr);
+						} else setTimeout(function () {hcaptcha.render("coolcaptcha")}, 1000);';
+      	        break;
+      	    case 2:
+      	        $captchaUsed = 'grecaptcha';
+      	        $captchaScript = 'if(typeof grecaptcha != "object") {
+    						cptscr = document.createElement("script");
+    						cptscr.id = "captchascript";
+    						cptscr.setAttribute("src", captchascript.getAttribute("src"));
+    						document.body.append(cptscr);
+						} else setTimeout(function () {grecaptcha.render("coolcaptcha")}, 1000);';
+      	        break;
+      	    case 3:
+      	        $captchaUsed = 'turnstile';
+      	        $captchaScript = 'if(typeof turnstile != "object") {
+    						cptscr = document.createElement("script");
+    						cptscr.id = "captchascript";
+    						cptscr.setAttribute("src", captchascript.getAttribute("src"));
+    						document.body.append(cptscr);
+    						console.log("penis");
+						} else setTimeout(function () {turnstile.implicitRender();}, 1000);';
+      	        break;
+      	}
 		$gs = new mainLib();
-		if($enableCaptcha) {
-			echo '<div id="captchadiv">';
-			Captcha::displayCaptcha('no');
-			echo "</div>";
-		}
 		$homeActive = $accountActive = $browseActive = $modActive = $reuploadActive = $statsActive = $msgActive = $profileActive = "";
 		switch($active){
 			case "home":
@@ -407,7 +432,7 @@ $(document).change(function(){
 		echo '</ul>
 			</div>
 		</nav>
-		<div class="form" style="margin:0px;position:absolute;bottom:50px;color:white;font-size:50px;width:max-content;right:50px;padding:25px;transition:0.3s;opacity:0;border-radius:500px" id="loadingloool"><i class="fa-solid fa-spinner fa-spin"></i></div>
+		<div class="form" style="margin:0px;position:absolute;bottom:50px;color:white;font-size:50px;width:max-content !important;right:50px;padding:25px;transition:0.3s;opacity:0;border-radius:500px" id="loadingloool"><i class="fa-solid fa-spinner fa-spin"></i></div>
 <script>
 	cptch = document.querySelector("#verycoolcaptcha");
 	$(document).click(function(event) {
@@ -453,6 +478,14 @@ $(document).change(function(){
 			navbar = document.querySelector("#navbarepta");
 			htmtitle = document.querySelectorAll("title")[0];
 			pg.onload = function (){
+    			'.($enableCaptcha ? 'if(typeof '.$captchaUsed.' == "object" && typeof '.$captchaUsed.'.getResponse() != "undefined") {
+    			    try {
+    			        if(document.getElementById("coolcaptcha") != null || typeof turnstile == "object") '.$captchaUsed.'.reset();
+        			}
+        			catch(e) {
+                       console.log(e);
+                    }
+    			}' : '').'
 				if(pg.response.getElementById("htmlpage") != null) {
 					document.getElementById("loadingloool").style.opacity = "0";
 					title = pg.response.querySelectorAll("title")[0];
@@ -466,6 +499,7 @@ $(document).change(function(){
 					htmtitle.replaceWith(title);
 					var scrp = document.createElement("script");
 					scrp.id = "pagescript";
+					captchascript = document.getElementById("captchascript");
 					lastChar = page.substr(page.length - 1);
 					if(lastChar == "/") pageyes = page.split("/")[0];
 					else pageyes = page;
@@ -475,25 +509,23 @@ $(document).change(function(){
 					if(document.getElementById("pagescript") !== null) document.getElementById("pagescript").remove();
 					document.body.appendChild(scrp);
 					if(!isback) history.pushState(null,null,page);
-					if(page != "" && typeof document.getElementsByTagName("base")[0] == "undefined") {
+					if(typeof document.querySelector("base") != "object") {
 						base = document.createElement("base");
-						base.href = "../";
+						if(page != "") base.href = "../";
+						else base.href = ".";
 						document.body.appendChild(base);
+					} else {
+						base = document.querySelectorAll("base")[0];
+						if(page.indexOf("settings") != "-1") base.href = "../../";
+						else if(page != "") base.href = "../";
+						else base.href = ".";
+						document.body.appendChild(base);
+						if(typeof document.querySelectorAll("base")[1] == "object") document.querySelectorAll("base")[1].remove();
 					}
-					if(document.querySelector("base").getAttribute("href") == "/") document.querySelector("base").href = "../";
-					if(page == "" && typeof document.querySelector("base") == "object") {
-						base2 = document.querySelector("base");
-						base2.href = ".";
-						document.body.appendChild(base2);
-					} else if(typeof document.querySelector("base") == "object") {
-						base2 = document.querySelector("base");
-						base2.href = "../";
-						document.body.appendChild(base2);
-					}
-					if(typeof coolcaptcha != "undefined") { 
-						if(cptch == null) coolcaptcha.replaceWith(captch);
-						else coolcaptcha.replaceWith(cptch);
-						$(".h-captcha").not("#captchadiv > #verycoolcaptcha")[0].style.display = "block";
+					if(typeof captchascript != "undefined") {
+					    var elems = document.querySelectorAll("div[aria-hidden=true]");
+						for(var i=0; i<elems.length; i++)elems[i].remove();
+						'.$captchaScript.'
 					}
 				} else {
 					document.getElementById("loadingloool").innerHTML = \'<i class="fa-solid fa-xmark" style="color:#ffb1ab;padding: 0px 8px;"></i>\';
@@ -530,7 +562,6 @@ $(document).change(function(){
 			else a(\'\', true, true, "GET", false, "", true);
 		}
 	}, false);
-	setTimeout(function () {captch = cptch.cloneNode(true)}, 1);
 </script>';
 	}
 	public function printPage($content, $isSubdirectory = true, $navbar = "home"){
