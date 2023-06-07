@@ -391,6 +391,18 @@ class mainLib {
 		}
 		return "1~|~".$song["ID"]."~|~2~|~".str_replace("#", "", $song["name"])."~|~3~|~".$song["authorID"]."~|~4~|~".$song["authorName"]."~|~5~|~".$song["size"]."~|~6~|~~|~10~|~".$dl."~|~7~|~~|~8~|~1";
 	}
+	public function getSongInfo($id, $column = "*") {
+	    if(!is_numeric($id)) return;
+	    include __DIR__ . "/connection.php";
+	    $sinfo = $db->prepare("SELECT `$column` FROM songs WHERE ID = :id");
+	    $sinfo->execute([':id' => $id]);
+	    $sinfo = $sinfo->fetch();
+	    if(empty($sinfo)) return false;
+	    else {
+	        if($column != "*")  return $sinfo[$column];
+	        else return array("ID" => $sinfo["ID"], "name" => $sinfo["name"], "authorName" => $sinfo["authorName"], "size" => $sinfo["size"], "download" => $sinfo["download"], "reuploadTime" => $sinfo["reuploadTime"], "reuploadID" => $sinfo["reuploadID"]);
+	    }
+	}
 	public function getClanInfo($clan, $column = "*") {
 	    if(!is_numeric($clan)) return;
 	    include __DIR__ . "/connection.php";
@@ -827,36 +839,30 @@ class mainLib {
 		if($mailEnabled) {
 			include __DIR__."/connection.php";
 			include __DIR__."/../../config/dashboard.php";
-			$string = $this->randomString(4);
-			$query = $db->prepare("UPDATE accounts SET mail = :mail WHERE userName = :user");
-			$query->execute([':mail' => $string, ':user' => $user]);
 			include __DIR__."/../../config/mail/PHPMailer.php";
 			include __DIR__."/../../config/mail/SMTP.php";
 			include __DIR__."/../../config/mail/Exception.php";
 			$m = new PHPMailer\PHPMailer\PHPMailer();
-			$m->isSMTP();
+			$string = $this->randomString(4);
+			$query = $db->prepare("UPDATE accounts SET mail = :mail WHERE userName = :user");
+			$query->execute([':mail' => $string, ':user' => $user]);
 			$m->CharSet = 'utf-8';
+			$m->isSMTP();
 			$m->SMTPAuth = true;
 			$m->Host = $mailbox;
 			$m->Username = $mailuser;
 			$m->Password = $mailpass;
 			$m->Port = $mailport;
-			$m->SMTPOptions = array(
-				'ssl' => array(
-					'verify_peer' => false,
-					'verify_peer_name' => false,
-					'allow_self_signed' => true
-				)
-			);
-			$m->setFrom($yourmail, $gdps.'!');
+			if($mailtype) $m->SMTPSecure = $mailtype;
+			$m->setFrom($yourmail, $gdps);
 			$m->addAddress($mail, $user);
 			$m->isHTML(true);
 			$m->Subject = 'Confirm link';
 			$m->Body = '<h1 align=center>Hello, <b>'.$user.'</b>!</h1><br>
-			<p align=center>It seems, that you wanna register new account in <b>'.$gdps.'</b></p><br>
-			<p align=center>Here is your link!</p><br>
-			<h2 align=center>http://'.$_SERVER["HTTP_HOST"].'/database/dashboard/login/activate.php?mail='.$string.'</h2>';
-			$m->send();
+			<h2 align=center>It seems, that you wanna register new account in <b>'.$gdps.'</b></h2><br>
+			<h2 align=center>Here is your link!</h2><br>
+			<h1 align=center>http://'.$_SERVER["HTTP_HOST"].'/database/dashboard/login/activate.php?mail='.$string.'</h1>';
+			return $m->send();
 		}
 	}
 }

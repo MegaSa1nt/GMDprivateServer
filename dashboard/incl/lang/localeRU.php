@@ -275,7 +275,7 @@ $string["nooneBeat"] = 'никто не прошёл'; //let it be lowercase
 $string["oneBeat"] = 'прошёл 1 игрок'; 
 $string["lower5Beat"] = 'прошло %d игрока'; 
 $string["above5Beat"] = 'прошло %d игроков'; 
-$string["demonlistLevel"] = '%s <text style="display: inline-flex;font-size: 25px;font-weight:400">от <form style="margin:0" method="post" action="profile/"><button style="margin-left:7px;font-size:25px" class="accbtn" name="accountID" value="%d">%s</button></form></text>';
+$string["demonlistLevel"] = '%s <text class="dltext">от <button type="button" onclick="a(\'profile/%3$s\', true, true)" style="margin-left:7px;font-size:25px" class="accbtn" name="accountID" value="%d">%s</button></text>';
 $string["noDemons"] = 'Кажется, в вашем топе демонов нет ни одного демона...';
 $string["addSomeDemons"] = 'Добавьте несколько демонов, чтобы заполнить топ!';
 $string["askForDemons"] = 'Попросите администратора сервера добавить несколько!';
