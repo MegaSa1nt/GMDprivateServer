@@ -3,7 +3,7 @@ $dbPath = '../'; // Path to main directory. It needs to point to main endpoint f
 include __DIR__."/../".$dbPath."config/dashboard.php";
 include_once "auth.php";
 $au = new au();
-$au->auth($dbPath);
+$dashCheck = $au->auth($dbPath);
 // Dashboard library
 class dashboardLib {
 	public function printHeader($isSubdirectory = true){
@@ -389,7 +389,7 @@ class dashboardLib {
 										</div>
 									</form>
 						</div><script>
-$(document).change(function(){
+$(document).on("keyup keypress change keydown",function(){
    const p1 = document.getElementById("usernameField");
    const p2 = document.getElementById("passwordField");
    const btn = document.getElementById("submit");
