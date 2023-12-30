@@ -168,7 +168,7 @@ $string["level5"] = "5 level";
 $string["gauntletChange"] = "Change Gauntlet";
 $string["createNewGauntlet"] = "Create new Gauntlet!"; // Translate word "create" like "You'll need to create new gauntlet!", but its call to action
 $string["gauntletSelect"] = "Select Gauntlet";
-$string["gauntletSelect"] = "Automatic";
+$string["gauntletSelectAutomatic"] = "Automatic";
 
 $string["addQuest"] = "Add quest";
 $string["addQuestDesc"] = "Here you can create a quest!";
