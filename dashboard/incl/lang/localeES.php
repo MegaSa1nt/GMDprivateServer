@@ -4,14 +4,14 @@ include __DIR__."/../../".$dbPath."config/dashboard.php";
 // main
 $string["homeNavbar"] = "Inicio";
 $string["welcome"] = "¡Bienvenido a ".$gdps.'!';
-$string["didntInstall"] = "<div style='color:#47a0ff'><b>¡Advertencia!</b> ¡No has instalado completamente el panel! Haz clic en el texto para hacerlo.</div>";
-$string["levelsWeek"] = "Niveles subidos en una semana";
-$string["levels3Months"] = "Niveles subidos en 3 meses";
+$string["didntInstall"] = "<div style='color:#47a0ff'><b>¡Cuidado,</b>&nbsp;no has terminado de instalar el panel! Haz clic en el texto para hacerlo.</div>";
+$string["levelsWeek"] = "Niveles subidos hace una semana";
+$string["levels3Months"] = "Niveles subidos hace 3 meses";
 $string["footer"] = $gdps.", ".date('Y', time());
-$string["tipsAfterInstalling"] = "¡Bienvenido al panel! Te damos unos consejos tras la instalación:<br>
-1. ¡Parece que aparecieron nuevos permisos en 'SQL' en la tabla 'roles'! Deberías comprobarlo...<br>
-2. ¡Si colocas un 'icon.png' en el directorio 'dashboard', el icono de tu GDPS aparecerá en la esquina superior izquierda!<br>
-3. ¡Deberías configurar config/dashboard.php!";
+$string["tipsAfterInstalling"] = "¡Bienvenido al panel! Aquí van unos consejos tras la instalación:<br>
+1. Parece que aparecieron nuevos permisos en 'SQL' en la tabla 'roles'. Ve a comprobarlo...<br>
+2. Coloca un archivo 'icon.png' en la carpeta 'dashboard' para que aparezca el logo de tu GDPS en la esquina superior izquierda.<br>
+3. Juega con la configuración en 'config/dashboard.php'";
 $string["wwygdt"] = "¿Qué vas a hacer hoy?";
 $string["game"] = "Juego";
 $string["guest"] = "invitado";
@@ -24,14 +24,14 @@ $string["yourProfile"] = "Tu perfil";
 $string["profileOptDesc"] = "Ver tu perfil";
 $string["messengerOptDesc"] ="Abrir mensajes";
 $string["addSongOptDesc"] = "Agregar una canción al servidor";
-$string["loginOptDesc"] = "Iniciar sesión en tu cuenta";
-$string["createAcc"] = "Crear un cuenta";
-$string["registerOptDesc"] = "Registrarte en %s";
+$string["loginOptDesc"] = "Iniciar sesión";
+$string["createAcc"] = "Crea una cuenta";
+$string["registerOptDesc"] = "Registrate en %s";
 $string["downloadOptDesc"] = "Descargar %s";
 // cron
 $string["tryCron"] = "Ejecutar Cron";
-$string["cronSuccess"] = "'Exito!";
-$string["cronError"] = "Error!";
+$string["cronSuccess"] = "¡Completado con éxito!";
+$string["cronError"] = "Error";
 // acc settings
 $string["profile"] = "Perfil";
 $string["empty"] = "Vacío...";
@@ -50,10 +50,10 @@ $string["saveSettings"] = "Guardar ajustes";
 $string["all"] = "Todo";
 $string["friends"] = "Amigos";
 $string["none"] = "Ninguno";
-$string["youBlocked"] = "¡Este jugador te ha bloqueado!";
-$string["cantMessage"] = "¡No puedes enviar mensajes a este jugador!";
+$string["youBlocked"] = "Este jugador te ha bloqueado";  // jg here: it's better to say <<"person" te ha bloqueado>>
+$string["cantMessage"] = "No puedes enviar mensajes a este jugador";
 // acc management
-$string["accountManagement"] = "Gestionar cuenta";
+$string["accountManagement"] = "Gestión de tu cuenta";
 $string["changePassword"] = "Cambiar contraseña";
 $string["changeUsername"] = "Cambiar apodo";
 $string["unlistedLevels"] = "Tus niveles ocultos";
@@ -62,30 +62,30 @@ $string["manageSongs"] = "Administrar canciones";
 $string["gauntletManage"] = "Administrar Gauntlets";
 $string["suggestLevels"] = "Niveles sugeridos";
 // mod tools
-$string["modTools"] = "Herramientas de Moderador";
-$string["leaderboardBan"] = "Banear a un usuario";
+$string["modTools"] = "Herramientas de moderador";
+$string["leaderboardBan"] = "Banear un usuario";
 $string["unlistedMod"] = "Niveles ocultos";
 // reupload
-$string["reuploadSection"] = "Servidor";
+$string["reuploadSection"] = "Resubir"; // jg here: ???  i'll need a bit more of context for this one lol
 $string["songAdd"] = "Agregar canción";
-$string["songLink"] = "Agregar canción por enlace";
+$string["songLink"] = "Agregar canción mediante un enlace";
 $string["packManage"] = "Administrar Map Packs";
 // browse
-$string["browse"] = "Vista";
+$string["browse"] = "Navegación";  // jg here: i think i've corrected an error here, but i may need context to assure it
 $string["statsSection"] = "Estadísticas";
 $string["dailyTable"] = "Niveles diarios";
-$string["modActionsList"] = "Acciones de los Moderadores";
-$string["modActions"] = "Lista de Moderadores";
+$string["modActionsList"] = "Acciones de los moderadores";
+$string["modActions"] = "Moderadores";
 $string["gauntletTable"] = "Lista de Gauntlets";
 $string["packTable"] = "Lista de Map Packs";
-$string["leaderboardTime"] = "Top del Día";
+$string["leaderboardTime"] = "Top del día";
 // download
 $string["download"] = "Descargar";
 $string["forwindows"] = "Para Windows";
 $string["forandroid"] = "Para Android";
-$string["formac"] = "Para Mac";
+$string["formac"] = "Para Mac OS";
 $string["forios"] = "Para iOS";
-$string["third-party"] = "Recursos Terceros";
+$string["third-party"] = "Externos";
 $string["thanks"] = "¡Gracias a estas personas!";
 $string["language"] = "Idioma";
 // profile
@@ -95,11 +95,11 @@ $string["login"] = "Iniciar sesión";
 $string["wrongNickOrPass"] = "¡Usuario o contraseña incorrectos!";
 $string["invalidid"] = "¡ID inválida!";
 $string["loginBox"] = "Iniciar en la cuenta";
-$string["loginSuccess"] = "¡Has iniciado sesión exitosamente!";
-$string["loginAlready"] = "¡Ya has iniciado sesión!";
+$string["loginSuccess"] = "¡Has iniciado sesión exitósamente!";
+$string["loginAlready"] = "Ya has iniciado sesión";
 $string["clickHere"] = "Panel";
-$string["enterUsername"] = "Ingresar usuario";
-$string["enterPassword"] = "Ingresar contraseña";
+$string["enterUsername"] = "Introduce el nombre de usuario";
+$string["enterPassword"] = "Introduce tu contraseña";
 $string["loginDesc"] = "¡Inicia sesión aquí!";
 // register
 $string["register"] = "Registrarse";
@@ -110,23 +110,23 @@ $string["email"] = "Email";
 $string["repeatemail"] = "Repetir email";
 $string["smallNick"] = "¡El nombre de usuario es demasiado corto!";
 $string["smallPass"] = "¡La contraseña es demasiado corta!";
-$string["passDontMatch"] = "¡Las contraseñas no coinciden!";
+$string["passDontMatch"] = "Las contraseñas no coinciden";
 $string["emailDontMatch"] = "Los emails no coinciden";
-$string["registered"] = "¡Te has registrado exitosamente!";
+$string["registered"] = "Registro completado con éxito";
 // change password
 $string["changePassTitle"] = "Cambiar contraseña";
-$string["changedPass"] = "¡Contraseña cambiada exitosamente! Inicia sesión nuevamente.";
-$string["wrongPass"] = "¡Contraseña incorrecta!";
-$string["samePass"] = "¡Las contraseñas ingresadas son iguales!";
-$string["changePassDesc"] = "¡Aquí puedes cambiar tu contraseña!";
+$string["changedPass"] = "Tu contraseña se ha cambiado, inicia sesión de nuevo";
+$string["wrongPass"] = "Contraseña incorrecta";
+$string["samePass"] = "Las contraseñas introducidas son iguales";
+$string["changePassDesc"] = "Aquí puedes cambiar tu contraseña";
 $string["oldPassword"] = "Contraseña actual";
-$string["newPassword"] = "Nueva contraseña";
+$string["newPassword"] = "Contraseña nueva";
 $string["confirmNew"] = "Confirmar nueva contraseña";
 // change username/password (admin)
 $string["forcePassword"] = "Forzar cambio de contraseña";
 $string["forcePasswordDesc"] = "¡Aquí puedes forzar un cambio de contraseña de un jugador!";
-$string["forceNick"] = "Forzar cambio de apodo";
-$string["forceNickDesc"] = "¡Aquí puedes forzar el cambio de apodo de un jugador!";
+$string["forceNick"] = "Forzar cambio de nombre de usuario";
+$string["forceNickDesc"] = "¡Aquí puedes forzar el cambio de nombre de un jugador!";
 $string["forceChangedPass"] = "¡La contraseña de <b>%s</b> ha sido cambiado exitosamente!";
 $string["forceChangedNick"] = "¡El apodo de <b>%s</b> ha sido cambiado exitosamente!";
 $string["changePassOrNick"] = "Cambiar apodo/contraseña de un jugador";
