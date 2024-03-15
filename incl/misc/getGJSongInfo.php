@@ -3,7 +3,7 @@ chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/songReup.php";
 require_once "../lib/exploitPatch.php";
-require "../".$dbPath."config/proxy.php";
+require "../../config/proxy.php";
 if(empty($_POST["songID"])){
 	exit("-1");
 }
