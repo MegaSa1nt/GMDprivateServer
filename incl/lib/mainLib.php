@@ -1208,7 +1208,7 @@ class mainLib {
 			return $m->send();
 		}
 	}
-	function formatTimestamp($timestamp) {
+	function formatTimestamp($timestamp, $removeAgo = false) {
 		$timeDifference = time() - $timestamp;
 		$minute = 60;
 		$hour = 3600;
@@ -1216,29 +1216,31 @@ class mainLib {
 		$week = 604800;
 		$month = 2592000;
 		$year = 31536000;
+		
+		$ago = $removeAgo ? '' : ' ago';
 	
 		if ($timeDifference <= 1) {
-			return '1 second ago';
+			return '1 second' . $ago;
 		} elseif ($timeDifference < $minute) {
-			return $timeDifference . ' second' . ($timeDifference > 1 ? 's' : '') . ' ago';
+			return $timeDifference . ' second' . ($timeDifference > 1 ? 's' : '') . $ago;
 		} elseif ($timeDifference < $hour) {
 			$minutes = round($timeDifference / $minute);
-			return $minutes . ' minute' . ($minutes > 1 ? 's' : '') . ' ago';
+			return $minutes . ' minute' . ($minutes > 1 ? 's' : '') . $ago;
 		} elseif ($timeDifference < $day) {
 			$hours = round($timeDifference / $hour);
-			return $hours . ' hour' . ($hours > 1 ? 's' : '') . ' ago';
+			return $hours . ' hour' . ($hours > 1 ? 's' : '') . $ago;
 		} elseif ($timeDifference < $week) {
 			$days = round($timeDifference / $day);
-			return $days . ' day' . ($days > 1 ? 's' : '') . ' ago';
+			return $days . ' day' . ($days > 1 ? 's' : '') . $ago;
 		} elseif ($timeDifference < $month) {
 			$weeks = round($timeDifference / $week);
-			return $weeks . ' week' . ($weeks > 1 ? 's' : '') . ' ago';
+			return $weeks . ' week' . ($weeks > 1 ? 's' : '') . $ago;
 		} elseif ($timeDifference < $year) {
 			$months = round($timeDifference / $month);
-			return $months . ' month' . ($months > 1 ? 's' : '') . ' ago';
+			return $months . ' month' . ($months > 1 ? 's' : '') . $ago;
 		} else {
 			$years = round($timeDifference / $year);
-			return $years . ' year' . ($years > 1 ? 's' : '') . ' ago';
+			return $years . ' year' . ($years > 1 ? 's' : '') . $ago;
 		}
 	}
 }
