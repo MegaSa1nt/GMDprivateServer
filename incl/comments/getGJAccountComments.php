@@ -22,7 +22,7 @@ $countquery->execute([':userID' => $userID]);
 $commentcount = $countquery->fetchColumn();
 foreach($result as &$comment1) {
 	if($comment1["commentID"]!=""){
-      		$uploadDate = $gs->formatTimestamp($comment1["timestamp"]);
+      		$uploadDate = $gs->formatTimestamp($comment1["timestamp"], true);
 		$reply = $db->prepare("SELECT count(*) FROM replies WHERE commentID = :id");
 		$reply->execute([':id' => $comment1["commentID"]]);
 		$reply = $reply->fetchColumn();
