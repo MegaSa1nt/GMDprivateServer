@@ -75,7 +75,7 @@ foreach ($result as &$score) {
 	$query2 = $db->prepare("SELECT userName, userID, icon, color1, color2, color3, iconType, special, extID, isBanned FROM users WHERE extID = :extID");
 	$query2->execute([':extID' => $extID]);
 	$user = $query2->fetch();
-	$time = date("d/m/Y G.i", $score["uploadDate"]);
+	$time = $gs->formatTimestamp($score["uploadDate"], true);
 	if($user["isBanned"] == 0){
 		if($score["percent"] == 100) $place = 1;
 		else if($score["percent"] > 75) $place = 2;

@@ -68,7 +68,7 @@ foreach ($result as &$score) {
 	$user = $user[0];
 	if($user["isBanned"] != 0) continue;
 	$x++;
-	$time = date("d/m/Y G.i", $score["timestamp"]);
+	$time = $gs->formatTimestamp($score["timestamp"], true);
 	$scoreType = $score[$mode];
 	$lvlstr .= "1:{$user['userName']}:2:{$user['userID']}:9:{$user['icon']}:10:{$user['color1']}:11:{$user['color2']}:14:{$user['iconType']}:15:{$user['color3']}:16:{$extID}:3:{$scoreType}:6:{$x}:42:{$time}|";
 }
