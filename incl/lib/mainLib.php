@@ -1,3 +1,4 @@
+
 <?php
 include_once __DIR__ . "/ip_in_range.php";
 class mainLib {
@@ -564,49 +565,51 @@ class mainLib {
 		}
 		return $accountlist;
 	}
-	public function checkPermission($accountID, $permission){
-		if(!is_numeric($accountID)) return false;
-
+	public function checkPermission($accountID, $permission) {
+		if (!is_numeric($accountID)) {
+			return false;
+		}
+	
 		include __DIR__ . "/connection.php";
-		//isAdmin check
+	
 		$query = $db->prepare("SELECT isAdmin FROM accounts WHERE accountID = :accountID");
 		$query->execute([':accountID' => $accountID]);
 		$isAdmin = $query->fetchColumn();
-		if($isAdmin == 1){
-			return 1;
-		}
-		
-		$query = $db->prepare("SELECT roleID FROM roleassign WHERE accountID = :accountID");
-		$query->execute([':accountID' => $accountID]);
-		$roleIDarray = $query->fetchAll();
-		if(empty($roleIDarray)) return false;
-		$roleIDlist = "";
-		foreach($roleIDarray as &$roleIDobject){
-			$roleIDlist .= $roleIDobject["roleID"] . ",";
-		}
-		$roleIDlist = substr($roleIDlist, 0, -1);
-		if($roleIDlist != ""){
-			$query = $db->prepare("SELECT $permission FROM roles WHERE roleID IN ($roleIDlist) ORDER BY priority DESC");
-			$query->execute();
-			$roles = $query->fetchAll();
-			foreach($roles as &$role){
-				if($role[$permission] == 1){
-					return true;
-				}
-				if($role[$permission] == 2){
-					return false;
-				}
-			}
-		}
-		$query = $db->prepare("SELECT $permission FROM roles WHERE isDefault = 1");
-		$query->execute();
-		$permState = $query->fetchColumn();
-		if($permState == 1){
+	
+		if ($isAdmin == 1) {
 			return true;
 		}
-		if($permState == 2){
+	
+		$query = $db->prepare("SELECT roleID FROM roleassign WHERE accountID = :accountID");
+		$query->execute([':accountID' => $accountID]);
+		$roleIDarray = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+	
+		if (empty($roleIDarray)) {
 			return false;
 		}
+	
+		$denyExists = false;
+	
+		foreach ($roleIDarray as $roleID) {
+			$query = $db->prepare("SELECT $permission FROM roles WHERE roleID = :roleID");
+			$query->bindParam(':roleID', $roleID, PDO::PARAM_INT);
+			$query->execute();
+			$permissionValue = $query->fetchColumn();
+	
+			if ($permissionValue === "0") {
+				$denyExists = true;
+				continue;
+			}
+	
+			if ($permissionValue === "1") {
+				return true;
+			}
+		}
+	
+		if ($denyExists) {
+			return false;
+		}
+
 		return false;
 	}
 	public function isCloudFlareIP($ip) {
