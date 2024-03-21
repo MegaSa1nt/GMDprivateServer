@@ -827,36 +827,40 @@ class mainLib {
 		$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('3', :value, :levelID, :timestamp, :id)");
 		$query->execute([':value' => $coins, ':timestamp' => time(), ':id' => $accountID, ':levelID' => $levelID]);
 	}
-    public function songReupload($url, $author, $name, $accountID){
-        require __DIR__ . "/../../incl/lib/connection.php";
-        require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
-        $song = str_replace("www.dropbox.com","dl.dropboxusercontent.com",$url);
-        if (filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http") {
-            $song = str_replace(["?dl=0","?dl=1"],"",$song);
-            $song = trim($song);
-            $query = $db->prepare("SELECT ID FROM songs WHERE download = :download");
-            $query->execute([':download' => $song]);    
-            $count = $query->fetch();
-            if(!empty($count)){
-                return "-3".$count["ID"];
-            }
-            $db_fid = "9999".rand(100, 892);
-            if(empty($name)) $name = ExploitPatch::remove(urldecode(str_replace([".mp3",".webm",".mp4",".wav"], "", basename($song))));
-            if(empty($author)) $author = "Reupload";
-            $info = $this->getFileInfo($song);
-            $size = $info['size'];
-            if(substr($info['type'], 0, 6) != "audio/")
-                return "-4";
-            $size = round($size / 1024 / 1024, 2);
-            $hash = "";
-            $query = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, download, hash, reuploadTime, reuploadID)
-            VALUES (:sid, :name, '9', :author, :size, :download, :hash, :time, :ID)");
-            $query->execute([':sid' => $db_fid, ':name' => $name, ':download' => $song, ':author' => $author, ':size' => $size, ':hash' => $hash, ':time' => time(), ':ID' => $accountID]);
-            return $db_fid;
-        }else{
-            return "-2";
-        }
-    }
+	public function songReupload($url, $author, $name, $accountID) {
+		require __DIR__ . "/../../incl/lib/connection.php";
+		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
+		$song = str_replace("www.dropbox.com","dl.dropboxusercontent.com",$url);
+		if(filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http") {
+			$song = str_replace(["?dl=0","?dl=1"],"",$song);
+			$song = trim($song);
+			$query = $db->prepare("SELECT ID FROM songs WHERE download = :download");
+			$query->execute([':download' => $song]);	
+			$count = $query->fetch();
+			if(!empty($count)){
+				return "-3".$count["ID"];
+			}
+			$freeID = false;
+			while(!$freeID) {
+				$db_fid = rand(99, 9999999);
+				$checkID = $db->prepare('SELECT count(*) FROM songs WHERE ID = :id'); // If randomized ID picks existing song ID
+				$checkID->execute([':id' => $db_fid]);
+				if($checkID->fetchColumn() == 0) $freeID = true;
+			}
+			if(empty($name)) $name = ExploitPatch::remove(urldecode(str_replace([".mp3",".webm",".mp4",".wav"], "", basename($song))));
+			if(empty($author)) $author = "Reupload";
+			$info = $this->getFileInfo($song);
+			$size = round($info['size'] / 1024 / 1024, 2);
+			if(substr($info['type'], 0, 6) != "audio/" || $size == 0 || $size == '-0') return "-4";
+			$hash = "";
+			$query = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, download, hash, reuploadTime, reuploadID)
+			VALUES (:songID, :name, '9', :author, :size, :download, :hash, :time, :accountID)");
+			$query->execute([':songID' => $db_fid, ':name' => $name, ':download' => $song, ':author' => $author, ':size' => $size, ':hash' => $hash, ':time' => time(), ':accountID' => $accountID]);
+			return $db_fid;
+		} else {
+			return "-2";
+		}
+	}
 	public function getFileInfo($url){
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
