@@ -5,7 +5,7 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
-if(!isset($_POST['itemID']))
+if (!isset($_POST['gameVersion']) && !isset($_POST['binaryVersion']) && !isset($_POST['gdw']) && !isset($_POST['accountID']) && !isset($_POST['gjp']) && !isset($_POST['uuid']) && !isset($_POST['udid']) && !isset($_POST['like']) && !isset($_POST['itemID']) && !isset($_POST['secret']) && !isset($_POST['type']))
 	exit(-1);
 
 $type = isset($_POST['type']) ? $_POST['type'] : 1;
