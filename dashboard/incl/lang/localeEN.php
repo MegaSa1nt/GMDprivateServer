@@ -281,7 +281,7 @@ $string["add"] = 'Add';
 $string["recordApproved"] = 'Record approved!';
 $string["recordDenied"] = 'Record denied!';
 $string["recordSubmitted"] = 'Record submitted!';
-$string["nooneBeat"] = 'noone has beaten'; //let it be lowercase
+$string["nooneBeat"] = 'no one has beaten'; //let it be lowercase
 $string["oneBeat"] = '1 player has beaten'; 
 $string["lower5Beat"] = '%d players have beaten'; // russian syntax, sorry
 $string["above5Beat"] = '%d players have beaten'; 
@@ -307,7 +307,7 @@ $string["likeSong"] = "Add song to favourites";
 $string["dislikeSong"] = "Remove song from favourites";
 $string["favouriteSongs"] = "Favourite songs";
 $string["howMuchLiked"] = "How much liked?";
-$string["nooneLiked"] = "Noone liked";
+$string["nooneLiked"] = "No one liked";
 
 $string["clan"] = "Clan";
 $string["joinedAt"] = "Joined clan at: <b>%s</b>";
