@@ -56,6 +56,5 @@ if($rate['songID'] != 0) {
 	];
 }
 exit(json_encode(['dashboard' => true, 'success' => true, 'level' => $data]));
-];
 exit(json_encode(['dashboard' => true, 'success' => true, 'level' => $level]));
 ?>
