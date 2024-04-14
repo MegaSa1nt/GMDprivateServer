@@ -610,8 +610,9 @@ class mainLib {
 		return false;
 	}
 	public function isCloudFlareIP($ip) {
-    	$cf_ips = array(
-	        '173.245.48.0/20',
+		// List of Cloudflare IPV4 addresses, last updated: 2024-04-14
+    	$cf_ipv4s = array(
+			'173.245.48.0/20',
 			'103.21.244.0/22',
 			'103.22.200.0/22',
 			'103.31.4.0/22',
@@ -627,11 +628,28 @@ class mainLib {
 			'172.64.0.0/13',
 			'131.0.72.0/22'
 	    );
-	    foreach ($cf_ips as $cf_ip) {
+		// List of Cloudflare IPV6 addresses, last updated: 2024-04-14
+    	$cf_ipv6s = array(
+			'2400:cb00::/32',
+			'2606:4700::/32',
+			'2803:f800::/32',
+			'2405:b500::/32',
+			'2405:8100::/32',
+			'2a06:98c0::/29',
+			'2c0f:f248::/32'
+	    );
+
+	    foreach ($cf_ipv4s as $cf_ip) {
 	        if (ipInRange::ipv4_in_range($ip, $cf_ip)) {
 	            return true;
 	        }
 	    }
+
+	    foreach ($cf_ipv6s as $cf_ip) {
+	        if (ipInRange::ipv6_in_range($ip, $cf_ip)) {
+	            return true;
+	        }
+		}
 	    return false;
 	}
 	public function getIP(){
