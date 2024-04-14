@@ -24,6 +24,8 @@ $CaptchaSecret = "";
 	Syntax: $proxies['NAME OF IPs'] = 'LINK';
 */
 
+$cloudflareProxy = false; // true = only allow IP ranges from Cloudflare (blocks all traffic that is outside of their proxies)
+
 $blockFreeProxies = true; // true = check if person uses free proxy
 $blockCommonVPNs = true; // true = check if person uses a common VPN
 // URLs for IPs of proxies
