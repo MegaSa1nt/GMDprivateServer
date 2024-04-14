@@ -41,4 +41,6 @@ Proxies list — https://github.com/SevenworksDev/proxy-list — (config/proxies
 
 Common VPNs list - https://github.com/X4BNet/lists_vpn (config/vpns.txt)
 
+Cloudflare IPV4 and IPV6 addresses - https://www.cloudflare.com/fr-fr/ips - (incl/lib/mainLib.php & incl/lib/ipCheck.php)
+
 Most of the stuff in generateHash.php has been figured out by pavlukivan and Italian APK Downloader, so credits to them
