@@ -102,8 +102,8 @@ class ipCheck {
         }
 
         // Rebuild the final long form IPV6 address
-        $first = ip2long6(implode(":", $first));
-        $last = ip2long6(implode(":", $last));
+        $first = $this->ip2long6(implode(":", $first));
+        $last = $this->ip2long6(implode(":", $last));
         $in_range = ($ip >= $first && $ip <= $last);
 
         return $in_range;
@@ -139,13 +139,13 @@ class ipCheck {
 		);
 
 		foreach ($cf_ipv4s as $cf_ip) {
-			if (ipInRange::ipv4_in_range($ip, $cf_ip)) {
+			if ($this->ipv4inrange($ip, $cf_ip)) {
 				return true;
 			}
 		}
 
 		foreach ($cf_ipv6s as $cf_ip) {
-			if (ipInRange::ipv6_in_range($ip, $cf_ip)) {
+			if ($this->ipv6_in_range($ip, $cf_ip)) {
 				return true;
 			}
 		}
