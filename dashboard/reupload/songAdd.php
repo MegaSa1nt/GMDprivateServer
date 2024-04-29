@@ -66,8 +66,8 @@ if(!empty($_POST["url"])){
     <form class="form__inner" method="post" action="">
 		<p>'.$dl->getLocalizedString("songAddUrlFieldLabel").'</p>
         <div class="field"><input type="text" name="url" id="p1" placeholder="'.$dl->getLocalizedString("songAddUrlFieldPlaceholder").'"></div>
-		<div class="field"><input type="text" name="author" placeholder="'.$dl->getLocalizedString("songAddAuthorFieldPlaceholder").'"></div>
 		<div class="field"><input type="text" name="name" placeholder="'.$dl->getLocalizedString("songAddNameFieldPlaceholder").'"></div>
+		<div class="field"><input type="text" name="author" placeholder="'.$dl->getLocalizedString("songAddAuthorFieldPlaceholder").'"></div>
 		'.Captcha::displayCaptcha(true).'<button type="button" onclick="a(\'reupload/songAdd.php\', true, true, \'POST\')" class="btn-song btn-block" id="submit" disabled>'.$dl->getLocalizedString("reuploadBTN").'</button>
     </form>
 </div>

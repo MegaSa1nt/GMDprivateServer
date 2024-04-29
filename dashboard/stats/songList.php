@@ -96,8 +96,8 @@ foreach($result as &$action){
 									 <form class="form__inner" method="post" name="songrename'.$songsid.'">
 										<div class="field" style="display:none"><input type="hidden" name="ID" value="'.$songsid.'"></div>
 										<div class="field" style="display:none"><input type="hidden" name="page" value="'.$actualpage.'"></div>
-										<div class="field"><input type="text" name="author" id="p1" value="'.$author.'" placeholder="'.$author.'"></div>
-										<div class="field"><input type="text" name="name" id="p2" value="'.$name.'" placeholder="'.$name.'"></div>
+										<div class="field"><input type="text" name="name" id="p2" value="'.$name.'" placeholder="'.$dl->getLocalizedString("songAddNameFieldPlaceholder").'"></div>
+										<div class="field"><input type="text" name="author" id="p1" value="'.$author.'" placeholder="'.$dl->getLocalizedString("songAddAuthorFieldPlaceholder").'"></div>
 										<button type="button" class="btn-song" id="submit" onclick="rename('.$songsid.')">'.$dl->getLocalizedString("change").'</button>
 									</form>
 								</div>';
