@@ -98,7 +98,7 @@ class ipCheck {
 		}
 		if(empty($allProxies)) $allProxies = file(__DIR__ .'/../../config/proxies.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		else $allProxies = explode(PHP_EOL, $allProxies);
-		if(in_array($this->getYourIP(), $allProxies)) {
+		if (in_array($this->getYourIP(), $allProxies)) {
 			http_response_code(404);
 			exit;
 		}
@@ -121,16 +121,23 @@ class ipCheck {
 		}
 		if(empty($allVPNs)) $allVPNs = file(__DIR__ .'/../../config/vpns.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		else $allVPNs = explode(PHP_EOL, $allVPNs);
-		foreach($allVPNs AS &$vpnCheck) {
-			if($this->ipv4inrange($this->getYourIP(), $vpnCheck)) {
-				http_response_code(404);
-				exit;
-			}
+		if (in_array($this->getYourIP(), $allVPNs)) {
+			http_response_code(404);
+			exit;
 		}
 	}
+	public function checkBannedIPS() {
+		if (!file_exists(__DIR__ . '/../../config/bannedips.txt')) return;
+		$allIPs = file(__DIR__ . '/../../config/bannedips.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		if (in_array($this->getYourIP(), $allIPs)) {
+			http_response_code(404);
+			exit;
+		}
+	}	
 	public function checkIP() {
 		$this->checkProxy();
 		$this->checkVPN();
+		$this->checkBannedIPS();
 	}
 }
 ?>
