@@ -7,8 +7,8 @@ $midnight = ($type == 1) ? strtotime("next monday") : strtotime("tomorrow 00:00:
 include "../lib/connection.php";
 //Getting DailyID
 $current = time();
-$query=$db->prepare("SELECT feaID FROM dailyfeatures WHERE timestamp < :current AND type = :type ORDER BY timestamp DESC LIMIT 1");
-$query->execute([':current' => $current, ':type' => $type]);
+$query=$db->prepare("SELECT COUNT(levelID) FROM dailyfeatures WHERE type = :type");
+$query->execute([':type' => $type]);
 if($query->rowCount() == 0) exit("-1");
 $dailyID = $query->fetchColumn();
 if($type == 1) $dailyID += 100001;
