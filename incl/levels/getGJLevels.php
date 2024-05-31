@@ -1,6 +1,7 @@
 <?php
 chdir(dirname(__FILE__));
 include "../lib/connection.php";
+include "../../config/misc.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
@@ -39,10 +40,12 @@ if(!empty($_POST["diff"])){
 
 
 //ADDITIONAL PARAMETERS
-if($gameVersion==0){
-	$params[] = "levels.gameVersion <= 18";
-}else{
-	$params[] = "levels.gameVersion <= '$gameVersion'";
+if($showAllLevels) {
+	if($gameVersion==0){
+		$params[] = "levels.gameVersion <= 18";
+	}else{
+		$params[] = "levels.gameVersion <= '$gameVersion'";
+	}	
 }
 if(!empty($_POST["original"]) AND $_POST["original"]==1){
 	$params[] = "original = 0";

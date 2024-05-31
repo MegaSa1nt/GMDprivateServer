@@ -86,56 +86,63 @@ class Commands {
 			case '!f':
 			case '!feature':
 			case '!epic':
-			case '!unepic':
 			case '!legendary':
 			case '!mythic':
+			case '!unfeature':
+			case '!unepic':
+			case '!unlegendary':
+			case '!unmythic':
 				if(!isset($commentarray[1])) {
-					$starArray = ['!f' => 1, '!feature' => 1, '!epic' => 2, '!unepic' => 0, '!legendary' => 3, '!mythic' => 4];
+					$starArray = ['!f' => 1, '!feature' => 1, '!epic' => 2, '!legendary' => 3, '!mythic' => 4, '!unfeature' => 0, '!unepic' => 0, '!unlegendary' => 0, '!unmythic' => 0];
 					if($starArray[$commentarray[0]] > 1) {
 						if(!$gs->checkPermission($accountID, "commandEpic")) return false;
 						$column = 'starEpic';
 						$starFeatured = $starArray[$commentarray[0]] - 1;
-						$returnTextArray = ['epiced %1$s!', 'set %1$s as a legendary level!', 'set %1$s as a mythic level!'];
-						$returnText = 'You successfully '.sprintf($returnTextArray[$starFeatured], $gs->getLevelName($levelID));
+						$returnTextArray = ['!epic' => 'epiced %1$s!', '!legendary' => 'set %1$s as a legendary level!', '!mythic' => 'set %1$s as a mythic level!'];
+						$returnText = 'You successfully '.sprintf($returnTextArray[$commentarray[0]], $gs->getLevelName($levelID));
 					} else {
 						if(!$gs->checkPermission($accountID, "commandFeature")) return false;
 						$column = 'starFeatured';
-						$query = $db->prepare("SELECT starFeatured FROM levels WHERE levelID=:levelID ORDER BY starFeatured DESC LIMIT 1");
-						$query->execute([':levelID' => $levelID]);
-						$starFeatured = $query->fetchColumn();
-						if(!$starFeatured) {
-							$query = $db->prepare("SELECT starFeatured FROM levels ORDER BY starFeatured DESC LIMIT 1");
-							$query->execute();
-							$starFeatured = $query->fetchColumn() + 1;
-						}
-						$returnText = 'You successfully '.($starFeatured == 0 ? 'un' : '').'featured '.$gs->getLevelName($levelID).'!';
+						if($starArray[$commentarray[0]] != 0) {
+							$query = $db->prepare("SELECT starFeatured FROM levels WHERE levelID=:levelID ORDER BY starFeatured DESC LIMIT 1");
+							$query->execute([':levelID' => $levelID]);
+							$starFeatured = $query->fetchColumn();
+							if(!$starFeatured) {
+								$query = $db->prepare("SELECT starFeatured FROM levels ORDER BY starFeatured DESC LIMIT 1");
+								$query->execute();
+								$starFeatured = $query->fetchColumn() + 1;
+							}
+							$returnText = 'You successfully featured '.$gs->getLevelName($levelID).'!';
+						} else $returnText = 'You successfully unfeatured '.$gs->getLevelName($levelID).'!';
 					}
 				} else {
-					if($commentarray[0] > 1) {
+					if($commentarray[1] > 1) {
 						if(!$gs->checkPermission($accountID, "commandEpic")) return false;
 						$column = 'starEpic';
-						$starFeatured = ExploitPatch::number($commentarray[0]) - 1;
-						$returnTextArray = ['epiced %1$s!', 'set %1$s as a legendary level!', 'set %1$s as a mythic level!'];
-						$returnText = 'You successfully '.sprintf($returnTextArray[$starFeatured], $gs->getLevelName($levelID));
+						$starFeatured = ExploitPatch::number($commentarray[1]) - 1;
+						$returnTextArray = ['!epic' => 'epiced %1$s!', '!legendary' => 'set %1$s as a legendary level!', '!mythic' => 'set %1$s as a mythic level!'];
+						$returnText = 'You successfully '.sprintf($returnTextArray[$commentarray[0]], $gs->getLevelName($levelID));
 					} else {
 						if(!$gs->checkPermission($accountID, "commandFeature")) return false;
 						$column = 'starFeatured';
-						$query = $db->prepare("SELECT starFeatured FROM levels WHERE levelID=:levelID ORDER BY starFeatured DESC LIMIT 1");
-						$query->execute([':levelID' => $levelID]);
-						$starFeatured = $query->fetchColumn();
-						if(!$starFeatured) {
-							$query = $db->prepare("SELECT starFeatured FROM levels ORDER BY starFeatured DESC LIMIT 1");
-							$query->execute();
-							$starFeatured = $query->fetchColumn() + 1;
-						}
-						$returnText = 'You successfully '.($starFeatured == 0 ? 'un' : '').'featured '.$gs->getLevelName($levelID).'!';
+						if($starArray[$commentarray[0]] != 0) {
+							$query = $db->prepare("SELECT starFeatured FROM levels WHERE levelID=:levelID ORDER BY starFeatured DESC LIMIT 1");
+							$query->execute([':levelID' => $levelID]);
+							$starFeatured = $query->fetchColumn();
+							if(!$starFeatured) {
+								$query = $db->prepare("SELECT starFeatured FROM levels ORDER BY starFeatured DESC LIMIT 1");
+								$query->execute();
+								$starFeatured = $query->fetchColumn() + 1;
+							}
+							$returnText = 'You successfully featured '.$gs->getLevelName($levelID).'!';
+						} else $returnText = 'You successfully unfeatured '.$gs->getLevelName($levelID).'!';
 					}
 				}
-				if($starFeatured == 0) $column = 'starFeatured = 0, starEpic';
+				if($starArray[$commentarray[0]] == 0 && $commentarray[1] == 0) $column = 'starFeatured = 0, starEpic';
 				$query = $db->prepare("UPDATE levels SET $column = :starFeatured WHERE levelID = :levelID");
 				$query->execute([':levelID' => $levelID, ':starFeatured' => $starFeatured]);
 				$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('".($column == 'starEpic' ? 4 : 2)."', :value, :levelID, :timestamp, :id)");
-				$query->execute([':value' => $starFeatured, ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+				$query->execute([':value' => ($column == 'starEpic' ? $starArray[$commentarray[0]] - 1 : $starArray[$commentarray[0]]), ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
 				return $returnText;
 				break;
 			case '!vc':
@@ -190,6 +197,8 @@ class Commands {
 				if(!$gs->checkPermission($accountID, "commandDelete")) return false;
 				$levelName = $gs->getLevelName($levelID);
 				if(!$levelName) return false;
+				$query = $db->prepare("DELETE FROM comments WHERE levelID = :levelID");
+				$query->execute([':levelID' => $levelID]);
 				$query = $db->prepare("DELETE from levels WHERE levelID = :levelID LIMIT 1");
 				$query->execute([':levelID' => $levelID]);
 				$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('6', :value, :levelID, :timestamp, :id)");

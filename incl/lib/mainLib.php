@@ -24,6 +24,7 @@ class mainLib {
 			"Deadlocked by F-777",
 			"Fingerbang by MDK",
 			"Dash by MDK",
+			"Explorers by Hinkik",
 			"The Seven Seas by F-777",
 			"Viking Arena by F-777",
 			"Airborne Robots by F-777",
@@ -37,7 +38,10 @@ class mainLib {
 			"Striker by Waterflame",
 			"Embers by Dex Arson",
 			"Round 1 by Dex Arson",
-			"Monster Dance Off by F-777"];
+			"Monster Dance Off by F-777",
+ 		        "Press Start by MDK",
+   		        "Nock Em by Bossfight",
+  		        "Power Trip by Boom Kitty"];
 		if($id < 0 || $id >= count($songs))
 			return "Unknown by DJVI";
 		return $songs[$id];
@@ -1303,23 +1307,25 @@ class mainLib {
 		$creatorUsername = $this->getAccountName($creatorAccID);
 		$creatorHasDiscord = $this->hasDiscord($creatorAccID);
 		$creatorFormattedUsername = $creatorHasDiscord ? "<@".$creatorHasDiscord.">" : "**".$creatorUsername."**";
-		$isRated = $level['starStars'] != 0;
-		$difficulty = $this->getDifficulty($level['starDifficulty'], $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
-		$starsIcon = 'stars';
-		$diffIcon = 'na';
-		switch(true) {
-			case ($level['starEpic'] > 0):
-				$starsArray = ['', 'epic', 'legendary', 'mythic'];
-				$starsIcon = $starsArray[$level['starEpic']];
-				break;
-			case ($level['starFeatured'] > 0):
-				$starsIcon = 'featured';
-				break;
-		}
-		$diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
-		$diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
-		if($level['starStars'] != 0) {
-			$setColor = $successColor;
+                $isRated = $level['starStars'] != 0;
+                $difficulty = $this->getDifficulty($level['starDifficulty'], $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
+                $starsIcon = 'stars';
+                $diffIcon = 'na';
+                switch(true) {
+                    case ($level['starEpic'] > 0):
+                        $starsArray = ['', 'epic', 'legendary', 'mythic'];
+                        $starsIcon = $starsArray[$level['starEpic']];
+                        break;
+                    case ($level['starFeatured'] > 0):
+                        $starsIcon = 'featured';
+                        break;
+                }
+                $diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
+                $diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
+                $originalDiffColorArray = ['na' => 'a9a9a9', 'auto' => 'f5c96b', 'easy' => '00e0ff', 'normal' => '00ff3a', 'hard' => 'ffb438', 'harder' => 'fc1f1f', 'insane' => 'f91ffc', 'demon-easy' => 'aa6bf5', 'demon-medium' => 'ac2974', 'demon-hard' => 'ff0000', 'demon-insane' => 'b31548', 'demon-extreme' => '8e0505'];
+                    $originalDiffColor = $originalDiffColor && empty($successColor);
+                    if($level['starStars'] != 0) {
+                        $setColor = empty($successColor) ? $originalDiffColorArray[$diffIcon] : $successColor;
 			$setTitle = $this->webhookLanguage('rateSuccessTitle', $webhookLangArray);
 			$dmTitle = $this->webhookLanguage('rateSuccessTitleDM', $webhookLangArray);
 			$setDescription = sprintf($this->webhookLanguage('rateSuccessDesc', $webhookLangArray), $modFormattedUsername);
@@ -1337,10 +1343,10 @@ class mainLib {
 		$levelField = [$this->webhookLanguage('levelTitle', $webhookLangArray), sprintf($this->webhookLanguage('levelDesc', $webhookLangArray), '**'.$level['levelName'].'**', $creatorFormattedUsername), true];
 		$IDField = [$this->webhookLanguage('levelIDTitle', $webhookLangArray), $level['levelID'], true];
 		if($level['starStars'] == 1) $action = 0; elseif(($level['starStars'] < 5 AND $level['starStars'] != 0) AND !($level['starStars'] > 9 AND $level['starStars'] < 20)) $action = 1; else $action = 2;
-		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc'.$action, $webhookLangArray), $difficulty, $level['starStars']), true];
+		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $difficulty, $level['starStars']), true];
 		$statsField = [$this->webhookLanguage('statsTitle', $webhookLangArray), $stats, true];
 		if($level['requestedStars'] == 1) $action = 0; elseif(($level['requestedStars'] < 5 AND $level['requestedStars'] != 0) AND !($level['requestedStars'] > 9 AND $level['requestedStars'] < 20)) $action = 1; else $action = 2;
-		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc'.$action, $webhookLangArray), $level['requestedStars']), true] : [];
+		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $level['requestedStars']), true] : [];
 		$descriptionField = [$this->webhookLanguage('descTitle', $webhookLangArray), (!empty($level['levelDesc']) ? base64_decode($level['levelDesc']) : $this->webhookLanguage('descDesc', $webhookLangArray)), false];
 		$setThumbnail = $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 		$setFooter = sprintf($this->webhookLanguage('footer', $webhookLangArray), $gdps);
@@ -1451,17 +1457,19 @@ class mainLib {
 		$starsIcon = $starsArray[$featured] ?? 'stars';
 		$diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
 		$diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
-		$setColor = $successColor;
+                $originalDiffColorArray = ['na' => 'a9a9a9', 'auto' => 'f5c96b', 'easy' => '00e0ff', 'normal' => '00ff3a', 'hard' => 'ffb438', 'harder' => 'fc1f1f', 'insane' => 'f91ffc', 'demon-easy' => 'aa6bf5', 'demon-medium' => 'ac2974', 'demon-hard' => 'ff0000', 'demon-insane' => 'b31548', 'demon-extreme' => '8e0505'];
+                $originalDiffColor = $originalDiffColor && empty($successColor);
+                $setColor = empty($successColor) ? $originalDiffColorArray[$diffIcon] : $successColor;
 		$setTitle = $this->webhookLanguage('suggestTitle', $webhookLangArray);
 		$setDescription = sprintf($this->webhookLanguage('suggestDesc', $webhookLangArray), $modFormattedUsername);
 		$stats = $downloadEmoji.' '.$level['downloads'].' | '.($level['likes'] - $level['dislikes'] >= 0 ? $likeEmoji.' '.abs($level['likes'] - $level['dislikes']) : $dislikeEmoji.' '.abs($level['likes'] - $level['dislikes']));
 		$levelField = [$this->webhookLanguage('levelTitle', $webhookLangArray), sprintf($this->webhookLanguage('levelDesc', $webhookLangArray), '**'.$level['levelName'].'**', $creatorFormattedUsername), true];
 		$IDField = [$this->webhookLanguage('levelIDTitle', $webhookLangArray), $level['levelID'], true];
 		if($stars == 1) $action = 0; elseif(($stars < 5 AND $stars != 0) AND !($stars > 9 AND $stars < 20)) $action = 1; else $action = 2;
-		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc'.$action, $webhookLangArray), $difficulty, $stars), true];
+		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $difficulty, $stars), true];
 		$statsField = [$this->webhookLanguage('statsTitle', $webhookLangArray), $stats, true];
 		if($level['requestedStars'] == 1) $action = 0; elseif(($level['requestedStars'] < 5 AND $level['requestedStars'] != 0) AND !($level['requestedStars'] > 9 AND $level['requestedStars'] < 20)) $action = 1; else $action = 2;
-		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc'.$action, $webhookLangArray), $level['requestedStars']), true] : [];
+		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $level['requestedStars']), true] : [];
 		$descriptionField = [$this->webhookLanguage('descTitle', $webhookLangArray), (!empty($level['levelDesc']) ? base64_decode($level['levelDesc']) : $this->webhookLanguage('descDesc', $webhookLangArray)), false];
 		$setThumbnail = $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 		$setFooter = sprintf($this->webhookLanguage('footerSuggest', $webhookLangArray), $gdps);
@@ -1789,10 +1797,10 @@ class mainLib {
 		$levelField = [$this->webhookLanguage('levelTitle', $webhookLangArray), sprintf($this->webhookLanguage('levelDesc', $webhookLangArray), '**'.$level['levelName'].'**', $creatorFormattedUsername), true];
 		$IDField = [$this->webhookLanguage('levelIDTitle', $webhookLangArray), $level['levelID'], true];
 		if($level['starStars'] == 1) $action = 0; elseif(($level['starStars'] < 5 AND $level['starStars'] != 0) AND !($level['starStars'] > 9 AND $level['starStars'] < 20)) $action = 1; else $action = 2;
-		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc'.$action, $webhookLangArray), $difficulty, $level['starStars']), true];
+		$difficultyField = [$this->webhookLanguage('difficultyTitle', $webhookLangArray), sprintf($this->webhookLanguage('difficultyDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $difficulty, $level['starStars']), true];
 		$statsField = [$this->webhookLanguage('statsTitle', $webhookLangArray), $stats, true];
 		if($level['requestedStars'] == 1) $action = 0; elseif(($level['requestedStars'] < 5 AND $level['requestedStars'] != 0) AND !($level['requestedStars'] > 9 AND $level['requestedStars'] < 20)) $action = 1; else $action = 2;
-		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc'.$action, $webhookLangArray), $level['requestedStars']), true] : [];
+		$requestedField = $level['requestedStars'] > 0 ? [$this->webhookLanguage('requestedTitle', $webhookLangArray), sprintf($this->webhookLanguage('requestedDesc' . ($level['levelLength'] == 5 ? 'Moon' : '') . $action, $webhookLangArray), $level['requestedStars']), true] : [];
 		$descriptionField = [$this->webhookLanguage('descTitle', $webhookLangArray), (!empty($level['levelDesc']) ? base64_decode($level['levelDesc']) : $this->webhookLanguage('descDesc', $webhookLangArray)), false];
 		$setThumbnail = $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 		$setFooter = sprintf($this->webhookLanguage('footer', $webhookLangArray), $gdps);
