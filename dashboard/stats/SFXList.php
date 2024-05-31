@@ -31,8 +31,8 @@ $pagelol = explode("?", $pagelol)[0];
 if(!isset($_GET["search"])) $_GET["search"] = "";
 if(!isset($_GET["type"])) $_GET["type"] = "";
 $srcbtn = $favs = $meta = "";
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) {
-	$q = is_numeric(trim(ExploitPatch::remove($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%')";
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) {
+	$q = is_numeric(trim(ExploitPatch::charclean($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::number($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%')";
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
 	$query = $db->prepare("SELECT * FROM sfxs WHERE $q ORDER BY reuploadTime DESC LIMIT 10 OFFSET $page");
 	$query->execute();
@@ -109,7 +109,7 @@ $pagel = '<div class="form new-form">
 		'.$srcbtn.'
 	</div>
 </form>';
-if($x > 0 AND !empty(trim(ExploitPatch::remove($_GET["search"])))) {
+if($x > 0 AND !empty(trim(ExploitPatch::charclean($_GET["search"])))) {
 	if($x > 1) {
 		echo '<meta name="description" content="Послушай '.$x.' звуковых эффектов по запросу '.trim($_GET["search"]).'!">';
 	} else {
@@ -118,7 +118,7 @@ if($x > 0 AND !empty(trim(ExploitPatch::remove($_GET["search"])))) {
 		<meta name="description" content="Послушай звуковой эффект '.$result[0]["name"].'!">';
 	}
 }
-if(!empty(trim($_GET["search"]))) $query = $db->prepare("SELECT count(*) FROM sfxs WHERE name LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'");
+if(!empty(trim($_GET["search"]))) $query = $db->prepare("SELECT count(*) FROM sfxs WHERE name LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%'");
 else $query = $db->prepare("SELECT count(*) FROM sfxs");
 $query->execute();
 $packcount = $query->fetchColumn();

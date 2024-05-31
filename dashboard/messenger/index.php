@@ -20,7 +20,7 @@ if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0){
   	if(!isset($_GET["id"])) {
 		if(empty($notyou)) {
 			if(is_numeric($_POST["receiver"])) $notyou = ExploitPatch::number($_POST["receiver"]);
-			else $notyou = $gs->getAccountIDFromName(ExploitPatch::remove($_POST["receiver"]));
+			else $notyou = $gs->getAccountIDFromName(ExploitPatch::number($_POST["receiver"]));
 		} 
 	} else {
 		$getID = str_replace('%20', ' ', explode("/", $_GET["id"])[count(explode("/", $_GET["id"]))-1]);

@@ -15,7 +15,7 @@ $pagelol = explode("?", $pagelol)[0];
 if(!isset($_GET["search"])) $_GET["search"] = "";
 $srcbtn = "";
 if(!empty($_GET["search"])) {
-	$query = $db->prepare("SELECT * FROM accounts INNER JOIN users INNER JOIN roleassign WHERE isActive = 1 AND accounts.accountID = users.extID AND accounts.accountID = roleassign.accountID AND accounts.userName LIKE '%".ExploitPatch::remove($_GET["search"])."%' ORDER BY roleassign.roleID ASC, accounts.userName ASC");
+	$query = $db->prepare("SELECT * FROM accounts INNER JOIN users INNER JOIN roleassign WHERE isActive = 1 AND accounts.accountID = users.extID AND accounts.accountID = roleassign.accountID AND accounts.userName LIKE '%".ExploitPatch::charclean($_GET["search"])."%' ORDER BY roleassign.roleID ASC, accounts.userName ASC");
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
 } else $query = $db->prepare("SELECT * FROM accounts INNER JOIN users INNER JOIN roleassign WHERE isActive = 1 AND accounts.accountID = users.extID AND accounts.accountID = roleassign.accountID ORDER BY roleassign.roleID ASC, accounts.userName ASC");
 $query->execute();

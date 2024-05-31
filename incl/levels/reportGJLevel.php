@@ -6,7 +6,7 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 if($_POST["levelID"]){
-	$levelID =  ExploitPatch::remove($_POST["levelID"]);
+	$levelID =  ExploitPatch::number($_POST["levelID"]);
 	$ip = $gs->getIP();
 	$query = "SELECT count(*) FROM reports WHERE levelID = :levelID AND hostname = :hostname";
 	$query = $db->prepare($query);

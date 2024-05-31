@@ -31,7 +31,7 @@ if(!empty($_POST["extID"])) {
 		$query->execute([':userName' => $userName]);
 		$accountID = $query->fetchColumn();
 			if(!is_numeric($extID)){
-				$nickname = ExploitPatch::remove($_POST["extID"]);
+				$nickname = ExploitPatch::charclean($_POST["extID"]);
 				$extID = $gs->getAccountIDFromName($extID);
 			} else $nickname = $gs->getAccountName($extID);
 			if($_SESSION["accountID"] == $extID) {

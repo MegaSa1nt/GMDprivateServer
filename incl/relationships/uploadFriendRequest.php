@@ -12,7 +12,7 @@ $toAccountID = ExploitPatch::number($_POST["toAccountID"]);
 if ($toAccountID == $accountID) {
 	exit("-1");
 }
-$comment = ExploitPatch::remove($_POST["comment"]);
+$comment = ExploitPatch::charclean($_POST["comment"]);
 $uploadDate = time();
 $blocked = $db->query("SELECT ID FROM `blocks` WHERE person1 = $toAccountID AND person2 = $accountID")->fetchAll(PDO::FETCH_COLUMN);
 $frSOnly = $db->query("SELECT frS FROM `accounts` WHERE accountID = $toAccountID AND frS = 1")->fetchAll(PDO::FETCH_COLUMN);

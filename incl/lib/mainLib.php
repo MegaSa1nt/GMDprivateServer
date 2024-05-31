@@ -285,7 +285,7 @@ class mainLib {
 		include_once __DIR__ . "/exploitPatch.php";
 		include_once __DIR__ . "/GJPCheck.php";
 		if(!empty($_POST["udid"]) AND $_POST['gameVersion'] < 20 AND $unregisteredSubmissions) {
-			$id = ExploitPatch::remove($_POST["udid"]);
+			$id = ExploitPatch::charclean($_POST["udid"]);
 			if(is_numeric($id)) exit("-1");
 		} elseif(!empty($_POST["accountID"]) AND $_POST["accountID"] !="0") $id = GJPCheck::getAccountIDOrDie();
 		else exit("-1");
@@ -818,7 +818,7 @@ class mainLib {
 	public function songReupload($url, $author, $name, $accountID) {
 		require __DIR__ . "/../../incl/lib/connection.php";
 		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
-		$song = str_replace("www.dropbox.com","dl.dropboxusercontent.com",$url);
+		$song = str_replace("www.dropbox.com","dl.dropboxusercontent.com", $url);
 		if(filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http") {
 			$song = str_replace(["?dl=0","?dl=1"],"",$song);
 			$song = trim($song);
@@ -835,7 +835,7 @@ class mainLib {
 				$checkID->execute([':id' => $db_fid]);
 				if($checkID->fetchColumn() == 0) $freeID = true;
 			}
-			if(empty($name)) $name = ExploitPatch::remove(urldecode(str_replace([".mp3",".webm",".mp4",".wav"], "", basename($song))));
+			if(empty($name)) $name = ExploitPatch::charclean(urldecode(str_replace([".mp3",".webm",".mp4",".wav"], "", basename($song))));
 			if(empty($author)) $author = "Reupload";
 			$info = $this->getFileInfo($song);
 			$size = round($info['size'] / 1024 / 1024, 2);

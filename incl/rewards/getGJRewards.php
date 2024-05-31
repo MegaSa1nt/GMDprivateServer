@@ -11,11 +11,11 @@ require "../lib/generateHash.php";
 require_once "../lib/exploitPatch.php";
 
 $extID = $gs->getIDFromPost();
-$chk = ExploitPatch::remove($_POST["chk"]);
-$rewardType = ExploitPatch::remove($_POST["rewardType"]);
+$chk = ExploitPatch::charclean($_POST["chk"]);
+$rewardType = ExploitPatch::number($_POST["rewardType"]);
 $userid = $gs->getUserID($extID);
-$udid = ExploitPatch::remove($_POST["udid"]);
-$accountID = ExploitPatch::remove($_POST["accountID"]);
+$udid = ExploitPatch::charclean($_POST["udid"]);
+$accountID = ExploitPatch::number($_POST["accountID"]);
 $chk = XORCipher::cipher(base64_decode(substr($chk, 5)),59182);
 
 $query=$db->prepare("SELECT chest1time, chest1count, chest2time, chest2count FROM users WHERE extID = :extID");

@@ -37,9 +37,9 @@ if(!empty($_POST["usertarg"]) AND !empty($_POST["passtarg"]) AND !empty($_POST["
 		die();
 	}
   	if(empty($_POST["debug"])) $debug = 0;
-	$usertarg = ExploitPatch::remove($_POST["usertarg"]);
-	$passtarg = ExploitPatch::remove($_POST["passtarg"]);
-	$levelID = ExploitPatch::remove($_POST["levelID"]);
+	$usertarg = ExploitPatch::charclean($_POST["usertarg"]);
+	$passtarg = ExploitPatch::charclean($_POST["passtarg"]);
+	$levelID = ExploitPatch::number($_POST["levelID"]);
 	$server = trim($_POST["server"]);
 	$query = $db->prepare("SELECT * FROM levels WHERE levelID = :level");
 	$query->execute([':level' => $levelID]);

@@ -81,7 +81,7 @@ if(!empty($_POST["userID"]) AND !empty($_POST[$type])) {
       	$accID = $_POST["userID"];
 	}
     else {
-		$userName = ExploitPatch::remove($_POST["userID"]);
+		$userName = ExploitPatch::number($_POST["userID"]);
 		$accID = $gs->getAccountIDFromName($_POST["userID"]); 
     }
   	$salt = '';

@@ -5,7 +5,7 @@ require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php"; //this is connection.php too
 $gs = new mainLib();
-$commentID = ExploitPatch::remove($_POST["commentID"]);
+$commentID = ExploitPatch::number($_POST["commentID"]);
 $accountID = GJPCheck::getAccountIDOrDie();
 
 $userID = $gs->getUserID($accountID);

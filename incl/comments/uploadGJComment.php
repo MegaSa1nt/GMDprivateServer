@@ -8,13 +8,13 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/commands.php";
 require_once "../../config/misc.php";
 
-$userName = !empty($_POST['userName']) ? ExploitPatch::remove($_POST['userName']) : "";
+$userName = !empty($_POST['userName']) ? ExploitPatch::charclean($_POST['userName']) : "";
 $gameVersion = !empty($_POST['gameVersion']) ? ExploitPatch::number($_POST['gameVersion']) : 0;
-$comment = ExploitPatch::remove($_POST["comment"]);
+$comment = ExploitPatch::charclean($_POST["comment"]);
 if($enableCommentLengthLimiter && strlen($comment) > $maxCommentLength) exit("temp_0_You cannot post comments above $maxCommentLength characters!");
 $comment = ($gameVersion < 20) ? base64_encode($comment) : $comment;
-$levelID = ($_POST['levelID'] < 0 ? '-' : '').ExploitPatch::number($_POST["levelID"]);
-$percent = !empty($_POST["percent"]) ? ExploitPatch::remove($_POST["percent"]) : 0;
+$levelID = ExploitPatch::numbercolon($_POST["levelID"]);
+$percent = !empty($_POST["percent"]) ? ExploitPatch::number($_POST["percent"]) : 0;
 
 if (strpos($levelID, '-') === 0) {
     $checkLevelExist = $db->prepare("SELECT * FROM lists WHERE listID = :levelID");

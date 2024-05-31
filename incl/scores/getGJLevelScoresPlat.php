@@ -6,7 +6,7 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 $accountID = GJPCheck::getAccountIDOrDie();
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 $scores = [];
 $scores['time'] = ExploitPatch::number($_POST["time"]);
 $scores['points'] = ExploitPatch::number($_POST["points"]);

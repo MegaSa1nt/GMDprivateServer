@@ -30,7 +30,7 @@ if(!empty($_POST["sr"]) AND is_numeric($_POST["sr"])) {
 		$ytlink = str_replace('www.youtube.com/watch?v=', '', $ytlink);
 		$ytlink = str_replace('youtu.be/', '', $ytlink);
 		$submit = $db->prepare("INSERT INTO dlsubmits (accountID, levelID, atts, ytlink, auth) VALUES (:acc, :lid, :atts, :yt, :str)");
-		$submit->execute([':acc' => $_SESSION["accountID"], ':lid' => ExploitPatch::remove($_POST["sr"]), ':atts' => ExploitPatch::remove($_POST["atts"]), ':yt' => ExploitPatch::remove($ytlink), ':str' => $string]);
+		$submit->execute([':acc' => $_SESSION["accountID"], ':lid' => ExploitPatch::number($_POST["sr"]), ':atts' => ExploitPatch::number($_POST["atts"]), ':yt' => ExploitPatch::escapedat($ytlink), ':str' => $string]);
 		$gs->sendDemonlistRecordWebhook($_SESSION['accountID'], $db->lastInsertId());
 		$dl->printSong('<div class="form">
 		<h1>'.sprintf($dl->getLocalizedString('submitRecordForLevel'), $gs->getLevelName($_POST["sr"])).'</h1>
@@ -75,7 +75,7 @@ if(!empty($_POST["sr"]) AND is_numeric($_POST["sr"])) {
 				<button style="margin-top:5px;margin-bottom:5px" type="button" onclick="a(\'demonlist\', true, false, \'GET\')" class="btn-song">'.$dl->getLocalizedString('demonlist').'</button>
 			</form></div>', 'browse'));
 			$lid = ExploitPatch::number($_POST["id"]);
-			$ytlink = ExploitPatch::remove($_POST["ytlink"]);
+			$ytlink = ExploitPatch::escapedat($_POST["ytlink"]);
 			$ytlink = str_replace('https://', '', $_POST["ytlink"]);
 			$ytlink = str_replace('http://', '', $ytlink);
 			$ytlink = str_replace('www.youtube.com/watch?v=', '', $ytlink);
@@ -195,7 +195,7 @@ if(!empty($_POST["sr"]) AND is_numeric($_POST["sr"])) {
 			$x++;
 		}
 		$table .= '</table>';
-		if(!empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM dlsubmits WHERE accountID LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'");
+		if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM dlsubmits WHERE accountID LIKE '%".trim(ExploitPatch::number($_GET["search"]))."%'");
 		else $query = $db->prepare("SELECT count(*) FROM dlsubmits");
 		$query->execute();
 		$packcount = $query->fetchColumn();

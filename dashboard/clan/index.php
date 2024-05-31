@@ -22,7 +22,7 @@ if($getID == "settings") {
 	echo '<base href="../../">';
 	if(isset($_GET['pending'])) $_POST['pending'] = 1;
 } else $dl->printFooter('../');
-$clanid = str_replace("%20", " ", ExploitPatch::remove($getID));
+$clanid = str_replace("%20", " ", ExploitPatch::number($getID));
 if(!is_numeric($clanid)) $clanid = $gs->getClanID($clanid);
 $clan = $gs->getClanInfo($clanid);
 $isPlayerInClan = $gs->isPlayerInClan($_SESSION["accountID"]);

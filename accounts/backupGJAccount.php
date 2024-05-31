@@ -15,14 +15,14 @@ use Defuse\Crypto\Key;*/
 //here im getting all the data
 $userName = ExploitPatch::charclean($_POST["userName"]);
 $password = !empty($_POST["password"]) ? $_POST["password"] : "";
-$saveData = ExploitPatch::remove($_POST["saveData"]);
+$saveData = ExploitPatch::charclean($_POST["saveData"]);
 
 if(empty($_POST["accountID"])) {
 	$query = $db->prepare("SELECT accountID FROM accounts WHERE userName = :userName");
 	$query->execute([':userName' => $userName]);
 	$accountID = $query->fetchColumn();
 } else {
-	$accountID = ExploitPatch::remove($_POST["accountID"]);
+	$accountID = ExploitPatch::number($_POST["accountID"]);
 }
 
 if(!is_numeric($accountID)){

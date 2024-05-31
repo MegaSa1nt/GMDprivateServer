@@ -55,7 +55,7 @@ switch($diff){
 }
 //TYPE DETECTION
 if(!empty($_POST["str"])){
-	$str = ExploitPatch::remove($_POST["str"]);
+	$str = ExploitPatch::charclean($_POST["str"]);
 }
 if(isset($_POST["page"]) AND is_numeric($_POST["page"])){
 	$offset = ExploitPatch::number($_POST["page"]) . "0";

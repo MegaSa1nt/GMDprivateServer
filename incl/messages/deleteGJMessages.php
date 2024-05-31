@@ -5,7 +5,7 @@ chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-if(isset($_POST['messageID'])){$messageID = ExploitPatch::remove($_POST["messageID"]);}
+if(isset($_POST['messageID'])){$messageID = ExploitPatch::number($_POST["messageID"]);}
 $accountID = GJPCheck::getAccountIDOrDie();
 if(isset($_POST['messages'])){
 	$messages = ExploitPatch::numbercolon($_POST["messages"]);

@@ -35,9 +35,9 @@ if(!empty($id)) {
 				$diff = 6;
 				break;
 		}
-		$levels = explode(',', ExploitPatch::remove($_GET["levels"]));
+		$levels = explode(',', ExploitPatch::escapedat($_GET["levels"]));
 		if(!$gs->getLevelName($levels[0]) OR !$gs->getLevelName($levels[1]) OR !$gs->getLevelName($levels[2])) die("-1");
-		$color = explode(',', ExploitPatch::remove($_GET["color"]));
+		$color = explode(',', ExploitPatch::escapedat($_GET["color"]));
 		if($color[0] > 255) $color[0] = 255; elseif($color[0] < 0) $color[0] = 0;
 		if($color[1] > 255) $color[1] = 255; elseif($color[1] < 0) $color[1] = 0;
 		if($color[2] > 255) $color[2] = 255; elseif($color[2] < 0) $color[2] = 0;
@@ -45,9 +45,9 @@ if(!empty($id)) {
 		if($_GET["stars"] > 10) $stars = 10; elseif($_GET["stars"] < 1) $stars = 1; else $stars = ExploitPatch::number($_GET["stars"]);
 		if($_GET["coins"] > 2) $coins = 2; elseif($_GET["coins"] < 1) $coins = 1; else $coins = ExploitPatch::number($_GET["coins"]);
 		$change = $db->prepare("UPDATE mappacks SET name = :n, levels = :l, rgbcolors = :r, stars = :s, coins = :c, difficulty = :d WHERE id = :i");
-		$change->execute([':n' => ExploitPatch::remove($_GET["name"]), ':l' => ExploitPatch::remove($_GET["levels"]), ':r' => $color, ':s' => $stars, ':c' => $coins, ':i' => $id, ':d' => $diff]);
+		$change->execute([':n' => ExploitPatch::charclean($_GET["name"]), ':l' => ExploitPatch::escapedat($_GET["levels"]), ':r' => $color, ':s' => $stars, ':c' => $coins, ':i' => $id, ':d' => $diff]);
 		$query = $db->prepare("INSERT INTO modactions  (type, value, timestamp, account, value2, value3, value4, value7) VALUES ('21',:value,:timestamp,:account,:levels, :stars, :coins, :rgb)");
-		$query->execute([':value' => ExploitPatch::remove($_GET["name"]), ':timestamp' => time(), ':account' => $_SESSION["accountID"], ':levels' => ExploitPatch::remove($_GET["levels"]), ':stars' => $stars, ':coins' => $coins, ':rgb' => $color]);
+		$query->execute([':value' => ExploitPatch::charclean($_GET["name"]), ':timestamp' => time(), ':account' => $_SESSION["accountID"], ':levels' => ExploitPatch::escapedat($_GET["levels"]), ':stars' => $stars, ':coins' => $coins, ':rgb' => $color]);
 		echo 1;
 	} else {
 	  $pck = $db->prepare("SELECT * FROM mappacks WHERE ID = :id");

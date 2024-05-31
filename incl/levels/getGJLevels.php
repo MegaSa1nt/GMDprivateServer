@@ -83,7 +83,7 @@ if(!empty($_POST["noStar"])){
 if(!empty($_POST["gauntlet"])){
 	$ordergauntlet = true;
 	$order = "starStars";
-	$gauntlet = ExploitPatch::remove($_POST["gauntlet"]);
+	$gauntlet = ExploitPatch::number($_POST["gauntlet"]);
 	$query=$db->prepare("SELECT * FROM gauntlets WHERE ID = :gauntlet");
 	$query->execute([':gauntlet' => $gauntlet]);
 	$actualgauntlet = $query->fetch();
@@ -153,7 +153,7 @@ switch($diff){
 //TYPE DETECTION
 //TODO: the 2 non-friend types that send GJP in 2.11
 if(!empty($_POST["str"])){
-	$str = ExploitPatch::remove($_POST["str"]);
+	$str = ExploitPatch::charclean($_POST["str"]);
 }
 if(isset($_POST["page"]) AND is_numeric($_POST["page"])){
 	$offset = ExploitPatch::number($_POST["page"]) . "0";

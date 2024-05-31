@@ -9,7 +9,7 @@ if(!isset($_POST['itemID']))
 	exit(-1);
 
 $type = isset($_POST['type']) ? $_POST['type'] : 1;
-$itemID = ExploitPatch::remove($_POST['itemID']);
+$itemID = ExploitPatch::number($_POST['itemID']);
 $isLike = isset($_POST['like']) ? $_POST['like'] : 1;
 $ip = $gs->getIP();
 

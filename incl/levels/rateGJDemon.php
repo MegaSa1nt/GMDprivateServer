@@ -10,9 +10,9 @@ $gjp2check = isset($_POST['gjp2']) ? $_POST['gjp2'] : $_POST['gjp'];
 if(!isset($gjp2check) OR !isset($_POST["rating"]) OR !isset($_POST["levelID"]) OR !isset($_POST["accountID"])){
 	exit("-1");
 }
-$gjp = ExploitPatch::remove($gjp2check);
-$rating = ExploitPatch::remove($_POST["rating"]);
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$gjp = ExploitPatch::charclean($gjp2check);
+$rating = ExploitPatch::number($_POST["rating"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 $id = GJPCheck::getAccountIDOrDie();
 if($gs->checkPermission($id, "actionRateDemon") == false){
 	exit("-1");

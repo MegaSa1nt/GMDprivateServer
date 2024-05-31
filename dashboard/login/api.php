@@ -35,7 +35,7 @@ if(isset($_POST["userName"]) AND isset($_POST["password"])){
 	$query6 = $db->prepare("SELECT count(*) FROM actions WHERE type = '6' AND timestamp > :time AND value2 = :ip");
 	$query6->execute([':time' => time() - (60*60), ':ip' => $gs->getIP()]);
 	if($query6->fetchColumn() > 20) exit(json_encode(['success' => false, 'error' => '-3']));
-	$auth = ExploitPatch::remove($_GET["auth"]);
+	$auth = ExploitPatch::charclean($_GET["auth"]);
 	if(empty($auth)) exit(json_encode(['success' => false, 'error' => '-3']));
 	$query = $db->prepare("SELECT userName, accountID FROM accounts WHERE auth = :id");
   	$query->execute([':id' => $auth]);

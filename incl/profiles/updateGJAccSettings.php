@@ -6,12 +6,12 @@ require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 
 $accountID = GJPCheck::getAccountIDOrDie();
-$mS = ExploitPatch::remove($_POST["mS"]);
-$frS = ExploitPatch::remove($_POST["frS"]);
-$cS = ExploitPatch::remove($_POST["cS"]);
-$youtubeurl = ExploitPatch::remove($_POST["yt"]);
-$twitter = ExploitPatch::remove($_POST["twitter"]);
-$twitch = ExploitPatch::remove($_POST["twitch"]);
+$mS = ExploitPatch::number($_POST["mS"]);
+$frS = ExploitPatch::number($_POST["frS"]);
+$cS = ExploitPatch::number($_POST["cS"]);
+$youtubeurl = ExploitPatch::escapedat($_POST["yt"]);
+$twitter = ExploitPatch::escapedat($_POST["twitter"]);
+$twitch = ExploitPatch::escapedat($_POST["twitch"]);
 
 if(substr($youtubeurl, 0, 4) == "../@") $youtubeurl = "@" . substr($youtubeurl, 4);
 $youtubeurl = mb_ereg_replace("(?!^@)[^a-zA-Z0-9_]", "", $youtubeurl);

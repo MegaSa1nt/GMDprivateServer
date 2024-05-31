@@ -49,7 +49,7 @@ class GJPCheck {
 		
 		if(empty($_POST['accountID'])) exit("-1");
 
-		$accountID = ExploitPatch::remove($_POST["accountID"]);
+		$accountID = ExploitPatch::number($_POST["accountID"]);
 
 		if(!empty($_POST['gjp'])) self::validateGJPOrDie($_POST['gjp'], $accountID);
 		elseif(!empty($_POST['gjp2'])) self::validateGJP2OrDie($_POST['gjp2'], $accountID);

@@ -7,12 +7,12 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 $usedids = array();
-$accountID = ExploitPatch::remove($_POST["accountID"]);
-$udid = ExploitPatch::remove($_POST["udid"]);
+$accountID = ExploitPatch::number($_POST["accountID"]);
+$udid = ExploitPatch::charclean($_POST["udid"]);
 if(is_numeric($udid)){
 	exit("-1");
 }
-$chk = ExploitPatch::remove($_POST["chk"]);
+$chk = ExploitPatch::charclean($_POST["chk"]);
 if($accountID != 0){
 	$userID = $gs->getUserID($accountID);
 }else{
