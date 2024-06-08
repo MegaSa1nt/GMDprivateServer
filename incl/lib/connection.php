@@ -30,7 +30,7 @@ if(empty($db)) {
 			$getExtID->execute([':ip' => $ip]);
 			$getExtID = $getExtID->fetchColumn();
 		}
-		if($installed && (!empty($getExtID) || isset($_SESSION['accountID']))) {
+		if(!empty($getExtID) || isset($_SESSION['accountID'])) {
 			$accountIDcheck = $getExtID ?? $_SESSION['accountID'];
 			$timezone = $db->prepare('SELECT timezone FROM accounts WHERE accountID = :id');
 			$timezone->execute([':id' => $accountIDcheck]);
