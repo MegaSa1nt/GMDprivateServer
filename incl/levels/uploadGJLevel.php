@@ -10,13 +10,13 @@ require_once "../lib/mainLib.php";
 $gs = new mainLib();
 //here im getting all the data
 $gjp2check = isset($_POST['gjp2']) ? $_POST['gjp2'] : $_POST['gjp'];
-$gjp = ExploitPatch::remove($gjp2check);
-$gameVersion = ExploitPatch::remove($_POST["gameVersion"]);
+$gjp = ExploitPatch::charclean($gjp2check);
+$gameVersion = ExploitPatch::number($_POST["gameVersion"]);
 $userName = ExploitPatch::charclean($_POST["userName"]);
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 $levelName = ExploitPatch::charclean($_POST["levelName"]);
 //TODO: move description fixing code to a function
-$levelDesc = ExploitPatch::remove($_POST["levelDesc"]);
+$levelDesc = ExploitPatch::charclean($_POST["levelDesc"]);
 if($gameVersion < 20){
 	$rawDesc = $levelDesc;
 	$levelDesc = str_replace('+', '-', base64_encode($rawDesc));
@@ -37,39 +37,39 @@ if (strpos($rawDesc, '<c') !== false) {
 		$levelDesc = str_replace('/', '_', $levelDesc);
 	}
 }
-$levelVersion = ExploitPatch::remove($_POST["levelVersion"]);
-$levelLength = ExploitPatch::remove($_POST["levelLength"]);
-$audioTrack = ExploitPatch::remove($_POST["audioTrack"]);
-$secret = ExploitPatch::remove($_POST["secret"]);
+$levelVersion = ExploitPatch::number($_POST["levelVersion"]);
+$levelLength = ExploitPatch::number($_POST["levelLength"]);
+$audioTrack = ExploitPatch::number($_POST["audioTrack"]);
+$secret = ExploitPatch::charclean($_POST["secret"]);
 
-$binaryVersion = !empty($_POST["binaryVersion"]) ? ExploitPatch::remove($_POST["binaryVersion"]) : 0;
-$auto = !empty($_POST["auto"]) ? ExploitPatch::remove($_POST["auto"]) : 0;
+$binaryVersion = !empty($_POST["binaryVersion"]) ? ExploitPatch::number($_POST["binaryVersion"]) : 0;
+$auto = !empty($_POST["auto"]) ? ExploitPatch::number($_POST["auto"]) : 0;
 
-$original = !empty($_POST["original"]) ? ExploitPatch::remove($_POST["original"]) : 0;
-$twoPlayer = !empty($_POST["twoPlayer"]) ? ExploitPatch::remove($_POST["twoPlayer"]) : 0;
-$songID = !empty($_POST["songID"]) ? ExploitPatch::remove($_POST["songID"]) : 0;
-$objects = !empty($_POST["objects"]) ? ExploitPatch::remove($_POST["objects"]) : 0;
-$coins = !empty($_POST["coins"]) ? ExploitPatch::remove($_POST["coins"]) : 0;
-$requestedStars = !empty($_POST["requestedStars"]) ? ExploitPatch::remove($_POST["requestedStars"]) : 0;
+$original = !empty($_POST["original"]) ? ExploitPatch::number($_POST["original"]) : 0;
+$twoPlayer = !empty($_POST["twoPlayer"]) ? ExploitPatch::number($_POST["twoPlayer"]) : 0;
+$songID = !empty($_POST["songID"]) ? ExploitPatch::number($_POST["songID"]) : 0;
+$objects = !empty($_POST["objects"]) ? ExploitPatch::number($_POST["objects"]) : 0;
+$coins = !empty($_POST["coins"]) ? ExploitPatch::number($_POST["coins"]) : 0;
+$requestedStars = !empty($_POST["requestedStars"]) ? ExploitPatch::number($_POST["requestedStars"]) : 0;
 //TODO: verify if this is an optimal extraString for old levels
-$extraString = !empty($_POST["extraString"]) ? ExploitPatch::remove($_POST["extraString"]) : "29_29_29_40_29_29_29_29_29_29_29_29_29_29_29_29";
-$levelString = ExploitPatch::remove($_POST["levelString"]);
+$extraString = !empty($_POST["extraString"]) ? ExploitPatch::charclean($_POST["extraString"]) : "29_29_29_40_29_29_29_29_29_29_29_29_29_29_29_29";
+$levelString = ExploitPatch::charclean($_POST["levelString"]);
 //TODO: optionally utilize the 1.9 parameter instead
-$levelInfo = !empty($_POST["levelInfo"]) ? ExploitPatch::remove($_POST["levelInfo"]) : "";
+$levelInfo = !empty($_POST["levelInfo"]) ? ExploitPatch::charclean($_POST["levelInfo"]) : "";
 //TODO: optionally utilize the 2.2 parameter instead
-$unlisted = !empty($_POST["unlisted1"]) ? ExploitPatch::remove($_POST["unlisted1"]) : 
-	(!empty($_POST["unlisted"]) ? ExploitPatch::remove($_POST["unlisted"]) : 0);
-$unlisted2 = !empty($_POST["unlisted2"]) ? ExploitPatch::remove($_POST["unlisted2"]) : $unlisted;
-$ldm = !empty($_POST["ldm"]) ? ExploitPatch::remove($_POST["ldm"]) : 0;
-$wt = !empty($_POST["wt"]) ? ExploitPatch::remove($_POST["wt"]) : 0;
-$wt2 = !empty($_POST["wt2"]) ? ExploitPatch::remove($_POST["wt2"]) : 0;
-$settingsString = !empty($_POST["settingsString"]) ? ExploitPatch::remove($_POST["settingsString"]) : "";
+$unlisted = !empty($_POST["unlisted1"]) ? ExploitPatch::number($_POST["unlisted1"]) : 
+	(!empty($_POST["unlisted"]) ? ExploitPatch::number($_POST["unlisted"]) : 0);
+$unlisted2 = !empty($_POST["unlisted2"]) ? ExploitPatch::number($_POST["unlisted2"]) : $unlisted;
+$ldm = !empty($_POST["ldm"]) ? ExploitPatch::number($_POST["ldm"]) : 0;
+$wt = !empty($_POST["wt"]) ? ExploitPatch::number($_POST["wt"]) : 0;
+$wt2 = !empty($_POST["wt2"]) ? ExploitPatch::number($_POST["wt2"]) : 0;
+$settingsString = !empty($_POST["settingsString"]) ? ExploitPatch::charclean($_POST["settingsString"]) : "";
 $songIDs = !empty($_POST["songIDs"]) ? ExploitPatch::numbercolon($_POST["songIDs"]) : '';
 $sfxIDs = !empty($_POST["sfxIDs"]) ? ExploitPatch::numbercolon($_POST["sfxIDs"]) : '';
 $ts = !empty($_POST["ts"]) ? ExploitPatch::number($_POST["ts"]) : 0;
 
 if(isset($_POST["password"])){
-	$password = ExploitPatch::remove($_POST["password"]);
+	$password = ExploitPatch::number($_POST["password"]);
 }else{
 	$password = 1;
 	if($gameVersion > 17){

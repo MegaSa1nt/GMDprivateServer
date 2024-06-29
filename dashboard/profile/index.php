@@ -65,7 +65,7 @@ if((!isset($_SESSION["accountID"]) OR $_SESSION["accountID"] == 0) AND (empty($_
   	die();
 }
 if(!empty($_POST["accountID"])) {
-	$accid = ExploitPatch::remove($_POST["accountID"]);
+	$accid = ExploitPatch::number($_POST["accountID"]);
 	if(!is_numeric($accid)) $userID = $gs->getUserID($accid);
 }
 elseif(isset($_GET["id"])) {
@@ -79,14 +79,14 @@ elseif(isset($_GET["id"])) {
 	if(!is_numeric($accid)) $accid = $gs->getAccountIDFromName(str_replace('%20', ' ', $accid));
 	if(!$accid) {
 		$userCheck = $db->prepare("SELECT * FROM users WHERE userName = :name LIMIT 1");
-		$userCheck->execute([":name" => ExploitPatch::remove($getID)]);
+		$userCheck->execute([":name" => ExploitPatch::number($getID)]);
 		$userCheck = $userCheck->fetch();
 		if($userCheck) {
 			$userID = $userCheck['userID'];
 			$accid = $userCheck['extID'];
 		} else {
 			$userCheck = $db->prepare("SELECT * FROM users WHERE extID = :id");
-			$userCheck->execute([":id" => ExploitPatch::remove($getID)]);
+			$userCheck->execute([":id" => ExploitPatch::number($getID)]);
 			$userCheck = $userCheck->fetch();
 			if($userCheck) {
 				$userID = $userCheck['userID'];
@@ -218,7 +218,7 @@ if(isset($_POST["settings"]) AND $_POST["settings"] == 1 AND $accid == $_SESSION
 		$_POST["twitter"] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $_POST["twitter"]);
 		$_POST["twitch"] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $_POST["twitch"]);
 		$query = $db->prepare("UPDATE accounts SET mS = :ms, frS = :frs, cS = :cs, youtubeurl = :yt, twitter = :twt, twitch = :ttv, timezone = :tz WHERE accountID=:id");
-        $query->execute([':id' => $accid, ':ms' => ExploitPatch::number($_POST["messages"]), ':frs' => ExploitPatch::number($_POST["friendreqs"]), ':cs' => ExploitPatch::number($_POST["comments"]), ':yt' => ExploitPatch::remove($_POST["youtube"]), ':twt' => ExploitPatch::remove($_POST["twitter"]), ':ttv' => ExploitPatch::remove($_POST["twitch"]), ':tz' => ExploitPatch::rucharclean($_POST["timezone"])]);
+        $query->execute([':id' => $accid, ':ms' => ExploitPatch::number($_POST["messages"]), ':frs' => ExploitPatch::number($_POST["friendreqs"]), ':cs' => ExploitPatch::number($_POST["comments"]), ':yt' => ExploitPatch::escapedat($_POST["youtube"]), ':twt' => ExploitPatch::escapedat($_POST["twitter"]), ':ttv' => ExploitPatch::escapedat($_POST["twitch"]), ':tz' => ExploitPatch::rucharclean($_POST["timezone"])]);
     }
 }
 $query = $db->prepare("SELECT * FROM users WHERE userID=:id");

@@ -8,8 +8,8 @@ require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
-$levelID = ExploitPatch::remove($_POST["levelID"]);
-$percent = ExploitPatch::remove($_POST["percent"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
+$percent = ExploitPatch::number($_POST["percent"]);
 $uploadDate = time();
 
 $attempts = !empty($_POST["s1"]) ? $_POST["s1"] - 8354 : 0;

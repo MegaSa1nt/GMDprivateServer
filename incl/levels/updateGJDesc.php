@@ -8,10 +8,10 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $mainLib = new mainLib();
 //here im getting all the data
-$levelDesc = ExploitPatch::remove($_POST["levelDesc"]);
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$levelDesc = ExploitPatch::charclean($_POST["levelDesc"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 if (isset($_POST['udid']) && !empty($_POST['udid'])) {
-	$id = ExploitPatch::remove($_POST["udid"]);
+	$id = ExploitPatch::charclean($_POST["udid"]);
 	if (is_numeric($id)) {
 		exit("-1");
 	}

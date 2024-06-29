@@ -24,7 +24,7 @@ if(!isset($_GET["search"])) $_GET["search"] = "";
 if(!isset($_GET["type"])) $_GET["type"] = "";
 if(!isset($_GET["ng"])) $_GET["ng"] = "";
 $srcbtn = $members = "";
-if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::remove($_GET["search"])))) {
+if(!isset($_GET["search"]) OR empty(trim(ExploitPatch::charclean($_GET["search"])))) {
 	$query = $db->prepare("SELECT * FROM accounts INNER JOIN users WHERE isActive = 1 AND accounts.accountID = users.extID ORDER BY accountID ASC LIMIT 10 OFFSET $page");
 	$query->execute();
 	$result = $query->fetchAll();

@@ -6,7 +6,7 @@ require_once "../lib/GJPCheck.php";
 include_once "../lib/mainLib.php";
 $gs = new mainLib();
 $reqstring = "";
-$getSent = !empty($_POST["getSent"]) ? ExploitPatch::remove($_POST["getSent"]) : 0;
+$getSent = !empty($_POST["getSent"]) ? ExploitPatch::number($_POST["getSent"]) : 0;
 $bcgjp = ($_POST["gameVersion"] > 21) ? $_POST["gjp2"] : $_POST["gjp"]; // Backwards Compatible GJP
 if(empty($_POST["accountID"]) OR (!isset($_POST["page"]) OR !is_numeric($_POST["page"])) OR empty($bcgjp)){
 	exit("-1");

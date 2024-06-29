@@ -28,8 +28,8 @@ if($_POST["oldpassword"] != "" AND $_POST["newpassword"] != "" AND $_POST["newpa
 		die();
 	}
 	$userName = $gs->getAccountName($_SESSION["accountID"]);
-	$oldpass = ExploitPatch::remove($_POST["oldpassword"]);
-	$newpass = ExploitPatch::remove($_POST["newpassword"]);
+	$oldpass = $_POST["oldpassword"];
+	$newpass = $_POST["newpassword"];
 	if($oldpass == $newpass){
 		$dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>

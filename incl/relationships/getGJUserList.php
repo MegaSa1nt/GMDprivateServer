@@ -9,7 +9,7 @@ if(!isset($_POST["type"]) OR !is_numeric($_POST["type"])){
 	exit("-1");
 }
 $accountID = GJPCheck::getAccountIDOrDie();
-$type = ExploitPatch::remove($_POST["type"]);
+$type = ExploitPatch::number($_POST["type"]);
 $people = "";
 $peoplestring = "";
 $new = array();

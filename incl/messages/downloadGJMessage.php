@@ -8,7 +8,7 @@ include_once "../lib/mainLib.php";
 $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
-$messageID = ExploitPatch::remove($_POST["messageID"]);
+$messageID = ExploitPatch::number($_POST["messageID"]);
 
 $query=$db->prepare("SELECT accID, toAccountID, timestamp, userName, messageID, subject, isNew, body FROM messages WHERE messageID = :messageID AND (accID = :accID OR toAccountID = :accID) LIMIT 1");
 $query->execute([':messageID' => $messageID, ':accID' => $accountID]);

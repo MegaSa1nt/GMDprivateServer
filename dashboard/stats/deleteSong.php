@@ -5,7 +5,7 @@ require "../".$dbPath."incl/lib/connection.php";
 include "../".$dbPath."incl/lib/connection.php";
 require "../".$dbPath."incl/lib/exploitPatch.php";
 $accID = $_SESSION["accountID"];
-$songid = ExploitPatch::remove($_GET["ID"]);
+$songid = ExploitPatch::number($_GET["ID"]);
 $type = 'songs';
 if(isset($_GET['sfx'])) $type = 'sfxs';
 if($accID == 0) die(json_encode(['success' => false, 'error' => 0]));

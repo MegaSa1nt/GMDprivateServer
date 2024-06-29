@@ -6,7 +6,7 @@ require_once "../incl/lib/mainLib.php";
 $gs = new mainLib();
 //here im getting all the data
 $ip = $gs->getIP();
-$udid = ExploitPatch::remove($_POST["udid"]);
+$udid = ExploitPatch::charclean($_POST["udid"]);
 $userName = ExploitPatch::charclean($_POST["userName"]);
 //registering
 $query = $db->prepare("SELECT accountID FROM accounts WHERE userName LIKE :userName");

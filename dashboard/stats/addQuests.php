@@ -27,7 +27,7 @@ if(!empty($_POST["type"]) AND !empty($_POST["amount"]) AND !empty($_POST["reward
 	$type = ExploitPatch::number($_POST["type"]);
 	$amount = ExploitPatch::number($_POST["amount"]);
     $reward = ExploitPatch::number($_POST["reward"]);
-    $name = ExploitPatch::remove($_POST["names"]);
+    $name = ExploitPatch::charclean($_POST["names"]);
 	$accountID = $_SESSION["accountID"];
 		if(!is_numeric($type) OR !is_numeric($amount) OR !is_numeric($reward) OR $type > 3 OR $type < 1){
 			$dl->printSong('<div class="form">

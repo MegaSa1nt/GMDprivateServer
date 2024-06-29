@@ -23,8 +23,8 @@ $pagelol = explode("?", $pagelol)[0];
 $accountID = $_SESSION["accountID"];
 if(!isset($_GET["search"])) $_GET["search"] = "";
 $srcbtn = "";
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) {
-	$q = is_numeric(trim(ExploitPatch::remove($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%')";
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) {
+	$q = is_numeric(trim(ExploitPatch::charclean($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::number($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%')";
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
 	$query = $db->prepare("SELECT * FROM songs WHERE reuploadID = $accountID AND $q ORDER BY reuploadTime DESC LIMIT 10 OFFSET $page");
 	$query->execute();
@@ -105,7 +105,7 @@ $pagel = '<div class="form new-form">
 		'.$srcbtn.'
 	</div>
 </form>';
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM songs WHERE reuploadID=:id AND $q");
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM songs WHERE reuploadID=:id AND $q");
 else $query = $db->prepare("SELECT count(*) FROM songs WHERE reuploadID=:id");
 $query->execute([':id' => $accountID]);
 $packcount = $query->fetchColumn();

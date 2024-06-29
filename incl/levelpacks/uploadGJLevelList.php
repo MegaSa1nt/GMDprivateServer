@@ -7,14 +7,14 @@ require_once "../lib/mainLib.php";
 $gs = new mainLib();
 $accountID = GJPCheck::getAccountIDOrDie();
 $listID = ExploitPatch::number($_POST["listID"]);
-$listName = !empty(ExploitPatch::remove($_POST["listName"])) ? ExploitPatch::remove($_POST["listName"]) : "Unnamed list";
-$listDesc = ExploitPatch::remove($_POST["listDesc"]);
-$listLevels = ExploitPatch::remove($_POST["listLevels"]);
+$listName = !empty(ExploitPatch::charclean($_POST["listName"])) ? ExploitPatch::charclean($_POST["listName"]) : "Unnamed list";
+$listDesc = ExploitPatch::charclean($_POST["listDesc"]);
+$listLevels = ExploitPatch::numbercolon($_POST["listLevels"]);
 $difficulty = ExploitPatch::number($_POST["difficulty"]);
 $listVersion = ExploitPatch::number($_POST["listVersion"]) == 0 ? 1 : ExploitPatch::number($_POST["listVersion"]);
 $original = ExploitPatch::number($_POST["original"]);
 $unlisted = ExploitPatch::number($_POST["unlisted"]);
-$secret = ExploitPatch::remove($_POST["secret"]);
+$secret = ExploitPatch::charclean($_POST["secret"]);
 
 if($secret != "Wmfd2893gb7") exit("-100");
 if(count(explode(',', $listLevels)) == 0) exit("-6");

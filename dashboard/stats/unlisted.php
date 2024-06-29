@@ -30,9 +30,9 @@ $srcbtn = $levels = "";
 $pagelol = explode("/", $_SERVER["REQUEST_URI"]);
 $pagelol = $pagelol[count($pagelol)-2]."/".$pagelol[count($pagelol)-1];
 $pagelol = explode("?", $pagelol)[0];
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) {
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) {
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
-	$query = $db->prepare("SELECT * FROM levels WHERE unlisted != 0 AND extID = :extid AND levelName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' LIMIT 10 OFFSET $page");
+	$query = $db->prepare("SELECT * FROM levels WHERE unlisted != 0 AND extID = :extid AND levelName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%' LIMIT 10 OFFSET $page");
 	$query->execute([':extid' => $_SESSION['accountID']]);
 	$result = $query->fetchAll();
 	if(empty($result)) {

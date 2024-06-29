@@ -10,11 +10,11 @@ $commentstring = "";
 $userstring = "";
 $users = array();
 
-$binaryVersion = isset($_POST['binaryVersion']) ? ExploitPatch::remove($_POST["binaryVersion"]) : 0;
-$gameVersion = isset($_POST['gameVersion']) ? ExploitPatch::remove($_POST["gameVersion"]) : 0;
-$mode = isset($_POST["mode"]) ? ExploitPatch::remove($_POST["mode"]) : 0;
-$count = (isset($_POST["count"]) AND is_numeric($_POST["count"])) ? ExploitPatch::remove($_POST["count"]) : 10;
-$page = isset($_POST['page']) ? ExploitPatch::remove($_POST["page"]) : 0;
+$binaryVersion = isset($_POST['binaryVersion']) ? ExploitPatch::number($_POST["binaryVersion"]) : 0;
+$gameVersion = isset($_POST['gameVersion']) ? ExploitPatch::number($_POST["gameVersion"]) : 0;
+$mode = isset($_POST["mode"]) ? ExploitPatch::number($_POST["mode"]) : 0;
+$count = (isset($_POST["count"]) AND is_numeric($_POST["count"])) ? ExploitPatch::number($_POST["count"]) : 10;
+$page = isset($_POST['page']) ? ExploitPatch::number($_POST["page"]) : 0;
 
 $commentpage = $page*$count;
 
@@ -27,7 +27,7 @@ else
 		$filterColumn = 'levelID';
 		$filterToFilter = '';
 		$displayLevelID = false;
-		$filterID = ExploitPatch::remove($_POST["levelID"]);
+		$filterID = ExploitPatch::number($_POST["levelID"]);
 
 		$levelExists = $db->prepare("SELECT COUNT(*) FROM levels WHERE levelID = :levelID");
 		$levelExists->execute([':levelID' => $filterID]);
@@ -41,7 +41,7 @@ elseif(isset($_POST['userID'])){
 	$filterColumn = 'userID';
 	$filterToFilter = 'comments.';
 	$displayLevelID = true;
-	$filterID = ExploitPatch::remove($_POST["userID"]);
+	$filterID = ExploitPatch::number($_POST["userID"]);
 	$userListColumns = ", levels.unlisted";
 	$userListJoin = "INNER JOIN levels ON comments.levelID = levels.levelID";
 	$userListWhere = "AND levels.unlisted = 0";

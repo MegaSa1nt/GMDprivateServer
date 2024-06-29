@@ -24,9 +24,9 @@ $pagelol = explode("/", $_SERVER["REQUEST_URI"]);
 $pagelol = $pagelol[count($pagelol)-2]."/".$pagelol[count($pagelol)-1];
 $pagelol = explode("?", $pagelol)[0];
 $modcheck = $gs->checkPermission($_SESSION["accountID"], "dashboardModTools");
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) {
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) {
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
-	$query = $db->prepare("SELECT * FROM levels WHERE unlisted = 0 AND levelName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' LIMIT 10 OFFSET $page");
+	$query = $db->prepare("SELECT * FROM levels WHERE unlisted = 0 AND levelName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%' LIMIT 10 OFFSET $page");
 	$query->execute();
 	$result = $query->fetchAll();
 	if(empty($result)) {
@@ -140,7 +140,7 @@ $pagel = '<div class="form new-form">
 	bottom row
 */
 //getting count
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM levels WHERE unlisted=0 AND levelName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'");
+if(!empty(trim(ExploitPatch::charclean($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM levels WHERE unlisted=0 AND levelName LIKE '%".trim(ExploitPatch::charclean($_GET["search"]))."%'");
 else $query = $db->prepare("SELECT count(*) FROM levels WHERE unlisted=0");
 $query->execute();
 $packcount = $query->fetchColumn();

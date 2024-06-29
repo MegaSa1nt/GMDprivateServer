@@ -7,7 +7,7 @@ require_once "../lib/exploitPatch.php";
 require "../lib/generateHash.php";
 if(!isset($orderMapPacksByStars)) global $orderMapPacksByStars;
 
-$page = ExploitPatch::remove($_POST["page"]);
+$page = ExploitPatch::number($_POST["page"]);
 $packpage = $page*10;
 $mappackstring = "";
 $lvlsmultistring = "";

@@ -9,7 +9,7 @@ require "../../config/proxy.php";
 if(empty($_POST["songID"])){
 	exit("-1");
 }
-$songid = ExploitPatch::remove($_POST["songID"]);
+$songid = ExploitPatch::number($_POST["songID"]);
 $query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM songs WHERE ID = :songid LIMIT 1");
 $query3->execute([':songid' => $songid]);
 $librarySong = $gs->getLibrarySongInfo($songid);

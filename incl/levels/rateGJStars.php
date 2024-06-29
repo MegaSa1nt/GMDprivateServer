@@ -6,9 +6,9 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 $gjp2check = isset($_POST['gjp2']) ? $_POST['gjp2'] : $_POST['gjp'];
-$gjp = ExploitPatch::remove($gjp2check);
-$stars = ExploitPatch::remove($_POST["stars"]);
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$gjp = ExploitPatch::charclean($gjp2check);
+$stars = ExploitPatch::number($_POST["stars"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 $accountID = GJPCheck::getAccountIDOrDie();
 $permState = $gs->checkPermission($accountID, "actionRateStars");
 if($permState) {

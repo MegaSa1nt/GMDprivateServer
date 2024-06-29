@@ -8,7 +8,7 @@ if(empty($_POST['targetAccountID']))
 	exit("-1");
 
 $accountID = GJPCheck::getAccountIDOrDie();
-$targetAccountID = ExploitPatch::remove($_POST["targetAccountID"]);
+$targetAccountID = ExploitPatch::number($_POST["targetAccountID"]);
 
 $query = "DELETE FROM blocks WHERE person1 = :accountID AND person2 = :targetAccountID";
 $query = $db->prepare($query);

@@ -16,13 +16,13 @@ $date = date("d-m");
 if(!empty($_POST["accountID"])){
 	$accountID = GJPCheck::getAccountIDOrDie();
 }else{
-	$accountID = ExploitPatch::remove($_POST["udid"]);
+	$accountID = ExploitPatch::charclean($_POST["udid"]);
 	if(is_numeric($accountID)){
 		exit("-1");
 	}
 }
 
-$type = ExploitPatch::remove($_POST["type"]);
+$type = ExploitPatch::charclean($_POST["type"]);
 if($type == "top" OR $type == "creators" OR $type == "relative"){
 	if($type == "top"){
 		$query = $db->prepare("SELECT * FROM users WHERE isBanned = '0' AND stars > 0 ORDER BY stars DESC LIMIT 100");
@@ -40,7 +40,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative"){
 		$user = $result[0];
 		$stars = $user["stars"];
 		if($_POST["count"]){
-			$count = ExploitPatch::remove($_POST["count"]);
+			$count = ExploitPatch::number($_POST["count"]);
 		}else{
 			$count = 50;
 		}

@@ -7,7 +7,7 @@ if(empty($_POST["requestID"])){
 	exit("-1");
 }
 $accountID = GJPCheck::getAccountIDOrDie();
-$requestID = ExploitPatch::remove($_POST["requestID"]);
+$requestID = ExploitPatch::number($_POST["requestID"]);
 
 //TODO: what happens if request does not exist?
 $query = $db->prepare("SELECT accountID, toAccountID FROM friendreqs WHERE ID = :requestID");

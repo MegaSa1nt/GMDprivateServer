@@ -8,7 +8,7 @@ include "../config/mail.php";
 if(!$preactivateAccounts) {
 	if($mailEnabled) {
 		if(isset($_GET["mail"])) {
-			$mail = ExploitPatch::remove(explode('/', $_GET["mail"])[count(explode('/', $_GET["mail"]))-1]);
+			$mail = ExploitPatch::charclean(explode('/', $_GET["mail"])[count(explode('/', $_GET["mail"]))-1]);
 			$check = $db->prepare("SELECT accountID FROM accounts WHERE mail = :mail");
 			$check->execute([':mail' => $mail]);
 			$check = $check->fetch();
