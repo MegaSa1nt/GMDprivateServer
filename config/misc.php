@@ -37,6 +37,8 @@ $maxBinaryVersion = 0;
 
 $showAllLevels = false; // true => Shows all levels like robtop, even if the client can't support it || false => Only shows levels supported by client
 
+$leaderboardMinStars = 0; // Minimum amount of stars for players to be displayed in the leaderboard, GD default is 500
+
 $correctDailysIDs = false; // true => Separate dailys and weeklys IDs when fetching them for the getGJDailyLevel.php endpoint || false => merge IDs together regardless of the type
 
 $ratedLevelsUpdates = true; // true => allow updates on rated levels || false => dont allow rated levels to be updated, you can put exceptions as IDs in the parameter below
