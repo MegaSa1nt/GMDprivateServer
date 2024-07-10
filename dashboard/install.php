@@ -110,6 +110,9 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardForceChangePassNick'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardForceChangePassNick INT NOT NULL DEFAULT '0' AFTER dashboardManageSongs");
+		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardBanTools'");
+      		$exist = $check->fetchAll();
+      		if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardBanTools INT NOT NULL DEFAULT '0' AFTER dashboardForceChangePassNick");
 		$check = $db->query("SHOW COLUMNS FROM `songs` LIKE 'reuploadID'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE songs ADD reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime");
@@ -118,7 +121,7 @@ if(!$installed) {
       		if(empty($exist)) $db->query("ALTER TABLE accounts ADD auth varchar(16) NOT NULL DEFAULT 'none' AFTER isActive");
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistAdd'");
       		$exist = $check->fetchAll();
-      		if(empty($exist)) $db->query("ALTER TABLE roles ADD demonlistAdd INT NOT NULL DEFAULT '0' AFTER dashboardForceChangePassNick");
+      		if(empty($exist)) $db->query("ALTER TABLE roles ADD demonlistAdd INT NOT NULL DEFAULT '0' AFTER dashboardBanTools");
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistApprove'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD demonlistApprove INT NOT NULL DEFAULT '0' AFTER demonlistAdd");
