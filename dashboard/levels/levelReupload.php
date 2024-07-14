@@ -17,6 +17,7 @@ include "../".$dbPath."incl/lib/exploitPatch.php";
 require "../".$dbPath."incl/lib/XORCipher.php";
 require "../".$dbPath."config/reuploadAcc.php";
 require "../".$dbPath."config/proxy.php";
+require "../".$dbPath."config/misc.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
 if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0) {
@@ -147,10 +148,10 @@ if(!empty($_POST["levelid"])) {
 			//values
 			$twoPlayer = chkarray($levelarray["a31"]);
 			$songID = chkarray($levelarray["a35"]);
+			$objects = chkarray($levelarray["a45"]);
 			$coins = chkarray($levelarray["a37"]);
 			$reqstar = chkarray($levelarray["a39"]);
 			$extraString = chkarray($levelarray["a36"], "");
-			$starStars = chkarray($levelarray["a18"]);
 			$isLDM = chkarray($levelarray["a40"]);
 			$password = chkarray($levelarray["a27"]);
 			$songIDs = isset($levelarray["a52"]) ? $levelarray["a52"] : '';
@@ -159,11 +160,35 @@ if(!empty($_POST["levelid"])) {
 			if($password != "0"){
 				$password = XORCipher::cipher(ExploitPatch::url_base64_decode($password),26364);
 			}
-			$starCoins = 0;
-			$starDiff = 0;
-			$starDemon = 0;
-			$starAuto = 0;
-			$starStars = 0;
+				if($reuploadOriginalValue){
+					$starStars = chkarray($levelarray["a18"]);
+					$starFeatured = chkarray($levelarray["a19"]);
+                                        $starEpic = chkarray($levelarray["a42"]);
+					$starCoins = chkarray($levelarray["a38"]);
+					$starDiff = chkarray($levelarray["a9"]);
+					$starDemon = chkarray($levelarray["a17"]);
+					$starDemonDiff = chkarray($levelarray["a43"]);
+					$starAuto = chkarray($levelarray["a25"]);
+				//avoid loading levels from other servers with a value greater than 10 (ONLY IF $reuploadOriginalValue IS ENABLED)
+				if ($starStars > 10) {
+				    $starStars = 10;
+				}
+                                //featured levels will be added in table order and counted in the scores (ONLY IF $reuploadOriginalValue IS ENABLED)
+				if ($starFeatured > 0) {
+                                    $queryMaxFeatured = $db->query("SELECT MAX(starFeatured) AS maxFeatured FROM levels");
+                                    $resultMaxFeatured = $queryMaxFeatured->fetch(PDO::FETCH_ASSOC);
+                                    $starFeatured = $resultMaxFeatured ? $resultMaxFeatured['maxFeatured'] + 1 : $starFeatured;
+				}
+			}else{
+				$starStars = 0;
+				$starFeatured = 0;
+				$starEpic = 0;
+				$starCoins = 0;
+				$starDiff = 0;
+				$starDemon = 0;
+				$starDemonDiff = 0;
+				$starAuto = 0;
+			}
 			$targetUserID = chkarray($levelarray["a6"]);
 			//linkacc
 			if($automaticID) {
@@ -171,9 +196,9 @@ if(!empty($_POST["levelid"])) {
 				$reupAID = $_SESSION["accountID"];
 			}
 			//query
-			$query = $db->prepare("INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, updateDate, originalReup, userID, extID, unlisted, hostname, starStars, starCoins, starDifficulty, starDemon, starAuto, isLDM, songIDs, sfxIDs, ts)
-												VALUES (:name ,:gameVersion, '27', 'Reupload', :desc, :version, :length, :audiotrack, '0', :password, :originalReup, :twoPlayer, :songID, '0', :coins, :reqstar, :extraString, :levelString, '', '', '$uploadDate', '$uploadDate', :originalReup, :userID, :extID, '0', :hostname, :starStars, :starCoins, :starDifficulty, :starDemon, :starAuto, :isLDM, :songIDs, :sfxIDs, :ts)");
-			$query->execute([':password' => $password, ':starDemon' => $starDemon, ':starAuto' => $starAuto, ':gameVersion' => $gameVersion, ':name' => strip_tags($levelarray["a2"]), ':desc' => strip_tags($levelarray["a3"]), ':version' => $levelarray["a5"], ':length' => $levelarray["a15"], ':audiotrack' => $levelarray["a12"], ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':coins' => $coins, ':reqstar' => $reqstar, ':extraString' => $extraString, ':levelString' => "", ':originalReup' => $levelarray["a1"], ':hostname' => $hostname, ':starStars' => 0, ':starCoins' => 0, ':starDifficulty' => $starDiff, ':userID' => $reupUID, ':extID' => $reupAID, ':isLDM' => $isLDM, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
+			$query = $db->prepare("INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, updateDate, originalReup, userID, extID, unlisted, hostname, starStars, starFeatured, starEpic, starCoins, starDifficulty, starDemon, starDemonDiff, starAuto, isLDM, songIDs, sfxIDs, ts)
+												VALUES (:name, :gameVersion, '27', 'Reupload', :desc, :version, :length, :audiotrack, '0', :password, :originalReup, :twoPlayer, :songID, :objects, :coins, :reqstar, :extraString, :levelString, '', '', '$uploadDate', '$uploadDate', :originalReup, :userID, :extID, '0', :hostname, :starStars, :starFeatured, :starEpic, :starCoins, :starDifficulty, :starDemon, :starDemonDiff, :starAuto, :isLDM, :songIDs, :sfxIDs, :ts)");
+			$query->execute([':password' => $password, ':starDemon' => $starDemon, ':starAuto' => $starAuto, ':gameVersion' => $gameVersion, ':name' => strip_tags($levelarray["a2"]), ':desc' => strip_tags($levelarray["a3"]), ':version' => $levelarray["a5"], ':length' => $levelarray["a15"], ':audiotrack' => $levelarray["a12"], ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':objects' => $objects, ':coins' => $coins, ':reqstar' => $reqstar, ':extraString' => $extraString, ':levelString' => "", ':originalReup' => $levelarray["a1"], ':hostname' => $hostname, ':starStars' => $starStars, ':starFeatured' => $starFeatured, ':starEpic' => $starEpic, ':starCoins' => $starCoins, ':starDifficulty' => $starDiff, ':starDemon' => $starDemon, ':starDemonDiff' => $starDemonDiff, ':starAuto' => $starAuto, ':userID' => $reupUID, ':extID' => $reupAID, ':isLDM' => $isLDM, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
 			$levelID = $db->lastInsertId();
 			file_put_contents("../".$dbPath."data/levels/$levelID", $levelString);
 		if($debug == 1) {
