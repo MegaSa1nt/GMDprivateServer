@@ -52,4 +52,6 @@ $specialCommentLikes = [
     2 => 20, // another commentID => multiplier
     // Add more comment IDs and their multipliers as needed
 ];
+
+$reuploadOriginalValue = false; // true => it allows you to reupload levels from other servers with values ​​(such as stars) already established by the game || false => each reuploaded level will always be NA, as is already predefined even when you load a level
 ?>
