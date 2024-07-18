@@ -952,13 +952,13 @@ class dashboardLib {
 		} else return date("d.m.Y G:i:s", $timestamp);
 	}
 	public function createProfileStats($stars = 0, $moons = 0, $diamonds = 0, $goldCoins = 0, $userCoins = 0, $demons = 0, $creatorPoints = 0, $isCreatorBanned = 0, $returnText = true) {
-		if($stars == 0) $st = ''; else $st = '<p class="profilepic">'.$stars.' <i class="fa-solid fa-star" style="color:#ffff88"></i></p>';
-		if($moons == 0) $ms = ''; else $ms = '<p class="profilepic">'.$moons.' <i class="fa-solid fa-moon" style="color:#80abff"></i></p>';
-		if($diamonds == 0) $dm = ''; else $dm = ' <p class="profilepic">'.$diamonds.' <i class="fa-solid fa-gem" style="color:#a6fffb"></i></p>';
-		if($goldCoins == 0) $gc = ''; else $gc = '<p class="profilepic">'.$goldCoins.' <i class="fa-solid fa-coins" style="color:#fffd6b"></i></p>';
-		if($userCoins == 0) $uc = ''; else $uc = '<p class="profilepic">'.$userCoins.' <i class="fa-solid fa-coins"></i></p>';
-		if($demons == 0) $dn = ''; else $dn = '<p class="profilepic">'.$demons.' <i class="fa-solid fa-dragon" style="color:#ffbbbb"></i></p>';
-		if($creatorPoints == 0) $cp = ''; else $cp = '<p class="profilepic">'.$creatorPoints.' <i class="fa-solid fa-screwdriver-wrench"></i></p>';
+		if($stars == 0) $st = ''; else $st = '<p class="profilepic">'.$stars.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdStar.png"/></p>';
+		if($moons == 0) $ms = ''; else $ms = '<p class="profilepic">'.$moons.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdMoon.png"/></p>';
+		if($diamonds == 0) $dm = ''; else $dm = ' <p class="profilepic">'.$diamonds.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdDiamond.png"/></p>';
+		if($goldCoins == 0) $gc = ''; else $gc = '<p class="profilepic">'.$goldCoins.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdGoldCoin.png"/></p>';
+		if($userCoins == 0) $uc = ''; else $uc = '<p class="profilepic">'.$userCoins.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdUserCoin.png"/></p>';
+		if($demons == 0) $dn = ''; else $dn = '<p class="profilepic">'.$demons.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdDemon.png"/></p>';
+		if($creatorPoints == 0) $cp = ''; else $cp = '<p class="profilepic">'.$creatorPoints.' <img style="height: 1em; width: auto;" src="/dashboard/assets/gdCreatorPoint.png"/></p>';
 		$all = $st.$ms.$dm.$gc.$uc.$dn.$cp;
 		if(empty($all) && $returnText) $all = '<p style="font-size:25px;color:#212529">'.$this->getLocalizedString("empty").'</p>';
 		return $all;
