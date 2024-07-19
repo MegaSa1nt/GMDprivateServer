@@ -237,3 +237,4 @@ if(!$installed) {
     header('Location: .?installed=1');
 } else header('Location: .');
 ?>
+
