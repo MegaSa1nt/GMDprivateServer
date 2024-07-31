@@ -46,6 +46,16 @@ if(!$installed) {
 			 `timestamp` int(20) NOT NULL DEFAULT '0',
 			 PRIMARY KEY (`ID`)
 			) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+	$check = $db->query("SHOW TABLES LIKE 'events'");
+      	$exist = $check->fetchAll();
+      	if(empty($exist)) $db->query("CREATE TABLE `events` (
+		 `feaID` int(11) NOT NULL AUTO_INCREMENT,
+		 `levelID` int(11) NOT NULL,
+		 `timestamp` int(11) NOT NULL,
+		 `duration` int(11) NOT NULL,
+		 `webhookSent` int(11) NOT NULL DEFAULT '0',
+		 PRIMARY KEY (`feaID`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$check = $db->query("SHOW TABLES LIKE 'clans'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("CREATE TABLE `clans` (
