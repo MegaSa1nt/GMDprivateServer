@@ -9,7 +9,7 @@ $gs = new mainLib();
 $dl = new dashboardLib();
 $dl->title($dl->getLocalizedString("banUserPlace"));
 $dl->printFooter('../');
-if(!$gs->checkPermission($_SESSION["accountID"], "dashboardModTools")) {
+if(!$gs->checkPermission($_SESSION["accountID"], "dashboardBanTools")) {
 	die($dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 		<p id="bruh">'.$dl->getLocalizedString("noPermission").'</p>

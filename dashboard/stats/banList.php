@@ -9,7 +9,7 @@ $gs = new mainLib();
 include "../".$dbPath."incl/lib/connection.php";
 $dl->title($dl->getLocalizedString("banList"));
 $dl->printFooter('../');
-if(!$gs->checkPermission($_SESSION["accountID"], "dashboardModTools")) exit($dl->printSong('<div class="form">
+if(!$gs->checkPermission($_SESSION["accountID"], "dashboardBanTools")) exit($dl->printSong('<div class="form">
     <h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
     <form class="form__inner" method="post" action=".">
 		<p>'.$dl->getLocalizedString("noPermission").'</p>
