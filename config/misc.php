@@ -159,4 +159,12 @@ $specialCommentLikes = [
 */
 
 $unlistedLevelsForAdmins = false;
+
+/*
+	Change how the downloads count work.
+ 	In the past, the server will check download count usinhg IP, but either this is the issue with INET6_ATON or with others hosting platform, download counts will never go above 2 because the IP is the same.
+ 	True - Account based download count
+  	False - [Legacy] IP based download count
+*/
+$accountBasedDownloadCount = false;
 ?>
