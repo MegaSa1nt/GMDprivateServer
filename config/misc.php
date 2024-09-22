@@ -167,4 +167,11 @@ $unlistedLevelsForAdmins = false;
   	False - [Legacy] IP based download count
 */
 $accountBasedDownloadCount = false;
+
+/*
+	Same as above but will count it REGARDLESS of you download it before
+	True - Count whenever any device (re)download a level
+	False - Base on $accountBasedDownloadCount
+*/
+$regardlessDownloadCount = false;
 ?>
