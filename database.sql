@@ -93,7 +93,8 @@ CREATE TABLE `actions` (
 CREATE TABLE `actions_downloads` (
   `id` int(11) NOT NULL,
   `levelID` int(11) NOT NULL,
-  `ip` varbinary(16) NOT NULL,
+  `ip` varchar(255),
+  `accountID` int(11),
   `uploadDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
