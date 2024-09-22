@@ -94,11 +94,18 @@ if(!is_numeric($levelID)){
 			$accountID = GJPCheck::getAccountIDOrDie();
 			$query6 = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID=:levelID AND accountID=:accountID");
 			$query6->execute([':levelID' => $levelID, ':accountID' => $accountID]);
-			if($inc && $query6->fetchColumn() < 2){
+			if($inc && $query6->fetchColumn() < 2) {
 				$query2=$db->prepare("UPDATE levels SET downloads = downloads + 1 WHERE levelID = :levelID");
 				$query2->execute([':levelID' => $levelID]);
 				$query6 = $db->prepare("INSERT INTO actions_downloads (levelID, accountID) VALUES (:levelID,:accountID)");
 				$query6->execute([':levelID' => $levelID, ':accountID' => $accountID]);
+			}
+		}
+		else if ($regardlessDownloadCount) {
+			$query2=$db->prepare("UPDATE levels SET downloads = downloads + 1 WHERE levelID = :levelID");
+			$query2->execute([':levelID' => $levelID]);
+			$query6 = $db->prepare("INSERT INTO actions_downloads (levelID) VALUES (:levelID)");
+			$query6->execute([':levelID' => $levelID]);
 		}
 		$uploadDate = $gs->makeTime($result["uploadDate"]);
 		$updateDate = $gs->makeTime($result["updateDate"]);
