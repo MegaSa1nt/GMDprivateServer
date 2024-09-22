@@ -79,14 +79,26 @@ if(!is_numeric($levelID)){
 		//Verifying friends only unlisted
 		if($result["unlisted2"] != 0) if(!($result["extID"] == $accountID || $gs->isFriends($accountID, $result["extID"])) && !$isPlayerAnAdmin) exit("-1");
 		//adding the download
-		$query6 = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID=:levelID AND ip=INET6_ATON(:ip)");
-		$query6->execute([':levelID' => $levelID, ':ip' => $ip]);
-		if($inc && $query6->fetchColumn() < 2){
-			$query2=$db->prepare("UPDATE levels SET downloads = downloads + 1 WHERE levelID = :levelID");
-			$query2->execute([':levelID' => $levelID]);
-			$query6 = $db->prepare("INSERT INTO actions_downloads (levelID, ip) VALUES 
-														(:levelID,INET6_ATON(:ip))");
+		if (!$accountBasedDownloadCount) {
+			$query6 = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID=:levelID AND ip=INET6_ATON(:ip)");
 			$query6->execute([':levelID' => $levelID, ':ip' => $ip]);
+			if($inc && $query6->fetchColumn() < 2){
+				$query2=$db->prepare("UPDATE levels SET downloads = downloads + 1 WHERE levelID = :levelID");
+				$query2->execute([':levelID' => $levelID]);
+				$query6 = $db->prepare("INSERT INTO actions_downloads (levelID, ip) VALUES (:levelID,INET6_ATON(:ip))");
+				$query6->execute([':levelID' => $levelID, ':ip' => $ip]);
+			}
+		}
+		else if ($accountBasedDownloadCount && !empty($_POST['accountID']) {
+			// TODO : Make this thing work with unregistered account (maybe impossible)
+			$accountID = GJPCheck::getAccountIDOrDie();
+			$query6 = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID=:levelID AND accountID=:accountID");
+			$query6->execute([':levelID' => $levelID, ':accountID' => $accountID]);
+			if($inc && $query6->fetchColumn() < 2){
+				$query2=$db->prepare("UPDATE levels SET downloads = downloads + 1 WHERE levelID = :levelID");
+				$query2->execute([':levelID' => $levelID]);
+				$query6 = $db->prepare("INSERT INTO actions_downloads (levelID, accountID) VALUES (:levelID,:accountID)");
+				$query6->execute([':levelID' => $levelID, ':accountID' => $accountID]);
 		}
 		$uploadDate = $gs->makeTime($result["uploadDate"]);
 		$updateDate = $gs->makeTime($result["updateDate"]);
