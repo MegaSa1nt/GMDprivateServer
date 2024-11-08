@@ -1,10 +1,10 @@
 <?php
 chdir(dirname(__FILE__));
-include "../lib/connection.php";
+require "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/XORCipher.php";
-include_once "../lib/mainLib.php";
+require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
@@ -18,7 +18,7 @@ if($query->rowCount() == 0){
 }
 if(empty($_POST["isSender"])){
 	$query=$db->prepare("UPDATE messages SET isNew=1 WHERE messageID = :messageID AND toAccountID = :accID");
-	$query->execute([':messageID' => $messageID, ':accID' =>$accountID]);
+	$query->execute([':messageID' => $messageID, ':accID' => $accountID]);
 	$accountID = $result["accID"];
 	$isSender = 0;
 }else{
@@ -30,7 +30,7 @@ $query->execute([':accountID' => $accountID]);
 $result12 = $query->fetch();
 $uploadDate = $gs->makeTime($result["timestamp"]);
 $result12["userName"] = $gs->makeClanUsername($result12);
-$result["subject"] = ExploitPatch::url_base64_encode(ExploitPatch::rutoen(ExploitPatch::url_base64_decode($result["subject"])));
-$result["body"] = ExploitPatch::url_base64_encode(XORCipher::cipher(ExploitPatch::rutoen(XORCipher::cipher(ExploitPatch::url_base64_decode($result["body"]), 14251)), 14251));
+$result["subject"] = ExploitPatch::url_base64_encode(ExploitPatch::translit(ExploitPatch::url_base64_decode($result["subject"])));
+$result["body"] = ExploitPatch::url_base64_encode(XORCipher::cipher(ExploitPatch::translit(XORCipher::cipher(ExploitPatch::url_base64_decode($result["body"]), 14251)), 14251));
 echo "6:".$result12["userName"].":3:".$result12["userID"].":2:".$result12["extID"].":1:".$result["messageID"].":4:".$result["subject"].":8:".$result["isNew"].":9:".$isSender.":5:".$result["body"].":7:".$uploadDate."";
 ?>

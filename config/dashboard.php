@@ -6,11 +6,15 @@ $lrEnabled = 1; // 1 = Level reupload enabled, 0 = disabled
 $msgEnabled = 1; // 1 = Messenger enabled, 0 = disabled
 $clansEnabled = 1; // 1 = Clans enabled, 0 = disabled
 $songEnabled = 12; // 0 = Song reupload disabled, add 1 to enable song file reupload, add 2 to enable song link reupload
-$sfxEnabled = 12; // 0 = SFX reupload disabled, add 1 to enable SFX file reupload, add 2 to enable SFX link reupload (not implemented yet)
+$sfxEnabled = 1; // 0 = SFX upload disabled, 1 = enabled
 $convertEnabled = 1; // 1 = Convert SFX to OGG enabled, 0 = disabled
 $songSize = 8; // Max song size in megabytes
 $sfxSize = 4.5; // Max SFX size in megabytes
 $timeType = 1; // How time will show in-game, 0 - default Cvolton time, 1 - Dashboard-like time, 2 - RobTop-like time
+$dashboardIcon = '/dashboard/icon.png'; // Icon at the top left of dashboard, can be link
+$dashboardFavicon = '/dashboard/icon.png'; // Icon in browser's tab, can be link
+$preenableSongs = true; // true = songs are enabled when reuploading, false = song must be enabled through dashboard/stats/disabledSongsList.php in order to use it
+$preenableSFXs = true; // true = SFXs are enabled when reuploading, false = SFX must be enabled through dashboard/stats/disabledSFXsList.php in order to use it
 // If you changed dashboard's place, change $dbPath in dashboard/incl/dashboardLib.php
 
 // External download links, disables when you have gdpsName.gdpsFileType in dashboard/download directory
@@ -47,12 +51,30 @@ $thirdParty[] = array('https://avatars.githubusercontent.com/u/52624723', 'Foxod
 $customLibrary[] = array(1, 'Geometry Dash', 'https://geometrydashfiles.b-cdn.net', 2); 
 $customLibrary[] = array(2, 'GDPSFH', 'https://sfx.fhgdps.com', 0); 
 $customLibrary[] = array(3, $gdps, null, 2); // Your GDPS's library, don't remove it
+$customLibrary[] = array(4, 'Song File Hub', 'https://api.songfilehub.com', 1);
 
-// SFX converter API links, make one using code from https://github.com/MegaSa1nt/GDPS-ConvertSFX
+// SFX converter API links, make one by using code from https://github.com/MegaSa1nt/GDPS-ConvertSFX
 // Template: $convertSFXAPI[] = "";
 
 $convertSFXAPI[] = "https://niko.gcs.icu";
-$convertSFXAPI[] = "https://lamb.gcs.icu"; // You're welcome
-$convertSFXAPI[] = "https://omori.gcs.icu";
+$convertSFXAPI[] = "https://lamb.gcs.icu";
+$convertSFXAPI[] = "https://omori.gcs.icu"; // You're welcome
 $convertSFXAPI[] = "https://im.gcs.icu";
+$convertSFXAPI[] = "https://hat.gcs.icu";
+
+/*
+	Level reupload tool
+	
+	These confing will allow you to customize level reupload tool
+	
+	$requireAccountForReuploading — if user must enter their account credentials to reupload level
+		True — require logging in
+		False — don't require to login
+	$disallowReuploadingNotUserLevels — if user should be allowed to reupload only their levels
+		True — allow reuploading only their levels
+		False — allow reuploading any levels
+*/
+
+$requireAccountForReuploading = false;
+$disallowReuploadingNotUserLevels = false;
 ?>

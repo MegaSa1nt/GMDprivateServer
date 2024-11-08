@@ -5,7 +5,7 @@ $dl = new dashboardLib();
 require_once "../".$dbPath."incl/lib/mainLib.php";
 require "../".$dbPath."incl/lib/exploitPatch.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/connection.php";
 $dl->title($dl->getLocalizedString("modActionsList"));
 if(isset($_GET["page"]) AND is_numeric($_GET["page"]) AND $_GET["page"] > 0){
 	$page = ($_GET["page"] - 1) * 10;
@@ -47,7 +47,7 @@ if(empty($result)) {
 	die();
 } 
 foreach($result as &$action){
-	$account =  $gs->getAccountName($action["account"]);
+	$account = $gs->getAccountName($action["account"]);
 	$value = htmlspecialchars($action["value"]);
 	$value2 = htmlspecialchars($action["value2"]);
 	$value3 = htmlspecialchars($action["value3"]);
@@ -64,6 +64,10 @@ foreach($result as &$action){
 		case 2:
 		case 3:
 		case 4:
+		case 12:
+		case 14:
+		case 29:
+		case 38:
 			if($action["value"] == 1) $value = '<text style="color:gray">'.$dl->getLocalizedString("isAdminYes").'</text>';
 			else $value = '<text style="color:gray">'.$dl->getLocalizedString("isAdminNo").'</text>';
 			$value2 = $gs->getLevelName($value3);
@@ -73,7 +77,25 @@ foreach($result as &$action){
 			if(is_numeric($value2)) $value3 = date("d.m.Y", $value2);
 			$value2 = $gs->getLevelName($value);
 			break;
+		case 6:
+		case 34:
+			$value = $value3;
+			if(empty($value2)) $value2 = '<text style="color:gray">'.$dl->getLocalizedString('empty').'</text>';
+			$value3 = date("d.m.Y", $action["timestamp"]);
+			break;
+		case 8:
+			$value2 = $value;
+			$value = htmlspecialchars($action['value2']);
+			if(empty($action['value2'])) $value = '<text style="color:gray">'.$dl->getLocalizedString('empty').'</text>';
+			break;
+		case 9:
+			if(!$gs->checkPermission($_SESSION['accountID'], "dashboardModTools")) $value = '<text style="color:gray">'.$dl->getLocalizedString('empty').'</text>';
+			else $value = substr($value, 1);
+			break;
+		case 7:
+		case 10:
 		case 11:
+		case 16:
 			$value2 = $gs->getLevelName($value3);
 			break;
 		case 13:
@@ -83,21 +105,27 @@ foreach($result as &$action){
 			$value = $gs->getAccountName($value);
 			switch($value4) {
 				case 'isBanned':
-					$value4  = $dl->getLocalizedString('playerTop');
+					$value4 = $dl->getLocalizedString('playerTop');
 					break;
 				case 'isCreatorBanned':
-					$value4  = $dl->getLocalizedString('creatorTop');
+					$value4 = $dl->getLocalizedString('creatorTop');
 					break;
 				case 'isUploadBanned':
-					$value4  = $dl->getLocalizedString('levelUploading');
+					$value4 = $dl->getLocalizedString('levelUploading');
 					break;
 				case 'isCommentBanned':
-					$value4  = $dl->getLocalizedString('commentBan');
+					$value4 = $dl->getLocalizedString('commentBan');
 					break;
 			}
 			if($value3 == 0) $value3 = $value4.', <span style="color:#a9ffa9">'.$dl->getLocalizedString("unban").'</span>';
 			else $value3 = $value4.', <span style="color:#ffa9a9">'.$dl->getLocalizedString("isBan").'</span>';
 			if($value2 == 'banned' OR $value2 == 'none') $value2 = '<span style="color:gray">'.$dl->getLocalizedString("noReason").'</span>';
+			break;
+		case 18:
+		case 22:
+			$value2 = $value;
+			$action['value2'] = $action['value'];
+			$value = $action['value'] = $gs->getGauntletName($value3);
 			break;
 		case 17:
 		case 21:
@@ -109,7 +137,7 @@ foreach($result as &$action){
 		case 20:
 		case 24:
 			$value = '<form style="margin:0" method="post" action="./profile/"><button type="button" onclick="a(\'profile/'.$value.'\', true, true, \'POST\')" style="margin:0" class="accbtn" name="accountID" value="'.$value2.'">'.$value.'</button></form>';
-			if($value3 != "-1") {
+			if(!empty($value3) && $value3 != "-1") {
 				$clr = $db->prepare("SELECT commentColor, roleName FROM roles WHERE roleID = :id");
 				$clr->execute([':id' => $value3]);
 				$clr = $clr->fetch();
@@ -172,6 +200,21 @@ foreach($result as &$action){
 			$value = ExploitPatch::url_base64_decode($action['value']);
 			$value2 = $gs->getListName($action["value3"]);
 			break;
+		case 39:
+			if($action["value"] == 1) $value = '<text style="color:gray">'.$dl->getLocalizedString("isAdminYes").'</text>';
+			else $value = '<text style="color:gray">'.$dl->getLocalizedString("isAdminNo").'</text>';
+			$value2 = $gs->getListName($value3);
+			break;
+		case 40:
+			$value = $value3;
+			$value2 = $gs->getLevelName($value3);
+			$value3 = date("d.m.Y", $action["timestamp"]);
+			break;
+		case 41:
+			$value2 = $value.' '.$dl->getLocalizedString("starsLevel1");
+			$value = $value3;
+			$value3 = $gs->getLevelName($value3);
+			break;
 	}
 	if(mb_strlen($action["value"]) > 18) $value = "<details><summary class='modactionsspoiler'>".$dl->getLocalizedString("spoiler")."</summary>$value</details>";
   	if(mb_strlen($action["value2"]) > 18) $value2 = "<details><summary class='modactionsspoiler'>".$dl->getLocalizedString("spoiler")."</summary>$value2</details>";
@@ -180,13 +223,35 @@ foreach($result as &$action){
 	$v2 = '<div class="mavdiv"><div class="profilepic"><i class="fa-solid fa-2" style="background: #29282c; padding: 5px 9.5px; border-radius: 500px;"></i> '.$value2.'</div></div>';
 	$v3 = '<div class="mavdiv"><div class="profilepic"><i class="fa-solid fa-3" style="background: #29282c; padding: 5px 6.5px; border-radius: 500px;"></i> '.$value3.'</div></div>';
 	$stats = $v1.$v2.$v3;
-	$members .= '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
-			<div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><div class="acclistdiv">
-				<h1 class="dlh1 profh1 suggest"><button type="button" onclick="a(\'profile/'.$account.'\', true, true)" class="accbtn" name="accountID">'.$account.'</button><text class="dltext"> '.$actionname.'</text></h1>
-			</div></div>
-			<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
-			<div class="acccomments"><h3 class="comments" style="margin: 0px;width: max-content;">'.$dl->getLocalizedString("ID").': <b>'.$action["ID"].'</b></h3><h3 class="comments" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">'.$dl->getLocalizedString("date").': <b>'.$time.'</b></h3></div>
-		</div></div>';
+	// Avatar management
+    $queryUserDetails = $db->prepare("SELECT u.iconType, u.accIcon, u.accShip, u.accBall, u.accBird, u.accDart, u.accRobot, u.accSpider, u.accSwing, u.accJetpack, u.color1, u.color2, u.color3, u.accGlow FROM users u JOIN modactions m ON u.extID = m.account WHERE m.account = :accountID");
+    $queryUserDetails->execute([':accountID' => $action['account']]);
+    if($userDetails = $queryUserDetails->fetch(PDO::FETCH_ASSOC)) {
+        $iconType = ($userDetails['iconType'] > 8) ? 0 : $userDetails['iconType'];
+        $iconTypeMap = [0 => ['type' => 'cube', 'value' => $userDetails['accIcon']], 1 => ['type' => 'ship', 'value' => $userDetails['accShip']], 2 => ['type' => 'ball', 'value' => $userDetails['accBall']], 3 => ['type' => 'ufo', 'value' => $userDetails['accBird']], 4 => ['type' => 'wave', 'value' => $userDetails['accDart']], 5 => ['type' => 'robot', 'value' => $userDetails['accRobot']], 6 => ['type' => 'spider', 'value' => $userDetails['accSpider']], 7 => ['type' => 'swing', 'value' => $userDetails['accSwing']], 8 => ['type' => 'jetpack', 'value' => $userDetails['accJetpack']]];
+        $iconValue = (isset($iconTypeMap[$iconType]) && $iconTypeMap[$iconType]['value'] > 0) ? $iconTypeMap[$iconType]['value'] : 1;
+        $avatarImg = '<img src="https://gdicon.oat.zone/icon.png?type=' . $iconTypeMap[$iconType]['type'] . '&value=' . $iconValue . '&color1=' . $userDetails['color1'] . '&color2=' . $userDetails['color2'] . ($userDetails['accGlow'] != 0 ? '&glow=' . $userDetails['accGlow'] . '&color3=' . $userDetails['color3'] : '') . '" alt="avatar" style="width: 31px; margin-right: 5px; object-fit: contain;">';
+    }
+    $members .= '<div style="width: 100%; display: flex; flex-wrap: wrap; justify-content: center;">
+        <div class="profile" style="width: 100%;">
+            <div style="display: flex; align-items: center; margin-bottom: 7px;">
+                <div style="display: flex; align-items: center;">
+                    '.$avatarImg.'
+                    <div>
+                        <h1 class="dlh1 profh1 suggest" style="margin: 0;">
+                            '.(!empty($account) ? '<button type="button" onclick="a(\'profile/'.$account.'\', true, true)" class="accbtn" name="accountID">'.$account.'</button>' : $dl->getLocalizedString("system")).'
+                            <text class="dltext"> '.$actionname.'</text>
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="form-control" style="display: flex; width: 100%; height: max-content; align-items: center;">'.$stats.'</div>
+            <div class="acccomments">
+                <h3 class="comments" style="margin: 0; width: max-content;">'.$dl->getLocalizedString("ID").':&nbsp;<b>'.$action["ID"].'</b></h3>
+                <h3 class="comments" style="justify-content: flex-end; grid-gap: 0.5vh; margin: 0; width: max-content;">'.$dl->getLocalizedString("date").': <b>'.$time.'</b></h3>
+            </div>
+        </div>
+    </div>';
 	$x++;
 }
 $mods = $db->prepare("SELECT * FROM roleassign GROUP BY accountID");
@@ -230,9 +295,10 @@ $pagel = '<div class="form new-form">
             <option value="23">'.$dl->getLocalizedString("modAction23").' (23)</option>
             <option value="24">'.$dl->getLocalizedString("modAction24").' (24)</option>
 			<option value="25">'.$dl->getLocalizedString("modAction25").' (25)</option>
-			<option value="27">'.$dl->getLocalizedString("modAction26").' (26)</option>
-			<option value="28">'.$dl->getLocalizedString("modAction27").' (27)</option>
-			<option value="26">'.$dl->getLocalizedString("modAction28").' (28)</option>
+			<option value="26">'.$dl->getLocalizedString("modAction26").' (26)</option>
+			<option value="27">'.$dl->getLocalizedString("modAction27").' (27)</option>
+			<option value="28">'.$dl->getLocalizedString("modAction28").' (28)</option>
+			<option value="29">'.$dl->getLocalizedString("modAction29").' (29)</option>
 			<option value="30">'.$dl->getLocalizedString("modAction30").' (30)</option>
 			<option value="31">'.$dl->getLocalizedString("modAction31").' (31)</option>
 			<option value="32">'.$dl->getLocalizedString("modAction32").' (32)</option>
@@ -241,6 +307,10 @@ $pagel = '<div class="form new-form">
 			<option value="35">'.$dl->getLocalizedString("modAction35").' (35)</option>
 			<option value="36">'.$dl->getLocalizedString("modAction36").' (36)</option>
 			<option value="37">'.$dl->getLocalizedString("modAction37").' (37)</option>
+			<option value="38">'.$dl->getLocalizedString("modAction38").' (38)</option>
+			<option value="39">'.$dl->getLocalizedString("modAction39").' (39)</option>
+   			<option value="40">'.$dl->getLocalizedString("modAction40").' (40)</option>
+         		<option value="41">'.$dl->getLocalizedString("modAction41").' (41)</option>
 		</select>
 		<select id="sel2" style="border-radius: 0;margin:0;width:35%" name="who" value="'.$_GET["who"].'" placeholder="'.$dl->getLocalizedString("search").'">
 			<option value="0">'.$dl->getLocalizedString("everyMod").'</option>

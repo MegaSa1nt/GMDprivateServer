@@ -1,7 +1,7 @@
 <?php
 //header
 chdir(dirname(__FILE__));
-include "../lib/connection.php";
+require "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
@@ -88,6 +88,10 @@ switch($type){
 		$order = "uploadDate";
 		break;
 	case 5:
+		if(!empty($_POST['accountID'])) {
+			$accountID = GJPCheck::getAccountIDOrDie();
+			if($accountID == $str) $params = [];
+		}	
 		$params[] = "lists.accountID = '$str'";
 		break;
 	case 6: // TOP LISTS
@@ -111,6 +115,8 @@ switch($type){
 		$params[] = "lists.accountID IN ($whereor)";
 		break;
 	case 7: // MAGIC
+	       	$order = "likes";
+		break;
 	case 27: // SENT
 		$params[] = "suggest.suggestLevelId < 0";
 		$order = "suggest.timestamp";
@@ -141,6 +147,8 @@ $levelcount = $query->rowCount();
 foreach($result as &$list) {
 	if(!$list['uploadDateUnix']) $list['uploadDateUnix'] = 0;
 	if(!$list['updateDateUnix']) $list['updateDateUnix'] = 0;
+	$list['listName'] = ExploitPatch::translit($list['listName']);
+	$list['listDesc'] = ExploitPatch::translit($list['listDesc']);
 	$list['likes'] = $list['likes']; // - $list['dislikes'];
 	$list['userName'] = $gs->makeClanUsername($list);
 	$lvlstring .= "1:{$list['listID']}:2:{$list['listName']}:3:{$list['listDesc']}:5:{$list['listVersion']}:49:{$list['accountID']}:50:{$list['userName']}:10:{$list['downloads']}:7:{$list['starDifficulty']}:14:{$list['likes']}:19:{$list['starFeatured']}:51:{$list['listlevels']}:55:{$list['starStars']}:56:{$list['countForReward']}:28:{$list['uploadDateUnix']}:29:{$list['updateDateUnix']}"."|";

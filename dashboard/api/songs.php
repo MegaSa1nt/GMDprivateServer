@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
 require "../incl/dashboardLib.php";
-include "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/connection.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 if(empty($_GET)) $json = json_decode(file_get_contents('php://input'), true);
 else $json = $_GET;
@@ -17,7 +17,7 @@ if(!empty($search)) {
 			$acc = $discord->fetch();
 			if($acc["accountID"]) {
 				if($search == 'MySongs') $songs = $db->prepare("SELECT * FROM songs WHERE reuploadID = :id AND isDisabled = 0 ORDER BY reuploadTime DESC");
-				else $songs = $db->prepare("SELECT * FROM favsongs INNER JOIN songs on favsongs.songID = songs.ID WHERE favsongs.accountID = :id ORDER BY favsongs.ID DESC");
+				else $songs = $db->prepare("SELECT * FROM favsongs INNER JOIN songs on favsongs.songID = songs.ID WHERE favsongs.accountID = :id AND songs.isDisabled = 0 ORDER BY favsongs.ID DESC");
 				$songs->execute([':id' => $acc["accountID"]]);
 				$songs = $songs->fetchAll();
 				if($songs) {

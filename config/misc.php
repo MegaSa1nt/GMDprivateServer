@@ -20,6 +20,18 @@ $orderMapPacksByStars = true;
 $sakujes = true;
 
 /*
+	Count unlisted rated levels in the creator points calculation (cron.php / fixcps.php)
+
+	Whether you want unlisted rated levels to be counted in the creator points calculation or not
+
+	True - Count unlisted rated levels in the creator points calculation
+	False - Do not count unlisted rated levels in the creator points calculation
+
+*/
+
+$unlistedCreatorPoints = false;
+
+/*
 	Comment length limiter
 	
 	This setting will enable comment length limiter to prevent flooding with scripts
@@ -136,4 +148,38 @@ $specialCommentLikes = [
     1 => 10,
     2 => 20
 ];
+
+/*
+	Let GDPS administrators to see unlisted levels
+	
+	This setting will show unlisted levels for administrators
+	
+	True - Show unlisted levels
+	False - Don't show unlisted levels
+*/
+
+$unlistedLevelsForAdmins = false;
+
+/*
+	Show rated levels in sent tab
+	
+	This setting will show rated levels in sent tab
+	
+	True - Show rated levels in sent tab
+	False - Don't show rated levels in sent tab
+*/
+
+$ratedLevelsInSent = false;
+
+/*
+	Show moderators list in-game
+	
+	This setting replaces global leaderboard with moderators list
+	https://github.com/MegaSa1nt/GMDprivateServer/issues/181
+	
+	True - Replace global leaderboard with moderators list
+	False - Keep global leaderboard
+*/
+
+$moderatorsListInGlobal = false;
 ?>

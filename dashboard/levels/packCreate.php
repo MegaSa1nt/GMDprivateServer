@@ -6,8 +6,8 @@ require "../".$dbPath."incl/lib/connection.php";
 $dl = new dashboardLib();
 require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
-include "../".$dbPath."incl/lib/exploitPatch.php";
+require "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/exploitPatch.php";
 $ep = new exploitPatch();
 $dl->title($dl->getLocalizedString("packCreateTitle"));
 $dl->printFooter('../');
@@ -35,10 +35,10 @@ if(!empty($_POST["packName"])) {
 </div>', 'mod');
 		die();
 	}
-	$name = ExploitPatch::remove($_POST["packName"]);
+	$name = ExploitPatch::rucharclean($_POST["packName"]);
 	$color = ExploitPatch::remove($dl->hex2RGB($_POST["color"], true));
-	$stars = ExploitPatch::remove($_POST["stars"]);
-	$coins = ExploitPatch::remove($_POST["coins"]);
+	$stars = ExploitPatch::number($_POST["stars"]);
+	$coins = ExploitPatch::number($_POST["coins"]);
 	if(!is_numeric($_POST['level_1']) OR !is_numeric($_POST['level_2']) OR !is_numeric($_POST['level_3']) OR $stars > 10 OR $stars < 0 OR $coins > 2 OR $coins < 0 OR !$gs->getLevelName(ExploitPatch::remove($_POST['level_1'])) OR !$gs->getLevelName(ExploitPatch::remove($_POST['level_2'])) OR !$gs->getLevelName(ExploitPatch::remove($_POST['level_3']))) {
 	$dl->printSong('<div class="form">
 			<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
@@ -49,7 +49,7 @@ if(!empty($_POST["packName"])) {
 			</div>', 'mod');
 		die();
 	}
-	$levels = ExploitPatch::remove($_POST['level_1']) . ',' . ExploitPatch::remove($_POST['level_2']) . ',' . ExploitPatch::remove($_POST['level_3']);
+	$levels = ExploitPatch::number($_POST['level_1']) . ',' . ExploitPatch::number($_POST['level_2']) . ',' . ExploitPatch::number($_POST['level_3']);
 	switch($stars) {
 		case 1:
 			$diff = 0;
@@ -77,7 +77,9 @@ if(!empty($_POST["packName"])) {
 			break;
 	}
 	$query = $db->prepare("INSERT INTO mappacks (name, levels, stars, coins, difficulty, rgbcolors, colors2, timestamp) VALUES (:name, :levels, :stars, :coins, :diff, :rgb, :c2, :time)");
-	$query->execute([':name' => $name, ':levels' => $levels, ':stars' => $stars, ':coins' => $coins, ':diff' => $diff, ':rgb' => $color, ':c2' => ExploitPatch::remove(str_replace("#", '', $_POST["color"])), ':time' => time()]);
+	$query->execute([':name' => $name, ':levels' => $levels, ':stars' => $stars, ':coins' => $coins, ':diff' => $diff, ':rgb' => $color, ':c2' => $color, ':time' => time()]);
+	$packID = $db->lastInsertId();
+	$gs->sendLogsMapPackChangeWebhook($packID, $_SESSION['accountID']);
 	$query = $db->prepare("INSERT INTO modactions  (type, value, timestamp, account, value2, value3, value4, value7) VALUES ('17',:value,:timestamp,:account,:levels, :stars, :coins, :rgb)");
 	$query->execute([':value' => $name, ':timestamp' => time(), ':account' => $accountID, ':levels' => $levels, ':stars' => $stars, ':coins' => $coins, ':rgb' => $color]);
 	$success = $dl->getLocalizedString("packCreateSuccess").' <b style="color:'.$_POST["color"].'">'.$name."</b>!";
@@ -96,7 +98,7 @@ if(!empty($_POST["packName"])) {
         <h2 class="subjectnotyou" style="color:rgb('.$pack["rgbcolors"].')" id="name'.$pack["ID"].'">'.$pack["name"].' <i style="opacity:0; margin-right: 10px; color: white; font-size: 13px;transition:0.2s" id="spin'.$pack["ID"].'" class="fa-solid fa-spinner fa-spin"></i></h2>
         <h2 class="messagenotyou" style="font-size: 15px;color: #c0c0c0;" id="stats'.$pack["ID"].'"><i class="fa-solid fa-star"></i> '.$pack["stars"].' | <i class="fa-solid fa-coins"></i> '.$pack["coins"].'</h2>
     </button>';
-	$dl->printSong('<div class="form-control itemsbox">
+	$dl->printSong('<div class="form-control itemsbox chatdiv">
 	<div class="itemoverflow"><div class="itemslist">
     <button type="submit" onclick="pack(0)" class="btn-primary itembtn">
         <h2 class="subjectnotyou">'.$dl->getLocalizedString("packCreate").'</h2>

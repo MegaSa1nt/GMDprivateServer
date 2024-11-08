@@ -1,42 +1,33 @@
 <?php
 //error_reporting(0);
 chdir(dirname(__FILE__));
-include "../lib/connection.php";
+require "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-require_once "../lib/mainLib.php";
-$mainLib = new mainLib();
+require_once "../lib/automod.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
+if(Automod::isLevelsDisabled(0)) exit('-1');
 //here im getting all the data
 $gjp2check = isset($_POST['gjp2']) ? $_POST['gjp2'] : $_POST['gjp'];
-$gjp = ExploitPatch::remove($gjp2check);
-$gameVersion = ExploitPatch::remove($_POST["gameVersion"]);
+$gjp = ExploitPatch::charclean($gjp2check);
+$gameVersion = ExploitPatch::number($_POST["gameVersion"]);
 $userName = ExploitPatch::charclean($_POST["userName"]);
-$levelID = ExploitPatch::remove($_POST["levelID"]);
+$levelID = ExploitPatch::number($_POST["levelID"]);
 $levelName = ExploitPatch::charclean($_POST["levelName"]);
 //TODO: move description fixing code to a function
 $levelDesc = ExploitPatch::remove($_POST["levelDesc"]);
-if($gameVersion < 20){
-	$rawDesc = $levelDesc;
-	$levelDesc = str_replace('+', '-', base64_encode($rawDesc));
-	$levelDesc = str_replace('/', '_', $levelDesc);
-} else {
-	$rawDesc = str_replace('-', '+', $levelDesc);
-	$rawDesc = str_replace('_', '/', $rawDesc);
-	$rawDesc = base64_decode($rawDesc);
-}
-if (strpos($rawDesc, '<c') !== false) {
+$rawDesc = $gameVersion < 20 ? ExploitPatch::translit($levelDesc) : ExploitPatch::translit(ExploitPatch::url_base64_decode($levelDesc));
+if(strpos($rawDesc, '<c') !== false) {
 	$tags = substr_count($rawDesc, '<c');
-	if ($tags > substr_count($rawDesc, '</c>')) {
+	if($tags > substr_count($rawDesc, '</c>')) {
 		$tags = $tags - substr_count($rawDesc, '</c>');
-		for ($i = 0; $i < $tags; $i++) {
+		for($i = 0; $i < $tags; $i++) {
 			$rawDesc .= '</c>';
 		}
-		$levelDesc = str_replace('+', '-', base64_encode($rawDesc));
-		$levelDesc = str_replace('/', '_', $levelDesc);
 	}
 }
+$levelDesc = ExploitPatch::url_base64_encode(ExploitPatch::rucharclean($rawDesc));
 $levelVersion = ExploitPatch::remove($_POST["levelVersion"]);
 $levelLength = ExploitPatch::remove($_POST["levelLength"]);
 $audioTrack = ExploitPatch::remove($_POST["audioTrack"]);
@@ -68,17 +59,11 @@ $songIDs = !empty($_POST["songIDs"]) ? ExploitPatch::numbercolon($_POST["songIDs
 $sfxIDs = !empty($_POST["sfxIDs"]) ? ExploitPatch::numbercolon($_POST["sfxIDs"]) : '';
 $ts = !empty($_POST["ts"]) ? ExploitPatch::number($_POST["ts"]) : 0;
 
-if(isset($_POST["password"])){
-	$password = ExploitPatch::remove($_POST["password"]);
-}else{
-	$password = 1;
-	if($gameVersion > 17){
-		$password = 0;
-	}
-}
+if(isset($_POST["password"])) $password = $_POST["password"] != 0 ? ExploitPatch::remove($_POST["password"]) : 1;
+else $password = $gameVersion > 21 ? 1 : 0;
 $id = $gs->getIDFromPost();
 $hostname = $gs->getIP();
-$userID = $mainLib->getUserID($id, $userName);
+$userID = $gs->getUserID($id, $userName);
 $checkBan = $gs->getPersonBan($id, $userID, 2);
 if($checkBan) exit("-1");
 $uploadDate = time();
@@ -89,27 +74,36 @@ $query = $db->prepare("INSERT INTO levels (levelName, gameVersion, binaryVersion
 VALUES (:levelName, :gameVersion, :binaryVersion, :userName, :levelDesc, :levelVersion, :levelLength, :audioTrack, :auto, :password, :original, :twoPlayer, :songID, :objects, :coins, :requestedStars, :extraString, :levelString, :levelInfo, :secret, :uploadDate, :userID, :id, :uploadDate, :unlisted, :hostname, :ldm, :wt, :wt2, :unlisted2, :settingsString, :songIDs, :sfxIDs, :ts)");
 
 if($levelString != "" AND $levelName != "") {
-	$querye=$db->prepare("SELECT levelID FROM levels WHERE levelName = :levelName AND userID = :userID");
+	$querye=$db->prepare("SELECT levelID, updateLocked FROM levels WHERE levelName = :levelName AND userID = :userID");
 	$querye->execute([':levelName' => $levelName, ':userID' => $userID]);
-	$levelID = $querye->fetchColumn();
+	$level = $querye->fetch();
+	$levelID = $level['levelID'];
+	if($level['updateLocked']) exit("-1");
 	$lvls = $querye->rowCount();
-	if($lvls==1) {
-		include "../../config/misc.php";
-		$query = $db->prepare("SELECT starStars FROM `levels` WHERE levelID = :levelID");
+	if($lvls == 1) {
+		require "../../config/misc.php";
+		$query = $db->prepare("SELECT * FROM levels WHERE levelID = :levelID");
 		$query->execute([":levelID"=> $levelID]);
-		$stars = $query->fetchColumn();
+		$getLevelData = $query->fetch();
+		$stars = $getLevelData['starStars'];
 		if(!$ratedLevelsUpdates && !in_array($levelID, $ratedLevelsUpdatesExceptions) && $stars > 0) exit("-1");
 		$query = $db->prepare("UPDATE levels SET levelName=:levelName, gameVersion=:gameVersion,  binaryVersion=:binaryVersion, userName=:userName, levelDesc=:levelDesc, levelVersion=:levelVersion, levelLength=:levelLength, audioTrack=:audioTrack, auto=:auto, password=:password, original=:original, twoPlayer=:twoPlayer, songID=:songID, objects=:objects, coins=:coins, requestedStars=:requestedStars, extraString=:extraString, levelString=:levelString, levelInfo=:levelInfo, secret=:secret, updateDate=:uploadDate, unlisted=:unlisted, hostname=:hostname, isLDM=:ldm, wt=:wt, wt2=:wt2, unlisted2=:unlisted2, settingsString=:settingsString, songIDs=:songIDs, sfxIDs=:sfxIDs, ts=:ts WHERE levelName=:levelName AND extID=:id");	
 		$query->execute([':levelName' => $levelName, ':gameVersion' => $gameVersion, ':binaryVersion' => $binaryVersion, ':userName' => $userName, ':levelDesc' => $levelDesc, ':levelVersion' => $levelVersion, ':levelLength' => $levelLength, ':audioTrack' => $audioTrack, ':auto' => $auto, ':password' => $password, ':original' => $original, ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':objects' => $objects, ':coins' => $coins, ':requestedStars' => $requestedStars, ':extraString' => $extraString, ':levelString' => "", ':levelInfo' => $levelInfo, ':secret' => $secret, ':levelName' => $levelName, ':id' => $id, ':uploadDate' => $uploadDate, ':unlisted' => $unlisted, ':hostname' => $hostname, ':ldm' => $ldm, ':wt' => $wt, ':wt2' => $wt2, ':unlisted2' => $unlisted2, ':settingsString' => $settingsString, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
-		file_put_contents("../../data/levels/$levelID",$levelString);
+		file_put_contents("../../data/levels/$levelID", $levelString);
 		echo $levelID;
+		$gs->logAction($id, 23, $levelName, $levelDesc, $levelID);
+		$gs->sendLogsLevelChangeWebhook($levelID, $id, $getLevelData);
+		Automod::checkLevelsCount();
 	} else {
 		$query->execute([':levelName' => $levelName, ':gameVersion' => $gameVersion, ':binaryVersion' => $binaryVersion, ':userName' => $userName, ':levelDesc' => $levelDesc, ':levelVersion' => $levelVersion, ':levelLength' => $levelLength, ':audioTrack' => $audioTrack, ':auto' => $auto, ':password' => $password, ':original' => $original, ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':objects' => $objects, ':coins' => $coins, ':requestedStars' => $requestedStars, ':extraString' => $extraString, ':levelString' => "", ':levelInfo' => $levelInfo, ':secret' => $secret, ':uploadDate' => $uploadDate, ':userID' => $userID, ':id' => $id, ':unlisted' => $unlisted, ':hostname' => $hostname, ':ldm' => $ldm, ':wt' => $wt, ':wt2' => $wt2, ':unlisted2' => $unlisted2, ':settingsString' => $settingsString, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
 		$levelID = $db->lastInsertId();
-		file_put_contents("../../data/levels/$levelID",$levelString);
+		file_put_contents("../../data/levels/$levelID", $levelString);
 		echo $levelID;
+		$gs->logAction($id, 22, $levelName, $levelDesc, $levelID);
+		$gs->sendLogsLevelChangeWebhook($levelID, $id);
+		Automod::checkLevelsCount();
 	}
-}else{
-	echo -1;
+} else {
+	exit('-1');
 }
 ?>

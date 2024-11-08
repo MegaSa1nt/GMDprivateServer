@@ -1,15 +1,17 @@
 <?php
-include "../config/security.php";
-include "../config/mail.php";
-include "../incl/lib/connection.php";
-include_once "../incl/lib/mainLib.php";
+require "../config/security.php";
+require "../config/mail.php";
+require "../incl/lib/connection.php";
+require_once "../incl/lib/mainLib.php";
 $gs = new mainLib();
 require_once "../incl/lib/exploitPatch.php";
 require_once "../incl/lib/generatePass.php";
+require_once "../incl/lib/automod.php";
+if(Automod::isAccountsDisabled(0)) exit('-1');
 if(!isset($preactivateAccounts)) $preactivateAccounts = true;
 if(!isset($filterUsernames)) global $filterUsernames;
 if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["email"])) {
-	$userName = ExploitPatch::charclean($_POST["userName"]);
+	$userName = str_replace(' ', '', ExploitPatch::charclean($_POST["userName"]));
 	$password = $_POST["password"];
     $email = ExploitPatch::rucharclean($_POST["email"]);
 	if($filterUsernames >= 1) {
@@ -24,7 +26,7 @@ if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["
 				}
 		}
 	}
-	if(strlen($userName) > 20 || strpos($userName, ' ') !== false) exit("-4");
+	if(strlen($userName) > 20) exit("-4");
 	if(strlen($userName) < 3) exit("-9");
 	if(strlen($password) < 6) exit("-8");
 	if(!filter_var($email, FILTER_VALIDATE_EMAIL)) exit("-6");
@@ -45,7 +47,10 @@ if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["
 		$query = $db->prepare("INSERT INTO accounts (userName, password, email, registerDate, isActive, gjp2)
 		VALUES (:userName, :password, :email, :time, :isActive, :gjp)");
 		$query->execute([':userName' => $userName, ':password' => $hashpass, ':email' => $email, ':time' => time(), ':isActive' => $preactivateAccounts ? 1 : 0, ':gjp' => $gjp2]);
+		$accountID = $db->lastInsertId();
 		echo "1";
+		$gs->logAction($accountID, 1, $userName, $email, $gs->getUserID($accountID, $userName));
+		$gs->sendLogsRegisterWebhook($accountID);
       	if($mailEnabled) $gs->mail($email, $userName);
 	}
 } else echo "-1";

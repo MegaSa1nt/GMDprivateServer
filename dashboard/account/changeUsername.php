@@ -2,8 +2,8 @@
 session_start();
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/Captcha.php";
-include "../".$dbPath."incl/lib/connection.php";
-include_once "../".$dbPath."config/security.php";
+require "../".$dbPath."incl/lib/connection.php";
+require_once "../".$dbPath."config/security.php";
 require "../".$dbPath."incl/lib/generatePass.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
@@ -26,8 +26,11 @@ if($_POST["oldnickname"] != "" AND $_POST["newnickname"] != "" AND $_POST["passw
 	}
 	$userName = $gs->getAccountName($_SESSION["accountID"]);
 	$accID = $_SESSION["accountID"];
+	$getAccountData = $db->prepare("SELECT * FROM accounts WHERE accountID = :accountID");
+	$getAccountData->execute([':accountID' => $accID]);
+	$getAccountData = $getAccountData->fetch();
 	$oldnick = ExploitPatch::charclean($_POST["oldnickname"]);
-	$newnick = ExploitPatch::charclean($_POST["newnickname"]);
+	$newnick = str_replace(' ', '', ExploitPatch::charclean($_POST["newnickname"]));
 	if($oldnick != $userName){
 		$dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
@@ -51,7 +54,7 @@ if($_POST["oldnickname"] != "" AND $_POST["newnickname"] != "" AND $_POST["passw
 	$pass = GeneratePass::isValidUsrname($userName, $pass);
 	$salt = "";
 if($pass == 1) {
-	$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName=:userName");
+	$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
 	$query->execute([':userName' => $newnick]);
 	$count = $query->fetchColumn();
 	if($count > 0){
@@ -67,8 +70,11 @@ if($pass == 1) {
 	$auth = $gs->randomString(8);
 	$query = $db->prepare("UPDATE accounts SET userName=:userName, salt=:salt, auth=:auth WHERE accountID=:accountid");	
 	$query->execute([':userName' => $newnick, ':salt' => $salt, ':accountid' => $accID, ':auth' => $auth]);
+	$query = $db->prepare("UPDATE levels SET userName=:newnick WHERE userName=:oldnick");
+	$query->execute([':newnick' => $newnick, ':oldnick' => $oldnick]); // IMPORTANT: each level's username will change along with the account username
 	$query = $db->prepare("UPDATE users SET userName=:userName WHERE extID=:accountid");
 	$query->execute([':userName' => $newnick,':accountid' => $accID]);
+	$gs->sendLogsAccountChangeWebhook($accID, $accID, $getAccountData);
 	$_SESSION["accountID"] = 0;
 	setcookie('auth', 'no', 2147483647, '/');
 	$dl->printSong('<div class="form">

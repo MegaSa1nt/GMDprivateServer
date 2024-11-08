@@ -4,9 +4,6 @@ include __DIR__."/../../".$dbPath."config/dashboard.php";
 
 $string["homeNavbar"] = "Home";
 $string["welcome"] = "Welcome to ".$gdps.'!';
-$string["didntInstall"] = "<div style='color:#47a0ff'><b>Warning!</b> You haven't fully installed dashboard! Click on the text to do this.</div>";
-$string["levelsWeek"] = "Levels uploaded in a week";
-$string["levels3Months"] = "Levels uploaded in 3 months";
 $string["footer"] = $gdps.", ".date('Y', time());
 $string["tipsAfterInstalling"] = "Welcome to Dashboard! We give you some hints after installation:<br>
 1. It seems that new permissions have appeared in SQL in the 'roles' table! You should check it out...<br>
@@ -206,7 +203,7 @@ $string["activateAccount"] = "Account activation";
 $string["activateDesc"] = "Activate your account!";
 $string["activated"] = "Your account has been successfully activated!";
 $string["alreadyActivated"] = "Your account is already activated";
-$string["maybeActivate"] = "Maybe you didn't activated your account yet.";
+$string["maybeActivate"] = "Maybe you didn't activate your account yet.";
 $string["activate"] = "Activate";
 $string["activateDisabled"] = "Account activation is disabled!";
 
@@ -231,9 +228,6 @@ $string["shareCP"] = "Share";
 $string["alreadyShared"] = "This level already shared CP to this player!";
 $string["shareToAuthor"] = "You tried to share CP to level author!";
 $string["userIsBanned"] = "This player is banned!";
-$string["shareCPSuccess"] = "You successfully shared Creator Points of level";
-$string["shareCPSuccess2"] = "to player";
-$string["updateCron"] = "Maybe you should update Creator Points.";
 $string["shareCPOneMore"] = "One more share?";
 $string['shareCPSuccessNew'] = 'You successfully shared Creator Points of level <b>%1$s</b> to player <b>%2$s</b>!';
 
@@ -244,6 +238,8 @@ $string["noMsgs"] = "Start dialog!";
 $string["subject"] = "Subject";
 $string["msg"] = "Message";
 $string["tooFast"] = "You're typing too fast!";
+$string["messengerYou"] = "You:";
+$string["chooseChat"] = "Choose chat";
 
 $string["levelToGD"] = "Reupload level to target server";
 $string["levelToGDDesc"] = "Here you can reupload your level to target server!";
@@ -256,53 +252,14 @@ $string["search"] = "Search...";
 $string["searchCancel"] = "Cancel search";
 $string["emptySearch"] = "Nothing found!";
 
-$string["demonlist"] = 'Demonlist';
-$string["demonlistRecord"] = '<b>%s</b>\'s record';
-$string["alreadyApproved"] = 'Already approved!';
-$string["alreadyDenied"] = 'Already denied!';
-$string["approveSuccess"] = 'You\'ve successfully approved <b>%s</b>\'s record!';
-$string["denySuccess"] = 'You\'ve successfully denied <b>%s</b>\'s record!';
-$string["recordParameters"] = '<b>%s</b> has beated <b>%s</b> in <b>%d</b> attempts';
 $string["approve"] = 'Approve';
 $string["deny"] = 'Deny';
-$string["submitRecord"] = 'Submit record';
-$string["submitRecordForLevel"] = 'Submit record for <b>%s</b>';
-$string["alreadySubmitted"] = 'You\'ve already submitted an record for <b>%s</b>!';
-$string["submitSuccess"] = 'You\'ve successfully submitted an record for <b>%s</b>!';
-$string["submitRecordDesc"] = 'Submit records only if you beated the level!';
-$string["atts"] = 'Attempts';
-$string["ytlink"] = 'YouTube video ID (dQw4w9WgXcQ)';
 $string["submit"] = 'Submit';
-$string["addDemonTitle"] = 'Add demon';
-$string["addDemon"] = 'Add demon to demonlist';
-$string["addedDemon"] = 'You\'ve been added <b>%s</b> to <b>%d</b> place!';
-$string["addDemonDesc"] = 'Here you can add a demon to demonlist!';
 $string["place"] = 'Place';
-$string["giveablePoints"] = 'Giveable points';
 $string["add"] = 'Add';
-$string["recordApproved"] = 'Record approved!';
-$string["recordDenied"] = 'Record denied!';
-$string["recordSubmitted"] = 'Record submitted!';
-$string["nooneBeat"] = 'noone has beaten'; //let it be lowercase
-$string["oneBeat"] = '1 player has beaten'; 
-$string["lower5Beat"] = '%d players have beaten'; // russian syntax, sorry
-$string["above5Beat"] = '%d players have beaten'; 
-$string["demonlistLevel"] = '%s <text class="dltext">by <button type="button" onclick="a(\'profile/%3$s\', true, true)" style="font-size:25px" class="accbtn" name="accountID" value="%d">%s</button></text>';
-$string["noDemons"] = 'It seems that your demonlist doesn\'t have any demons...';
-$string["addSomeDemons"] = 'Add some demons to fill up demonlist!';
-$string["askForDemons"] = 'Ask server\'s administrator to add some!';
-$string["recordList"] = 'List of records';
-$string["status"] = 'Status';
-$string["checkRecord"] = 'Check record';
-$string["record"] = 'Record';
-$string["recordDeleted"] = 'Record was deleted!';
-$string["changeDemon"] = 'Change demon';
-$string["demonDeleted"] = 'Demon was deleted!';
-$string["changedDemon"] = 'You replaced <b>%s</b> to <b>%d</b> place!';
-$string["changeDemonDesc"] = 'Here you can change a demon!<br>
-If you want to delete demon, set place to 0.';
+$string["demonlistLevel"] = '%s <text class="dltext">by <button type="button" onclick="a(\'profile/%3$s\', true, true)" style="font-size:25px" class="accbtn" name="accountID" value="%d">%s</button>%4$s</text>';
 
-$string["didntActivatedEmail"] = 'You didn\'t activated your account through email!';
+$string["didntActivatedEmail"] = 'You didn\'t activate your account through email!';
 $string["checkMail"] = 'You should check your email...';
 
 $string["likeSong"] = "Add song to favourites";
@@ -355,6 +312,8 @@ $string["create"] = "Create";
 $string["mainSettings"] = "Main settings";
 $string["takenClanName"] = "This clan name was already taken!";
 $string["takenClanTag"] = "This clan tag was already taken!";
+$string["badClanName"] = "Please choose another clan name.";
+$string["badClanTag"] = "Please choose another clan tag.";
 
 $string["suggestedName"] = '<button type="button" onclick="a(\'profile/%1$s\', true, true)" class="accbtn" name="accountID">%1$s</button><text class="dltext"> suggested <b>%4$s%3$s</b> for</text><text class="levelname">%2$s</text>'; // %1$s - Mod username, %2$s - level name, %3$s - x stars, %4$s - Featured/Epic (%4$s%3$s - Featured, x stars)
 $string["reportedName"] = '%1$s<text class="dltext"> was reported</text><text class="levelname">%2$s</text>';
@@ -397,6 +356,90 @@ $string['youAreBanned'] = 'You were banned until <b>%2$s</b> for reason:<br><b>%
 $string['banChange'] = 'Change';
 $string['system'] = 'System';
 
+$string['levelComments'] = 'Level comments';
+$string['levelLeaderboards'] = 'Level leaderboards';
+$string['manageLevel'] = 'Manage level';
+$string['noComments'] = 'No comments!';
+$string['commentHere'] = 'Publish comment...';
+$string['weekLeaderboards'] = 'For a week';
+$string['noLeaderboards'] = 'No leaderboards!';
+$string['manageLevelDesc'] = 'Here you can change level!';
+$string['silverCoins'] = 'Silver coins';
+$string['unlistedLevel'] = 'Unlisted level';
+$string['lockUpdates'] = 'Lock updating';
+$string['lockCommenting'] = 'Lock commenting';
+$string['successfullyChangedLevel'] = 'You successfully changed level!';
+$string['successfullyDeletedLevel'] = 'You successfully deleted level!';
+
+$string['resendMailTitle'] = 'Send email message again';
+$string['resendMailHint'] = 'Didn\'t get mail message?';
+$string['resendMailDesc'] = 'Here you can send email message again if you didn\'t get it!';
+$string['resendMailButton'] = 'Send message';
+
+$string['automodTitle'] = 'Automod';
+$string['possibleLevelsSpamming'] = 'Possible levels spamming';
+$string['disableLevelsUploading'] = 'Disable levels uploading';
+$string['possibleAccountsSpamming'] = 'Possible accounts spamming';
+$string['disableAccountsRegistering'] = 'Disable registering accounts';
+$string['possibleCommentsSpamming'] = 'Possible comments spamming';
+$string['disableComments'] = 'Disable commenting';
+$string['similarCommentsCount'] = 'Similar comments count';
+$string['similarityValueOfAllComments'] = 'Similarity value out of all comments';
+$string['possibleCommentsSpammer'] = 'Possible comments spammer';
+$string['banCommenting'] = 'Ban commenting';
+$string['spammerUsername'] = 'Spammer\'s username';
+$string['possibleAccountPostsSpamming'] = 'Possible account posts spamming';
+$string['disablePosting'] = 'Disable posting';
+$string['similarPostsCount'] = 'Similar posts count';
+$string['similarityValueOfAllPosts'] = 'Similarity value out of all posts';
+$string['possibleAccountPostsSpammer'] = 'Possible account posts spammer';
+$string['possibleRepliesSpamming'] = 'Possible replies spamming';
+$string['possibleRepliesSpammer'] = 'Possible replies spammer';
+$string['similarRepliesCount'] = 'Similar replies count';
+$string['similarityValueOfAllReplies'] = 'Similarity value out of all replies';
+$string['unknownWarning'] = 'Unknown warning';
+$string['before'] = 'Before';
+$string['after'] = 'After';
+$string['compare'] = 'Compare';
+$string['resolvedWarning'] = 'Resolved warning';
+$string['resolveWarning'] = 'Resolve warning';
+$string['enabled'] = 'Enabled';
+$string['disabled'] = 'Disabled';
+$string['yesterday'] = 'Yesterday';
+$string['today'] = 'Today';
+$string['uploading'] = 'Uploading';
+$string['commenting'] = 'Commenting';
+$string['leaderboardSubmits'] = 'Leaderboard submits';
+$string['manageLevels'] = 'Manage levels';
+$string['disableLevelsUploading'] = 'Disable levels uploading';
+$string['disableLevelsCommenting'] = 'Disable levels commenting';
+$string['disableLevelsLeaderboardSubmits'] = 'Disable levels leaderboard submits';
+$string['disable'] = 'Disable';
+$string['enable'] = 'Enable';
+$string['registering'] = 'Registering';
+$string['accountPosting'] = 'Making account posts';
+$string['updatingProfileStats'] = 'Updating profile stats';
+$string['messaging'] = 'Messaging';
+$string['manageAccounts'] = 'Manage accounts';
+$string['disableAccountsRegistering'] = 'Disable registering new accounts';
+$string['disableAccountPosting'] = 'Disable making account posts';
+$string['disableUpdatingProfileStats'] = 'Disable updating profile stats';
+$string['disableMessaging'] = 'Disable messaging';
+
+$string['cantPostCommentsAboveChars'] = 'You cannot post comments above %1$s characters!';
+$string['replyingIsDisabled'] = 'Replying to comments is currently disabled!';
+$string['youAreBannedFromCommenting'] = 'You are banned from commenting!';
+$string['cantPostAccountCommentsAboveChars'] = 'You cannot post account comments above %1$s characters!';
+$string['commentingIsDisabled'] = 'Commenting is currently disabled!';
+$string['noWarnings'] = 'No warnings';
+
+$string['downloadLevelAsGMD'] = 'Save as .gmd';
+
+$string['songIsAvailable'] = 'Available';
+$string['songIsDisabled'] = 'Not available';
+$string['disabledSongs'] = 'Disabled songs';
+$string['disabledSFXs'] = 'Disabled SFXs';
+
 /*
 	REUPLOAD
 */
@@ -415,7 +458,6 @@ $string["songAddButton"] = "Choose song";
 $string["songAddAnotherBTN"] = "Another Song?";
 $string["songAdded"] = "Song added";
 $string["deletedSong"] = "You successfully deleted song";
-$string["renamedSong"] = "You successfully renamed song to";
 $string["songID"] = "Song ID: ";
 $string["songIDw"] = "Song ID";
 $string["songAuthor"] = "Author";
@@ -469,8 +511,6 @@ $string["reportMod"] = "Reports";
 $string["username"] = "Username";
 $string["accountID"] = "Account ID";
 $string["registerDate"] = "Register date";
-$string["levelAuthor"] = "Level author";
-$string["isAdmin"] = "Role on server";
 $string["isAdminYes"] = "Yes";
 $string["isAdminNo"] = "No";
 $string["userCoins"] = "User Coins";
@@ -500,7 +540,7 @@ $string["stats"] = "Stats";
 $string["suggestFeatured"] = "Featured?";
 $string["whoAdded"] = "Who added?";
 $string["moons"] = "Moons";
-//modActionsList
+
 $string["banDesc"] = "Here you can ban a player!";
 $string["playerTop"] = 'Top of players';
 $string["creatorTop"] = 'Top of creators';
@@ -509,29 +549,13 @@ $string["successfullyBanned"] = 'Player <b>%1$s</b> with account ID <b>%2$s</b> 
 $string["successfullyUnbanned"] = 'Player <b>%1$s</b> with account ID <b>%2$s</b> was successfully unbanned!';
 $string["commentBan"] = 'Commenting';
 
-$string["admin"] = "Administrator";
-$string["elder"] = "Elder moderator";
-$string["moder"] = "Moderator";
 $string["player"] = "Player";
 
 $string["starsLevel2"] = "stars";
 $string["starsLevel1"] = "stars";
 $string["starsLevel0"] = "star";
-$string["coins2"] = "coins";
 $string["coins1"] = "coins";
 $string["coins0"] = "coin";
-$string["time0"] = "time";
-$string["time1"] = "times";
-$string["times"] = "times";
-$string["action0"] = "action";
-$string["action1"] = "actions";
-$string["action2"] = "actions";
-$string["lvl0"] = "level";
-$string["lvl1"] = "levels";
-$string["lvl2"] = "levels";
-$string["player0"] = "player";
-$string["player1"] = "players";
-$string["player2"] = "players";
 $string["unban"] = "Unban";
 $string["isBan"] = "Ban";
 
@@ -585,6 +609,7 @@ $string["modAction25"] = "Created a quest";
 $string["modAction26"] = "Changed player's username/password";
 $string["modAction27"] = "Changed SFX";
 $string["modAction28"] = "Banned person";
+$string["modAction29"] = "Locked/unlocked level updating";
 $string["modAction30"] = "Rated list";
 $string["modAction31"] = "Sent list";
 $string["modAction32"] = "Un/featured list";
@@ -593,6 +618,10 @@ $string["modAction34"] = "Deleted list";
 $string["modAction35"] = "Changed list's creator";
 $string["modAction36"] = "Changed list's name";
 $string["modAction37"] = "Changed list's description";
+$string["modAction38"] = "Locked/unlocked level commenting";
+$string["modAction39"] = "Locked/unlocked list commenting";
+$string["modAction40"] = "Removed sent level";
+$string["modAction41"] = "Suggested level";
 $string["everyActions"] = "Any actions";
 $string["everyMod"] = "All moderators";
 $string["Kish!"] = "Go away!";
@@ -601,5 +630,3 @@ $string["noLogin?"] = "You are not logged into your account!";
 $string["LoginBtn"] = "Login into account";
 $string["dashboard"] = "Dashboard";
 $string["userID"] = 'User ID';
-//errors
-$string["errorNoAccWithPerm"] = "Error: No accounts with the '%s' permission have been found";

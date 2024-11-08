@@ -6,9 +6,9 @@ require "../".$dbPath."incl/lib/Captcha.php";
 require "../".$dbPath."incl/lib/connection.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
-include "../".$dbPath."incl/lib/exploitPatch.php";
-include "../".$dbPath."config/security.php";
+require "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/exploitPatch.php";
+require "../".$dbPath."config/security.php";
 $dl->title($dl->getLocalizedString("gauntletCreateTitle"));
 $dl->printFooter('../');
 $allGauntlets = '';
@@ -59,10 +59,10 @@ if($gs->checkPermission($_SESSION["accountID"], "dashboardGauntletCreate")) {
 		$gauntletID = ExploitPatch::number($_POST['gauntlet_id']);
 		$levels = $gauntletLevels[0].','.$gauntletLevels[1].','.$gauntletLevels[2].','.$gauntletLevels[3].','.$gauntletLevels[4];
 		if($gauntletID > 0) {
-			$check = $db->prepare("SELECT count(*) FROM gauntlets WHERE ID = :gid");
+			$check = $db->prepare("SELECT * FROM gauntlets WHERE ID = :gid");
 			$check->execute([':gid' => $gauntletID]);
-			$check = $check->fetchColumn();
-			if($check > 0) { // Shit code
+			$check = $check->fetch();
+			if($check > 0) { // Shit code // Why
 				$query = $db->prepare("INSERT INTO gauntlets (level1, level2, level3, level4, level5, timestamp) VALUES (:l1, :l2, :l3, :l4, :l5, :t)");
 				$query->execute([':l1' => $gauntletLevels[0], ':l2' => $gauntletLevels[1], ':l3' => $gauntletLevels[2], ':l4' => $gauntletLevels[3], ':l5' => $gauntletLevels[4], ':t' => time()]);
 			} else {
@@ -74,6 +74,7 @@ if($gs->checkPermission($_SESSION["accountID"], "dashboardGauntletCreate")) {
 			$query->execute([':l1' => $gauntletLevels[0], ':l2' => $gauntletLevels[1], ':l3' => $gauntletLevels[2], ':l4' => $gauntletLevels[3], ':l5' => $gauntletLevels[4], ':t' => time()]);
 		}
 		$gauntletID = $db->lastInsertId();
+		$gs->sendLogsGauntletChangeWebhook($gauntletID, $_SESSION['accountID']);
 		$query = $db->prepare("INSERT INTO modactions  (type, value, value3, timestamp, account) VALUES ('18', :value, :value3, :timestamp, :account)");
 		$query->execute([':value' => $levels, ':value3' => $gauntletID, ':timestamp' => time(), ':account' => $accountID]);
 		$dl->printSong('<div class="form">
@@ -103,9 +104,9 @@ if($gs->checkPermission($_SESSION["accountID"], "dashboardGauntletCreate")) {
 		$gauntletArray = [];
 		foreach($query AS &$key) $gauntletArray[] = $key['ID'];
 		for($x = 1; $x <= $gs->getGauntletCount(); $x++) {
-			if(!in_array($x, $gauntletArray)) $gauntletOptions .= '<option id="gauntlet_id_option'.$x.'" value="'.$x.'">'.$gs->getGauntletName($x).' Gauntlet</option>';
+			if(is_array($gauntletArray) && !in_array($x, $gauntletArray)) $gauntletOptions .= '<option id="gauntlet_id_option'.$x.'" value="'.$x.'">'.$gs->getGauntletName($x).' Gauntlet</option>';
 		}
-		$dl->printSong('<div class="form-control itemsbox">
+		$dl->printSong('<div class="form-control itemsbox chatdiv">
 		<div class="itemoverflow"><div class="itemslist">
 		<button type="submit" onclick="gauntlet(0)" class="btn-primary itembtn">
 			<h2 class="subjectnotyou">'.$dl->getLocalizedString("gauntletCreate").'</h2>

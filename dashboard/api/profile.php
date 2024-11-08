@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
 require "../incl/dashboardLib.php";
-include "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/connection.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 require_once "../".$dbPath."incl/lib/generatePass.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
@@ -166,7 +166,7 @@ foreach($postComments AS &$postComment) {
 	}
 	$posts[] = [
 		'commentID' => (int)$postComment['commentID'],
-		'post' => base64_decode($postComment['comment']),
+		'post' => ExploitPatch::url_base64_decode($postComment['comment']),
 		'likes' => (int)$postComment['likes'],
 		'dislikes' => (int)$postComment['dislikes'],
 		'isSpam' => (int)$postComment['isSpam'],
@@ -189,5 +189,5 @@ exit(json_encode([
 		'bans' => $bans,
 		'posts' => $posts
 	]
-]));
+], JSON_INVALID_UTF8_IGNORE));
 ?>

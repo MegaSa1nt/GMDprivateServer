@@ -6,8 +6,8 @@ require "../".$dbPath."incl/lib/connection.php";
 $dl = new dashboardLib();
 require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
-include "../".$dbPath."incl/lib/exploitPatch.php";
+require "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/exploitPatch.php";
 $ep = new exploitPatch();
 $dl->title($dl->getLocalizedString("addMod"));
 $dl->printFooter('../');
@@ -42,7 +42,7 @@ if(!empty($_POST["user"])) {
 	$query = $db->prepare("SELECT accountID FROM accounts WHERE accountID = :id");
 	$query->execute([':id' => $mod]);
 	$res = $query->fetchAll();
-	if(count($res) == 0) {
+	if(!$res) {
 		$dl->printSong('<div class="form">
 			<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 			<form class="form__inner" method="post" action="">
@@ -75,10 +75,10 @@ if(!empty($_POST["user"])) {
 		</div>', 'mod');
 		die();
 	}
-	$query = $db->prepare("SELECT accountID FROM roleassign WHERE accountID = :mod");
+	$query = $db->prepare("SELECT * FROM roleassign WHERE accountID = :mod");
 	$query->execute([':mod' => $mod]);
-	$res = $query->fetchAll();
-	if(count($res) != 0) {
+	$res = $query->fetch();
+	if($res) {
 		$dl->printSong('<div class="form">
 			<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 			<form class="form__inner" method="post" action="">
@@ -101,9 +101,9 @@ if(!empty($_POST["user"])) {
 			<button type="button" onclick="a(\'account/addMod.php\', true, false, \'GET\')" class="btn-primary">'.$dl->getLocalizedString("addModOneMore").'</button>
 		</form>
 		</div>', 'mod');
-	} else {
+	} else { // I just realized this code will never run LOL
 		$query = $db->prepare("DELETE FROM roleassign WHERE accountID = :accID");
-		$query->execute([':accID' => $accountID]);
+		$query->execute([':accID' => $mod]);
 		$mod2 = $gs->getAccountName($mod);
 		$query = $db->prepare("INSERT INTO modactions  (type, value, timestamp, account, value2, value3) VALUES ('20', :value, :timestamp, :account, :value2, :value3)");
 		$query->execute([':value' => $mod2, ':timestamp' => time(), ':account' => $accountID, ':value2' => $mod, ':value3' => -1]);
@@ -115,6 +115,7 @@ if(!empty($_POST["user"])) {
 		</form>
 		</div>', 'mod');
 	}
+	$gs->sendLogsModChangeWebhook($res['accountID'], $_SESSION['accountID'], $res['assignID'], $res); 
 } else {
 	$admin = $db->prepare('SELECT isAdmin FROM accounts WHERE accountID = :accID');
 	$admin->execute([':accID' => $_SESSION['accountID']]);
@@ -150,7 +151,7 @@ if(!empty($_POST["user"])) {
 			<h2 class="messagenotyou" style="font-size: 15px;color: #c0c0c0;" id="stats'.$mod["assignID"].'"><i class="fa-solid fa-circle-dot" id="circle'.$mod["assignID"].'" style="color:rgb('.$gs->getAccountCommentColor($mod["accountID"]).')"></i> <span id="roleName'.$mod["assignID"].'">'.$modName.'</span> | <i class="fa-regular fa-clock"></i> '.$dl->convertToDate($time["timestamp"], true).' | <i class="fa-solid fa-user"></i> '.(!empty($moderator) ? $moderator : 'Unknown').'</h2>
 		</button>';
 	}
-	$dl->printSong('<div class="form-control itemsbox">
+	$dl->printSong('<div class="form-control itemsbox chatdiv">
 	<div class="itemoverflow"><div class="itemslist">
     <button type="submit" onclick="mod(0)" class="btn-primary itembtn">
         <h2 class="subjectnotyou">'.$dl->getLocalizedString("addMod").'</h2>

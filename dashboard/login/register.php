@@ -1,17 +1,25 @@
 <?php
 session_start();
-include "../incl/dashboardLib.php";
+require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/Captcha.php";
-include "../".$dbPath."config/security.php";
-include "../".$dbPath."config/mail.php";
-include "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."config/security.php";
+require "../".$dbPath."config/mail.php";
+require "../".$dbPath."incl/lib/connection.php";
 require "../".$dbPath."incl/lib/exploitPatch.php";
 require "../".$dbPath."incl/lib/generatePass.php";
+require "../".$dbPath."incl/lib/automod.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
 $dl = new dashboardLib();
 $dl->title($dl->getLocalizedString("registerAcc"));
 $dl->printFooter('../');
+if(Automod::isAccountsDisabled(0)) exit($dl->printSong('<div class="form">
+	<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+	<form class="form__inner" method="post" action="">
+	<p>'.$dl->getLocalizedString("pageDisabled").'</p>
+	<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+	</form>
+</div>'));
 if(!isset($_SESSION["accountID"]) OR $_SESSION["accountID"] == 0) {
 if(!isset($preactivateAccounts)) $preactivateAccounts = false;
 if(!isset($filterUsernames)) global $filterUsernames;
@@ -26,7 +34,7 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 			</form>
 		</div>'));
 	}
-	$username = ExploitPatch::charclean($_POST["username"]);
+	$username = str_replace(' ', '', ExploitPatch::charclean($_POST["username"]));
 	$password = $_POST["password"];
 	$repeat_password = $_POST["repeatpassword"];
 	$email = ExploitPatch::rucharclean($_POST["email"]);
@@ -35,7 +43,7 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 		$bannedUsernamesList = array_map('strtolower', $bannedUsernames);
 		switch($filterUsernames) {
 			case 1:
-				if(in_array(strtolower($userName), $bannedUsernamesList)) exit($dl->printSong('<div class="form">
+				if(in_array(strtolower($username), $bannedUsernamesList)) exit($dl->printSong('<div class="form">
 					<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 					<form class="form__inner" method="post" action="">
 					<p>'.$dl->getLocalizedString("badUsername").'</p>
@@ -54,15 +62,6 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 				</div>'));
 				}
 		}
-	}
-	if(strpos($userName, ' ') !== false) {
-		exit($dl->printSong('<div class="form">
-			<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
-			<form class="form__inner" method="post" action="">
-			<p>'.$dl->getLocalizedString("badUsername").'</p>
-			<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
-			</form>
-		</div>'));
 	}
 	if(strlen($username) < 3) {
 		exit($dl->printSong('<div class="form">
@@ -137,7 +136,10 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 				$query2 = $db->prepare("INSERT INTO accounts (userName, password, email, registerDate, isActive, gjp2)
 				VALUES (:userName, :password, :email, :time, :isActive, :gjp)");
 				$query2->execute([':userName' => $username, ':password' => $hashpass, ':email' => $email, ':time' => time(), ':isActive' => $preactivateAccounts ? 1 : 0, ':gjp' => $gjp2]);
-              	if($mailEnabled) {
+				$accountID = $db->lastInsertId();
+				$gs->logAction($accountID, 1, $username, $email, $gs->getUserID($accountID, $username));
+              	$gs->sendLogsRegisterWebhook($accountID);
+				if($mailEnabled) {
 					$gs->mail($email, $username);
 					exit($dl->printSong('<div class="form">
 						<h1>'.$dl->getLocalizedString("registerAcc").'</h1>

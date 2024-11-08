@@ -2,11 +2,10 @@
 session_start();
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/connection.php";
-$dl = new dashboardLib();
 require_once "../".$dbPath."incl/lib/mainLib.php";
+require_once "../".$dbPath."incl/lib/exploitPatch.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
-require "../".$dbPath."incl/lib/exploitPatch.php";
+$dl = new dashboardLib();
 $dl->title($dl->getLocalizedString("manageSFX"));
 $dl->printFooter('../');
 if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0){
@@ -23,8 +22,8 @@ $pagelol = explode("?", $pagelol)[0];
 $accountID = $_SESSION["accountID"];
 if(!isset($_GET["search"])) $_GET["search"] = "";
 $srcbtn = "";
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) {
-	$q = is_numeric(trim(ExploitPatch::remove($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::remove($_GET["search"]))."%')";
+if(!empty(trim(ExploitPatch::rucharclean($_GET["search"])))) {
+	$q = is_numeric(trim(ExploitPatch::rucharclean($_GET["search"]))) ? "ID LIKE '%".trim(ExploitPatch::rucharclean($_GET["search"]))."%'" : "(name LIKE '%".trim(ExploitPatch::rucharclean($_GET["search"]))."%' OR authorName LIKE '%".trim(ExploitPatch::rucharclean($_GET["search"]))."%')";
 	$srcbtn = '<button type="button" onclick="a(\''.$pagelol.'\', true, true, \'GET\')"  href="'.$_SERVER["SCRIPT_NAME"].'" style="width: 0%;display: flex;margin-left: 5px;align-items: center;justify-content: center;color: indianred; text-decoration:none" class="btn-primary" title="'.$dl->getLocalizedString("searchCancel").'"><i class="fa-solid fa-xmark"></i></button>';
 	$query = $db->prepare("SELECT * FROM sfxs WHERE reuploadID = $accountID AND $q ORDER BY reuploadTime DESC LIMIT 10 OFFSET $page");
 	$query->execute();
@@ -55,29 +54,7 @@ if(empty($result)) {
 </div>', 'account');
 	die();
 } 
-foreach($result as &$action){
-	$fontsize = 27;
-	$sfxsid = $action["ID"];
-	$songIDlol = '<button id="copy'.$action["ID"].'" class="accbtn songidyeah" onclick="copysong('.$action["ID"].')">'.$action["ID"].'</button>';
-	$time = $dl->convertToDate($action["reuploadTime"], true);
-  	$author = htmlspecialchars($action["authorName"]);
-	$name = htmlspecialchars($action["name"]);
-	$size = round($action["size"] / 1024 / 1024, 2);
- 	$delete = '<button onclick="deletesong('.$sfxsid.')" style="color:#ffbbbb;margin-left:5px;width:max-content;padding:7px 10px;font-size:15px"  class="btn-rendel"><i class="fa-solid fa-xmark"></i></button>';
-	$download = str_replace('http://', 'https://', $action["download"]);
-	$btn = '<button type="button" name="btnsng" id="btn'.$sfxsid.'" title="'.$author.' — '.$name.'" style="display: contents;color: white;margin: 0;" download="'.$download.'" onclick="btnsong(\''.$sfxsid.'\');"><div class="icon" style="font-size:13px; height:25px;width:25px;background:#373A3F;margin-left: 5px;"><i id="icon'.$sfxsid.'" name="iconlol" class="fa-solid fa-play" aria-hidden="false"></i></div></button>';
-	if(mb_strlen($name) > 30) $fontsize = 17;
-	elseif(mb_strlen($name) > 20) $fontsize = 20;
-	$songSize = '<p class="profilepic"><i class="fa-solid fa-weight-hanging"></i> '.$size.' MB</p>';
-	$stats = $songSize;
-	$songs .= '<div id="profile'.$sfxsid.'" style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
-			<div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
-				<h2 style="margin: 0px;font-size: '.$fontsize.'px;margin-left:5px;display: flex;align-items: center;" class="profilenick">'.$name.$btn.'</h2>'.$delete.'
-			</div></div>
-			<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
-			<div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" class="songidyeah" style="margin: 0px;width: max-content;">'.$dl->getLocalizedString("sfxID").': <b>'.$songIDlol.'</b></h3><h3 id="comments" class="songidyeah" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">'.$dl->getLocalizedString("date").': <b>'.$time.'</b></h3></div>
-		</div></div>';
-}
+foreach($result as &$action) $songs .= $dl->generateSFXCard($action, '', false);
 $pagel = '<div class="form new-form">
 <h1 style="margin-bottom:5px">'.$dl->getLocalizedString("manageSFX").'</h1>
 <div class="form-control new-form-control songs">
@@ -89,23 +66,13 @@ $pagel = '<div class="form new-form">
 		'.$srcbtn.'
 	</div>
 </form>';
-if(!empty(trim(ExploitPatch::remove($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM sfxs WHERE reuploadID=:id AND $q");
+if(!empty(trim(ExploitPatch::rucharclean($_GET["search"])))) $query = $db->prepare("SELECT count(*) FROM sfxs WHERE reuploadID=:id AND $q");
 else $query = $db->prepare("SELECT count(*) FROM sfxs WHERE reuploadID=:id");
 $query->execute([':id' => $accountID]);
 $packcount = $query->fetchColumn();
 $pagecount = ceil($packcount / 10);
 $bottomrow = $dl->generateBottomRow($pagecount, $actualpage);
-$dl->printPage($pagel . $bottomrow.'<script>
-			function deletesong(id) {
-				del = new XMLHttpRequest();
-				del.open("GET", "stats/deleteSong.php?ID=" + id + "&sfx=1", true);
-				del.onload = function () {
-					dl = JSON.parse(del.response);
-					if(dl.success) document.getElementById("profile"+id).remove()
-				}
-				del.send();
-			}
-		</script>', true, "account");
+$dl->printPage($pagel . $bottomrow, true, "account");
 } else {
 	$dl->printSong('<div class="form">
     <h1>'.$dl->getLocalizedString("errorGeneric").'</h1>

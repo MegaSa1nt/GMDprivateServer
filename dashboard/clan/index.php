@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../incl/dashboardLib.php";
+require "../incl/dashboardLib.php";
 $dl = new dashboardLib();
 global $clansEnabled;
 if(!$clansEnabled) exit($dl->printSong('<div class="form">
@@ -10,10 +10,11 @@ if(!$clansEnabled) exit($dl->printSong('<div class="form">
 			<button type="button" onclick="a(\'\', true, false, \'GET\')" class="btn-song">'.$dl->getLocalizedString("dashboard").'</button>
 			</form>
 		</div>', 'profile'));
-include "../".$dbPath."incl/lib/exploitPatch.php";
-include_once "../".$dbPath."incl/lib/mainLib.php";
+require "../".$dbPath."incl/lib/exploitPatch.php";
+require_once "../".$dbPath."incl/lib/mainLib.php";
 $gs = new mainLib();
-include "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."config/security.php";
 $getID = explode("/", $_GET["id"])[count(explode("/", $_GET["id"]))-1];
 if($getID == "settings") {
     $getID = explode("/", $_GET["id"])[count(explode("/", $_GET["id"]))-2];
@@ -249,19 +250,79 @@ if(!empty($clan)) {
 			}
 		</script>', 'profile'));
         } else {
-            $name = base64_encode(strip_tags(ExploitPatch::rucharclean(str_replace(' ', '', $_POST["clanname"]), 20)));
-			$tag = base64_encode(strip_tags(ExploitPatch::charclean(str_replace(' ', '', strtoupper($_POST["clantag"])), 5)));
+            $name = strip_tags(ExploitPatch::rucharclean(str_replace(' ', '', $_POST["clanname"]), 20));
+			$tag = strip_tags(ExploitPatch::charclean(str_replace(' ', '', strtoupper($_POST["clantag"])), 5));
             $desc = base64_encode(strip_tags(ExploitPatch::rucharclean($_POST["clandesc"], 255)));
             $color = ExploitPatch::charclean(mb_substr($_POST["clancolor"], 1), 6);
 			$isClosed = ExploitPatch::number($_POST["isclosed"], 1);
-            if(!empty($name) AND !empty($color) AND !empty($tag) AND strlen($_POST['clantag']) > 2 AND strlen($_POST['clantag']) < 6 AND is_numeric($isClosed)) {
-				$check = $db->prepare('SELECT count(*) FROM clans WHERE clan LIKE :c AND tag LIKE :t AND ID != :id');
-				$check->execute([':c' => $name, ':id' => $clan['ID'], ':t' => $tag]);
+            if(!empty($name) AND !empty($color) AND !empty($tag) AND strlen($tag) > 1 AND is_numeric($isClosed)) {
+				if($filterClanNames >= 1) {
+					$bannedClanNamesList = array_map('strtolower', $bannedClanNames);
+					switch($filterClanNames) {
+						case 1:
+							if(in_array(strtolower($name), $bannedClanNamesList)) exit($dl->printSong('<div class="form">
+								<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+								<form class="form__inner" method="post" action="">
+								<p>'.$dl->getLocalizedString("badClanName").'</p>
+								<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+								</form>
+							</div>'));
+							break;
+						case 2:
+							foreach($bannedClanNamesList as $bannedClanName) {
+								if(!empty($bannedClanName) && mb_strpos(strtolower($name), $bannedClanName) !== false) exit($dl->printSong('<div class="form">
+								<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+								<form class="form__inner" method="post" action="">
+								<p>'.$dl->getLocalizedString("badClanName").'</p>
+								<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+								</form>
+							</div>'));
+							}
+					}
+				}
+				if($filterClanTags >= 1) {
+					$bannedClanTagsList = array_map('strtolower', $bannedClanTags);
+					switch($filterClanTags) {
+						case 1:
+							if(in_array(strtolower($tag), $bannedClanTagsList)) exit($dl->printSong('<div class="form">
+								<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+								<form class="form__inner" method="post" action="">
+								<p>'.$dl->getLocalizedString("badClanTag").'</p>
+								<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+								</form>
+							</div>'));
+							break;
+						case 2:
+							foreach($bannedClanTagsList as $bannedClanTag) {
+								if(!empty($bannedClanTag) && mb_strpos(strtolower($tag), $bannedClanTag) !== false) exit($dl->printSong('<div class="form">
+								<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+								<form class="form__inner" method="post" action="">
+								<p>'.$dl->getLocalizedString("badClanTag").'</p>
+								<button type="submit" class="btn-song">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+								</form>
+							</div>'));
+							}
+					}
+				}
+				$name = base64_encode($name);
+				$tag = base64_encode($tag);
+				$check = $db->prepare('SELECT count(*) FROM clans WHERE clan LIKE :c AND ID != :id');
+				$check->execute([':c' => $name, ':id' => $clan['ID']]);
 				$check = $check->fetchColumn();
 				if($check > 0) exit($dl->printSong('<div class="form">
 					<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 					<form class="form__inner" method="post" action=".">
 						<p>'.$dl->getLocalizedString("takenClanName").'</p>
+							<button type="button" onclick="a(\'clan/'.$clan['clan'].'/settings\', true, true, \'GET\')" class="btn-primary">'.$dl->getLocalizedString("tryAgainBTN").'</button>
+					</form>
+				</div>', 'browse'));
+				$check = $db->prepare('SELECT count(*) FROM clans WHERE tag LIKE :t AND ID != :id');
+				$check->execute([':id' => $clan['ID'], ':t' => $tag]);
+				$check = $check->fetchColumn();
+				if($check > 0) exit($dl->printSong('<div class="form">
+					<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
+					<form class="form__inner" method="post" action=".">
+						<p>'.$dl->getLocalizedString("takenClanTag").'</p>
 							<button type="button" onclick="a(\'clan/'.$clan['clan'].'/settings\', true, true, \'GET\')" class="btn-primary">'.$dl->getLocalizedString("tryAgainBTN").'</button>
 					</form>
 				</div>', 'browse'));
@@ -315,8 +376,8 @@ if(!empty($clan)) {
     $mbrs->execute([':cid' => $clan["ID"]]);
     $mbrs = $mbrs->fetchAll();
     foreach($mbrs as &$mbr) {
-		if($clan["clanOwner"] == $_SESSION["accountID"]) $kick = '<form name="kick" style="margin:0px"><input type="hidden" name="kick" value="1"></input><input type="hidden" name="accountID" value="'.$mbr["extID"].'"></input></form>
-			<button type="button" onclick="a(\'clan/'.$clan["clan"].'\', true, true, \'POST\', false, \'kick\')" style="width: max-content;height: max-content;color: #ffbbbb;padding: 7px 10px;" title="'.$dl->getLocalizedString("kickMember").'" class="btn-rendel"><i class="fa-solid fa-xmark"></i></button>';
+		if($clan["clanOwner"] == $_SESSION["accountID"]) $kick = '<form name="kick'.$mbr["extID"].'" style="margin:0px"><input type="hidden" name="kick" value="1"></input><input type="hidden" name="accountID" value="'.$mbr["extID"].'"></input></form>
+			<button type="button" onclick="a(\'clan/'.$clan["clan"].'\', true, true, \'POST\', false, \'kick'.$mbr["extID"].'\')" style="width: max-content;height: max-content;color: #ffbbbb;padding: 7px 10px;" title="'.$dl->getLocalizedString("kickMember").'" class="btn-rendel"><i class="fa-solid fa-xmark"></i></button>';
 		$allstars += $mbr['stars'];
 		$allmoons += $mbr['moons'];
 		$alldias += $mbr['diamonds'];
@@ -326,16 +387,36 @@ if(!empty($clan)) {
 		$allcp += $mbr['creatorPoints'];
         $stats = $dl->createProfileStats($mbr['stars'], $mbr['moons'], $mbr['diamonds'], $mbr['coins'], $mbr['userCoins'], $mbr['demons'], $mbr['creatorPoints'], 0);
 		$mbr["userName"] = $mbr["userName"] == 'Undefined' ? $gs->getAccountName($mbr['extID']) : $mbr['userName'];
-        if($mbr["extID"] != $clan["clanOwner"]) $members .= '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
-			<div class="profile"><div class="clanmemberndiv"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$mbr["userName"].'\', true, true, \'GET\')"><h2 style="color:rgb('.$gs->getAccountCommentColor($mbr["extID"]).')" class="profilenick clanmembernick">'.$mbr["userName"].'</h2></button>'.$kick.'</div>
-			<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
-			<h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;">'.sprintf($dl->getLocalizedString("joinedAt"), $dl->convertToDate($mbr["joinedAt"], true)).'</h3>
-		</div></div>';
-		else $owner = '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
-			<div class="profile"><div style="display:flex"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$mbr['userName'].'\', true, true, \'GET\')"><h1 style="margin: 0;margin-bottom: 10px;color:rgb('.$gs->getAccountCommentColor($mbr["extID"]).')" class="profilenick clanownernick">'.$mbr["userName"].' <i style="color:#ffff91" class="fa-solid fa-crown"></i></h1></button></div>
-			<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
-			<h3 class="comments clancreatetext">'.sprintf($dl->getLocalizedString("createdAt"), $dl->convertToDate($clan["creationDate"], true)).'</h3>
-		</div></div>';
+		// Avatar management
+		$avatarImg = '';
+		$iconType = ($mbr['iconType'] > 8) ? 0 : $mbr['iconType'];
+		$iconTypeMap = [0 => ['type' => 'cube', 'value' => $mbr['accIcon']], 1 => ['type' => 'ship', 'value' => $mbr['accShip']], 2 => ['type' => 'ball', 'value' => $mbr['accBall']], 3 => ['type' => 'ufo', 'value' => $mbr['accBird']], 4 => ['type' => 'wave', 'value' => $mbr['accDart']], 5 => ['type' => 'robot', 'value' => $mbr['accRobot']], 6 => ['type' => 'spider', 'value' => $mbr['accSpider']], 7 => ['type' => 'swing', 'value' => $mbr['accSwing']], 8 => ['type' => 'jetpack', 'value' => $mbr['accJetpack']]];
+		$iconValue = isset($iconTypeMap[$iconType]) ? $iconTypeMap[$iconType]['value'] : 1;	    
+        if($mbr["extID"] != $clan["clanOwner"]) {
+			$badgeImg = '';
+			$queryRoleID = $db->prepare("SELECT roleID FROM roleassign WHERE accountID = :accountID");
+			$queryRoleID->execute([':accountID' => $mbr["extID"]]);	
+			if($roleAssignData = $queryRoleID->fetch(PDO::FETCH_ASSOC)) {        
+				$queryBadgeLevel = $db->prepare("SELECT modBadgeLevel FROM roles WHERE roleID = :roleID");
+				$queryBadgeLevel->execute([':roleID' => $roleAssignData['roleID']]);	    
+				if(($modBadgeLevel = $queryBadgeLevel->fetchColumn() ?? 0) >= 1 && $modBadgeLevel <= 3) {
+					$badgeImg = '<img src="https://raw.githubusercontent.com/Fenix668/GMDprivateServer/master/dashboard/modBadge_0' . $modBadgeLevel . '_001.png" alt="badge" style="width: 34px; height: 34px; margin-left: -3px; margin-top: -3px; vertical-align: middle;">';
+				}
+			}	
+			$avatarImg = '<img src="https://gdicon.oat.zone/icon.png?type=' . $iconTypeMap[$iconType]['type'] . '&value=' . $iconValue . '&color1=' . $mbr['color1'] . '&color2=' . $mbr['color2'] . ($mbr['accGlow'] != 0 ? '&glow=' . $mbr['accGlow'] . '&color3=' . $mbr['color3'] : '') . '" alt="Avatar" style="width: 30px; height: 30px; vertical-align: middle; object-fit: contain;">';
+			$members .= '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
+				<div class="profile"><div class="clanmemberndiv"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$mbr["userName"].'\', true, true, \'GET\')"><h2 style="color:rgb('.$gs->getAccountCommentColor($mbr["extID"]).')" class="profilenick clanmembernick"><div class="accounts-badge-icon-div">'.$avatarImg.$mbr["userName"].$badgeImg.'</div></h2></button>'.$kick.'</div>
+				<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
+				<h3 id="comments" style="justify-content: flex-end;grid-gap: 0.5vh;">'.sprintf($dl->getLocalizedString("joinedAt"), $dl->convertToDate($mbr["joinedAt"], true)).'</h3>
+			</div></div>';
+		} else {
+			$avatarImg = '<img src="https://gdicon.oat.zone/icon.png?type=' . $iconTypeMap[$iconType]['type'] . '&value=' . $iconValue . '&color1=' . $mbr['color1'] . '&color2=' . $mbr['color2'] . ($mbr['accGlow'] != 0 ? '&glow=' . $mbr['accGlow'] . '&color3=' . $mbr['color3'] : '') . '" alt="Avatar" style="width: 40px; height: 40px; vertical-align: middle; object-fit: contain;">';
+			$owner = '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
+				<div class="profile"><div style="display:flex"><button style="display:contents;cursor:pointer" type="button" onclick="a(\'profile/'.$mbr['userName'].'\', true, true, \'GET\')"><h1 style="margin: 0; margin-bottom: 10px; color: rgb('.$gs->getAccountCommentColor($mbr["extID"]).'); justify-content: center; grid-gap: 10px;" class="profilenick clanownernick accounts-badge-icon-div">'.$avatarImg.$mbr["userName"].'<i style="color:#ffff91" class="fa-solid fa-crown"></i></h1></button></div>
+				<div class="form-control" style="display: flex;width: 100%;height: max-content;align-items: center;">'.$stats.'</div>
+				<h3 class="comments clancreatetext">'.sprintf($dl->getLocalizedString("createdAt"), $dl->convertToDate($clan["creationDate"], true)).'</h3>
+			</div></div>';
+		}
     }
 	$allstats = $dl->createProfileStats($allstars, $allmoons, $alldias, $allcoins, $allucoins, $alldemons, $allcp, 0);
 	$total = '<div style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;margin-top:10px">
@@ -360,6 +441,7 @@ if(!empty($clan)) {
     $dontmind = mb_substr($membercount, -1);
     if($dontmind == 1) $dm = 0; elseif($dontmind < 5 AND $dontmind > 0) $dm = 1; else $dm = 2;
     if($membercount > 9 AND $membercount < 20) $dm = 2;
+	$clanDescription = $dl->parseMessage(htmlspecialchars($clan["desc"]));
     if($_SESSION["accountID"] != 0 AND $clan["clanOwner"] != $_SESSION["accountID"] AND !empty($membermenu)) $menu = '<li class="nav-item dropdown dropleft" style="position: absolute;right: 8px; list-style-type: none;top: 8px;">
 					<a style="margin: 0px;padding: 10px 17px; font-size: 17px;" class="nav-link dropdown-toggle menu-arrow dropleft msgupd" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></a>
 					<div style="background: #141414" class="dropdown-menu dropdown-menu-left" aria-labelledby="navbarDropdownMenuLink">
@@ -371,7 +453,7 @@ if(!empty($clan)) {
     	<style>.menu-arrow::after {display:none}</style>
         	'.$back.'<div style="display: flex;flex-direction: column;align-items: center">'.$clanname.'</div>'.$settings.$menu.'
         </div>
-        <p class="clandesc">'.htmlspecialchars($clan["desc"]).'</p>
+        <p class="clandesc">'.$clanDescription.'</p>
 		<div>
             '.$total.'
         </div>

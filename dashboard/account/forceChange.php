@@ -2,8 +2,8 @@
 session_start();
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/Captcha.php";
-include "../".$dbPath."incl/lib/connection.php";
-include_once "../".$dbPath."config/security.php";
+require "../".$dbPath."incl/lib/connection.php";
+require_once "../".$dbPath."config/security.php";
 require "../".$dbPath."incl/lib/generatePass.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 require_once "../".$dbPath."incl/lib/mainLib.php";
@@ -41,11 +41,11 @@ if(!empty($_POST["userID"]) AND !empty($_POST[$type])) {
 		die();
 	}
   if(!empty($_POST["Nick"])) {
-    $newnick = ExploitPatch::charclean($_POST["Nick"]);
+    $newnick = str_replace(' ', '', ExploitPatch::charclean($_POST["Nick"]));
     if(!is_numeric($_POST["userID"])) $accID = $gs->getAccountIDFromName($_POST["userID"]); 
     else $accID = ExploitPatch::number($_POST["userID"]);
     $salt = '';
-   	$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName=:userName");
+   	$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
 	$query->execute([':userName' => $newnick]);
 	$count = $query->fetchColumn();
 	if($count > 0) {
@@ -58,10 +58,14 @@ if(!empty($_POST["userID"]) AND !empty($_POST[$type])) {
 				</div>', 'mod');
 				die();
 	}
+	$getAccountData = $db->prepare("SELECT * FROM accounts WHERE accountID = :accountID");
+	$getAccountData->execute([':accountID' => $accID]);
+	$getAccountData = $getAccountData->fetch();
 	$query = $db->prepare("UPDATE accounts SET userName=:userName, salt=:salt WHERE accountID=:accountid");	
 	$query->execute([':userName' => $newnick, ':salt' => $salt, ':accountid' => $accID]);
 	$query = $db->prepare("UPDATE users SET userName=:userName WHERE extID=:accountid");
 	$query->execute([':userName' => $newnick,':accountid' => $accID]);
+	$gs->sendLogsAccountChangeWebhook($accID, $acc, $getAccountData);
     $auth = $gs->randomString(8);
     $query = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :id");
     $query->execute([':auth' => $auth, ':id' => $accID]);
@@ -88,8 +92,12 @@ if(!empty($_POST["userID"]) AND !empty($_POST[$type])) {
 	$passhash = password_hash($newpass, PASSWORD_DEFAULT);
 	$gjp2 = GeneratePass::GJP2hash($newpass);
     $auth = $gs->randomString(8);
+	$getAccountData = $db->prepare("SELECT * FROM accounts WHERE accountID = :accountID");
+	$getAccountData->execute([':accountID' => $accID]);
+	$getAccountData = $getAccountData->fetch();
 	$query = $db->prepare("UPDATE accounts SET password=:password, gjp2 = :gjp, salt=:salt, auth=:auth WHERE userName=:userName");	
 	$query->execute([':password' => $passhash, ':userName' => $userName, ':salt' => $salt, ':gjp' => $gjp2, ':auth' => $auth]);
+	$gs->sendLogsAccountChangeWebhook($accID, $acc, $getAccountData);
     $accountID = $gs->getAccountIDFromName($userName);
     $query = $db->prepare("INSERT INTO modactions  (type, value, value2, timestamp, account) VALUES ('26',:userID, :type, :timestamp,:account)");
 	$query->execute([':userID' => $accountID, ':timestamp' => time(), ':type' => $type, ':account' => $acc]);

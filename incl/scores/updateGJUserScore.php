@@ -1,10 +1,13 @@
 <?php
 chdir(dirname(__FILE__));
-include "../lib/connection.php";
+require "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
+require_once "../lib/automod.php";
+require_once "../../config/security.php";
 $gs = new mainLib();
+if(empty($_POST["accountID"]) && !$unregisteredSubmissions) exit("0");
 
 if(!isset($_POST["userName"]) OR !isset($_POST["secret"]) OR !isset($_POST["stars"])
 	OR !isset($_POST["demons"]) OR !isset($_POST["icon"]) OR !isset($_POST["color1"])
@@ -56,8 +59,9 @@ $userID = $gs->getUserID($id, $userName);
 $uploadDate = time();
 $hostname = $gs->getIP();
 
+if(Automod::isAccountsDisabled(2)) exit((string)$userID);
 
-$query = $db->prepare("SELECT stars,coins,demons,userCoins,diamonds,moons FROM users WHERE userID=:userID LIMIT 1"); //getting differences
+$query = $db->prepare("SELECT stars, coins, demons, userCoins, diamonds, moons FROM users WHERE userID = :userID LIMIT 1"); //getting differences
 $query->execute([':userID' => $userID]);
 $old = $query->fetch();
 
@@ -104,8 +108,7 @@ $demondiff = $demons - $old["demons"];
 $ucdiff = $userCoins - $old["userCoins"];
 $diadiff = $diamonds - $old["diamonds"];
 $moondiff = $moons - $old["moons"];
-$query2 = $db->prepare("INSERT INTO actions (type, value, timestamp, account, value2, value3, value4, value5, value6) 
-									 VALUES ('9',:stars,:timestamp,:account,:coinsd, :demon, :usrco, :diamond, :moons)"); //creating the action
-$query2->execute([':timestamp' => time(), ':stars' => $starsdiff, ':account' => $userID, ':coinsd' => $coindiff, ':demon' => $demondiff, ':usrco' => $ucdiff, ':diamond' => $diadiff, ':moons' => $moondiff]);
+$gs->logAction($id, 9, $starsdiff, $coindiff, $demondiff, $ucdiff, $diadiff, $moondiff);
+if($gameVersion < 20 && !is_numeric($id) && $starsdiff + $coindiff + $demondiff + $ucdiff + $diadiff + $moondiff != 0) exit('-9');
 echo $userID;
 ?>

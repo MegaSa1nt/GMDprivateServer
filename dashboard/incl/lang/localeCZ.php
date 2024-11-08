@@ -4,9 +4,6 @@ include __DIR__."/../../".$dbPath."config/dashboard.php";
 
 $string["homeNavbar"] = "Domov";
 $string["welcome"] = "Vítejte v ".$gdps.'!';
-$string["didntInstall"] = "<div style='color:#47a0ff'><b>Varování!</b> Nenainstalovali jste plně dashboard! Stiskněte tento text pro instalaci.</div>";
-$string["levelsWeek"] = "Úrovně nahrané za poslední týden";
-$string["levels3Months"] = "Úrovně nahrané za poslední 3 měsíce";
 $string["footer"] = $gdps.", ".date('Y', time());
 $string["tipsAfterInstalling"] = "Vítejte v Dashboard! Dáváme vám pár poinstalačních rad:<br>
 1. Vypadá to, že se nová oprávnění objevila v SQL v 'roles' tabulce! Měli byste se podívat...<br>
@@ -230,10 +227,7 @@ $string["shareCPDesc"] = "Zde můžete sdílet Creator Pointy!";
 $string["shareCP"] = "Sdílet";
 $string["alreadyShared"] = "Tato úroveň již měla Creator Pointy sdíleny tomuto hráči!";
 $string["shareToAuthor"] = "Nemůžete sdílet Creator Pointy s autorem úrovně!";
-$string["userIsBanned"] = "Tento uživatel je zabanován!";
-$string["shareCPSuccess"] = "Úspěšně jste sdílely Creator Pointy úrovně";
-$string["shareCPSuccess2"] = "hráči";
-$string["updateCron"] = "Možná byste měli aktualizovat Creator Pointy skrz Cron.";
+$string["userIsBanned"] = "Tento uživatel je zabanován!";	
 $string["shareCPOneMore"] = "Ještě jednou?";
 $string['shareCPSuccessNew'] = 'Úspěšně jste sdílely Creator Pointy úrovně <b>%1$s</b> hráči <b>%2$s</b>!';
 
@@ -244,6 +238,8 @@ $string["noMsgs"] = "Zahajte dialog!";
 $string["subject"] = "Nadpis";
 $string["msg"] = "Zpráva";
 $string["tooFast"] = "Píšete příliš rychle!";
+$string["messengerYou"] = "You:";
+$string["chooseChat"] = "Choose chat";
 
 $string["levelToGD"] = "Znovunahrát úroveň na cílový server";
 $string["levelToGDDesc"] = "Zde múžete znovunahrát vaši úroveň na cílový server!";
@@ -256,51 +252,12 @@ $string["search"] = "Hledat...";
 $string["searchCancel"] = "Zrušit hledání";
 $string["emptySearch"] = "Nic nenalezeno!";
 
-$string["demonlist"] = 'Demonlist';
-$string["demonlistRecord"] = 'Rekord hráče <b>%s</b>';
-$string["alreadyApproved"] = 'Již přijat!';
-$string["alreadyDenied"] = 'Již odmítnut!';
-$string["approveSuccess"] = 'Úspěšně jste přijali rekord hráče <b>%s</b>!';
-$string["denySuccess"] = 'Úspěšně jste odmítli rekord hráče <b>%s</b>!';
-$string["recordParameters"] = '<b>%s</b> porazil/a <b>%s</b> v <b>%d</b> pokusech';
 $string["approve"] = 'Přijmout';
 $string["deny"] = 'Odmítnout';
-$string["submitRecord"] = 'Vložit rekord';
-$string["submitRecordForLevel"] = 'Vložit rekord pro <b>%s</b>';
-$string["alreadySubmitted"] = 'Již jste vložili rekord pro <b>%s</b>!';
-$string["submitSuccess"] = 'Úspěšně jste vložili rekord pro <b>%s</b>!';
-$string["submitRecordDesc"] = 'Vlkádejte rekordy jenom když jste úroveň porazili!';
-$string["atts"] = 'Pokusy';
-$string["ytlink"] = 'ID YouTube videa (dQw4w9WgXcQ)';
 $string["submit"] = 'Vložit';
-$string["addDemonTitle"] = 'Přidat démona';
-$string["addDemon"] = 'Přidat démona do demonlistu';
-$string["addedDemon"] = 'Přidali jste <b>%s</b> na <b>%d.</b> místo!';
-$string["addDemonDesc"] = 'Zde můžete přidat démona do demonlistu!';
 $string["place"] = 'Položit';
-$string["giveablePoints"] = 'Datelné body';
 $string["add"] = 'Přidat';
-$string["recordApproved"] = 'Rekord přijat!';
-$string["recordDenied"] = 'Rekord odmítnut!';
-$string["recordSubmitted"] = 'Rekord vložen!';
-$string["nooneBeat"] = 'nikdo neporazil'; //let it be lowercase
-$string["oneBeat"] = '1 hráč porazil'; 
-$string["lower5Beat"] = '%d hráči porazili'; // russian syntax, sorry
-$string["above5Beat"] = '%d hráčů porazilo'; 
-$string["demonlistLevel"] = '%s <text class="dltext">od <button type="button" onclick="a(\'profile/%3$s\', true, true)" style="font-size:25px" class="accbtn" name="accountID" value="%d">%s</button></text>';
-$string["noDemons"] = 'Vypadá to, že váš demonlist nemá žádné démony...';
-$string["addSomeDemons"] = 'Přidejte démony pro vyplnění demonlistu!';
-$string["askForDemons"] = 'Zeptejte se administrátora serveru pro přidání některých!';
-$string["recordList"] = 'Seznam rekordů';
-$string["status"] = 'Stav';
-$string["checkRecord"] = 'Zkontrolovat rekord';
-$string["record"] = 'Rekord';
-$string["recordDeleted"] = 'Rekord byl smazán!';
-$string["changeDemon"] = 'Změnit démona';
-$string["demonDeleted"] = 'Démon byl smazán!';
-$string["changedDemon"] = 'Přesunuli jste <b>%s</b> na <b>%d.</b> místo!';
-$string["changeDemonDesc"] = 'Zde můžete přesunout démony!<br>
-Jestli chcete démona smazat, nastavte místo na 0.';
+$string["demonlistLevel"] = '%s <text class="dltext">od <button type="button" onclick="a(\'profile/%3$s\', true, true)" style="font-size:25px" class="accbtn" name="accountID" value="%d">%s</button>%4$s</text>';
 
 $string["didntActivatedEmail"] = 'Nemáte aktivovaný účet!';
 $string["checkMail"] = 'Zkontrolujte si e-mail...';
@@ -353,8 +310,10 @@ $string["createdClan"] = "Úspěšně jste vytvořili klan <span style='font-wei
 $string["createClanDesc"] = "Zde můžete vytvořit klan!";
 $string["create"] = "Vytvořit";
 $string["mainSettings"] = "Hlavní nastavení";
-$string["takenClanName"] = "JménoThis clan name was already taken!";
+$string["takenClanName"] = "This clan name was already taken!";
 $string["takenClanTag"] = "This clan tag was already taken!";
+$string["badClanName"] = "Please choose another clan name.";
+$string["badClanTag"] = "Please choose another clan tag.";
 
 $string["suggestedName"] = '<button type="button" onclick="a(\'profile/%1$s\', true, true)" class="accbtn" name="accountID">%1$s</button><text class="dltext"> navhrhl/a <b>%4$s%3$s</b> pro </text><text class="levelname">%2$s</text>'; // %1$s - Mod username, %2$s - level name, %3$s - x stars, %4$s - Featured/Epic (%4$s%3$s - Featured, x stars)
 $string["reportedName"] = '%1$s<text class="dltext"> nahlásil/a </text><text class="levelname">%2$s</text>';
@@ -397,6 +356,90 @@ $string['youAreBanned'] = 'Byli jste zabanováni do <b>%2$s</b> z důvodu:<br><b
 $string['banChange'] = 'Změnit';
 $string['system'] = 'Systém';
 
+$string['levelComments'] = 'Level comments';
+$string['levelLeaderboards'] = 'Level leaderboards';
+$string['manageLevel'] = 'Manage level';
+$string['noComments'] = 'No comments!';
+$string['commentHere'] = 'Publish comment...';
+$string['weekLeaderboards'] = 'For a week';
+$string['noLeaderboards'] = 'No leaderboards!';
+$string['manageLevelDesc'] = 'Here you can change level!';
+$string['silverCoins'] = 'Silver coins';
+$string['unlistedLevel'] = 'Unlisted level';
+$string['lockUpdates'] = 'Lock updating';
+$string['lockCommenting'] = 'Lock commenting';
+$string['successfullyChangedLevel'] = 'You successfully changed level!';
+$string['successfullyDeletedLevel'] = 'You successfully deleted level!';
+
+$string['resendMailTitle'] = 'Send email message again';
+$string['resendMailHint'] = 'Didn\'t get mail message?';
+$string['resendMailDesc'] = 'Here you can send email message again if you didn\'t get it!';
+$string['resendMailButton'] = 'Send message';
+
+$string['automodTitle'] = 'Automod';
+$string['possibleLevelsSpamming'] = 'Possible levels spamming';
+$string['disableLevelsUploading'] = 'Disable levels uploading';
+$string['possibleAccountsSpamming'] = 'Possible accounts spamming';
+$string['disableAccountsRegistering'] = 'Disable registering accounts';
+$string['possibleCommentsSpamming'] = 'Possible comments spamming';
+$string['disableComments'] = 'Disable commenting';
+$string['similarCommentsCount'] = 'Similar comments count';
+$string['similarityValueOfAllComments'] = 'Similarity value out of all comments';
+$string['possibleCommentsSpammer'] = 'Possible comments spammer';
+$string['banCommenting'] = 'Ban commenting';
+$string['spammerUsername'] = 'Spammer\'s username';
+$string['possibleAccountPostsSpamming'] = 'Possible account posts spamming';
+$string['disablePosting'] = 'Disable posting';
+$string['similarPostsCount'] = 'Similar posts count';
+$string['similarityValueOfAllPosts'] = 'Similarity value out of all posts';
+$string['possibleAccountPostsSpammer'] = 'Possible account posts spammer';
+$string['possibleRepliesSpamming'] = 'Possible replies spamming';
+$string['possibleRepliesSpammer'] = 'Possible replies spammer';
+$string['similarRepliesCount'] = 'Similar replies count';
+$string['similarityValueOfAllReplies'] = 'Similarity value out of all replies';
+$string['unknownWarning'] = 'Unknown warning';
+$string['before'] = 'Before';
+$string['after'] = 'After';
+$string['compare'] = 'Compare';
+$string['resolvedWarning'] = 'Resolved warning';
+$string['resolveWarning'] = 'Resolve warning';
+$string['enabled'] = 'Enabled';
+$string['disabled'] = 'Disabled';
+$string['yesterday'] = 'Yesterday';
+$string['today'] = 'Today';
+$string['uploading'] = 'Uploading';
+$string['commenting'] = 'Commenting';
+$string['leaderboardSubmits'] = 'Leaderboard submits';
+$string['manageLevels'] = 'Manage levels';
+$string['disableLevelsUploading'] = 'Disable levels uploading';
+$string['disableLevelsCommenting'] = 'Disable levels commenting';
+$string['disableLevelsLeaderboardSubmits'] = 'Disable levels leaderboard submits';
+$string['disable'] = 'Disable';
+$string['enable'] = 'Enable';
+$string['registering'] = 'Registering';
+$string['accountPosting'] = 'Making account posts';
+$string['updatingProfileStats'] = 'Updating profile stats';
+$string['messaging'] = 'Messaging';
+$string['manageAccounts'] = 'Manage accounts';
+$string['disableAccountsRegistering'] = 'Disable registering new accounts';
+$string['disableAccountPosting'] = 'Disable making account posts';
+$string['disableUpdatingProfileStats'] = 'Disable updating profile stats';
+$string['disableMessaging'] = 'Disable messaging';
+
+$string['cantPostCommentsAboveChars'] = 'You cannot post comments above %1$s characters!';
+$string['replyingIsDisabled'] = 'Replying to comments is currently disabled!';
+$string['youAreBannedFromCommenting'] = 'You are banned from commenting!';
+$string['cantPostAccountCommentsAboveChars'] = 'You cannot post account comments above %1$s characters!';
+$string['commentingIsDisabled'] = 'Commenting is currently disabled!';
+$string['noWarnings'] = 'No warnings';
+
+$string['downloadLevelAsGMD'] = 'Save as .gmd';
+
+$string['songIsAvailable'] = 'Available';
+$string['songIsDisabled'] = 'Not available';
+$string['disabledSongs'] = 'Disabled songs';
+$string['disabledSFXs'] = 'Disabled SFXs';
+
 /*
 	REUPLOAD
 */
@@ -415,7 +458,6 @@ $string["songAddButton"] = "Vybrat skladbu";
 $string["songAddAnotherBTN"] = "Ještě jedna?";
 $string["songAdded"] = "Skladba přidána";
 $string["deletedSong"] = "Úspěšně jste smazali skladbu";
-$string["renamedSong"] = "Úspěšně jste přejmenovali skladbu na";
 $string["songID"] = "ID skladby: ";
 $string["songIDw"] = "ID skladby";
 $string["songAuthor"] = "Autor";
@@ -469,8 +511,6 @@ $string["reportMod"] = "Nahlášení";
 $string["username"] = "Uživatelské jméno";
 $string["accountID"] = "ID účtu";
 $string["registerDate"] = "Datum registrace";
-$string["levelAuthor"] = "Autor úrovně";
-$string["isAdmin"] = "Role na serveru";
 $string["isAdminYes"] = "Ano";
 $string["isAdminNo"] = "Ne";
 $string["userCoins"] = "Bronzové mince";
@@ -500,7 +540,7 @@ $string["stats"] = "Statistiky";
 $string["suggestFeatured"] = "Speciálně ohodnoceno?";
 $string["whoAdded"] = "Kdo přidal?";
 $string["moons"] = "Měsíce";
-//modActionsList
+
 $string["banDesc"] = "Zde můžete zabanovat hráče!";
 $string["playerTop"] = 'Žebříčky hráčů';
 $string["creatorTop"] = 'Žebříčky tvůrců';
@@ -509,29 +549,13 @@ $string["successfullyBanned"] = 'Hráč <b>%1$s</b> s ID účtu <b>%2$s</b> byl 
 $string["successfullyUnbanned"] = 'Hráč <b>%1$s</b> s ID účtu <b>%2$s</b> byl úspěšně odbanován!';
 $string["commentBan"] = 'Komentování';
 
-$string["admin"] = "Administrátor";
-$string["elder"] = "Elder moderátor";
-$string["moder"] = "Moderátor";
 $string["player"] = "Hráč";
 
 $string["starsLevel2"] = "hvězd";
 $string["starsLevel1"] = "hvězdy";
 $string["starsLevel0"] = "hvězda";
-$string["coins2"] = "mincí";
 $string["coins1"] = "mince";
 $string["coins0"] = "mince";
-$string["time0"] = "krát";
-$string["time1"] = "krát";
-$string["times"] = "krát";
-$string["action0"] = "čin";
-$string["action1"] = "činy";
-$string["action2"] = "činů";
-$string["lvl0"] = "úroveň";
-$string["lvl1"] = "úrovně";
-$string["lvl2"] = "úrovní";
-$string["player0"] = "hráč";
-$string["player1"] = "hráči";
-$string["player2"] = "hráčů";
 $string["unban"] = "Odbanován";
 $string["isBan"] = "Zabanován";
 
@@ -585,6 +609,7 @@ $string["modAction25"] = "Vytvořil(a) quest";
 $string["modAction26"] = "Změnil(a) jméno/heslo hráče";
 $string["modAction27"] = "Změnil(a) zvukový efekt";
 $string["modAction28"] = "Zabanoval(a) osobu";
+$string["modAction29"] = "Locked/unlocked level updating";
 $string["modAction30"] = "Ohodnotil(a) list";
 $string["modAction31"] = "Odeslal(a) list";
 $string["modAction32"] = "Odstranil/přidal(a) zvláštní hodnocení listu";
@@ -593,6 +618,10 @@ $string["modAction34"] = "Odstranil(a) list";
 $string["modAction35"] = "Změnil(a) autora listu";
 $string["modAction36"] = "Změnil(a) jméno listu";
 $string["modAction37"] = "Změnil(a) popis listu";
+$string["modAction38"] = "Locked/unlocked level commenting";
+$string["modAction39"] = "Locked/unlocked list commenting";
+$string["modAction40"] = "Removed sent level";
+$string["modAction41"] = "Suggested level";
 $string["everyActions"] = "Všechny činy";
 $string["everyMod"] = "Každý moderátor";
 $string["Kish!"] = "Nemáš co tady dělat!";
@@ -601,5 +630,3 @@ $string["noLogin?"] = "Nejste přihlášeni k účtu!";
 $string["LoginBtn"] = "Přihlásit se";
 $string["dashboard"] = "Dashboard";
 $string["userID"] = 'ID uživatele';
-//errors
-$string["errorNoAccWithPerm"] = "Chyba: Žádný účet s oprávněním '%s' nebyl nalezen";

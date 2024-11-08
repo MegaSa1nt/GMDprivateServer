@@ -2,14 +2,15 @@
 session_start();
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/Captcha.php";
-include "../".$dbPath."incl/lib/connection.php";
-include "../".$dbPath."incl/lib/mainLib.php";
-$gs = new mainLib();
+require "../".$dbPath."incl/lib/connection.php";
+require_once "../".$dbPath."incl/lib/mainLib.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
+require "../".$dbPath."config/dashboard.php";
+$gs = new mainLib();
 $dl = new dashboardLib();
 $dl->title($dl->getLocalizedString("sfxAdd"));
 $dl->printFooter('../');
-if(strpos($sfxEnabled, '1') === false) {
+if(!$sfxEnabled) {
 	$dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 		<form class="form__inner" method="post" action="">
@@ -40,38 +41,28 @@ if($_FILES && $_FILES['filename']['error'] == UPLOAD_ERR_OK) {
 		else {
 			if($_FILES['filename']['size'] >= $sfxSize * 1024 * 1024) $db_fid = -5;
 			else {
+				$server = (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http")."://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 				$time = time();
-				$length = 10;
 				$types = array('.mp3', '.ogg', '.mpeg');
 				$name = !empty(mb_substr(ExploitPatch::rucharclean($_POST['name']), 0, 40)) ? mb_substr(ExploitPatch::rucharclean($_POST['name']), 0, 40) : 'Unnamed SFX';
 				$author = $gs->getAccountName($_SESSION['accountID']);
 				$size = $_FILES['filename']['size'];
-				$query = $db->prepare("INSERT INTO sfxs (name, authorName, size, download,  reuploadTime, reuploadID) VALUES (:name, :author, :size, :download, :reuploadTime, :reuploadID)");
-				$query->execute([':name' => $name, ':download' => '', ':author' => $author, ':size' => $size, ':reuploadTime' => $time, ':reuploadID' => $_SESSION['accountID']]);
+				$query = $db->prepare("INSERT INTO sfxs (name, authorName, size, download,  reuploadTime, reuploadID) VALUES (:name, :author, :size, '', :reuploadTime, :reuploadID)");
+				$query->execute([':name' => $name, ':author' => $author, ':size' => $size, ':reuploadTime' => $time, ':reuploadID' => $_SESSION['accountID']]);
 				$db_fid = $db->lastInsertId();
-				$song = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]".$db_fid.".ogg";
-				move_uploaded_file($_FILES['filename']['tmp_name'], "$db_fid.ogg");
-				$duration = $gs->getAudioDuration(realpath("$db_fid.ogg"));
+				$token = $convertEnabled ? $gs->randomString(16) : '';
+				$convert = $gs->convertSFX($_FILES['filename'], $server, $name, $token);
+				$temp = $convert ? '_temp' : '';
+				$song = $server.$db_fid.$temp.".ogg";
+				move_uploaded_file($_FILES['filename']['tmp_name'], $db_fid.$temp.".ogg");
+				$duration = $gs->getAudioDuration(realpath($db_fid.$temp.".ogg"));
 				$duration = empty($duration) ? 0 : $duration * 1000;
-				$query = $db->prepare('UPDATE sfxs SET download = :dl, milliseconds = :ms WHERE ID = :id');
-				$query->execute([':dl' => $song, ':ms' => $duration, ':id' => $db_fid]);
-				$fontsize = 27;
-				$songIDlol = '<button id="copy'.$db_fid.'" class="accbtn songidyeah" onclick="copysong('.$db_fid.')">'.$db_fid.'</button>';
-				$time = $dl->convertToDate($time, true);
-				if(mb_strlen($author) + mb_strlen($name) > 30) $fontsize = 17;
-				elseif(mb_strlen($author) + mb_strlen($name) > 20) $fontsize = 20;
-				$btn = '<button type="button" name="btnsng" id="btn'.$db_fid.'" title="'.$author.' — '.$name.'" style="display: contents;color: white;margin: 0;" download="'.$song.'" onclick="btnsong(\''.$db_fid.'\');"><div class="icon" style="font-size:13px; height:25px;width:25px;background:#373A3F;margin-left: 5px;"><i id="icon'.$db_fid.'" name="iconlol" class="fa-solid fa-play" aria-hidden="false"></i></div></button>';
-				$songSize = '<p class="profilepic"><i class="fa-solid fa-weight-hanging"></i> '.round($size / 1024 / 1024, 2).' MB</p>';
-				$whoused = '<p class="profilepic" style="display: inline-flex;justify-content: center;grid-gap: 7px;"><i class="fa-solid fa-gamepad"></i> <span style="color:#333">0</span></p>';
-				$favs = '';
-				$stats = $songSize.$whoused;
-				$songs = '<div id="profile'.$db_fid.'" style="width: 100%;display: flex;flex-wrap: wrap;justify-content: center;">
-						<div class="profile"><div style="display: flex;width: 100%;justify-content: space-between;margin-bottom: 7px;align-items: center;"><div style="display: flex;width: 100%; justify-content: space-between;align-items: center;">
-							<h2 style="margin: 0px;font-size: '.$fontsize.'px;margin-left:5px;display: flex;align-items: center;" class="profilenick">'.$author.' — '.$name.$btn.'</h2>
-						</div></div>
-						<div class="form-control" style="display: flex;width: 97.5%;height: max-content;align-items: center;">'.$stats.'</div>
-						<div style="display: flex;justify-content: space-between;margin-top: 10px;"><h3 id="comments" class="songidyeah" style="margin: 0px;width: max-content;">SFX ID: <b>'.$songIDlol.'</b></h3><h3 id="comments" class="songidyeah" style="justify-content: flex-end;grid-gap: 0.5vh;margin: 0px;width: max-content;">'.$dl->getLocalizedString("date").': <b>'.$time.'</b></h3></div>
-					</div></div>';
+				$query = $db->prepare('UPDATE sfxs SET download = :dl, milliseconds = :ms, token = :token, isDisabled = :isDisabled WHERE ID = :id');
+				$query->execute([':dl' => $song, ':ms' => $duration, ':id' => $db_fid, ':token' => $token, ':isDisabled' => ($preenableSFXs ? 0 : 1)]);
+				$songArray = $db->prepare('SELECT * FROM sfxs WHERE ID = :ID');
+				$songArray->execute([':ID' => $db_fid]);
+				$songArray = $songArray->fetch();
+				$songs = $dl->generateSongCard($songArray, '', false);
 			}
 		}			
 	}

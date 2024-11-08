@@ -3,8 +3,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
 require "../incl/dashboardLib.php";
-include "../".$dbPath."incl/lib/connection.php";
-include "../".$dbPath."incl/lib/mainLib.php";
+require "../".$dbPath."incl/lib/connection.php";
+require "../".$dbPath."incl/lib/mainLib.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 $gs = new mainLib();
 if(!isset($_GET)) $_GET = json_decode(file_get_contents('php://input'), true);
@@ -16,6 +16,7 @@ $rates = $rates->fetchAll();
 if(empty($rates)) exit(json_encode(['dashboard' => true, 'success' => false, 'error' => 2, 'message' => 'Nothing was rated!']));
 foreach($rates as &$rate) {
 	$songInfo = $song = $songName = false;
+	$rate['extID'] = is_numeric($rate['extID']) ? $rate['extID'] : 0;
 	if($rate['songID'] != 0) {
 		$songInfo = $gs->getSongInfo($rate['songID']);
 		if($songInfo) {
