@@ -23,6 +23,10 @@ class Commands {
 		$getLevelData->execute([':levelID' => $levelID]);
 		$getLevelData = $getLevelData->fetch();
 		switch($commentarray[0]) {
+			case '!cron':
+				include __DIR__ . '../../tools/cron/cron.php';
+				return 'Cron job successfully executed!';
+				break;
 			case '!r':
 			case '!rate':
 				if(!$gs->checkPermission($accountID, "commandRate")) return false;
