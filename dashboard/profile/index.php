@@ -354,7 +354,7 @@ $dl->printSong('<div class="form profileform">
 		'.$send.'
 </div></div>
 <script>
-'.(isset($msgTooLong) ? 'alert("You cannot post account comments above '.$maxAccountCommentLength.' characters!");':'').'
+'.(isset($msgTooLong) ? 'alert("You cannot post comments above the '.$maxAccountCommentLength.' character limit!");':'').'
 function reply(id) {
 	document.getElementById("spin" + id).style.display = "block";
     replies = new XMLHttpRequest();

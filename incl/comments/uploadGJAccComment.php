@@ -12,7 +12,7 @@ if(Automod::isAccountsDisabled(1)) exit(($_POST['gameVersion'] > 20 ? 'temp_0_Ac
 $userName = ExploitPatch::remove($_POST["userName"]);
 $comment = ExploitPatch::remove($_POST["comment"]);
 $commentLength = ($gameVersion >= 20) ? mb_strlen(ExploitPatch::url_base64_decode($comment)) : mb_strlen($comment);
-if($enableCommentLengthLimiter && $commentLength > $maxAccountCommentLength) exit("temp_0_You cannot post account comments above $maxAccountCommentLength characters! (Your's ".$commentLength.")");
+if($enableCommentLengthLimiter && $commentLength > $maxAccountCommentLength) exit("temp_0_You cannot post account comments above the $maxCommentLength character limit! Yours was $commentLength.");
 $accountID = GJPCheck::getAccountIDOrDie();
 $userID = $gs->getUserID($accountID, $userName);
 $uploadDate = time();

@@ -13,7 +13,7 @@ $userName = !empty($_POST['userName']) ? ExploitPatch::charclean($_POST['userNam
 $comment = !empty($_POST['comment']) ? $_POST['comment'] : "";
 $gameVersion = !empty($_POST['gameVersion']) ? ExploitPatch::number($_POST['gameVersion']) : 0;
 $commentLength = ($gameVersion >= 20) ? mb_strlen(ExploitPatch::url_base64_decode($comment)) : mb_strlen($comment);
-if($enableCommentLengthLimiter && $commentLength > $maxCommentLength) exit("temp_0_You cannot post comments above $maxCommentLength characters! (Your's ".$commentLength.")");
+if($enableCommentLengthLimiter && $commentLength > $maxCommentLength) exit("temp_0_You cannot post comments above the $maxCommentLength character limit! Yours was $commentLength.");
 $comment = ($gameVersion < 20) ? ExploitPatch::url_base64_encode(ExploitPatch::rucharclean($comment)) : ExploitPatch::url_base64_encode(ExploitPatch::rucharclean(ExploitPatch::url_base64_decode($comment)));
 $levelID = ExploitPatch::numbercolon($_POST["levelID"]);
 $percent = !empty($_POST["percent"]) ? ExploitPatch::number($_POST["percent"]) : 0;
