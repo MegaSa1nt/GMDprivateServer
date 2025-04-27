@@ -17,6 +17,15 @@ if (!empty($_POST)) {
                 $response = array();
 
                 foreach ($res as $row) {
+                    $clanOwnerID = $row['clanOwner'];
+
+                    $querywhatUser = "SELECT userName FROM accounts WHERE accountID = :clanOwnerID";
+                    $queryUser = $db->prepare($querywhatUser);
+                    $queryUser->execute([':clanOwnerID' => $clanOwnerID]);
+
+                    $user = $queryUser->fetch();
+                    $username = $user ? $user['userName'] : 'Unknown';
+
                     $clan = array(
                         'ID' => $row['ID'],
                         'name' => $row['clan'],
@@ -25,7 +34,8 @@ if (!empty($_POST)) {
                         'clanOwner' => $row['clanOwner'],
                         'color' => $row['color'],
                         'isClosed' => $row['isClosed'],
-                        'creationDate' => $row['creationDate']
+                        'creationDate' => $row['creationDate'],
+                        'username' => $username
                     );
 
                     $response[] = $clan;
