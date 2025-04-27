@@ -8,14 +8,17 @@ if ($db->connect_error) {
     echo "Database connected successfully!";
 }
 
-$query = "SELECT * FROM clans";
-$result = $db->query($query);
+$querywhat = "SELECT * FROM clans"; 
+$query = $db->prepare($querywhat);
+$query->execute();
 
-if ($result) {
-    if ($result->num_rows > 0) {
+$res = $query->fetchAll();
+
+if ($res) {
+    if (count($res) > 0) {
         $response = array();
 
-        while ($row = $result->fetch_assoc()) {
+        foreach ($res as $row) {
             $clan = array(
                 'ID' => $row['ID'],
                 'name' => $row['clan'],
@@ -35,6 +38,6 @@ if ($result) {
         echo "No rows found in the clans table.";
     }
 } else {
-    echo "Error executing query: " . $db->error;
+    echo "Error executing query.";
 }
 ?>
