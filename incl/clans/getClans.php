@@ -2,6 +2,12 @@
 chdir(dirname(__FILE__));
 require "../lib/connection.php";
 
+if ($db->connect_error) {
+    die("Connection failed: " . $db->connect_error);
+} else {
+    echo "Database connected successfully!";
+}
+
 $query = "SELECT * FROM clans";
 $result = $db->query($query);
 
@@ -29,6 +35,6 @@ if ($result) {
         echo "No rows found in the clans table.";
     }
 } else {
-    echo "Query failed: " . $db->error;
+    echo "Error executing query: " . $db->error;
 }
 ?>
