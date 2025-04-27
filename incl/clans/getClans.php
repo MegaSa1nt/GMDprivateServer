@@ -2,7 +2,7 @@
 chdir(dirname(__FILE__));
 require "../lib/connection.php";
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (!empty($_POST)) {
     if ($db->connect_error) {
         die("-1"); // Connection failed
     } else {
