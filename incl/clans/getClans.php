@@ -3,41 +3,39 @@ chdir(dirname(__FILE__));
 require "../lib/connection.php";
 
 if ($db->connect_error) {
-    die("Connection failed: " . $db->connect_error);
+    die("-1");
 } else {
-    echo "Database connected successfully!";
-}
+    $querywhat = "SELECT * FROM clans"; 
+    $query = $db->prepare($querywhat);
+    $query->execute();
 
-$querywhat = "SELECT * FROM clans"; 
-$query = $db->prepare($querywhat);
-$query->execute();
+    $res = $query->fetchAll();
 
-$res = $query->fetchAll();
+    if ($res) {
+        if (count($res) > 0) {
+            $response = array();
 
-if ($res) {
-    if (count($res) > 0) {
-        $response = array();
+            foreach ($res as $row) {
+                $clan = array(
+                    'ID' => $row['ID'],
+                    'name' => $row['clan'],
+                    'tag' => $row['tag'],
+                    'desc' => $row['desc'],
+                    'clanOwner' => $row['clanOwner'],
+                    'color' => $row['color'],
+                    'isClosed' => $row['isClosed'],
+                    'creationDate' => $row['creationDate']
+                );
 
-        foreach ($res as $row) {
-            $clan = array(
-                'ID' => $row['ID'],
-                'name' => $row['clan'],
-                'tag' => $row['tag'],
-                'desc' => $row['desc'],
-                'clanOwner' => $row['clanOwner'],
-                'color' => $row['color'],
-                'isClosed' => $row['isClosed'],
-                'creationDate' => $row['creationDate']
-            );
+                $response[] = $clan;
+            }
 
-            $response[] = $clan;
+            echo json_encode($response);
+        } else {
+            echo "-1"; // No rows found in the clans table
         }
-
-        echo json_encode($response);
     } else {
-        echo "No rows found in the clans table.";
+        echo "-1"; // Error executing query
     }
-} else {
-    echo "Error executing query.";
 }
 ?>
