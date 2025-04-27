@@ -15,7 +15,7 @@ if (!isset($_POST['id'])) {
         $res = $query->fetchAll();
 
         if ($res) {
-            echo json_encode($res);
+            echo json_encode($res[0]); // Output the first result as an object
         } else {
             echo "-1"; // No results found
         }
