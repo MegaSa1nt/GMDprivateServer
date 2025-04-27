@@ -25,6 +25,17 @@ if (!isset($_POST['id'])) {
 
             $res[0]['username'] = $username;
 
+            $querywhatMembers = "SELECT userName FROM users WHERE clan = :id";
+            $queryMembers = $db->prepare($querywhatMembers);
+            $queryMembers->execute([':id' => $_POST['id']]);
+
+            $members = [];
+            while ($member = $queryMembers->fetch()) {
+                $members[] = $member['userName'];
+            }
+
+            $res[0]['members'] = $members;
+
             echo json_encode($res[0]);
         } else {
             echo "-1"; // No results found
