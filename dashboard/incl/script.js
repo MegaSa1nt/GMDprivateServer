@@ -1,6 +1,6 @@
 if(typeof localStorage.player_volume == "undefined") localStorage.player_volume = 0.15;
 
-var dashboardLoader, dashboardBody, dashboardBase;
+var dashboardLoader, dashboardBody, dashboardBase, dashboardBackground;
 var intervals = [];
 var updateFilters = true;
 
@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
 	dashboardLoader = document.getElementById("dashboard-loader");
 	dashboardBody = document.getElementById("dashboard-body");
 	dashboardBase = document.querySelector("base");
+	dashboardBackground = document.querySelector("span.background");
 	
 	dashboardBody.classList.add("hide");
 	
@@ -15,7 +16,10 @@ window.addEventListener('load', () => {
 	updatePage();
 	updateNavbar();
 	
-	window.addEventListener("popstate", (e) => getPage(e.target.location.href, true));
+	window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
+	
+	window.addEventListener("popstate", (event) => getPage(event.target.location.href, true));
+	window.addEventListener("wheel", () => document.querySelector("[dashboard-context-menu].show")?.classList.remove("show"));
 	
 	setTimeout(() => dashboardLoader.classList.add("hide"), 200);
 });
@@ -133,6 +137,8 @@ function changePage(response, href, skipCheck = false) {
 		updatePage();
 		updateNavbar();
 		
+		window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
+		
 		r(true);
 	});
 }
@@ -233,6 +239,9 @@ async function updatePage() {
 		const href = element.getAttribute("href");
 		
 		element.addEventListener("mouseup", async (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			
 			switch(event.button) {
 				case 0:
 					getPage(href);
@@ -242,9 +251,15 @@ async function updatePage() {
 					openNewTab.href = href;
 					openNewTab.target = "_blank";
 					openNewTab.click();
-					return false;
 					break;
 			}
+		});
+		
+		element.addEventListener("mousedown", async (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			
+			return false;
 		});
 	});
 	
@@ -341,11 +356,16 @@ async function updatePage() {
 	modalButtonElements.forEach(async (element) => {
 		const modalID = element.getAttribute("dashboard-modal-button");
 		const modalElement = document.querySelector(`[dashboard-modal="${modalID}"]`);
-		const modalBackground = modalElement.querySelector(`span.background`);
+		const modalSearchElement = modalElement.querySelector("[dashboard-modal-search]");
 		
 		element.onclick = () => modalElement.classList.toggle("show");
-		modalBackground.onclick = () => modalElement.classList.remove("show");
-	});
+		dashboardBackground.onclick = () => modalElement.classList.remove("show");
+		if(modalSearchElement != null) {
+			modalSearchElement.addEventListener("keyup", (event) => {
+				if(event.keyCode == 13) applyFilters(modalID);
+			});
+		}
+	});	
 	
 	const selectSearchElements = document.querySelectorAll("[dashboard-select-search]");
 	selectSearchElements.forEach(async (element) => {
@@ -449,8 +469,6 @@ async function updatePage() {
 							const selectValue = url.searchParams.get(selectValueInput.name);
 							const selectInput = selectDiv.querySelector("[dashboard-select-input]");
 							
-							console.log(selectValue.trim().length, selectValue != '0', selectValue);
-							
 							if(selectValue.trim().length && selectValue != '0') {
 								const search = await searchSomething(selectInput.getAttribute("dashboard-select-input"), selectValue);
 								
@@ -480,14 +498,17 @@ async function updatePage() {
 	}
 	if(updateFilters) updateFilters = false;
 	
-	const contextMenuDivs = document.querySelectorAll("[dashboard-context-div]");
+	const contextMenuDivs = document.querySelectorAll("[dashboard-context-div]:has([dashboard-context-menu])");
 	contextMenuDivs.forEach(async (element) => {
-		const contextMenuElement = element.querySelector("[dashboard-context-menu]");
+		const contextMenuElement = element.querySelector(":scope > [dashboard-context-menu]");
+		
+		if(contextMenuElement == null) return;
 		
 		document.addEventListener('click', () => contextMenuElement.classList.remove("show"));
 		element.onclick = () => contextMenuElement.classList.remove("show");
 		element.oncontextmenu = async (event) => {
 			event.preventDefault();
+			event.stopPropagation();
 			
 			if(!contextMenuElement.classList.contains("show")) {
 				contextMenuElement.style.left = (event.clientX + contextMenuElement.clientWidth + 50 >= window.innerWidth) ? window.innerWidth - contextMenuElement.clientWidth - 50 : event.clientX;
@@ -572,7 +593,9 @@ function timeConverter(timestamp, textStyle = "short") {
 	return capitalize(rtf.format(-1 * passedTime, unitType));
 }
 
-function copyElementContent(textToCopy) {
+function copyElementContent(textToCopy, relativeLink = false) {
+	if(relativeLink) textToCopy = baseURL.href + textToCopy;
+	
 	navigator.clipboard.writeText(textToCopy);
 	
 	Toastify({

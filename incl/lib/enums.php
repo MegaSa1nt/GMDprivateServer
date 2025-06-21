@@ -73,6 +73,7 @@ class Action { // Last action ID is 58
 	
 	const SuccessfulLogin = 2;
 	const FailedLogin = 6;
+	const GJPSessionGrant = 16;
 	
 	// To be done with dashboard
 	const SuccessfulAccountActivation = 3;
@@ -144,7 +145,6 @@ class Action { // Last action ID is 58
 	const AccountBackupRateLimit = 58;
 	
 	// Unused
-	const GJPSessionGrant = 16;
 	const LevelReport = 20;
 	const LevelDescriptionChange = 21;
 }

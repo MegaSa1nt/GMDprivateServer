@@ -9,23 +9,49 @@ class Security {
 	}
 	
 	public function loginToAccountWithID($accountID, $key, $type) {
+		require __DIR__."/../../config/security.php";
 		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/enums.php";
 		require_once __DIR__."/ip.php";
 		
 		$IP = IP::getIP();
+		$skipValidating = false;
 		
 		$account = Library::getAccountByID($accountID);
 		if(!$account) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
 		
-		switch($type) {
-			case 1:
-				if(!password_verify($key, $account["password"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
-				break;
-			case 2:
-				if(!password_verify($key, $account["gjp2"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
-				break;
-		}		
+		if($sessionGrants) {
+			$searchPerson = [
+				'accountID' => 0,
+				'userID' => 0,
+				'userName' => '',
+				'IP' => $IP
+			];
+			
+			$hourAgo = time() - 3600;
+			
+			$searchFilters = ['type = '.Action::PasswordChange, 'timestamp >= '.$hourAgo];
+			$passwordChanges = Library::getPersonActions($searchPerson, $searchFilters, 1);
+			
+			$sessionTimeToCheck = $passwordChanges && $passwordChanges[0]['timestamp'] >= $hourAgo ? $passwordChanges[0]['timestamp'] : $hourAgo;
+			
+			$searchFilters = ['type = '.Action::GJPSessionGrant, 'timestamp >= '.$sessionTimeToCheck, 'account = '.$accountID];
+			$session = Library::getPersonActions($searchPerson, $searchFilters, 1);
+			
+			if($session) $skipValidating = true;
+		}
+		
+		if(!$skipValidating) {
+			switch($type) {
+				case 1:
+					if(!password_verify($key, $account["password"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					break;
+				case 2:
+					if(!password_verify($key, $account["gjp2"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					break;
+			}
+		}
+		
 		if($account["isActive"] == "0") return ["success" => false, "error" => LoginError::AccountIsNotActivated, "accountID" => (string)$accountID, "IP" => $IP];
 		
 		$userID = Library::getUserID($accountID);
@@ -43,15 +69,29 @@ class Security {
 		$udid = isset($_POST['udid']) ? Escape::text($_POST['udid']) : '';
 		if($udid) self::assignUDIDToRegisteredAccount($userID, $udid, $userName);
 		
+		if($sessionGrants && !$skipValidating) {
+			$logPerson = [
+				"accountID" => (string)$accountID,
+				"userID" => (string)$userID,
+				"userName" => (string)$userName,
+				"IP" => $IP
+			];
+			
+			Library::logAction($logPerson, Action::GJPSessionGrant);
+		}
+		
 		return ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => (string)$userName, "IP" => $IP];
 	}
 	
 	public function loginToAccountWithUserName($userName, $key, $type) {
 		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/enums.php";
+		require_once __DIR__."/ip.php";
+		
+		$IP = IP::getIP();
 		
 		$accountID = Library::getAccountIDWithUserName($userName);
-		if(!$accountID) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => "0"];
+		if(!$accountID) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => "0", "IP" => $IP];
 		
 		return $this->loginToAccountWithID($accountID, $key, $type);
 	}
@@ -269,7 +309,7 @@ class Security {
 		
 		$hashedUDID = sha1($udid."PUH7d3v6hDjAa2bfuM9r");
 		
-		$unregistered = $db->prepare("SELECT * FROM udids WHERE userID = :userID OR udids REGEXP :udid");
+		$unregistered = $db->prepare("SELECT * FROM udids WHERE userID = :userID OR udids REGEXP CONCAT('(\\\D|^)(', :udid, ')(\\\D|$)')");
 		$unregistered->execute([':userID' => $userID, ':udid' => $hashedUDID]);
 		$unregistered = $unregistered->fetch();
 		
@@ -378,12 +418,12 @@ class Security {
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";
 		
-		$auth = Library::randomString(16);
+		$auth = Library::randomString(32);
 		
 		$assignAuthToken = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :accountID");
 		$assignAuthToken->execute([':auth' => $auth, ':accountID' => $accountID]);
 		
-		return true;
+		return $auth;
 	}
 	
 	public static function checkRateLimits($person, $type) {
@@ -410,7 +450,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($globalLevelsUploadDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded allowed rate limit for uploading level.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$globalLevelsUploadDelay." * ".$rateLimitBanMultiplier.", global)");
+						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$globalLevelsUploadDelay." * ".$rateLimitBanMultiplier.", global)");
 					}
 					
 					return false;
@@ -420,7 +460,7 @@ class Security {
 			case 1:
 				if(!$perUserLevelsUploadDelay) return true;
 			
-				$lastUploadedLevelByUser = $db->prepare('SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP :IP)');
+				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
 				$lastUploadedLevelByUser->execute([':time' => time() - $perUserLevelsUploadDelay, ':userID' => $userID, ':IP' => Library::convertIPForSearching($IP, true)]);
 				$lastUploadedLevelByUser = $lastUploadedLevelByUser->fetchColumn();
 				
@@ -431,7 +471,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($perUserLevelsUploadDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded allowed rate limit for uploading levels.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$perUserLevelsUploadDelay." * ".$rateLimitBanMultiplier.", per user)");
+						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$perUserLevelsUploadDelay." * ".$rateLimitBanMultiplier.", per user)");
 					}
 					
 					return false;
@@ -452,7 +492,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($accountsRegisterDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded allowed rate limit for registering accounts.", 4, 2, (time() + $rateLimitBanTime), "Person tried to register too many accounts. (".count($isRateLimited)." > ".$accountsRegisterDelay." * ".$rateLimitBanMultiplier.")");
+						Library::banPerson(0, $person, "You exceeded rate limit for registering accounts.", 4, 2, (time() + $rateLimitBanTime), "Person tried to register too many accounts. (".count($isRateLimited)." > ".$accountsRegisterDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -472,7 +512,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($usersCreateDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded allowed rate limit for creating users.", 4, 2, (time() + $rateLimitBanTime), "Person tried to create too many users. (".count($isRateLimited)." > ".$usersCreateDelay." * ".$rateLimitBanMultiplier.")");
+						Library::banPerson(0, $person, "You exceeded rate limit for creating users.", 4, 2, (time() + $rateLimitBanTime), "Person tried to create too many users. (".count($isRateLimited)." > ".$usersCreateDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -498,7 +538,7 @@ class Security {
 				$isRateLimited = Library::getPersonActions($person, $searchFilters);
 				
 				if(count($isRateLimited) > $maxLoginTries) {
-					Library::banPerson(0, $person, "You exceeded allowed rate limit for logging in.", 4, 2, (time() + $rateLimitBanTime), "Person failed to login too much. (".count($isRateLimited)." > ".$maxLoginTries.")");
+					Library::banPerson(0, $person, "You exceeded rate limit for logging in.", 4, 2, (time() + $rateLimitBanTime), "Person failed to login too much. (".count($isRateLimited)." > ".$maxLoginTries.")");
 					return false;
 				}
 				

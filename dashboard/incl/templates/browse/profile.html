@@ -1,37 +1,47 @@
 <div class="wideBox levelPage">
-	<div class="contentDiv">
+	<div class="contentDiv" dashboard-context-div>
 		<div class="horisontal bigGap">
 			<div class="profilePlayerIcon">
 				<img src="%PROFILE_MAIN_ICON_URL%" />
 			</div>
 			
 			<div class="vertical">
-				<div class="horisontal spaceBetween">
+				<div class="horisontal spaceBetween flexStart">
 					<div class="profileTitle">
 						<h1>%PROFILE_USERNAME%</h1>
 						<img dashboard-show="%PROFILE_HAS_BADGE%" src="incl/icons/badge_%PROFILE_MODERATOR_BADGE%.png" />
 						<p style="%PROFILE_CLAN_COLOR%" dashboard-show="%PROFILE_HAS_CLAN%" title="%PROFILE_CLAN_TITLE%" href="clan/%PROFILE_CLAN_NAME%">%PROFILE_CLAN_NAME%</p>
 					</div>
 					
-					<h1 title="%TEXT_rank%" dashboard-show="%PROFILE_HAS_RANK%">
-						<i class="fa-solid fa-trophy"></i>
+					<h1 title="%TEXT_rank%" dashboard-score="%PROFILE_RANK%" dashboard-show="%PROFILE_HAS_RANK%">
+						<i dashboard-show="%PROFILE_IS_TOP_100%" class="fa-solid fa-trophy"></i>
+						<i dashboard-hide="%PROFILE_IS_TOP_100%" class="fa-solid fa-hashtag"></i>
 						%PROFILE_RANK%
 					</h1>
 				</div>
 				
-				<div class="iconKitDiv">
-					<img class="profileIconBig" src="%PROFILE_ICON_CUBE%" />
-					<img class="profileIconSmall" src="%PROFILE_ICON_SHIP%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_BALL%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_UFO%" />
-					<img class="profileIconSmall" src="%PROFILE_ICON_WAVE%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_ROBOT%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_SPIDER%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_SWING%" />
-					<img class="profileIconBig" src="%PROFILE_ICON_JETPACK%" />
+				<div class="horisontal spaceBetween flexEnd">
+					<div class="iconKitDiv">
+						<img class="profileIconBig" src="%PROFILE_ICON_CUBE%" />
+						<img class="profileIconSmall" src="%PROFILE_ICON_SHIP%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_BALL%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_UFO%" />
+						<img class="profileIconSmall" src="%PROFILE_ICON_WAVE%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_ROBOT%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_SPIDER%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_SWING%" />
+						<img class="profileIconBig" src="%PROFILE_ICON_JETPACK%" />
+					</div>
+			
+					<button class="button short titleToRight" type="button" onclick="copyElementContent('profile/%PROFILE_USERNAME%', true)">
+						<i class="fa-solid fa-chain"></i>
+						%TEXT_copyLink%
+					</button>
 				</div>
 			</div>
 		</div>
+		
+		%PROFILE_CONTEXT_MENU%
 	</div>
 	
 	<div class="horisontal">
@@ -97,7 +107,7 @@
 				<button type="button" class="eyeButton" onclick="getPage('profile/%PROFILE_USERNAME%')"><i class="fa-solid fa-eye"></i></button>
 			</div>
 			
-			<div class="levelStat several" title="%TEXT_personComments%">
+			<div class="levelStat several" title="%TEXT_personComments%" dashboard-show="%PROFILE_CAN_SEE_COMMENT_HISTORY%">
 				<text>
 					<i class="fa-solid fa-comment"></i>
 					%PROFILE_COMMENTS_COUNT%
@@ -142,13 +152,13 @@
 				<button type="button" class="eyeButton" onclick="getPage('profile/%PROFILE_USERNAME%/bans')"><i class="fa-solid fa-eye"></i></button>
 			</div>
 			
-			<div class="levelStat several" dashboard-show="%PROFILE_CAN_MANAGE%" title="%TEXT_manageAccount%">
+			<div class="levelStat several" dashboard-show="%PROFILE_CAN_OPEN_SETTINGS%" title="%TEXT_accountSettings%">
 				<text>
-					<i class="fa-solid fa-pencil"></i>
-					%TEXT_manage%
+					<i class="fa-solid fa-gear"></i>
+					%TEXT_settings%
 				</text>
 				
-				<button type="button" class="eyeButton" onclick="getPage('profile/%PROFILE_USERNAME%/manage')"><i class="fa-solid fa-eye"></i></button>
+				<button type="button" class="eyeButton" onclick="getPage('profile/%PROFILE_USERNAME%/settings')"><i class="fa-solid fa-eye"></i></button>
 			</div>
 		</div>
 		

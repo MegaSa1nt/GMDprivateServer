@@ -1,8 +1,17 @@
 <?php
 /*
+	Session grants
+	
+	Validating password/GJP2 takes 100-200 milliseconds every request. Should core grant "session" to successfully logged IP?
+		True — if you successfully logged in, core won't validate password/GJP2 for this account from your IP for next hour
+		False — password/GJP2 will be validated every request
+*/
+$sessionGrants = false;
+
+/*
 	Submissions by unregistered accounts
 	
-	Should unregistered accounts be able to upload levels, post comments, etc. Required for <1.9 GDPSs:
+	Should unregistered accounts be able to upload levels, post comments, etc. Required for <1.9 GDPSs
 		True — unregistered accounts can interact with GDPS
 		False — only registered accounts can interact with GDPS
 */
@@ -11,8 +20,8 @@ $unregisteredSubmissions = false;
 /*
 	Preactivate accounts
 	
-	Should new accounts already be registered:
-		True — all new accounts are automatically registered
+	Should new accounts already be activated
+		True — all new accounts are automatically activated
 		False — new accounts must be activated through activate page (dashboard/login/activate.php) or email message
 */
 $preactivateAccounts = true;

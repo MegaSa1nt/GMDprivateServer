@@ -1,12 +1,12 @@
 <div class="wideBox levelPage">
-	<div class="contentDiv">
+	<div class="contentDiv" dashboard-context-div>
 		<div class="horisontal">
 			<div class="vertical">
 				<div class="levelTitle">
 					<h2>%LEVEL_TITLE% • <text dashboard-copy>%levelID%</text></h2>
 				</div>
 				
-				<p class="levelDescription">%LEVEL_DESCRIPTION%</p>
+				<h3 class="levelDescription">%LEVEL_DESCRIPTION%</h3>
 			</div>
 			
 			<img loading="lazy" class="difficultyImage" src="%LEVEL_DIFFICULTY_IMAGE%"></img>
@@ -26,7 +26,14 @@
 				
 				<text>%LEVEL_SONG%</text>
 			</div>
+			
+			<button class="button short titleToRight" type="button" onclick="copyElementContent('browse/levels/%levelID%', true)">
+				<i class="fa-solid fa-chain"></i>
+				%TEXT_copyLink%
+			</button>
 		</div>
+		
+		%LEVEL_CONTEXT_MENU%
 	</div>
 	
 	<div class="horisontal">
@@ -40,8 +47,8 @@
 				</text>
 			</div>
 			
-			<div class="levelStat" title="%TEXT_downloads%>
-				<text">
+			<div class="levelStat" title="%TEXT_downloads%">
+				<text>
 					<i class="fa-solid fa-reply fa-rotate-270"></i>
 					%downloads%
 				</text>

@@ -5,7 +5,7 @@
 				<h2>%LEVEL_TITLE%</h2>
 			</div>
 			
-			<p class="levelDescription">%LEVEL_DESCRIPTION%</p>
+			<h3 class="levelDescription">%LEVEL_DESCRIPTION%</h3>
 		</div>
 		
 		<img loading="lazy" class="difficultyImage" src="%LEVEL_DIFFICULTY_IMAGE%"></img>
@@ -69,35 +69,5 @@
 		</div>
 	</div>
 	
-	<div class="contextMenuDiv" dashboard-context-menu>
-		<button class="contextMenuButton" title="%TEXT_viewLevel%" type="button" href="browse/levels/%levelID%">
-			<i class="fa-solid fa-eye"></i>
-			<text>%TEXT_viewLevel%</text>
-		</button>
-		
-		<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/levels/%levelID%/comments">
-			<i class="fa-solid fa-comment"></i>
-			<text>%TEXT_viewComments%</text>
-		</button>
-		
-		<button class="contextMenuButton" title="%TEXT_viewLeaderboards%" type="button" href="browse/levels/%levelID%/scores">
-			<i class="fa-solid fa-chart-simple"></i>
-			<text>%TEXT_viewLeaderboards%</text>
-		</button>
-		
-		<button class="contextMenuButton" title="%TEXT_viewSongs%" type="button" href="browse/levels/%levelID%/songs">
-			<i class="fa-solid fa-music"></i>
-			<text>%TEXT_viewSongs%</text>
-		</button>
-		
-		<button class="contextMenuButton" title="%TEXT_viewSFXs%" type="button" href="browse/levels/%levelID%/sfxs">
-			<i class="fa-solid fa-drum"></i>
-			<text>%TEXT_viewSFXs%</text>
-		</button>
-		
-		<button class="contextMenuButton" title="%TEXT_manageLevel%" type="button" href="browse/levels/%levelID%/manage" dashboard-show="%LEVEL_CAN_MANAGE%">
-			<i class="fa-solid fa-pencil"></i>
-			<text>%TEXT_manageLevel%</text>
-		</button>
-	</div>
+	%LEVEL_CONTEXT_MENU%
 </div>

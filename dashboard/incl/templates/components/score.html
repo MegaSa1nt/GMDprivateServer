@@ -1,16 +1,17 @@
-<div class="contentDiv">
+<div class="contentDiv" dashboard-context-div>
 	<div class="vertical">
 		<div class="levelTitle">
 			<div class="horisontal">
-				<h1 dashboard-score="%SCORE_NUMBER%">
+				<h1 dashboard-score="%SCORE_NUMBER%" dashboard-show="%SCORE_SHOW_PLACE%">
 					<i dashboard-show="%SCORE_IS_LEADER%" class="fa-solid fa-trophy"></i>
 					<i dashboard-hide="%SCORE_IS_LEADER%" class="fa-solid fa-hashtag"></i>
-					%SCORE_NUMBER%</h1>
+					%SCORE_NUMBER%
+				</h1>
+				
 				<h2>%SCORE_USER%</h2>
 			</div>
 			
 			<div class="commentStat">
-				<button dashboard-show="%SCORE_CAN_DELETE%" class="button squareButton" onclick="postPage('manage/deleteScore', 'score%scoreID%')"><i class="fa-solid fa-xmark"></i></button>
 				<form name="score%scoreID%">
 					<input type="hidden" name="scoreID" value="%scoreID%"></input>
 					<input dashboard-show="%SCORE_IS_PLATFORMER%" type="hidden" name="isPlatformer" value="1"></input>
@@ -67,4 +68,6 @@
 			</div>
 		</div>
 	</div>
+	
+	%SCORE_CONTEXT_MENU%
 </div>

@@ -230,5 +230,24 @@ $language['library'] = 'Библиотека';
 
 $language['rank'] = 'Ранк';
 
-$language['manageAccount'] = 'Управление аккаунтом';
+$language['accountSettings'] = 'Настройки аккаунта';
+$language['viewAccount'] = 'Посмотреть аккаунт';
+$language['banPerson'] = 'Забанить пользователя';
+$language['blockPerson'] = 'Заблокировать пользователя';
+
+$language['deleteLevel'] = 'Удалить уровень';
+$language['copyLink'] = 'Скопировать ссылку';
+
+$language['emptyComment'] = 'Пустой комментарий';
+$language['emptyPost'] = 'Пустой пост';
+$language['emptyMessage'] = 'Пустое сообщение';
+
+$language['viewList'] = 'Посмотреть список уровней';
+$language['manageList'] = 'Управление списком уровней';
+$language['deleteList'] = 'Удалить список уровней';
+
+$language['deletePost'] = 'Удалить пост';
+$language['deleteScore'] = 'Удалить рекорд';
+$language['deleteSong'] = 'Удалить песню';
+$language['deleteSFX'] = 'Удалить звуковой эффект';
 ?>

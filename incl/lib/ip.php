@@ -141,8 +141,8 @@ class IP {
 		self::checkProxy();
 		self::checkVPN();
 		
-		$banip = $db->prepare("SELECT count(*) FROM bannedips WHERE IP REGEXP :ip");
-		$banip->execute([':ip' => Library::convertIPForSearching(self::getIP(), true)]);
+		$banip = $db->prepare("SELECT count(*) FROM bannedips WHERE IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
+		$banip->execute([':IP' => Library::convertIPForSearching(self::getIP(), true)]);
 		$banip = $banip->fetchColumn();
 		
 		if($banip > 0) {

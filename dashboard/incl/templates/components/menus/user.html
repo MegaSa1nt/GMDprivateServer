@@ -1,0 +1,68 @@
+<div class="contextMenuDiv" dashboard-context-menu>
+	<button class="contextMenuButton contextMenuTitle" %MENU_NAME_ATTRIBUTES% type="button" dashboard-show="%MENU_SHOW_NAME%">
+		<span>
+			<img loading="lazy" src="%MENU_PFP%"></img>
+			%MENU_NAME%
+		</span>
+		
+		<span title="%MENU_ROLE%" dashboard-show="%MENU_HAS_BADGE%">
+			<img src="incl/icons/badge_%MENU_BADGE_NUMBER%.png"></img>
+		</span>
+	</button>
+	
+	<hr dashboard-show="%MENU_SHOW_NAME%">
+	
+	<button class="contextMenuButton" title="%TEXT_viewAccount%" type="button" href="profile/%MENU_NAME%">
+		<i class="fa-solid fa-eye"></i>
+		<text>%TEXT_viewAccount%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_copyLink%" type="button" onclick="copyElementContent('profile/%MENU_NAME%', true)">
+		<i class="fa-solid fa-chain"></i>
+		<text>%TEXT_copyLink%</text>
+	</button>
+	
+	<hr>
+	
+	<button class="contextMenuButton" title="%TEXT_personComments%" type="button" href="profile/%MENU_NAME%/comments" dashboard-show="%MENU_CAN_SEE_COMMENT_HISTORY%">
+		<i class="fa-solid fa-comment"></i>
+		<text>%TEXT_personComments%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_personScores%" type="button" href="profile/%MENU_NAME%/scores">
+		<i class="fa-solid fa-chart-simple"></i>
+		<text>%TEXT_personScores%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_personSongs%" type="button" href="profile/%MENU_NAME%/songs">
+		<i class="fa-solid fa-music"></i>
+		<text>%TEXT_personSongs%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_personSFXs%" type="button" href="profile/%MENU_NAME%/sfxs">
+		<i class="fa-solid fa-drum"></i>
+		<text>%TEXT_personSFXs%</text>
+	</button>
+	
+	<hr dashboard-show="%MENU_SHOW_MANAGE_HR%">
+	
+	<button class="contextMenuButton" title="%TEXT_personBans%" type="button" href="profile/%MENU_NAME%/bans" dashboard-show="%MENU_CAN_SEE_BANS%">
+		<i class="fa-solid fa-gavel"></i>
+		<text>%TEXT_personBans%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_accountSettings%" type="button" href="profile/%MENU_NAME%/settings" dashboard-show="%MENU_CAN_OPEN_SETTINGS%">
+		<i class="fa-solid fa-gear"></i>
+		<text>%TEXT_accountSettings%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_blockPerson%" type="button" href="profile/%MENU_NAME%/block" dashboard-show="%MENU_CAN_BLOCK%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-ban"></i>
+		<text>%TEXT_blockPerson%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_banPerson%" type="button" href="profile/%MENU_NAME%/ban" dashboard-show="%MENU_CAN_BAN%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-gavel"></i>
+		<text>%TEXT_banPerson%</text>
+	</button>
+</div>

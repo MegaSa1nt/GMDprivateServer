@@ -10,6 +10,8 @@ $userID = $person['userID'];
 
 // Level page
 if($_GET['id']) {
+	$contextMenuData = [];
+	
 	$parameters = explode("/", Escape::text($_GET['id']));
 	
 	$levelID = Escape::number($parameters[0]);
@@ -18,6 +20,7 @@ if($_GET['id']) {
 	if(!$level || !Library::canAccountPlayLevel($person, $level)) exit(Dashboard::renderErrorPage(Dashboard::string("levelsTitle"), Dashboard::string("errorLevelNotFound"), '../../'));
 
 	$user = Library::getUserByID($level['userID']);
+	$userName = $user ? $user['userName'] : 'Undefined';
 	
 	$userAttributes = [];
 	$levelLengths = ['Tiny', 'Short', 'Medium', 'Long', 'XL', 'Platformer'];
@@ -34,11 +37,22 @@ if($_GET['id']) {
 	if($userColor != '255 255 255') $userAttributes[] = 'style="--href-color: rgb('.$userColor.'); --href-shadow-color: rgb('.$userColor.' / 38%)"';
 	if(!$user['isRegistered']) $userAttributes[] = 'dashboard-remove="href title"';
 	
-	$level['LEVEL_TITLE'] = sprintf(Dashboard::string('levelTitle'), $level['levelName'], Dashboard::getUsernameString($user['userName'], $iconKit['main'], $userAppearance['modBadgeLevel'], implode(' ', $userAttributes)));
+	$level['LEVEL_TITLE'] = sprintf(Dashboard::string('levelTitle'), $level['levelName'], Dashboard::getUsernameString($person, $user, $userName, $iconKit['main'], $userAppearance['modBadgeLevel'], implode(' ', $userAttributes)));
 	$level['LEVEL_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($level['levelDesc']))) ?: "<i>".Dashboard::string('noDescription')."</i>";
 	$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
 	
 	$level['LEVEL_LENGTH'] = $levelLengths[$level['levelLength']];
+		
+	$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+	$contextMenuData['MENU_ID'] = $level['levelID'];
+	
+	$contextMenuData['MENU_CAN_MANAGE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+	$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+	
+	$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
+	
+	$level['LEVEL_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/level', $contextMenuData);
 	
 	$song = $level['songID'] ? Library::getSongByID($level['songID']) : Library::getAudioTrack($level['audioTrack']);
 	

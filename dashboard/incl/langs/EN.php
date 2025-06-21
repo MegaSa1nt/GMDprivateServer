@@ -212,12 +212,12 @@ $language['userCoins'] = 'User coins';
 $language['demons'] = 'Demons';
 $language['creatorPoints'] = 'Creator Points';
 $language['registerDate'] = 'Register date';
-$language['personPosts'] = 'Person posts';
-$language['personComments'] = 'Person comments';
-$language['personScores'] = 'Person scores';
-$language['personSongs'] = 'Person songs';
-$language['personSFXs'] = 'Person SFXs';
-$language['personBans'] = 'Person bans';
+$language['personPosts'] = 'User posts';
+$language['personComments'] = 'User comments';
+$language['personScores'] = 'User scores';
+$language['personSongs'] = 'User songs';
+$language['personSFXs'] = 'User SFXs';
+$language['personBans'] = 'User bans';
 
 $language['unknownLevel'] = 'Unknown level';
 $language['unknownList'] = 'Unknown list';
@@ -230,5 +230,24 @@ $language['library'] = 'Library';
 
 $language['rank'] = 'Rank';
 
-$language['manageAccount'] = 'Manage account';
+$language['accountSettings'] = 'Account settings';
+$language['viewAccount'] = 'View account';
+$language['banPerson'] = 'Ban user';
+$language['blockPerson'] = 'Block user';
+
+$language['deleteLevel'] = 'Delete level';
+$language['copyLink'] = 'Copy link';
+
+$language['emptyComment'] = 'Empty comment';
+$language['emptyPost'] = 'Empty post';
+$language['emptyMessage'] = 'Empty message';
+
+$language['viewList'] = 'View list';
+$language['manageList'] = 'Manage list';
+$language['deleteList'] = 'Delete list';
+
+$language['deletePost'] = 'Delete post';
+$language['deleteScore'] = 'Delete score';
+$language['deleteSong'] = 'Delete song';
+$language['deleteSFX'] = 'Delete SFX';
 ?>

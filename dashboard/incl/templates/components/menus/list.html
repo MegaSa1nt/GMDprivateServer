@@ -1,0 +1,37 @@
+<div class="contextMenuDiv" dashboard-context-menu>
+	<button class="contextMenuButton contextMenuTitle" %MENU_NAME_ATTRIBUTES% type="button" dashboard-show="%MENU_SHOW_NAME%">
+		<i class="fa-solid fa-list"></i>
+		<text>%MENU_NAME%</text>
+	</button>
+	
+	<hr dashboard-show="%MENU_SHOW_NAME%">
+	
+	<button class="contextMenuButton" title="%TEXT_viewList%" type="button" href="browse/lists/%MENU_ID%">
+		<i class="fa-solid fa-eye"></i>
+		<text>%TEXT_viewList%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_copyLink%" type="button" onclick="copyElementContent('browse/lists/%MENU_ID%', true)">
+		<i class="fa-solid fa-chain"></i>
+		<text>%TEXT_copyLink%</text>
+	</button>
+	
+	<hr>
+	
+	<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/lists/%MENU_ID%/comments">
+		<i class="fa-solid fa-comment"></i>
+		<text>%TEXT_viewComments%</text>
+	</button>
+	
+	<hr dashboard-show="%MENU_SHOW_MANAGE_HR%">
+	
+	<button class="contextMenuButton" title="%TEXT_manageList%" type="button" href="browse/lists/%MENU_ID%/manage" dashboard-show="%MENU_CAN_MANAGE%">
+		<i class="fa-solid fa-pencil"></i>
+		<text>%TEXT_manageList%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_deleteList%" type="button" href="browse/lists/%MENU_ID%/delete" dashboard-show="%MENU_CAN_DELETE%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-trash"></i>
+		<text>%TEXT_deleteList%</text>
+	</button>
+</div>

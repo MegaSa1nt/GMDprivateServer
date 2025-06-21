@@ -10,6 +10,8 @@ $accountID = $person['accountID'];
 $userName = $person['userName'];
 $userID = $person['userID'];
 
+$contextMenuData = [];
+
 $parameters = explode("/", Escape::text($_GET['id']));
 if(!$parameters[1]) $parameters[1] = '';
 
@@ -19,13 +21,18 @@ $account = Library::getAccountByUserName($profileUserName);
 if(!$account) exit(http_response_code(404));
 $user = Library::getUserByAccountID($account['accountID']);
 
+$isPersonThemselves = $accountID == $user['extID']; 
+
 $accountClan = Library::getAccountClan($account['accountID']);
 $iconKit = Dashboard::getUserIconKit($user['userID']);
 $userMetadata = Dashboard::getUserMetadata($user);
 $profileStats = Library::getProfileStatsCount($person, $user['userID']);
 $userRank = Library::getUserRank($user['stars'], $user['moons'], $user['userName']);
 
+$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $user['userID']);
+
 $canSeeBans = ($accountID == $account['accountID'] || Library::checkPermission($person, "dashboardModTools"));
+$canOpenSettings = ($accountID == $account['accountID'] || Library::checkPermission($person, "dashboardManageAccounts"));
 
 $additionalPage = '';
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
@@ -35,7 +42,6 @@ switch($parameters[1]) {
 		$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 		$sortMode = $mode ? "comments.likes - comments.dislikes" : "comments.timestamp";
 		
-		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $user['userID']);
 		if(!$canSeeCommentHistory) {
 			$additionalData = [
 				'ADDITIONAL_PAGE' => '',
@@ -230,7 +236,7 @@ $user['PROFILE_PAGE_TEXT'] = sprintf(Dashboard::string('pageText'), $pageNumber,
 
 $user['PROFILE_REGISTER_DATE'] = $account['registerDate'];
 
-$user['PROFILE_USERNAME'] = htmlspecialchars($account['userName']);
+$user['PROFILE_USERNAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($account['userName']);
 $user['PROFILE_TITLE'] = sprintf(Dashboard::string("userProfile"), htmlspecialchars($account['userName']));
 
 $user['PROFILE_HAS_CLAN'] = $accountClan ? 'true' : 'false';
@@ -238,10 +244,12 @@ $user['PROFILE_CLAN_NAME'] = $accountClan ? $accountClan['clan'] : Dashboard::st
 $user['PROFILE_CLAN_COLOR'] = $accountClan ? "color: #".$accountClan['color']."" : '';
 $user['PROFILE_CLAN_TITLE'] = $accountClan ? sprintf(Dashboard::string("clanProfile"), htmlspecialchars($accountClan['clan'])) : '';
 
-$user['PROFILE_HAS_BADGE'] = $userMetadata["userAppearance"]["modBadgeLevel"] > 0 ? 'true' : 'false';
+$user['PROFILE_HAS_BADGE'] =  $userMetadata["userAppearance"]["modBadgeLevel"] > 0 ? 'true' : 'false';
 $user['PROFILE_MODERATOR_BADGE'] = $userMetadata["userAppearance"]["modBadgeLevel"];
+$user['PROFILE_ROLE'] = htmlspecialchars($userMetadata["userAppearance"]['roleName']);
 
 $user['PROFILE_HAS_RANK'] = $userRank > 0 ? 'true' : 'false';
+$user['PROFILE_IS_TOP_100'] = $userRank <= 100 ? 'true' : 'false';
 $user['PROFILE_RANK'] = $userRank;
 
 $user['PROFILE_MAIN_ICON_URL'] = $iconKit['main'];
@@ -262,7 +270,18 @@ $user['PROFILE_SONGS_COUNT'] = $profileStats['songs'];
 $user['PROFILE_SFXS_COUNT'] = $profileStats['sfxs'];
 $user['PROFILE_BANS_COUNT'] = $canSeeBans ? $profileStats['bans'] : 'So sneaky! :)';
 
-$user['PROFILE_CAN_SEE_BANS'] = $canSeeBans ? 'true' : 'false';
+$contextMenuData['MENU_SHOW_NAME'] = 'false';
+
+$user['PROFILE_CAN_SEE_COMMENT_HISTORY'] = $contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
+
+$user['PROFILE_CAN_SEE_BANS'] = $contextMenuData['MENU_CAN_SEE_BANS'] = $canSeeBans ? 'true' : 'false';
+$user['PROFILE_CAN_OPEN_SETTINGS'] = $contextMenuData['MENU_CAN_OPEN_SETTINGS'] = $canOpenSettings ? 'true' : 'false';
+$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
+$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+
+$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+
+$user['PROFILE_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/user', $contextMenuData);
 
 exit(Dashboard::renderPage("browse/profile", $user['PROFILE_TITLE'], $pageBase, $user));
 ?>

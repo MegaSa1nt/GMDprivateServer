@@ -1,4 +1,4 @@
-<div class="contentDiv">
+<div class="contentDiv" dashboard-context-div>
 	<div class="horisontal">
 		<div class="vertical">
 			<div class="levelTitle">
@@ -14,26 +14,11 @@
 				</button>
 			</div>
 		</div>
-		
-		<button class="button squareButton"
-			onclick="downloadSong('%SONG_AUTHOR%', '%SONG_NAME%', '%SONG_URL%')"
-			title="%TEXT_downloadSong%"
-		>
-			<i class="fa-solid fa-download"></i>
-		</button>
-		
-		<button class="button squareButton titleToRight"
-			dashboard-show="%SONG_CAN_CHANGE%"
-			onclick="getPage('songs/edit')"
-			title="%TEXT_editSong%"
-		>
-			<i class="fa-solid fa-pencil"></i>
-		</button>
 	</div>
 	
 	<div class="horisontal stats">
 		<div class="songCard">
-			<button class="contents userButton">%SONG_USER%</button>
+			<div class="contents userButton">%SONG_USER%</div>
 		</div>
 		
 		<div class="levelStats card">
@@ -47,10 +32,12 @@
 				<text dashboard-date="%reuploadTime%"></text>
 			</text>
 		
-			<text class="levelStat" title="%TEXT_usageCount%">
-				<i class="fa-solid fa-gamepad"></i>
-				%levelsCount%
-			</text>
+			<button class="button" type="button" title="%TEXT_usageCount%" href="browse/levels?customSong=1&song=%ID%">
+				<text class="levelStat">
+					<i class="fa-solid fa-gamepad"></i>
+					%levelsCount%
+				</text>
+			</button>
 			
 			<button class="button titleToRight" type="button" title="%TEXT_favouritesCount%" dashboard-favourite="%ID%">
 				<text class="levelStat">
@@ -61,4 +48,6 @@
 			</button>
 		</div>
 	</div>
+	
+	%SONG_CONTEXT_MENU%
 </div>

@@ -135,7 +135,7 @@ class Library {
 		
 		if(isset($GLOBALS['core_cache']['accounts']['ip'][$IP])) return $GLOBALS['core_cache']['accounts']['ip'][$IP];
 		
-		$accounts = $db->prepare("SELECT * FROM accounts WHERE registerIP REGEXP :IP");
+		$accounts = $db->prepare("SELECT * FROM accounts WHERE registerIP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
 		$accounts->execute([':IP' => $IP]);
 		$accounts = $accounts->fetchAll();
 		
@@ -641,7 +641,7 @@ class Library {
 		
 		$roleIDs = [];
 		
-		$getRoleID = $db->prepare("SELECT roleID FROM roleassign WHERE (person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person REGEXP :IP AND personType = 2)");
+		$getRoleID = $db->prepare("SELECT roleID FROM roleassign WHERE (person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') AND personType = 2)");
 		$getRoleID->execute([':accountID' => $person['accountID'], ':userID' => $person['userID'], ':IP' => self::convertIPForSearching($person['IP'], true)]);
 		$getRoleID = $getRoleID->fetchAll();
 		
@@ -713,6 +713,7 @@ class Library {
 	public static function getPersonCommentAppearance($person) {
 		if($person['accountID'] == 0 || $person['userID'] == 0) return [
 			'commentsExtraText' => '',
+			'roleName' => '',
 			'modBadgeLevel' => 0,
 			'commentColor' => '255,255,255'
 		];
@@ -724,12 +725,14 @@ class Library {
 		if(!$getRoles) {
 			$roleAppearance = [
 				'commentsExtraText' => '',
+				'roleName' => '',
 				'modBadgeLevel' => 0,
 				'commentColor' => '255,255,255'
 			];
 		} else {		
 			$roleAppearance = [
 				'commentsExtraText' => $getRoles[0]['commentsExtraText'],
+				'roleName' => $getRoles[0]['roleName'],
 				'modBadgeLevel' => $getRoles[0]['modBadgeLevel'],
 				'commentColor' => $getRoles[0]['commentColor']
 			];
@@ -781,7 +784,7 @@ class Library {
 		
 		if(!empty($extIDsString)) $queryArray[] = "extID NOT IN ('".$extIDsString."')";
 		if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
-		if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
+		if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '((\\\D[^.])|^)(".$bannedIPsString.")(\\\D[^$])'";
 	
 		$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).')'.($addSeparator ? ' AND' : '') : '';
 		
@@ -1038,14 +1041,20 @@ class Library {
 			$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = true;
 			return true;
 		}
+
+		$user = self::getUserByID($targetUserID);
+		if(!$user) {
+			$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = false;
+			return false;
+		}
 		
-		$account = self::getUserByID($targetUserID);
+		$account = self::getAccountByID($user['extID']);
 		if(!$account) {
 			$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = false;
 			return false;
 		}
 		
-		$isBlocked = self::isPersonBlocked($account['extID'], $person['accountID']);
+		$isBlocked = self::isPersonBlocked($account['accountID'], $person['accountID']);
 		if($isBlocked) {
 			$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = false;
 			return false;
@@ -1056,7 +1065,7 @@ class Library {
 				$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = false;
 				return false;
 			case 1:
-				$isFriends = self::isFriends($person['accountID'], $account['extID']);
+				$isFriends = self::isFriends($person['accountID'], $account['accountID']);
 				if(!$isFriends) {
 					$GLOBALS['core_cache']['canSeeCommentsHistory'][$person['userID']][$targetUserID] = false;
 					return false;
@@ -1405,7 +1414,7 @@ class Library {
 			'dashboardLevelPackCreate',
 			'dashboardManageSongs',
 			'dashboardAddMod',
-			'dashboardForceChangePassNick',
+			'dashboardManageAccounts',
 			'dashboardDeleteLeaderboards',
 			'dashboardManageLevels',
 			'dashboardManageAutomod',
@@ -2525,7 +2534,7 @@ class Library {
 	public static function reportLevel($levelID, $IP) {
 		require __DIR__."/connection.php";
 		
-		$checkIfReported = $db->prepare("SELECT count(*) FROM reports WHERE levelID = :levelID AND IP REGEXP :IP");
+		$checkIfReported = $db->prepare("SELECT count(*) FROM reports WHERE levelID = :levelID AND IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
 		$checkIfReported->execute([':levelID' => $levelID, ':IP' => self::convertIPForSearching($IP, true)]);
 		$checkIfReported = $checkIfReported->fetchColumn();
 		if($checkIfReported) return false;
@@ -2891,7 +2900,7 @@ class Library {
 			if(!isset($query["customSong"])) {
 				$song = $song - 1;
 				$filters[] = "audioTrack = '".$song."' AND songID = 0";
-			} else $filters[] = $song == 0 ? "audioTrack = 0 AND songID > 0" : "songID = '".$song."'";
+			} else $filters[] = $song == 0 ? "audioTrack = 0 AND songID > 0" : "audioTrack = 0 AND (songID = '".$song."' OR songIDs REGEXP '(\\\D|^)(".$song.")(\\\D|$)')";
 		}
 		
 		if(isset($query["twoPlayer"]) && $query["twoPlayer"] == 1) $filters[] = "twoPlayer = 1";
@@ -4405,7 +4414,7 @@ class Library {
 		$accountID = $person['accountID'];
 		$IP = self::convertIPForSearching($person['IP'], true);
 		
-		$getActions = $db->prepare("SELECT * FROM actions WHERE (account = :accountID OR IP REGEXP :IP) AND (".implode(") AND (", $filters).") ORDER BY timestamp DESC".($limit ? ' LIMIT '.$limit : ''));
+		$getActions = $db->prepare("SELECT * FROM actions WHERE (account = :accountID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')) AND (".implode(") AND (", $filters).") ORDER BY timestamp DESC".($limit ? ' LIMIT '.$limit : ''));
 		$getActions->execute([':accountID' => $accountID, ':IP' => $IP]);
 		$getActions = $getActions->fetchAll();
 		

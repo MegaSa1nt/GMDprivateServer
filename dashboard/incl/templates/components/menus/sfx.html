@@ -1,0 +1,23 @@
+<div class="contextMenuDiv" dashboard-context-menu>
+	<button class="contextMenuButton" title="%TEXT_downloadSong%" type="button" onclick="downloadSong('%MENU_SFX_AUTHOR%', '%MENU_SFX_NAME%', '%MENU_SFX_URL%')">
+		<i class="fa-solid fa-arrow-down"></i>
+		<text>%TEXT_downloadSFX%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_editSong%" type="button" href="songs/edit" dashboard-show="%MENU_CAN_CHANGE%">
+		<i class="fa-solid fa-pencil"></i>
+		<text>%TEXT_editSFX%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_deleteSong%" type="button" href="songs/edit" dashboard-show="%MENU_CAN_CHANGE%">
+		<i class="fa-solid fa-trash"></i>
+		<text>%TEXT_deleteSFX%</text>
+	</button>
+
+	<hr dashboard-show="%MENU_CAN_BAN%">
+	
+	<button class="contextMenuButton" title="%TEXT_banPerson%" type="button" href="profile/%MENU_NAME%/ban" dashboard-show="%MENU_CAN_BAN%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-gavel"></i>
+		<text>%TEXT_banPerson%</text>
+	</button>
+</div>

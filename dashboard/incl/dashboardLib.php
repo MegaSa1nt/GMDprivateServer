@@ -169,6 +169,7 @@ class Dashboard {
 		
 		$players = array_unique($players);
 		$levels = array_unique($levels);
+		$lists = array_unique($lists);
 		
 		if(!empty($players)) {
 			Library::cacheAccountsByUserNames($players);
@@ -182,7 +183,7 @@ class Dashboard {
 				if(!$account || !$account['isActive']) continue;
 				
 				$userMetadata = self::getUserMetadata($user);
-				$userString = self::getUsernameString($user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']);
+				$userString = self::getUsernameString($person, $user, $user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
 				
 				$body = str_replace('@'.$userName, $userString, $body);
 			}
@@ -198,7 +199,7 @@ class Dashboard {
 				$canSeeLevel = Library::canAccountPlayLevel($person, $level);
 				if(!$canSeeLevel) continue;
 				
-				$levelString = self::getLevelString($levelID, $level['levelName']);
+				$levelString = self::getLevelString($person, $level['extID'], $levelID, $level['levelName']);
 				
 				$body = str_replace('#'.$levelID, $levelString, $body);
 			}
@@ -214,13 +215,13 @@ class Dashboard {
 				$canSeeList = Library::canAccountSeeList($person, $list);
 				if(!$canSeeList) continue;
 				
-				$listString = self::getListString($listID, $list['listName']);
+				$listString = self::getListString($person, $list['accountID'], $listID, $list['listName']);
 				
 				$body = str_replace('#-'.$listID, $listString, $body);
 			}
 		}
 		
-		return $body;
+		return trim($body);
 	}
 	
 	public static function getUserMetadata($user) {
@@ -233,6 +234,7 @@ class Dashboard {
 				'mainIcon' => $iconsRendererServer."/icon.png?type=cube&value=1&color1=0&color2=3",
 				'userAppearance' => [
 					'commentsExtraText' => '',
+					'roleName' => '',
 					'modBadgeLevel' => 0,
 					'commentColor' => '255,255,255'
 				],
@@ -403,33 +405,103 @@ class Dashboard {
 		return $templatePage;
 	}
 	
-	public static function getUsernameString($userName, $mainIcon, $badgeNumber, $attributes = '') {
-		return sprintf('<text class="username" title="'.sprintf(self::string('userProfile'), $userName).'" %3$s href="profile/%1$s">
-			<text class="emptySymbol">:(</text><img loading="lazy" src="%2$s"></img>
-			%1$s
-			'.($badgeNumber ? '<img src="incl/icons/badge_%4$s.png"></img>' : '').'
-		</text>', $userName, $mainIcon, $attributes, $badgeNumber);
+	public static function getUsernameString($person, $user, $userName, $mainIcon, $userAppearance, $attributes = '') {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$isPersonThemselves = $person['accountID'] == $user['extID']; 
+		$badgeNumber = $userAppearance['modBadgeLevel'];
+		
+		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $user['userID']);
+
+		$usernameData = $contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'true';
+		
+		$usernameData['USERNAME_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		$usernameData['USERNAME_TITLE'] = sprintf(self::string('userProfile'), $usernameData['USERNAME_NAME']);
+		$usernameData['USERNAME_PFP'] = $contextMenuData['MENU_PFP'] = $mainIcon;
+			
+		$usernameData['USERNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = $attributes;
+			
+		$usernameData['USERNAME_HAS_BADGE'] = $contextMenuData['MENU_HAS_BADGE'] = (int)$badgeNumber ? 'true' : 'false';
+		$usernameData['USERNAME_BADGE_NUMBER'] = $contextMenuData['MENU_BADGE_NUMBER'] = (int)$badgeNumber;
+		$usernameData['USERNAME_ROLE'] = $contextMenuData['MENU_ROLE'] = htmlspecialchars($userAppearance['roleName']);
+		
+		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
+		
+		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+		
+		$usernameData['USERNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/user', $contextMenuData);
+		
+		return self::renderTemplate('components/username', $usernameData);
 	}
 	
-	public static function getLevelString($levelID, $levelName) {
-		return sprintf('<text class="username" '.(!$levelID ? 'dashboard-remove="href title"' : '').' title="'.sprintf(self::string('levelProfile'), htmlspecialchars($levelName)).'" href="browse/levels/%2$s">
-			<text class="emptySymbol">:(</text><i class="fa-solid fa-gamepad"></i>
-			%1$s
-		</text>', htmlspecialchars($levelName), (int)$levelID);
+	public static function getLevelString($person, $accountID, $levelID, $levelName) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$isPersonThemselves = $person['accountID'] == $accountID; 
+		
+		$levelnameData = $contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'true';
+		
+		$levelnameData['LEVELNAME_ID'] = $contextMenuData['MENU_ID'] = (int)$levelID;
+		$levelnameData['LEVELNAME_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($levelName);
+		$levelnameData['LEVELNAME_TITLE'] = sprintf(self::string('levelProfile'), $levelnameData['LEVELNAME_NAME']);
+			
+		$levelnameData['LEVELNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = !$levelID ? 'dashboard-remove="href title"' : '';
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
+		
+		$levelnameData['LEVELNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/level', $contextMenuData);
+		
+		return self::renderTemplate('components/levelname', $levelnameData);
 	}
 	
-	public static function getListString($listID, $listName) {
-		return sprintf('<text class="username" '.(!$listID ? 'dashboard-remove="href title"' : '').' title="'.sprintf(self::string('listProfile'), htmlspecialchars($listName)).'" href="browse/lists/%2$s">
-			<text class="emptySymbol">:(</text><i class="fa-solid fa-list"></i>
-			%1$s
-		</text>', htmlspecialchars($listName), (int)$listID);
+	public static function getListString($person, $accountID, $listID, $listName) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$isPersonThemselves = $person['accountID'] == $accountID; 
+		
+		$listnameData = $contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'true';
+		
+		$listnameData['LISTNAME_ID'] = $contextMenuData['MENU_ID'] = (int)$listID;
+		$listnameData['LISTNAME_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($listName);
+		$listnameData['LISTNAME_TITLE'] = sprintf(self::string('listProfile'), $listnameData['LISTNAME_NAME']);
+			
+		$listnameData['LISTNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = !$listID ? 'dashboard-remove="href title"' : '';
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
+		
+		$listnameData['LISTNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/list', $contextMenuData);
+		
+		return self::renderTemplate('components/listname', $listnameData);
 	}
 	
 	public static function renderLevelCard($level, $person) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		
 		$user = Library::getUserByID($level['userID']);
+		$userName = $user ? $user['userName'] : 'Undefined';
 	
 		$levelLengths = ['Tiny', 'Short', 'Medium', 'Long', 'XL', 'Platformer'];
 		
@@ -437,7 +509,7 @@ class Dashboard {
 		
 		$song = $level['songID'] ? Library::getSongByID($level['songID']) : Library::getAudioTrack($level['audioTrack']);
 		
-		$level['LEVEL_TITLE'] = sprintf(self::string('levelTitle'), $level['levelName'], self::getUsernameString($user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']));
+		$level['LEVEL_TITLE'] = sprintf(self::string('levelTitle'), $level['levelName'], self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']));
 		$level['LEVEL_DESCRIPTION'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($level['levelDesc']))) ?: "<i>".self::string('noDescription')."</i>";
 		$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
 		
@@ -455,7 +527,16 @@ class Dashboard {
 		$level['LEVEL_SONG_URL'] = urlencode(urldecode($song['download'])) ?: '';
 		$level['LEVEL_IS_CUSTOM_SONG'] = isset($song['ID']) ? 'true' : 'false';
 		
-		$level['LEVEL_CAN_MANAGE'] = ($person['userID'] == $level['userID'] || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+		$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+		$contextMenuData['MENU_ID'] = $level['levelID'];
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
+		
+		$level['LEVEL_CONTEXT_MENU'] = self::renderTemplate('components/menus/level', $contextMenuData);
 		
 		return self::renderTemplate('components/level', $level);
 	}
@@ -464,23 +545,33 @@ class Dashboard {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['userID'] == $comment['userID'];
+		
 		$user = Library::getUserByID($comment['userID']);
 		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
 		if($showLevel) {
-			$comment['COMMENT_LEVEL_TEXT'] = $comment['itemID'] >= 0 ? self::getLevelString($comment['itemID'], $comment['itemName']) : self::getListString($comment['itemID'] * -1, $comment['itemName']);
+			$comment['COMMENT_LEVEL_TEXT'] = $comment['itemID'] >= 0 ? self::getLevelString($person, $comment['creatorAccountID'], $comment['itemID'], $comment['itemName']) : self::getListString($person, $comment['creatorAccountID'], $comment['itemID'] * -1, $comment['itemName']);
 		}
 		$comment['COMMENT_SHOW_LEVEL'] = $showLevel ? 'true' : 'false';
 		
-		$comment['COMMENT_USER'] = self::getUsernameString($userName, $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']);
-		$comment['COMMENT_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($comment['comment'])));
-		
+		$comment['COMMENT_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
+		$comment['COMMENT_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($comment['comment']))) ?: "<i>".self::string('emptyComment')."</i>";
 		
 		$comment['COMMENT_SHOW_PERCENT'] = $comment['percent'] > 0 ? 'true' : 'false';
 		
-		$comment['COMMENT_CAN_DELETE'] = ($person['userID'] == $user['userID'] || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
+		$contextMenuData['MENU_ID'] = $comment['commentID'];
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+		
+		$comment['COMMENT_CONTEXT_MENU'] = self::renderTemplate('components/menus/comment', $contextMenuData);
 			
 		return self::renderTemplate('components/comment', $comment);
 	}
@@ -489,15 +580,26 @@ class Dashboard {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['userID'] == $accountPost['userID'];
+		
 		$user = Library::getUserByID($accountPost['userID']);
 		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
-		$accountPost['POST_USER'] = self::getUsernameString($userName, $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']);
-		$accountPost['POST_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($accountPost['comment'])));
+		$accountPost['POST_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
+		$accountPost['POST_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($accountPost['comment']))) ?: "<i>".self::string('emptyPost')."</i>";
 		
-		$accountPost['POST_CAN_DELETE'] = ($person['userID'] == $user['userID'] || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
+		$contextMenuData['MENU_ID'] = $accountPost['commentID'];
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+		
+		$accountPost['POST_CONTEXT_MENU'] = self::renderTemplate('components/menus/post', $contextMenuData);
 			
 		return self::renderTemplate('components/post', $accountPost);
 	}
@@ -506,19 +608,23 @@ class Dashboard {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['accountID'] == $score['accountID'];
+		
 		$user = Library::getUserByAccountID($score['accountID']);
+		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
 		if($showLevel) {
-			$score['SCORE_LEVEL_TEXT'] = self::getLevelString($score['levelID'], $score['levelName']);
+			$score['SCORE_LEVEL_TEXT'] = self::getLevelString($person, $score['accountID'], $score['levelID'], $score['levelName']);
 		}
 		$score['SCORE_SHOW_LEVEL'] = $showLevel ? 'true' : 'false';
+		$score['SCORE_SHOW_PLACE'] = !$showLevel ? 'true' : 'false';
 		
-		$score['SCORE_USER'] = self::getUsernameString($user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']);
+		$score['SCORE_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
 		
 		$score['SCORE_IS_LEADER'] = $score['SCORE_NUMBER'] < 4 ? 'true' : 'false';
-		$score['SCORE_CAN_DELETE'] = ($person['accountID'] == $user['accountID'] || Library::checkPermission($person, "dashboardDeleteLeaderboards")) ? 'true' : 'false';
 		
 		$score['SCORE_IS_PLATFORMER'] = $levelIsPlatformer ? 'true' : 'false';
 		
@@ -529,8 +635,17 @@ class Dashboard {
 		}
 		
 		if(isset($score['uploadDate'])) $score['timestamp'] = $score['uploadDate'];
-		
 		if(isset($score['ID'])) $score['scoreID'] = $score['ID'];
+		
+		$contextMenuData['MENU_ID'] = $score['scoreID'];
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardDeleteLeaderboards")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+		
+		$score['SCORE_CONTEXT_MENU'] = self::renderTemplate('components/menus/score', $contextMenuData);
 			
 		return self::renderTemplate('components/score', $score);
 	}
@@ -539,22 +654,32 @@ class Dashboard {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['accountID'] == $song['reuploadID'];
+		
 		$user = Library::getUserByAccountID($song['reuploadID']);
+		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
 		$downloadLink = urlencode(urldecode($song["download"]));
 		
-		$song['SONG_USER'] = self::getUsernameString($user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']);
+		$song['SONG_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
 		
 		$song['SONG_TITLE'] = sprintf(self::string('songTitle'), htmlspecialchars($song['authorName']), htmlspecialchars($song['name']));
-		$song['SONG_AUTHOR'] = htmlspecialchars($song['authorName']);
-		$song['SONG_NAME'] = htmlspecialchars($song['name']);
-		$song['SONG_URL'] = htmlspecialchars($downloadLink);
-		
-		$song['SONG_CAN_CHANGE'] = ($person['userID'] == $user['userID'] || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
+		$song['SONG_AUTHOR'] = $contextMenuData['MENU_SONG_AUTHOR'] = htmlspecialchars($song['authorName']);
+		$song['SONG_NAME'] = $contextMenuData['MENU_SONG_NAME'] = htmlspecialchars($song['name']);
+		$song['SONG_URL'] = $contextMenuData['MENU_SONG_URL'] = htmlspecialchars($downloadLink);
 		
 		$song['SONG_IS_FAVOURITE'] = (is_array($favouriteSongs) && in_array($song['ID'], $favouriteSongs)) || (!is_array($favouriteSongs) && $favouriteSongs) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_ID'] = $song['ID'];
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_CHANGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$song['SONG_CONTEXT_MENU'] = self::renderTemplate('components/menus/song', $contextMenuData);
 		
 		return self::renderTemplate('components/song', $song);
 	}
@@ -563,7 +688,11 @@ class Dashboard {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['accountID'] == $sfx['reuploadID'];
+		
 		$user = Library::getUserByAccountID($sfx['reuploadID']);
+		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
@@ -571,13 +700,19 @@ class Dashboard {
 		
 		$sfx['SFX_IS_LOCAL'] = $sfx['isLocalSFX'] ? 'true' : 'false';
 		
-		$sfx['SFX_USER'] = $sfx['isLocalSFX'] ? self::getUsernameString($user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance']['modBadgeLevel'], $userMetadata['userAttributes']) : '';
+		$sfx['SFX_USER'] = $sfx['isLocalSFX'] ? self::getUsernameString($person, $user, $user['userName'], $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']) : '';
 		
-		$sfx['SFX_AUTHOR'] = $sfx['isLocalSFX'] ? htmlspecialchars($user['userName']) : htmlspecialchars($sfx['authorName']);
-		$sfx['SFX_NAME'] = htmlspecialchars($sfx['name']);
-		$sfx['SFX_URL'] = htmlspecialchars($downloadLink);
+		$sfx['SFX_AUTHOR'] =$contextMenuData['MENU_SONG_AUTHOR'] =  $sfx['isLocalSFX'] ? htmlspecialchars($user['userName']) : htmlspecialchars($sfx['authorName']);
+		$sfx['SFX_NAME'] = $contextMenuData['MENU_SFX_NAME'] = htmlspecialchars($sfx['name']);
+		$sfx['SFX_URL'] = $contextMenuData['MENU_SFX_URL'] = htmlspecialchars($downloadLink);
 		
-		$sfx['SFX_CAN_CHANGE'] = ($person['userID'] == $user['userID'] || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
+		$contextMenuData['MENU_ID'] = $sfx['ID'];
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_CHANGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$sfx['SFX_CONTEXT_MENU'] = self::renderTemplate('components/menus/sfx', $contextMenuData);
 		
 		return self::renderTemplate('components/sfx', $sfx);
 	}

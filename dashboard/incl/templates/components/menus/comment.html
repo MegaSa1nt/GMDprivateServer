@@ -1,0 +1,13 @@
+<div class="contextMenuDiv" dashboard-context-menu dashboard-show="%MENU_SHOW_CONTEXT%">
+	<button class="contextMenuButton" title="%TEXT_deleteComment%" type="button" onclick="postPage('manage/deleteComment', 'comment%MENU_ID%')" dashboard-show="%MENU_CAN_DELETE%">
+		<i class="fa-solid fa-trash"></i>
+		<text>%TEXT_deleteComment%</text>
+	</button>
+
+	<hr dashboard-show="%MENU_CAN_BAN%">
+	
+	<button class="contextMenuButton" title="%TEXT_banPerson%" type="button" href="profile/%MENU_NAME%/ban" dashboard-show="%MENU_CAN_BAN%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-gavel"></i>
+		<text>%TEXT_banPerson%</text>
+	</button>
+</div>

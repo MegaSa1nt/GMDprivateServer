@@ -150,9 +150,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageSongs'");
     	$exist = $check->fetchAll();
     	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardAddMod");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardForceChangePassNick'");
-    	$exist = $check->fetchAll();
-    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardForceChangePassNick INT NOT NULL DEFAULT '0' AFTER dashboardManageSongs");
 	$check = $db->query("SHOW COLUMNS FROM `songs` LIKE 'reuploadID'");
     	$exist = $check->fetchAll();
     	if(empty($exist)) $db->query("ALTER TABLE songs ADD reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime");
@@ -315,12 +312,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandLockUpdating'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandLockUpdating` INT NOT NULL DEFAULT '0' AFTER `commandLockComments`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardDeleteLeaderboards'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardDeleteLeaderboards` INT NOT NULL DEFAULT '0' AFTER `dashboardForceChangePassNick`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageLevels'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageLevels` INT NOT NULL DEFAULT '0' AFTER `dashboardDeleteLeaderboards`");
 	$check = $db->query("SHOW COLUMNS FROM `sfxs` LIKE 'token'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `sfxs` ADD `token` varchar(255) NOT NULL DEFAULT '' AFTER `reuploadTime`");
@@ -548,6 +539,18 @@ if(!$installed) {
 			$db->query("ALTER TABLE `accounts` ADD `passCodeExpires` INT NOT NULL DEFAULT '0' AFTER `passCode`");
 			$db->query("UPDATE accounts SET passCodeExpires = ".(time() + 3600));
 		}
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardForceChangePassNick'");
+    	$exist = $check->fetchAll();
+    	if(!empty($exist)) $db->query("ALTER TABLE roles CHANGE `dashboardForceChangePassNick` `dashboardManageAccounts` INT NOT NULL DEFAULT '0'");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageAccounts'");
+    	$exist = $check->fetchAll();
+    	if(empty($exist)) $db->query("ALTER TABLE roles ADD `dashboardManageAccounts` INT NOT NULL DEFAULT '0' AFTER `dashboardManageSongs`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardDeleteLeaderboards'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardDeleteLeaderboards` INT NOT NULL DEFAULT '0' AFTER `dashboardManageAccounts`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageLevels'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageLevels` INT NOT NULL DEFAULT '0' AFTER `dashboardDeleteLeaderboards`");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

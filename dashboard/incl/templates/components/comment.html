@@ -1,4 +1,4 @@
-<div class="contentDiv">
+<div class="contentDiv" dashboard-context-div>
 	<div class="vertical">
 		<div class="levelTitle">
 			<div class="horisontal">
@@ -7,13 +7,6 @@
 			</div>
 			
 			<div class="commentStat">
-				<button class="button squareButton"
-					dashboard-show="%COMMENT_CAN_DELETE%"
-					onclick="postPage('manage/deleteComment', 'comment%commentID%')"
-					title="%TEXT_deleteComment%"
-				>
-					<i class="fa-solid fa-xmark"></i>
-				</button>
 				<form name="comment%commentID%">
 					<input type="hidden" name="commentID" value="%commentID%"></input>
 				</form>
@@ -28,7 +21,7 @@
 			</div>
 		</div>
 		
-		<p class="levelDescription">%COMMENT_CONTENT%</p>
+		<h3 class="levelDescription">%COMMENT_CONTENT%</h3>
 		
 		<div class="stats small">
 			<div class="commentStat" title="ID">
@@ -48,4 +41,6 @@
 			</div>
 		</div>
 	</div>
+	
+	%COMMENT_CONTEXT_MENU%
 </div>
