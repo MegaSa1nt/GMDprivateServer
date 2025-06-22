@@ -130,6 +130,7 @@ $tadaEmoji = ":tada:";
 $sobEmoji = ":sob:";
 
 $difficultiesURL = "https://gcs.icu/WTFIcons/difficulties/";
+$gauntletsURL = "https://gcs.icu/WTFIcons/gauntlets/";
 
 $authorURL = "";
 $authorIconURL = "";

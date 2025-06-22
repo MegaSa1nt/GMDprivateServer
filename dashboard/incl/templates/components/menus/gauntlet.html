@@ -1,0 +1,23 @@
+<div class="contextMenuDiv" dashboard-context-menu>
+	<button class="contextMenuButton" title="%TEXT_viewGauntlet%" type="button" href="browse/gauntlets/%MENU_ID%">
+		<i class="fa-solid fa-eye"></i>
+		<text>%TEXT_viewGauntlet%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_copyLink%" type="button" onclick="copyElementContent('browse/gauntlets/%MENU_ID%', true)">
+		<i class="fa-solid fa-chain"></i>
+		<text>%TEXT_copyLink%</text>
+	</button>
+	
+	<hr dashboard-show="%MENU_CAN_MANAGE%">
+	
+	<button class="contextMenuButton" title="%TEXT_manageGauntlet%" type="button" href="browse/gauntlets/%MENU_ID%/manage" dashboard-show="%MENU_CAN_MANAGE%">
+		<i class="fa-solid fa-pencil"></i>
+		<text>%TEXT_manageGauntlet%</text>
+	</button>
+	
+	<button class="contextMenuButton" title="%TEXT_deleteGauntlet%" type="button" href="browse/gauntlets/%MENU_ID%/delete" dashboard-show="%MENU_CAN_MANAGE%" style="--button-color: #ff9999;">
+		<i class="fa-solid fa-trash"></i>
+		<text>%TEXT_deleteGauntlet%</text>
+	</button>
+</div>

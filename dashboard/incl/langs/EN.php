@@ -19,6 +19,7 @@ $language['listProfile'] = 'List %1$s';
 $language['nothingIsPlaying'] = 'Nothing is playing...';
 $language['manage'] = 'Manage';
 $language['view'] = 'View';
+$language['levels'] = 'Levels'; // Levels in general
 
 /* Panel strings */
 $language['hidePanel'] = 'Hide panel';
@@ -33,7 +34,10 @@ $language['favouriteSongsTitle'] = 'Favourite songs';
 $language['yourSFXsTitle'] = 'Your SFXs';
 
 $language['browse'] = 'Browse';
-$language['levelsTitle'] = 'Levels';
+$language['levelsTitle'] = 'Levels'; // "Levels" as page title
+$language['listsTitle'] = 'Lists';
+$language['mapPacksTitle'] = 'Map Packs';
+$language['gauntletsTitle'] = 'Gauntlets';
 $language['songsTitle'] = 'Songs';
 $language['sfxsTitle'] = 'SFXs';
 
@@ -72,6 +76,8 @@ $language['errorBadPost'] = 'Your post contains a bad word.';
 $language['errorPostingIsDisabled'] = 'Creating posts is disabled.';
 
 $language['errorSongNotFound'] = 'Song wasn\'t found!';
+
+$language['errorListNotFound'] = 'List wasn\'t found!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -250,4 +256,21 @@ $language['deletePost'] = 'Delete post';
 $language['deleteScore'] = 'Delete score';
 $language['deleteSong'] = 'Delete song';
 $language['deleteSFX'] = 'Delete SFX';
+
+$language['listID'] = 'List ID';
+$language['countForReward'] = 'Amount of levels to beat';
+$language['noLists'] = 'No lists!';
+$language['manageList'] = 'Manage list';
+
+$language['mapPackID'] = 'Map Pack ID';
+$language['viewMapPack'] = 'View Map Pack';
+$language['manageMapPack'] = 'Manage Map Pack';
+$language['deleteMapPack'] = 'Delete Map Pack';
+$language['noMapPacks'] = 'No Map Packs!';
+
+$language['gauntletID'] = 'Gauntlet ID';
+$language['viewGauntlet'] = 'View Gauntlet';
+$language['manageGauntlet'] = 'Manage Gauntlet';
+$language['deleteGauntlet'] = 'Delete Gauntlet';
+$language['noGauntlets'] = 'No Gauntlets!';
 ?>

@@ -399,7 +399,7 @@ class Library {
 		return $isAdmin;
 	}
 	
-	public static function getCommentsOfUser($userID, $sortMode, $pageOffset) {
+	public static function getCommentsOfUser($userID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
 		
 		$comments = $db->prepare("SELECT * FROM comments
@@ -408,7 +408,7 @@ class Library {
 				UNION
 				(SELECT listID * -1 AS itemID, listName COLLATE utf8mb3_unicode_ci AS itemName, accountID AS creatorAccountID FROM lists WHERE lists.unlisted = 0)
 			) items ON comments.levelID = items.itemID
-			WHERE comments.userID = :userID ORDER BY ".$sortMode." DESC LIMIT 10 OFFSET ".$pageOffset);
+			WHERE comments.userID = :userID ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':userID' => $userID]);
 		$comments = $comments->fetchAll();
 		
@@ -1782,20 +1782,6 @@ class Library {
 		return ["levels" => $levels, "count" => $levelsCount];
 	}
 	
-	public static function getGauntletByID($gauntletID) {
-		require __DIR__."/connection.php";
-		
-		if(isset($GLOBALS['core_cache']['gauntlets'][$gauntletID])) return $GLOBALS['core_cache']['gauntlets'][$gauntletID];
-		
-		$gauntlet = $db->prepare("SELECT * FROM gauntlets WHERE ID = :gauntletID");
-		$gauntlet->execute([':gauntletID' => $gauntletID]);
-		$gauntlet = $gauntlet->fetch();
-		
-		$GLOBALS['core_cache']['gauntlets'][$gauntletID] = $gauntlet;
-		
-		return $gauntlet;
-	}
-	
 	public static function canAccountPlayLevel($person, $level) {
 		require __DIR__."/../../config/misc.php";
 		
@@ -1880,10 +1866,10 @@ class Library {
 		return $_POST['gameVersion'] > 20 ? 'temp_'.$time.'_</c>'.PHP_EOL.' '.$text.'<cc> ' : '-10';
 	}
 	
-	public static function getCommentsOfLevel($levelID, $sortMode, $pageOffset) {
+	public static function getCommentsOfLevel($levelID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
 		
-		$comments = $db->prepare("SELECT *, levels.userID AS creatorUserID FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0 ORDER BY ".$sortMode." DESC LIMIT 10 OFFSET ".$pageOffset);
+		$comments = $db->prepare("SELECT *, levels.userID AS creatorUserID FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0 ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':levelID' => $levelID]);
 		$comments = $comments->fetchAll();
 		
@@ -3037,18 +3023,22 @@ class Library {
 		return ['mapPacks' => $mapPacks, 'count' => $mapPacksCount];
 	}
 	
-	public static function getGauntlets() {
+	public static function getGauntlets($pageOffset = false) {
 		require __DIR__."/connection.php";
 		
 		if(isset($GLOBALS['core_cache']['gauntlets'])) return $GLOBALS['core_cache']['gauntlets'];
 		
-		$gauntlets = $db->prepare("SELECT * FROM gauntlets ORDER BY ID ASC");
+		$gauntlets = $db->prepare("SELECT * FROM gauntlets ORDER BY ID ASC".($pageOffset ? ' LIMIT 10 OFFSET '.$pageOffset : ''));
 		$gauntlets->execute();
 		$gauntlets = $gauntlets->fetchAll();
 		
-		$GLOBALS['core_cache']['gauntlets'] = $gauntlets;
+		$gauntletsCount = $db->prepare("SELECT count(*) FROM gauntlets");
+		$gauntletsCount->execute();
+		$gauntletsCount = $gauntletsCount->fetchColumn();
+		
+		$GLOBALS['core_cache']['gauntlets'] = ['gauntlets' => $gauntlets, 'count' => $gauntletsCount];
 	
-		return $gauntlets;
+		return ['gauntlets' => $gauntlets, 'count' => $gauntletsCount];
 	}
 	
 	public static function getLists($person, $filters, $order, $pageOffset) {
@@ -3106,10 +3096,10 @@ class Library {
 		return $list;
 	}
 	
-	public static function getCommentsOfList($listID, $sortMode, $pageOffset) {
+	public static function getCommentsOfList($listID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
 		
-		$comments = $db->prepare("SELECT *, lists.accountID AS creatorAccountID FROM lists INNER JOIN comments ON comments.levelID = (lists.listID * -1) WHERE lists.listID = :listID ORDER BY ".$sortMode." DESC LIMIT 10 OFFSET ".$pageOffset);
+		$comments = $db->prepare("SELECT *, lists.accountID AS creatorAccountID FROM lists INNER JOIN comments ON comments.levelID = (lists.listID * -1) WHERE lists.listID = :listID ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':listID' => $listID]);
 		$comments = $comments->fetchAll();
 		
@@ -3173,7 +3163,7 @@ class Library {
 		
 		if($unlistedLevelsForAdmins && self::isAccountAdministrator($accountID)) return true;
 		
-		return !($list['unlisted'] > 0 && ($list['unlisted'] == 1 && (self::isFriends($accountID, $list['accountID']) || $accountID == $list['accountID'])));
+		return $list['unlisted'] != 1 || ($accountID == $list['accountID'] || self::isFriends($accountID, $list['accountID']));
 	}
 	
 	public static function rateList($listID, $person, $reward, $difficulty, $featuredValue, $levelsCount) {
@@ -3244,7 +3234,7 @@ class Library {
 			case "extreme demon":
 				return ["name" => "Extreme Demon", "difficulty" => 10];
 			default:
-				return ["name" => "N/A", "difficulty" => 0];
+				return ["name" => "N/A", "difficulty" => -1];
 		}
 	}
 	
@@ -3375,6 +3365,153 @@ class Library {
 		foreach($getLists AS &$list) $GLOBALS['core_cache']['lists'][$list['listID']] = $list;
 		
 		return $getLists;
+	}
+	
+	public static function getListSearchFilters($query, $addSearchFilter, $removeDefaultFilter) {
+		require __DIR__."/../../config/misc.php";
+		require_once __DIR__."/exploitPatch.php";
+		
+		$diffParams = [];
+		$filters = !$removeDefaultFilter ? ["unlisted = 0"] : [];
+		
+		$str = Escape::text(urldecode($query["str"])) ?: '';
+		$diff = Escape::multiple_ids(urldecode($query["diff"])) ?: '-';
+
+		// Additional search parameters
+		if(isset($query["star"])) $filters[] = $query["star"] == 1 ? "NOT starStars = 0" : "starStars = 0";
+
+		// Difficulty filters
+		if($diff && $diff != '-') {
+			$diffArray = explode(',', $diff);
+			
+			foreach($diffArray AS &$diffEntry) {
+				switch($diffEntry) {
+					case -3:
+						$diffParams[] = "starDifficulty = '0'";
+						
+						break;
+					case -2:
+						$demonDiffs = [1, 2, 3, 4, 5];
+						$demonFilter = $query["demonFilter"] ? explode(',', Escape::multiple_ids(urldecode($query["demonFilter"]))) : [];
+						
+						foreach($demonFilter AS &$demonDiff) $demonParams[] = "starDifficulty = ".($demonDiffs[$demonDiff - 1] + 5);
+						
+						$diffParams[] = $demonParams ? '('.implode(" OR ", $demonParams).')' : "starDifficulty >= 6";
+						
+						break;
+					default:
+						$diffParams[] = "starDifficulty = '".$diffEntry."'";
+						
+						break;
+				}
+			}
+		}
+		$diffFilter = implode(") OR (", $diffParams);
+		if(!empty($diffFilter)) $filters[] = '('.$diffFilter.')';
+		
+		if($addSearchFilter) $filters[] = "listName LIKE '%".$str."%'";
+		
+		return [
+			'filters' => $filters,
+			'type' => $type
+		];
+	}
+	
+	public static function getListDifficultyImage($list) {
+		require __DIR__."/../../config/discord.php";
+		
+		$starsIcon = $list['starFeatured'] ? 'featured' : 'stars';
+		
+		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-easy', '7' => 'demon-medium', '8' => 'demon-hard', '9' => 'demon-insane', '10' => 'demon-extreme'];
+        $diffIcon = $diffArray[(string)$list['starDifficulty']] ?: 'na';
+		
+		return $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
+	}
+	
+	public static function getListStatsCount($person, $listID) {
+		require __DIR__."/connection.php";
+		require_once __DIR__."/exploitPatch.php";
+		
+		if(isset($GLOBALS['core_cache']['listStatsCount'][$listID])) return $GLOBALS['core_cache']['listStatsCount'][$listID];
+		
+		$accountID = $person['accountID'];
+		
+		$list = self::getListByID($listID);
+		if(!$list) {
+			$GLOBALS['core_cache']['listStatsCount'][$listID] = ['levels' => 0, 'comments' => 0];
+			return ['levels' => 0, 'comments' => 0];
+		}
+		
+		$friendsArray = self::getFriends($accountID);
+		$friendsArray[] = $accountID;
+		$friendsString = "'".implode("','", $friendsArray)."'";
+		
+		$levelsCount = $db->prepare("SELECT count(*) FROM levels WHERE levelID IN (".$list['listlevels'].") AND (unlisted != 1 OR (unlisted = 1 AND (extID IN (".$friendsString."))))");
+		$levelsCount->execute();
+		$levelsCount = $levelsCount->fetchColumn();
+		
+		$commentsCount = $db->prepare("SELECT count(*) FROM lists INNER JOIN comments ON comments.levelID * -1 = lists.listID WHERE lists.listID = :listID");
+		$commentsCount->execute([':listID' => $listID]);
+		$commentsCount = $commentsCount->fetchColumn();
+		
+		$GLOBALS['core_cache']['listStatsCount'][$listID] = ['levels' => $levelsCount, 'comments' => $commentsCount];
+		
+		return ['levels' => $levelsCount, 'comments' => $commentsCount];
+	}
+	
+	public static function getMapPackDifficultyImage($mapPack) {
+		require __DIR__."/../../config/discord.php";
+		
+		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-easy', '7' => 'demon-medium', '8' => 'demon-hard', '9' => 'demon-insane', '10' => 'demon-extreme'];
+        $diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'na';
+		
+		return $difficultiesURL.'stars/'.$diffIcon.'.png';
+	}
+	
+	public static function getMapPackByID($mapPackID) {
+		require __DIR__."/connection.php";
+		
+		if(isset($GLOBALS['core_cache']['mapPack'][$mapPackID])) return $GLOBALS['core_cache']['mapPack'][$mapPackID];
+		
+		$mapPack = $db->prepare("SELECT * FROM mappacks WHERE ID = :mapPackID");
+		$mapPack->execute([':mapPackID' => $mapPackID]);
+		$mapPack = $mapPack->fetch();
+		
+		$GLOBALS['core_cache']['mapPack'][$mapPackID] = $mapPack;
+		
+		return $mapPack;
+	}
+	
+	public static function getGauntletByID($gauntletID) {
+		require __DIR__."/connection.php";
+		
+		if(isset($GLOBALS['core_cache']['gauntlet'][$gauntletID])) return $GLOBALS['core_cache']['gauntlet'][$gauntletID];
+		
+		$gauntlet = $db->prepare("SELECT * FROM gauntlets WHERE ID = :gauntletID");
+		$gauntlet->execute([':gauntletID' => $gauntletID]);
+		$gauntlet = $gauntlet->fetch();
+		
+		$GLOBALS['core_cache']['gauntlet'][$gauntletID] = $gauntlet;
+		
+		return $gauntlet;
+	}
+	
+	public static function getGauntletImage($gauntletID) {
+		require __DIR__."/../../config/discord.php";
+		
+		return $gauntletsURL.'/'.$gauntletID.'.png';
+	}
+	
+	public static function getGauntletNames() {
+		$gauntlets = ["Unknown", "Fire", "Ice", "Poison", "Shadow", "Lava", "Bonus", "Chaos", "Demon", "Time", "Crystal", "Magic", "Spike", "Monster", "Doom", "Death", 'Forest', 'Rune', 'Force', 'Spooky', 'Dragon', 'Water', 'Haunted', 'Acid', 'Witch', 'Power', 'Potion', 'Snake', 'Toxic', 'Halloween', 'Treasure', 'Ghost', 'Spider', 'Gem', 'Inferno', 'Portal', 'Strange', 'Fantasy', 'Christmas', 'Surprise', 'Mystery', 'Cursed', 'Cyborg', 'Castle', 'Grave', 'Temple', 'World', 'Galaxy', 'Universe', 'Discord', 'Split', 'NCS I', 'NCS II', 'Space', 'Cosmos'];
+		
+		return $gauntlets;
+	}
+	
+	public static function getGauntletName($gauntletID) {
+		$gauntlets = self::getGauntletNames();
+		
+		return $gauntlets[$gauntletID] ?: $gauntlets[0];
 	}
 	
 	/*

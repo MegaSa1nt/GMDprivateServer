@@ -1,0 +1,162 @@
+<div class="pageDiv" dashboard-page-buttons>
+	<button class="button squareButton big" type="button" title="%TEXT_filters%" dashboard-modal-button="listFilters" dashboard-show="%ENABLE_FILTERS%">
+		<i class="fa-solid fa-filter"></i>
+	</button>
+	
+	<p>%LIST_PAGE_TEXT%</p>
+	
+	<div class="pageButtons">
+		<button dashboard-disable="%IS_FIRST_PAGE%" class="pageButton" type="button" onclick="%FIRST_PAGE_BUTTON%">
+			<i class="fa-solid fa-backward"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_FIRST_PAGE%" class="pageButton" type="button" onclick="%PREVIOUS_PAGE_BUTTON%">
+			<i class="fa-solid fa-chevron-left"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_LAST_PAGE%" class="pageButton" type="button" onclick="%NEXT_PAGE_BUTTON%">
+			<i class="fa-solid fa-chevron-right"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_LAST_PAGE%" class="pageButton" type="button" onclick="%LAST_PAGE_BUTTON%">
+			<i class="fa-solid fa-forward"></i>
+		</button>
+	</div>
+</div>
+
+<div class="nothingOnPageDiv" dashboard-show="%LIST_NO_LISTS%">
+	<i class="fa-solid fa-list nothing-icon"></i>
+	<h1>%TEXT_noLists%</h1>
+</div>
+
+%ADDITIONAL_PAGE%
+
+<form class="modalPage" dashboard-modal="listFilters" dashboard-show="%ENABLE_FILTERS%">
+	<div class="box">
+		<div class="inlineForm">
+			<input dashboard-modal-search class="inputStyle bordered" type="text" name="str" autocomplete="off" placeholder="%TEXT_searchText%" />
+		</div>
+		
+		<div class="horisontal">
+			<div class="vertical">
+				<div class="languageDiv">
+					<div class="settingDescription">
+						<h2>%TEXT_notRatedTitle%</h2>
+						<h3>%TEXT_notRatedDesc%</h3>
+					</div>
+					
+					<input class="toggle" type="checkbox" name="star" value="0"></input>
+				</div>
+				
+				<div class="languageDiv">
+					<div class="settingDescription">
+						<h2>Featured</h2>
+						<h3>%TEXT_featuredDesc%</h3>
+					</div>
+					
+					<input class="toggle" type="checkbox" name="featured" value="1"></input>
+				</div>
+			</div>
+			
+			<div class="vertical">
+				<div class="languageDiv">
+					<div class="settingDescription">
+						<h2>%TEXT_ratedTitle%</h2>
+						<h3>%TEXT_ratedDesc%</h3>
+					</div>
+					
+					<input class="toggle" type="checkbox" name="star" value="1"></input>
+				</div>
+			</div>
+		</div>
+		
+		<div class="difficultiesDiv">
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="N/A"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/na.png"></img>
+				<input type="hidden" name="diff[]" value="-1" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Auto"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/auto.png"></img>
+				<input type="hidden" name="diff[]" value="-3" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Easy"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/easy.png"></img>
+				<input type="hidden" name="diff[]" value="1" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Normal"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/normal.png"></img>
+				<input type="hidden" name="diff[]" value="2" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Hard"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/hard.png"></img>
+				<input type="hidden" name="diff[]" value="3" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Harder"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/harder.png"></img>
+				<input type="hidden" name="diff[]" value="4" disabled></input>
+			</div>
+			
+			<div class="difficultyButton non-demon" dashboard-filter-button>
+				<button type="button" title="Insane"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/insane.png"></img>
+				<input type="hidden" name="diff[]" value="5" disabled></input>
+			</div>
+			
+			<div class="difficultyButton demon" dashboard-filter-button="demon">
+				<button type="button" title="Easy Demon"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/demon-easy.png"></img>
+				<input type="hidden" name="diff[]" value="-2" dashboard-modal-skip disabled></input>
+				<input type="hidden" name="demonFilter[]" value="1" disabled></input>
+			</div>
+			
+			<div class="difficultyButton demon" dashboard-filter-button="demon">
+				<button type="button" title="Medium Demon"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/demon-medium.png"></img>
+				<input type="hidden" name="diff[]" value="-2" dashboard-modal-skip disabled></input>
+				<input type="hidden" name="demonFilter[]" value="2" disabled></input>
+			</div>
+			
+			<div class="difficultyButton" dashboard-filter-button="demon">
+				<button type="button" title="Hard Demon"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/demon-hard.png"></img>
+				<input type="hidden" name="diff[]" value="-2" dashboard-modal-skip disabled></input>
+				<input type="hidden" name="demonFilter[]" value="3" disabled></input>
+			</div>
+			
+			<div class="difficultyButton demon" dashboard-filter-button="demon">
+				<button type="button" title="Insane Demon"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/demon-insane.png"></img>
+				<input type="hidden" name="diff[]" value="-2" dashboard-modal-skip disabled></input>
+				<input type="hidden" name="demonFilter[]" value="4" disabled></input>
+			</div>
+			
+			<div class="difficultyButton demon" dashboard-filter-button="demon">
+				<button type="button" title="Extreme Demon"></button>
+				<img loading="lazy" src="https://gcs.icu/WTFIcons/difficulties/stars/demon-extreme.png"></img>
+				<input type="hidden" name="diff[]" value="-2" dashboard-modal-skip disabled></input>
+				<input type="hidden" name="demonFilter[]" value="5" disabled></input>
+			</div>
+		</div>
+		
+		<div class="applyButtons">
+			<button type="button" class="button squareButton big" title="%TEXT_resetFilters%" onclick="getPage(window.location.pathname)">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+			
+			<button type="button" class="button squareButton big" title="%TEXT_applyFilters%" onclick="applyFilters('listFilters')">
+				<i class="fa-solid fa-check"></i>
+			</button>
+		</div>
+	</div>
+</form>

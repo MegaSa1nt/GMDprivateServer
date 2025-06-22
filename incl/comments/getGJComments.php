@@ -32,7 +32,7 @@ switch(true) {
 			$canSeeComments = Library::canAccountPlayLevel($person, $level);
 			if(!$canSeeComments) exit(CommentsError::NothingFound);
 			
-			$comments = Library::getCommentsOfLevel($levelID, $sortMode, $pageOffset);
+			$comments = Library::getCommentsOfLevel($levelID, $sortMode, $pageOffset, $count);
 		} else {
 			$listID = $levelID * -1;
 			$list = Library::getListByID($listID);
@@ -40,7 +40,7 @@ switch(true) {
 			$canSeeComments = Library::canAccountSeeList($person, $list);
 			if(!$canSeeComments) exit(CommentsError::NothingFound);
 			
-			$comments = Library::getCommentsOfList($listID, $sortMode, $pageOffset);
+			$comments = Library::getCommentsOfList($listID, $sortMode, $pageOffset, $count);
 		}
 		break;
 	case isset($_POST['userID']):
@@ -51,7 +51,7 @@ switch(true) {
 		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $targetUserID);
 		if(!$canSeeCommentHistory) exit(CommentsError::NothingFound);
 		
-		$comments = Library::getCommentsOfUser($targetUserID, $sortMode, $pageOffset);
+		$comments = Library::getCommentsOfUser($targetUserID, $sortMode, $pageOffset, $count);
 		break;
 	default:
 		exit(CommonError::InvalidRequest);
@@ -70,7 +70,7 @@ foreach($comments['comments'] AS &$comment) {
 	
 	$comment['comment'] = Escape::translit(Escape::url_base64_decode($comment["comment"]));
 	$showLevelID = $displayLevelID ? $comment["levelID"] : Library::getFirstMentionedLevel($comment['comment']);
-	$commentText = $gameVersion < 20 ? Escape::gd($comment["comment"]) : Escape::url_base64_encode($comment["comment"]);
+	$commentText = $gameVersion < 20 ? (trim(Escape::gd($comment["comment"])) ?: '(Empty comment)') : Escape::url_base64_encode(trim($comment["comment"]) ?: '(Empty comment)');
 	
 	$likes = $comment['likes'] - $comment['dislikes'];
 	if($commentAutoLike && isset($specialCommentLikes[$comment["commentID"]])) $likes = $likes * $specialCommentLikes[$comment["commentID"]]; // Multiply by the specified value

@@ -10,7 +10,7 @@ $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
 
 if(isset($_POST['levelID']) && isset($_POST['comment'])) {
-	$levelID = abs(Escape::number($_POST['levelID']));
+	$levelID = Escape::number($_POST['levelID']);
 	$comment = Escape::text($_POST['comment']);
 	if(empty($levelID) || empty($comment)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	

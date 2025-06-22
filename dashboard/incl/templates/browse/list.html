@@ -1,0 +1,95 @@
+<div class="wideBox levelPage">
+	<div class="contentDiv" dashboard-context-div>
+		<div class="horisontal">
+			<div class="vertical">
+				<div class="levelTitle">
+					<h2>%LIST_TITLE% • <text dashboard-copy>%listID%</text></h2>
+				</div>
+				
+				<h3 class="levelDescription">%LIST_DESCRIPTION%</h3>
+			</div>
+			
+			<img loading="lazy" class="difficultyImage" src="%LIST_DIFFICULTY_IMAGE%"></img>
+		</div>
+		
+		<div class="horisontal stats">
+			<span class="emptySymbol">:3</span>
+			
+			<button class="button short titleToRight" type="button" onclick="copyElementContent('browse/lists/%listID%', true)">
+				<i class="fa-solid fa-chain"></i>
+				%TEXT_copyLink%
+			</button>
+		</div>
+		
+		%LIST_CONTEXT_MENU%
+	</div>
+	
+	<div class="horisontal">
+		<div class="levelStats">
+			<div class="levelStat" title="%TEXT_countForReward%">
+				<text>
+					<i class="fa-solid fa-gamepad"></i>
+					%countForReward%
+				</text>
+			</div>
+			
+			<div class="levelStat" title="%TEXT_diamonds%">
+				<text>
+					<i class="fa-solid fa-gem"></i>
+					%starStars%
+				</text>
+			</div>
+			
+			<div class="levelStat" title="%TEXT_downloads%">
+				<text>
+					<i class="fa-solid fa-reply fa-rotate-270"></i>
+					%downloads%
+				</text>
+			</div>
+			
+			<div class="levelStat several">
+				<text title="%TEXT_likes%">
+					<i class="fa-solid fa-thumbs-up"></i> %likes%
+				</text>
+				<text title="%TEXT_dislikes%">
+					<i class="fa-solid fa-thumbs-down"></i> %dislikes%
+				</text>
+			</div>
+			
+			<div class="levelStat" title="%TEXT_uploadDate%">
+				<text>
+					<i class="fa-solid fa-calendar"></i>
+					<text dashboard-date="%uploadDate%" dashboard-full></text>
+				</text>
+			</div>
+			
+			<div class="levelStat several" title="%TEXT_levels%">
+				<text>
+					<i class="fa-solid fa-gamepad"></i> %LIST_LEVELS%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('browse/lists/%listID%')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+			
+			<div class="levelStat several" title="%TEXT_comments%">
+				<text>
+					<i class="fa-solid fa-comment"></i> %LIST_COMMENTS%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('browse/lists/%listID%/comments')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+			
+			<div class="levelStat several" dashboard-show="%LIST_CAN_MANAGE%" title="%TEXT_manageList%">
+				<text>
+					<i class="fa-solid fa-pencil"></i> %TEXT_manage%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('browse/lists/%listID%/manage')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+		</div>
+		
+		<div class="commentsDiv" dashboard-page-div>
+			%LIST_ADDITIONAL_PAGE%
+		</div>
+	</div>
+</div>

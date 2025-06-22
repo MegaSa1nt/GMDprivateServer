@@ -45,7 +45,7 @@ switch($parameters[1]) {
 		if(!$canSeeCommentHistory) {
 			$additionalData = [
 				'ADDITIONAL_PAGE' => '',
-				'LEVEL_NO_COMMENTS' => 'true',
+				'COMMENT_NO_COMMENTS' => 'true',
 				'COMMENT_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), 1, 1),
 				'LEVEL_ID' => 0,
 				
@@ -76,7 +76,7 @@ switch($parameters[1]) {
 		
 		$additionalData = [
 			'ADDITIONAL_PAGE' => $additionalPage,
-			'LEVEL_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
+			'COMMENT_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
 			'COMMENT_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
 			
 			'COMMENT_CAN_POST' => 'false',

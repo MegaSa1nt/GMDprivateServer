@@ -14,38 +14,14 @@ $time = time();
 $str = $echoString = $userString = '';
 $order = "uploadDate";
 $isIDSearch = false;
-$filters = ["unlisted = 0"];
 
-$gameVersion = abs(Escape::number($_POST["gameVersion"]) ?: 0);
-$binaryVersion = abs(Escape::number($_POST["binaryVersion"]) ?: 0);
-$type = abs(Escape::number($_POST["type"]) ?: 0);
-$diff = Escape::multiple_ids($_POST["diff"]) ?: '-';
-
-// Additional search parameters
-
-if(isset($_POST["star"]) && $_POST["star"] == 1) $filters[] = "NOT starStars = 0";
-
-// Difficulty filters
-switch($diff) {
-	case -1:
-		$filters[] = "starDifficulty = '-1'";
-		break;
-	case -3:
-		$filters[] = "starDifficulty = '0'";
-		break;
-	case -2:
-		$filters[] = "starDifficulty = 5 + ".$demonFilter;
-		break;
-	case "-";
-		break;
-	default:
-		if($diff) $filters[] = "starDifficulty IN (".$diff.")";
-		break;
-}
+$getFilters = Library::getListSearchFilters($_POST, false, false);
+$filters = $getFilters['filters'];
+$type = $getFilters['type'];
 
 // Type detection
 $str = Escape::text($_POST["str"]) ?: '';
-$pageOffset = is_numeric($_POST["page"]) ? abs(Escape::number($_POST["page"])) * 10 : 0;
+$pageOffset = is_numeric($_POST["page"]) ? abs(Escape::number($_POST["page"]) ?: 0) * 10 : 0;
 
 switch($type) {
 	case 0: // Search
@@ -120,8 +96,10 @@ $lists = Library::getLists($person, $filters, $order, $pageOffset);
 foreach($lists['lists'] as &$list) {
 	$list['listName'] = Escape::translit($list['listName']);
 	$list['listDesc'] = Escape::translit($list['listDesc']);
+	
 	$list['likes'] = $list['likes'] - $list['dislikes'];
 	$list['userName'] = Library::makeClanUsername($list['accountID']);
+	
 	$echoString .= "1:".$list['listID'].":2:".$list['listName'].":3:".$list['listDesc'].":5:".$list['listVersion'].":49:".$list['accountID'].":50:".$list['userName'].":10:".$list['downloads'].":7:".$list['starDifficulty'].":14:".$list['likes'].":19:".$list['starFeatured'].":51:".$list['listlevels'].":55:".$list['starStars'].":56:".$list['countForReward'].":28:".$list['uploadDate'].":29:".$list['updateDate']."|";
 	$userString .= Library::getUserString($list)."|";
 }

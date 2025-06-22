@@ -19,6 +19,7 @@ $language['listProfile'] = 'Список уровней %1$s';
 $language['nothingIsPlaying'] = 'Ничего не играет...';
 $language['manage'] = 'Управление';
 $language['view'] = 'Посмотреть';
+$language['levels'] = 'Уровни'; // Levels in general
 
 /* Panel strings */
 $language['hidePanel'] = 'Скрыть панель';
@@ -33,7 +34,10 @@ $language['favouriteSongsTitle'] = 'Любимые песни';
 $language['yourSFXsTitle'] = 'Ваши звуковые эффекты';
 
 $language['browse'] = 'Просмотр';
-$language['levelsTitle'] = 'Уровни';
+$language['levelsTitle'] = 'Уровни'; // "Levels" as page title
+$language['listsTitle'] = 'Списки уровней';
+$language['mapPacksTitle'] = 'Мап-Паки';
+$language['gauntletsTitle'] = 'Гаунтлеты';
 $language['songsTitle'] = 'Песни';
 $language['sfxsTitle'] = 'Звуковые эффекты';
 
@@ -72,6 +76,8 @@ $language['errorBadPost'] = 'Ваш пост содержит плохие сл�
 $language['errorPostingIsDisabled'] = 'Выкладывание постов отключение.';
 
 $language['errorSongNotFound'] = 'Песня не найдена!';
+
+$language['errorListNotFound'] = 'Список уровней не найден!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -250,4 +256,21 @@ $language['deletePost'] = 'Удалить пост';
 $language['deleteScore'] = 'Удалить рекорд';
 $language['deleteSong'] = 'Удалить песню';
 $language['deleteSFX'] = 'Удалить звуковой эффект';
+
+$language['listID'] = 'ID списка уровней';
+$language['countForReward'] = 'Кол-во уровней для прохождения';
+$language['noLists'] = 'Списков уровней нет!';
+$language['manageList'] = 'Управление списком уровней';
+
+$language['mapPackID'] = 'ID Мап-Пака';
+$language['viewMapPack'] = 'Посмотреть Мап-Пак';
+$language['manageMapPack'] = 'Управление Мап-Паком';
+$language['deleteMapPack'] = 'Удалить Мап-Пак';
+$language['noMapPacks'] = 'Мап-Паков нет!';
+
+$language['gauntletID'] = 'ID Гаунтлета';
+$language['viewGauntlet'] = 'Посмотреть Гаунтлет';
+$language['manageGauntlet'] = 'Управление Гаунтлетом';
+$language['deleteGauntlet'] = 'Удалить Гаунтлет';
+$language['noGauntlets'] = 'Гаунтлетов нет!';
 ?>

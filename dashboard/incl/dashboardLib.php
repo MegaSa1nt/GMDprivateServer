@@ -497,6 +497,7 @@ class Dashboard {
 	public static function renderLevelCard($level, $person) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
 		
 		$contextMenuData = [];
 		
@@ -514,9 +515,9 @@ class Dashboard {
 		$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
 		
 		$level['LEVEL_LENGTH'] = $levelLengths[$level['levelLength']];
-		$level['LEVEL_LIKES'] = abs($level['likes'] - $level['dislikes']);
-		
 		$level['LEVEL_IS_PLATFORMER'] = $level['levelLength'] == 5 ? 'true' : 'false';
+		
+		$level['LEVEL_LIKES'] = abs($level['likes'] - $level['dislikes']);
 		$level['LEVEL_IS_DISLIKED'] = $level['dislikes'] > $level['likes'] ? 'true' : 'false';
 		
 		if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'].(isset($song['ID']) ? " • <text dashboard-copy>".$song['ID'].'</text>' : '');
@@ -544,6 +545,7 @@ class Dashboard {
 	public static function renderCommentCard($comment, $person, $showLevel = false) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
 		
 		$contextMenuData = [];
 		$isPersonThemselves = $person['userID'] == $comment['userID'];
@@ -579,6 +581,7 @@ class Dashboard {
 	public static function renderPostCard($accountPost, $person) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
 		
 		$contextMenuData = [];
 		$isPersonThemselves = $person['userID'] == $accountPost['userID'];
@@ -715,6 +718,84 @@ class Dashboard {
 		$sfx['SFX_CONTEXT_MENU'] = self::renderTemplate('components/menus/sfx', $contextMenuData);
 		
 		return self::renderTemplate('components/sfx', $sfx);
+	}
+	
+	public static function renderListCard($list, $person) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
+		
+		$contextMenuData = [];
+		$isPersonThemselves = $person['accountID'] == $list['accountID'];
+		
+		$user = Library::getUserByAccountID($list['accountID']);
+		$userName = $user ? $user['userName'] : 'Undefined';
+		
+		$userMetadata = self::getUserMetadata($user);
+		
+		$list['LIST_TITLE'] = sprintf(self::string('levelTitle'), $list['listName'], self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']));
+		$list['LIST_DESCRIPTION'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($list['listDesc']))) ?: "<i>".self::string('noDescription')."</i>";
+		$list['LIST_DIFFICULTY_IMAGE'] = Library::getListDifficultyImage($list);
+		
+		$list['LIST_LIKES'] = abs($list['likes'] - $list['dislikes']);
+		$list['LIST_IS_DISLIKED'] = $list['dislikes'] > $list['likes'] ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+		$contextMenuData['MENU_ID'] = $list['listID'];
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
+		
+		$list['LIST_CONTEXT_MENU'] = self::renderTemplate('components/menus/list', $contextMenuData);
+		
+		return self::renderTemplate('components/list', $list);
+	}
+	
+	public static function renderMapPackCard($mapPack, $person) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$contextMenuData = [];
+		
+		$mapPackTextColor = str_replace(',', ' ', $mapPack['rgbcolors']);
+		$mapPackBarColor = $mapPack['colors2'] && $mapPack['colors2'] != 'none' ? str_replace(',', ' ', $mapPack['colors2']) : $mapPackTextColor;
+		
+		$mapPack['MAPPACK_TITLE'] = htmlspecialchars($mapPack['name']);
+		$mapPack['MAPPACK_DIFFICULTY_IMAGE'] = Library::getMapPackDifficultyImage($mapPack);
+		
+		$mapPack['MAPPACK_NAME_ATTRIBUTES'] = 'style="--href-color: rgb('.$mapPackTextColor.'); --href-shadow-color: rgb('.$mapPackTextColor.' / 38%)"';
+		$mapPack['MAPPACK_LEVELS_ATTRIBUTES'] = 'style="--href-color: rgb('.$mapPackBarColor.'); --href-shadow-color: rgb('.$mapPackBarColor.' / 38%)"';
+		
+		$mapPack['MAPPACK_LEVELS_COUNT'] = count(explode(',', $mapPack['levels']));
+		
+		$contextMenuData['MENU_ID'] = $mapPack['ID'];
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardLevelPackCreate") ? 'true' : 'false';
+		
+		$mapPack['MAPPACK_CONTEXT_MENU'] = self::renderTemplate('components/menus/mappack', $contextMenuData);
+		
+		return self::renderTemplate('components/mappack', $mapPack);
+	}
+	
+	public static function renderGauntletCard($gauntlet, $person) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$contextMenuData = [];
+		
+		$gauntlet['GAUNTLET_TITLE'] = Library::getGauntletName($gauntlet['ID']).' Gauntlet';
+		$gauntlet['GAUNTLET_DIFFICULTY_IMAGE'] = Library::getGauntletImage($gauntlet['ID']);
+		
+		$contextMenuData['MENU_ID'] = $gauntlet['ID'];
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardGauntletCreate") ? 'true' : 'false';
+		
+		$gauntlet['GAUNTLET_CONTEXT_MENU'] = self::renderTemplate('components/menus/gauntlet', $contextMenuData);
+		
+		return self::renderTemplate('components/gauntlet', $gauntlet);
 	}
 }
 ?>

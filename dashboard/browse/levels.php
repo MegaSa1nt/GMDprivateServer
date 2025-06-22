@@ -23,21 +23,10 @@ if($_GET['id']) {
 	$userName = $user ? $user['userName'] : 'Undefined';
 	
 	$userAttributes = [];
-	$levelLengths = ['Tiny', 'Short', 'Medium', 'Long', 'XL', 'Platformer'];
 	
-	$userPerson = [
-		'accountID' => $user['extID'],
-		'userID' => $user['userID'],
-		'IP' => $user['IP'],
-	];
-	$iconKit = Dashboard::getUserIconKit($userID);
-	$userAppearance = Library::getPersonCommentAppearance($userPerson);
-	$userColor = str_replace(",", " ", $userAppearance['commentColor']);
+	$userMetadata = Dashboard::getUserMetadata($user);
 	
-	if($userColor != '255 255 255') $userAttributes[] = 'style="--href-color: rgb('.$userColor.'); --href-shadow-color: rgb('.$userColor.' / 38%)"';
-	if(!$user['isRegistered']) $userAttributes[] = 'dashboard-remove="href title"';
-	
-	$level['LEVEL_TITLE'] = sprintf(Dashboard::string('levelTitle'), $level['levelName'], Dashboard::getUsernameString($person, $user, $userName, $iconKit['main'], $userAppearance['modBadgeLevel'], implode(' ', $userAttributes)));
+	$level['LEVEL_TITLE'] = sprintf(Dashboard::string('levelTitle'), $level['levelName'], Dashboard::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']));
 	$level['LEVEL_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($level['levelDesc']))) ?: "<i>".Dashboard::string('noDescription')."</i>";
 	$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
 	
@@ -116,7 +105,7 @@ if($_GET['id']) {
 				
 				$additionalData = [
 					'ADDITIONAL_PAGE' => $additionalPage,
-					'LEVEL_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
+					'COMMENT_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
 					'COMMENT_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
 					'LEVEL_ID' => $levelID,
 					
@@ -131,7 +120,7 @@ if($_GET['id']) {
 					'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
 				];
 				
-				if(!$additionalPage) $additionalData['LEVEL_NO_COMMENTS'] = 'true';
+				if(!$additionalPage) $additionalData['COMMENT_NO_COMMENTS'] = 'true';
 				
 				$level['LEVEL_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/comments', $additionalData);
 				break;
@@ -291,7 +280,7 @@ if($_GET['id']) {
 		}
 	}
 	
-	exit(Dashboard::renderPage("browse/level", $level['levelName'], $pageBase, $level));
+	exit(Dashboard::renderPage("browse/level", htmlspecialchars($level['levelName']), $pageBase, $level));
 }
 
 // Search levels

@@ -1,0 +1,66 @@
+<div class="wideBox levelPage">
+	<div class="contentDiv" dashboard-context-div>
+		<div class="horisontal spaceBetween">
+			<div class="levelTitle colored">
+				<img loading="lazy" class="difficultyImage mini" src="%MAPPACK_DIFFICULTY_IMAGE%"></img>
+					<h2 %MAPPACK_ATTRIBUTES%>
+					
+					<text class="big">%MAPPACK_TITLE%</text>
+				</h2>
+			</div>
+			
+			<button class="button short titleToRight" type="button" onclick="copyElementContent('browse/mappacks/%ID%', true)">
+				<i class="fa-solid fa-chain"></i>
+				%TEXT_copyLink%
+			</button>
+		</div>
+		
+		%MAPPACK_CONTEXT_MENU%
+	</div>
+	
+	<div class="horisontal">
+		<div class="levelStats">
+			<text class="levelStat" title="%TEXT_mapPackID%">
+				<i class="fa-solid fa-folder-open"></i>
+				<text dashboard-copy>%ID%</text>
+			</text>
+		
+			<text class="levelStat" title="%TEXT_uploadDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%timestamp%" dashboard-full></text>
+			</text>
+			
+			<text class="levelStat" title="%TEXT_stars%">
+				<i class="fa-solid fa-star"></i>
+				%stars%
+			</text>
+			
+			<text class="levelStat" title="%TEXT_coins%">
+				<i class="fa-solid fa-coins"></i>
+				%coins%
+			</text>
+			
+			<div class="levelStat several" title="%TEXT_levels%">
+				<text>
+					<i class="fa-solid fa-gamepad"></i>
+					%MAPPACK_LEVELS_COUNT%
+				</text>
+				
+				<button type="button" class="eyeButton" href="browse/mappacks/%ID%"><i class="fa-solid fa-eye"></i></button>
+			</div>
+			
+			<div class="levelStat several" dashboard-show="%MAPPACK_CAN_MANAGE%" title="%TEXT_manageMapPack%">
+				<text>
+					<i class="fa-solid fa-pencil"></i>
+					%TEXT_manage%
+				</text>
+				
+				<button type="button" class="eyeButton" href="browse/mappacks/%ID%/manage"><i class="fa-solid fa-eye"></i></button>
+			</div>
+		</div>
+		
+		<div class="commentsDiv" dashboard-page-div>
+			%MAPPACK_ADDITIONAL_PAGE%
+		</div>
+	</div>
+</div>

@@ -26,6 +26,15 @@
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^dashboard/browse/levels/(.+)$ dashboard/browse/levels.php?id=$1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^dashboard/browse/lists/(.+)$ dashboard/browse/lists.php?id=$1 [L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^dashboard/browse/mappacks/(.+)$ dashboard/browse/mappacks.php?id=$1 [L,QSA]
+	
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^dashboard/browse/gauntlets/(.+)$ dashboard/browse/gauntlets.php?id=$1 [L,QSA]
 	
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d

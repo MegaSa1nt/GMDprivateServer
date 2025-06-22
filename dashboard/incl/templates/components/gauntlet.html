@@ -1,0 +1,35 @@
+<div class="contentDiv" dashboard-context-div>
+	<div class="horisontal">
+		<div class="vertical">
+			<div class="levelTitle">
+				<h2>
+					<text class="big">%GAUNTLET_TITLE%</text>
+				</h2>
+			</div>
+		</div>
+		
+		<img loading="lazy" class="difficultyImage" src="%GAUNTLET_DIFFICULTY_IMAGE%"></img>
+	</div>
+	
+	<div class="horisontal stats">
+		<span class="emptySymbol">:)</span>
+		
+		<div class="levelStats">
+			<text class="levelStat" title="%TEXT_gauntletID%">
+				<i class="fa-solid fa-globe"></i>
+				<text dashboard-copy>%ID%</text>
+			</text>
+		
+			<text class="levelStat" title="%TEXT_uploadDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%timestamp%"></text>
+			</text>
+			
+			<button class="button titleToRight" type="button" title="%TEXT_viewGauntlet%" href="browse/gauntlets/%ID%">
+				<i class="fa-solid fa-eye"></i>
+			</button>
+		</div>
+	</div>
+	
+	%GAUNTLET_CONTEXT_MENU%
+</div>

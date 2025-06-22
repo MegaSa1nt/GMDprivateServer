@@ -1,0 +1,50 @@
+<div class="contentDiv" dashboard-context-div>
+	<div class="horisontal">
+		<div class="vertical justifyCenter">
+			<div class="levelTitle colored">
+				<img loading="lazy" class="difficultyImage mini" src="%MAPPACK_DIFFICULTY_IMAGE%"></img>
+		
+				<h2 %MAPPACK_NAME_ATTRIBUTES%>
+					<text class="big">%MAPPACK_TITLE%</text>
+				</h2>
+			</div>
+		</div>
+		
+		<span class="emptySymbol">:)</span>
+		
+		<div class="levelStats">
+			<text class="levelStat" title="%TEXT_mapPackID%">
+				<i class="fa-solid fa-folder-open"></i>
+				<text dashboard-copy>%ID%</text>
+			</text>
+		
+			<text class="levelStat" title="%TEXT_uploadDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%timestamp%"></text>
+			</text>
+			
+			<text class="levelStat" title="%TEXT_levels%">
+				<i class="fa-solid fa-gamepad"></i>
+				<text class="colored" %MAPPACK_LEVELS_ATTRIBUTES%>
+					%MAPPACK_LEVELS_COUNT%
+				</text>
+			</text>
+			
+			<text class="levelStat" title="%TEXT_stars%">
+				<i class="fa-solid fa-star"></i>
+				%stars%
+			</text>
+			
+			<text class="levelStat" title="%TEXT_coins%">
+				<i class="fa-solid fa-coins"></i>
+				%coins%
+			</text>
+			
+			<button class="button titleToRight" type="button" title="%TEXT_viewMapPack%" href="browse/mappacks/%ID%">
+				<i class="fa-solid fa-eye"></i>
+			</button>
+		</div>
+	</div>
+	
+	%MAPPACK_CONTEXT_MENU%
+</div>

@@ -1,0 +1,56 @@
+<div class="contentDiv" dashboard-context-div>
+	<div class="horisontal">
+		<div class="vertical">
+			<div class="levelTitle">
+				<h2>%LIST_TITLE%</h2>
+			</div>
+			
+			<h3 class="levelDescription">%LIST_DESCRIPTION%</h3>
+		</div>
+		
+		<img loading="lazy" class="difficultyImage" src="%LIST_DIFFICULTY_IMAGE%"></img>
+	</div>
+	
+	<div class="horisontal stats">
+		<span class="emptySymbol">:)</span>
+		
+		<div class="levelStats">
+			<text class="levelStat" title="%TEXT_listID%">
+				<i class="fa-solid fa-list"></i>
+				<text dashboard-copy>%listID%</text>
+			</text>
+		
+			<text class="levelStat" title="%TEXT_uploadDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%uploadDate%"></text>
+			</text>
+			
+			<text class="levelStat" title="%TEXT_countForReward%">
+				<i class="fa-solid fa-gamepad"></i>
+				%countForReward%
+			</text>
+			
+			<text class="levelStat" title="%TEXT_diamonds%">
+				<i class="fa-solid fa-gem"></i>
+				%starStars%
+			</text>
+			
+			<text class="levelStat" title="%TEXT_downloads%">
+				<i class="fa-solid fa-reply fa-rotate-270"></i>
+				%downloads%
+			</text>
+			
+			<text class="levelStat" title="%TEXT_rating%">
+				<i dashboard-hide="%LIST_IS_DISLIKED%" class="fa-solid fa-thumbs-up"></i>
+				<i dashboard-show="%LIST_IS_DISLIKED%" class="fa-solid fa-thumbs-down"></i>
+				%LIST_LIKES%
+			</text>
+			
+			<button class="button titleToRight" type="button" title="%TEXT_viewList%" href="browse/lists/%listID%">
+				<i class="fa-solid fa-eye"></i>
+			</button>
+		</div>
+	</div>
+	
+	%LIST_CONTEXT_MENU%
+</div>
