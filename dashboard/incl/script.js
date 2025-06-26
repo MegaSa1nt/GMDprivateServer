@@ -525,6 +525,20 @@ async function updatePage() {
 			return false;
 		}
 	});
+	
+	const submitFormElements = document.querySelectorAll("form:has([dashboard-submit])");
+	submitFormElements.forEach(async (element) => {
+		const submitFormButton = element.querySelector("[dashboard-submit]");
+		
+		element.addEventListener("keyup", (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			
+			if(event.keyCode == 13) submitFormButton.click()
+			
+			return false;
+		});
+	});
 }
 
 function timeConverter(timestamp, textStyle = "short") {
@@ -759,4 +773,19 @@ async function resetSettings() {
 		
 		settingsForm.set(element.name, element.value);
 	});
+}
+
+async function addEmojiToInput(emojiName) {
+	const formInput = document.querySelector(`[dashboard-emoji-input]`);
+	if(formInput == null) return;
+	
+	formInput.value += `:${emojiName}:`;
+	formInput.focus();
+}
+
+async function toggleEmojisDiv() {
+	const emojisDiv = document.querySelector("[dashboard-emojis-div]");
+	if(emojisDiv == null) return;
+	
+	emojisDiv.classList.toggle("show");
 }

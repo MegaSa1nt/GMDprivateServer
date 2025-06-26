@@ -1,0 +1,34 @@
+{
+	"geometrydash": [
+		"Geometry Dash",
+		"easy"
+	],
+	"twemoji": [
+		"Twemoji",
+		"sunglasses"
+	],
+	"legacy": [
+		"Legacy Set",
+		"ned"
+	],
+	"custom": [
+		"Custom Emojis",
+		"eyesShock"
+	],
+	"samsung": [
+		"Samsung Emojis",
+		"grinning"
+	],
+	"cube": [
+		"Cube Emotes (By @cyanflower)",
+		"cubehappy"
+	],
+	"cat": [
+		"Cat Emotes (C# Discord Server)",
+		"catgun"
+	],
+	"players": [
+		"Player Icons",
+		"default"
+	]
+}

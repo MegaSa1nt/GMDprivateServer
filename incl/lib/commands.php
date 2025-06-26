@@ -14,6 +14,13 @@ class Commands {
 		$increaseSplit = 0;
 		$command = $commentSplit[0];
 		
+		$forceFlagSet = false;
+		
+		if(strtolower($commentSplit[1]) == '-f') {
+			$forceFlagSet = true;
+			array_splice($commentSplit, 1, 1);
+		}
+		
 		switch($command) {
 			case '!rate':
 			case '!r':
@@ -38,6 +45,9 @@ class Commands {
 				
 				if($dontRateYourOwnLevels && $person['userID'] == $level['userID']) return "You ".Library::textColor("can't", Color::Red)." rate your own level.";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to rate ".Library::textColor($level['levelName'], Color::SkyBlue).' to '.$stars .' star'.($stars > 1 ? 's' : '').'?'.PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				$rateLevel = Library::rateLevel($levelID, $person, $difficulty, $stars, $verifyCoins, $featured);
 				
 				return "You ".Library::textColor("successfully", Color::Green)." rated ".Library::textColor($level['levelName'], Color::SkyBlue).' as '.Library::textColor($rateLevel, Color::Yellow).', '.$stars .' star'.($stars > 1 ? 's!' : '!');
@@ -46,6 +56,9 @@ class Commands {
 				if(!Library::checkPermission($person, 'commandRate')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
 				
 				if($dontRateYourOwnLevels && $person['userID'] == $level['userID']) return "You ".Library::textColor("can't", Color::Red)." unrate your own level.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to unrate ".Library::textColor($level['levelName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), 0, 0, 0);
 				
@@ -127,6 +140,9 @@ class Commands {
 				$dailyPermission = $type ? 'Weekly' : 'Daily';
 				if(!Library::checkPermission($person, 'command'.$dailyPermission)) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to make ".Library::textColor($level['levelName'], Color::SkyBlue)." ".($type ? 'weekly' : 'daily')."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				$setDaily = Library::setLevelAsDaily($levelID, $person, $type);
 				if(!$setDaily) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("is already", Color::Green)." ".($type ? 'weekly' : 'daily')."!";
 				
@@ -144,6 +160,9 @@ class Commands {
 				
 				$dailyPermission = $type ? 'Weekly' : 'Daily';
 				if(!Library::checkPermission($person, 'command'.$dailyPermission)) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to remove ".Library::textColor($level['levelName'], Color::SkyBlue)." from ".($type ? 'weekly' : 'daily')." levels?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				$removeDaily = Library::removeDailyLevel($levelID, $person, $type);
 				if(!$removeDaily) return Library::textColor($level['levelName'], Color::SkyBlue)." is not ".($type ? 'weekly' : 'daily')." level!";
@@ -168,6 +187,9 @@ class Commands {
 						."Example: ".Library::textColor("!event 60 7 1000 8 20 1001 379", Color::LightYellow);
 				}
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to make ".Library::textColor($level['levelName'], Color::SkyBlue)." event level?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				$setEvent = Library::setLevelAsEvent($levelID, $person, $duration, $rewards);
 				if(!$setEvent) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("is already", Color::Green)." event level!";
 				
@@ -176,6 +198,9 @@ class Commands {
 			case "!unevent":
 			case "!unev":
 				if(!Library::checkPermission($person, 'commandEvent')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to remove ".Library::textColor($level['levelName'], Color::SkyBlue)." from event levels?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 
 				$removeEvent = Library::removeEventLevel($levelID, $person);
 				if(!$removeEvent) return Library::textColor($level['levelName'], Color::SkyBlue)." is not event level!";
@@ -237,9 +262,12 @@ class Commands {
 				
 				if($player['extID'] == $level['extID']) return "User ".Library::textColor($player['userName'], Color::SkyBlue)." ".Library::textColor("already owns", Color::Green)." level ".Library::textColor($level['levelName'], Color::SkyBlue)."!";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to move ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($player['userName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				Library::moveLevel($levelID, $person, $player);
 				
-				return "You ".Library::textColor("successfully", Color::Green)." moved ".Library::textColor($level['levelName'], Color::SkyBlue)." to user ".Library::textColor($player['userName'], Color::SkyBlue)."!";
+				return "You ".Library::textColor("successfully", Color::Green)." moved ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($player['userName'], Color::SkyBlue)."!";
 			case '!lockUpdating':
 			case '!unlockUpdating':
 			case '!lu':
@@ -272,6 +300,9 @@ class Commands {
 				
 				if(Security::checkFilterViolation($person, $newLevelName, 3)) return "New level name contains a ".Library::textColor("bad", Color::Red)." word.";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to rename ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($newLevelName, Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				Library::renameLevel($levelID, $person, $newLevelName);
 				
 				return "You ".Library::textColor("successfully", Color::Green)." renamed ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".$newLevelName."!";
@@ -290,6 +321,9 @@ class Commands {
 				$newPassword = sprintf("%06d", abs(Escape::number($commentSplit[1])));
 				
 				if($level['password'] == '1'.$newPassword || $level['password'].'000000' == '1'.$newPassword) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this password!";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to change password of ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($newPassword, Color::Yellow)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::changeLevelPassword($levelID, $person, $newPassword);
 				
@@ -328,6 +362,9 @@ class Commands {
 				if(Escape::url_base64_decode($level['levelDesc']) == $newLevelDesc) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this description!";
 				
 				if(Security::checkFilterViolation($person, $newLevelDesc, 3)) return "New level description contains a ".Library::textColor("bad", Color::Red)." word.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to change description of ".Library::textColor($level['levelName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::changeLevelDescription($levelID, $person, $newLevelDesc);
 				
@@ -373,6 +410,9 @@ class Commands {
 				
 				if($player['extID'] == $level['extID']) return "User ".Library::textColor($player['userName'], Color::SkyBlue)." is creator of ".Library::textColor($level['levelName'], Color::SkyBlue)."!";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to share Creator Points of ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($player['userName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				$shareCreatorPoints = Library::shareCreatorPoints($levelID, $person, $player['userID']);
 				if(!$shareCreatorPoints) return "User ".Library::textColor($player['userName'], Color::SkyBlue)." have already been shared Creator Points from ".Library::textColor($level['levelName'], Color::SkyBlue)."!";
 				
@@ -399,6 +439,9 @@ class Commands {
 			case '!d':
 				if(!Library::checkPermission($person, 'commandDelete') && $person['userID'] != $level['userID']) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to delete ".Library::textColor($level['levelName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				$deleteLevel = Library::deleteLevel($levelID, $person);
 				if(!$deleteLevel) return "You ".Library::textColor("can't", Color::Red)." delete ".Library::textColor($level['levelName'], Color::SkyBlue).".";
 				
@@ -420,6 +463,13 @@ class Commands {
 		$commentSplit = explode(' ', $comment);
 		$increaseSplit = 0;
 		$command = $commentSplit[0];
+		
+		$forceFlagSet = false;
+		
+		if(strtolower($commentSplit[1]) == '-f') {
+			$forceFlagSet = true;
+			array_splice($commentSplit, 1, 1);
+		}
 		
 		switch($command) {
 			case '!rate':
@@ -443,9 +493,12 @@ class Commands {
 						."Example: ".Library::textColor("!rate 50 harder 1 7", Color::LightYellow);
 				}
 
-				if(!$reward) return "Please use !unrate to unrate list.";
+				if(!$reward) return "Please use ".Library::textColor("!unrate", Color::Red)." to unrate list.";
 				
 				if($dontRateYourOwnLevels && $person['accountID'] == $list['accountID']) return "You ".Library::textColor("can't", Color::Red)." rate your own list.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to rate ".Library::textColor($list['listName'], Color::SkyBlue).' '.$reward .' diamond'.($reward > 1 ? 's' : '').'?'.PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				$rateList = Library::rateList($listID, $person, $reward, $difficulty, $featured, $levelsCount);
 				
@@ -455,6 +508,9 @@ class Commands {
 				if(!Library::checkPermission($person, 'commandRate')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
 				
 				if($dontRateYourOwnLevels && $person['accountID'] == $list['accountID']) return "You ".Library::textColor("can't", Color::Red)." unrate your own list.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to unrate ".Library::textColor($list['listName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::rateList($listID, $person, 0, $list['starDifficulty'], 0, 0);
 				
@@ -485,6 +541,9 @@ class Commands {
 			case '!del':
 			case '!d':
 				if(!Library::checkPermission($person, 'commandDelete') && $person['accountID'] != $list['accountID']) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to delete ".Library::textColor($list['listName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::deleteList($listID, $person);
 				
@@ -532,9 +591,12 @@ class Commands {
 				
 				if($player['extID'] == $list['accountID']) return "User ".Library::textColor($player['userName'], Color::SkyBlue)." ".Library::textColor("already owns", Color::Green)." ".Library::textColor($list['listName'], Color::SkyBlue)."!";
 				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to move ".Library::textColor($list['listName'], Color::SkyBlue)."to ".Library::textColor($player['userName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
 				Library::moveList($listID, $person, $player);
 				
-				return "You ".Library::textColor("successfully", Color::Green)." moved ".Library::textColor($list['listName'], Color::SkyBlue)." to user ".Library::textColor($player['userName'], Color::SkyBlue)."!";
+				return "You ".Library::textColor("successfully", Color::Green)." moved ".Library::textColor($list['listName'], Color::SkyBlue)." to ".Library::textColor($player['userName'], Color::SkyBlue)."!";
 			case "!rename":
 			case "!re":
 				if(!Library::checkPermission($person, 'commandRename') && $person['accountID'] != $list['accountID']) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
@@ -550,6 +612,9 @@ class Commands {
 				if($list['listName'] == $newListName) return Library::textColor($list['listName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this name!";
 				
 				if(Security::checkFilterViolation($person, $newLevelName, 3)) return "New list name contains a ".Library::textColor("bad", Color::Red)." word.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to rename ".Library::textColor($list['listName'], Color::SkyBlue)." to ".Library::textColor($newListName, Color::Yellow)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::renameList($listID, $person, $newListName);
 				
@@ -569,6 +634,9 @@ class Commands {
 				if(Escape::url_base64_decode($list['listDesc']) == $newListDesc) return Library::textColor($list['listName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this description!";
 				
 				if(Security::checkFilterViolation($person, $newLevelName, 3)) return "New list description contains a ".Library::textColor("bad", Color::Red)." word.";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to change description of ".Library::textColor($list['listName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
 				Library::changeListDescription($listID, $person, $newListDesc);
 				

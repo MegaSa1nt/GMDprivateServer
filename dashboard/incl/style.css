@@ -493,7 +493,8 @@ nav .dropdown-items button {
 	border-radius: 500px;
 }
 
-nav::-webkit-scrollbar {
+nav::-webkit-scrollbar,
+.emojisDiv::-webkit-scrollbar {
 	width: 0px;
 	height: 0px;
 }
@@ -672,7 +673,7 @@ span.username {
 }
 
 .userButton img,
-.levelDescription .username img {
+.levelDescription img {
 	height: 30px;
 }
 
@@ -816,7 +817,7 @@ h1.username[href],
 	bottom: 50px;
 	right: 50px;
 	
-	padding: 15px;
+	padding: 10px;
 
 	border: 1px solid #86868634;
 	background-color: #00000055;
@@ -1318,15 +1319,15 @@ h1[dashboard-score="3"] {
 	margin: 0px;
 }
 
-.inlineForm button {
+.inlineForm .button {
 	width: max-content !important;
 }
 
-.inlineForm button:hover {
+.inlineForm .button:hover {
 	background-color: #86868624 !important;
 }
 
-.inlineForm button:active {
+.inlineForm .button:active {
 	scale: 90% !important;
 }
 
@@ -2260,11 +2261,13 @@ body:has(.modalPage.show) span.background {
 	gap: 20px;
 }
 
-.profileTitle img {
+.profileTitle img,
+.levelTitle img {
 	width: 45px;
 }
 
-.profileTitle:has(img) {
+.profileTitle:has(img),
+.levelTitle:has(img) {
 	gap: 5px;
 }
 
@@ -2300,4 +2303,93 @@ body:has(.modalPage.show) span.background {
 
 .justifyCenter {
 	justify-content: center;
+}
+
+.emojisButton {
+	position: absolute;
+	right: 10px;
+	
+	color: #FFFFFF99;
+	
+	transition: 0.2s;
+}
+
+.emojisButton:hover,
+.emojisInput.show .emojisButton {
+	background: transparent;
+	
+	color: white;
+}
+
+.emojisInput {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	
+	width: 100%;
+	position: relative;
+}
+
+.emojisDiv {
+	position: absolute;
+	top: calc(100% + 10px);
+	
+	opacity: 0;
+	pointer-events: none;
+	
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	
+	gap: 25px;
+	
+	background-color: #86868614;
+	border: 1px solid #86868634;
+	
+	max-width: 340px;
+	max-height: 250px;
+	
+	backdrop-filter: blur(5px);
+	
+	padding: 15px;
+	
+	transition: 0.2s;
+	
+	overflow: scroll;
+}
+
+.emojisInput.show .emojisDiv {
+	opacity: 1;
+	pointer-events: initial;
+}
+
+.emojisDiv img {
+	cursor: pointer;
+	
+	max-height: 40px;
+}
+
+.emojisDiv .horisontal {
+	flex-wrap: wrap;
+}
+
+.emojisDiv h3 {
+	display: flex;
+	align-items: center;
+	
+	gap: 7px;
+	
+	font-size: 25px;
+	font-weight: 700;
+	
+	width: 100%;
+	
+	color: white;
+}
+
+.emojisDiv h3 img {
+	cursor: initial;
+	
+	max-height: 30px;
+	max-width: 30px;
 }

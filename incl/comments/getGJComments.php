@@ -15,7 +15,7 @@ $usersArray = [];
 $binaryVersion = isset($_POST['binaryVersion']) ? abs(Escape::number($_POST["binaryVersion"])) : 0;
 $gameVersion = isset($_POST['gameVersion']) ? abs(Escape::number($_POST["gameVersion"])) : 0;
 $sortMode = $_POST["mode"] ? "comments.likes - comments.dislikes" : "comments.timestamp";
-$count = isset($_POST["count"]) ? abs(Escape::number($_POST["count"])) : 10;
+$count = isset($_POST["count"]) ? Security::limitValue(10, abs(Escape::number($_POST["count"])), 20) : 10;
 $page = isset($_POST["page"]) ? abs(Escape::number($_POST["page"])) : 0;
 
 $pageOffset = $page * $count;

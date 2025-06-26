@@ -460,7 +460,7 @@ class Security {
 			case 1:
 				if(!$perUserLevelsUploadDelay) return true;
 			
-				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
+				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])'))");
 				$lastUploadedLevelByUser->execute([':time' => time() - $perUserLevelsUploadDelay, ':userID' => $userID, ':IP' => Library::convertIPForSearching($IP, true)]);
 				$lastUploadedLevelByUser = $lastUploadedLevelByUser->fetchColumn();
 				

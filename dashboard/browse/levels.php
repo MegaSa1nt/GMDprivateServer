@@ -26,6 +26,8 @@ if($_GET['id']) {
 	
 	$userMetadata = Dashboard::getUserMetadata($user);
 	
+	$levelLengths = ['Tiny', 'Short', 'Medium', 'Long', 'XL', 'Platformer'];
+	
 	$level['LEVEL_TITLE'] = sprintf(Dashboard::string('levelTitle'), $level['levelName'], Dashboard::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']));
 	$level['LEVEL_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($level['levelDesc']))) ?: "<i>".Dashboard::string('noDescription')."</i>";
 	$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
@@ -103,6 +105,8 @@ if($_GET['id']) {
 				
 				if($pageCount == 0) $pageCount = 1;
 				
+				$emojisDiv = Dashboard::renderEmojisDiv();
+				
 				$additionalData = [
 					'ADDITIONAL_PAGE' => $additionalPage,
 					'COMMENT_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
@@ -110,6 +114,8 @@ if($_GET['id']) {
 					'LEVEL_ID' => $levelID,
 					
 					'COMMENT_CAN_POST' => 'true',
+					
+					'COMMENT_EMOJIS_DIV' => $emojisDiv,
 					
 					'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 					'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',

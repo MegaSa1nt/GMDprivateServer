@@ -38,9 +38,24 @@ $daily = $daily->fetch();
 if(!$daily) exit(CommonError::InvalidRequest);
 
 $dailyID = $daily['feaID'] + ($type * 100000);
-$timeLeft = $daily[$dailyTime] - $current;
 
-if(!$oldDailyWeekly && $timeLeft < 0) exit("0|0");
+if(!$isEvent) {
+	$newDailyTime = $db->prepare("SELECT timestamp FROM dailyfeatures WHERE feaID > :feaID AND type = :type ORDER BY feaID ASC LIMIT 1");
+	$newDailyTime->execute([':feaID' => $daily['feaID'], ':type' => $type]);
+	$newDailyTime = $newDailyTime->fetchColumn();
+	
+	$timeLeft = ($newDailyTime ?: $current) - $current;
+} else {
+	$chk = XORCipher::cipher(Escape::url_base64_decode(substr(Escape::latin($_POST["chk"]), 5)), 59182);
+	$string = Escape::url_base64_encode(XORCipher::cipher('M336G:'.$chk.':'.($daily['feaID'] + 19).':3:'.$daily['rewards'], 59182));
+	$hash = Security::generateFourthHash($string);
+	
+	$timeLeft = 10;
+	
+	$stringToAdd = '|PGDPS'.$string.'|'.$hash;
+}
+
+if(!$oldDailyWeekly && $timeLeft <= 0) exit("0|0");
 
 if(!$daily['webhookSent']) {
 	//$gs->sendDailyWebhook($daily['levelID'], $type);
@@ -54,14 +69,6 @@ if(!$daily['webhookSent']) {
 	];
 	
 	if($automaticCron) Cron::updateCreatorPoints($person, false);
-}
-
-if($isEvent) {
-	$chk = XORCipher::cipher(Escape::url_base64_decode(substr(Escape::latin($_POST["chk"]), 5)), 59182);
-	$string = Escape::url_base64_encode(XORCipher::cipher('M336G:'.$chk.':'.($daily['feaID'] + 19).':3:'.$daily['rewards'], 59182));
-	$timeLeft = 10;
-	$hash = Security::generateFourthHash($string);
-	$stringToAdd = '|PGDPS'.$string.'|'.$hash;
 }
 
 exit($dailyID."|".$timeLeft.$stringToAdd);

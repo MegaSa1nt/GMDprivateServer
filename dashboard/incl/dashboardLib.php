@@ -133,7 +133,8 @@ class Dashboard {
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
 
 		$parseBody = explode(' ', $body);
-		$players = $levels = $lists = [];
+		$players = $levels = $lists =  $emojis = [];
+		$hasEmojis = strpos($body, ':') !== false;
 
 		foreach($parseBody AS &$element) {
 			$firstChar = mb_substr($element, 0, 1);
@@ -167,9 +168,23 @@ class Dashboard {
 			}
 		}
 		
+		if($hasEmojis) {
+			preg_match_all(':(\w+):', Escape::translit($body), $emojisArray);
+			
+			foreach($emojisArray AS &$emojiArray) {
+				foreach($emojiArray AS &$emojiName) {				
+					$emoji = Escape::text(strtolower($emojiName));
+					$emojis[] = $emoji;
+						
+					$body = str_replace([' :'.$emoji.':', ' :'.$emoji.': ', ':'.$emoji.': '], ['&nbsp;:'.$emoji.':', '&nbsp;:'.$emoji.':&nbsp;', ':'.$emoji.':&nbsp;'], $body);
+				}
+			}
+		}
+		
 		$players = array_unique($players);
 		$levels = array_unique($levels);
 		$lists = array_unique($lists);
+		$emojis = array_unique($emojis);
 		
 		if(!empty($players)) {
 			Library::cacheAccountsByUserNames($players);
@@ -221,13 +236,23 @@ class Dashboard {
 			}
 		}
 		
+		if(!empty($emojis)) {
+			$emojisList = self::getExistingEmojisFromList($emojis);
+			
+			foreach($emojisList AS $emoji => $emojiCategory) {
+				$body = str_replace(':'.$emoji.':', self::getEmojiImg($emojiCategory, $emoji), $body);
+			}
+		}
+		
 		return trim($body);
 	}
 	
 	public static function getUserMetadata($user) {
 		global $dbPath;
 		require __DIR__."/../".$dbPath."config/dashboard.php";
-		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";		
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		if(isset($GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']])) return $GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']];
 		
 		if(!$user) {
 			return [
@@ -256,11 +281,33 @@ class Dashboard {
 		if($userColor != '255 255 255') $userAttributes[] = 'style="--href-color: rgb('.$userColor.'); --href-shadow-color: rgb('.$userColor.' / 38%)"';
 		if(!$user['isRegistered']) $userAttributes[] = 'dashboard-remove="href title"';
 		
-		return [
+		$GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']] = [
 			'mainIcon' => $iconKit['main'],
 			'userAppearance' => $userAppearance,
 			'userAttributes' => implode(' ', $userAttributes)
 		];
+		
+		return $GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']];
+	}
+	
+	public static function getExistingEmojisFromList($emojis) {
+		$emojisArray = $allEmojisArray = [];
+		
+		$emojisJSONArray = self::loadJSON("icons/emojis/list");
+		
+		foreach($emojisJSONArray AS $emojisCategory => $emojisCategoryValue) {
+			foreach($emojisCategoryValue AS &$emoji) $allEmojisArray[$emoji] = $emojisCategory;
+		}
+		
+		foreach($emojis AS &$emoji) {
+			if($allEmojisArray[$emoji]) $emojisArray[$emoji] = $allEmojisArray[$emoji];
+		}
+		
+		return $emojisArray;
+	}
+	
+	public static function getEmojiImg($emojiCategory, $emojiName, $setOnclick = false) {
+		return '<img loading="lazy" title=":'.$emojiName.':" src="incl/icons/emojis/'.$emojiCategory.'/'.$emojiName.'.png" '.($setOnclick ? 'onclick="addEmojiToInput(\''.$emojiName.'\')"' : '').' />';
 	}
 	
 	/*
@@ -304,14 +351,14 @@ class Dashboard {
 		return $language;
 	}
 	
-	public static function loadCredits() {
-		if(isset($GLOBALS['core_cache']['dashboard']['languageCredits'])) return $GLOBALS['core_cache']['dashboard']['languageCredits'];
+	public static function loadJSON($JSONPath) {
+		if(isset($GLOBALS['core_cache']['dashboard']['json'][$JSONPath])) return $GLOBALS['core_cache']['dashboard']['json'][$JSONPath];
 		
-		$languageCredits = json_decode(file_get_contents(__DIR__."/credits.json"), true);
+		$json = json_decode(file_get_contents(__DIR__."/".$JSONPath.".json"), true);
 		
-		$GLOBALS['core_cache']['dashboard']['languageCredits'] = $languageCredits;
+		$GLOBALS['core_cache']['dashboard']['json'][$JSONPath] = $json;
 		
-		return $languageCredits;
+		return $json;
 	}
 	
 	/*
@@ -366,7 +413,7 @@ class Dashboard {
 		$allStrings = self::allStrings();
 		foreach($allStrings AS $string => $value) $mainPageData['TEXT_'.$string] = $value;
 		
-		$languageCredits = self::loadCredits();
+		$languageCredits = self::loadJSON("credits");
 		foreach($languageCredits['languages'] AS $string => $value) $mainPageData['LANGUAGE_'.$string] = $value;
 		
 		$page = self::renderTemplate('main', $mainPageData);
@@ -405,7 +452,7 @@ class Dashboard {
 		return $templatePage;
 	}
 	
-	public static function getUsernameString($person, $user, $userName, $mainIcon, $userAppearance, $attributes = '') {
+	public static function getUsernameString($person, $user, $userName, $mainIcon, $userAppearance, $attributes = '', $showContextMenu = true) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
@@ -428,16 +475,20 @@ class Dashboard {
 		$usernameData['USERNAME_BADGE_NUMBER'] = $contextMenuData['MENU_BADGE_NUMBER'] = (int)$badgeNumber;
 		$usernameData['USERNAME_ROLE'] = $contextMenuData['MENU_ROLE'] = htmlspecialchars($userAppearance['roleName']);
 		
-		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
+		$usernameData['USERNAME_CONTEXT_MENU'] = '';
 		
-		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
-		
-		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
-		
-		$usernameData['USERNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/user', $contextMenuData);
+		if($showContextMenu) {
+			$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
+			
+			$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+			$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
+			$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
+			$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+			
+			$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+			
+			$usernameData['USERNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/user', $contextMenuData);
+		}
 		
 		return self::renderTemplate('components/username', $usernameData);
 	}
@@ -796,6 +847,72 @@ class Dashboard {
 		$gauntlet['GAUNTLET_CONTEXT_MENU'] = self::renderTemplate('components/menus/gauntlet', $contextMenuData);
 		
 		return self::renderTemplate('components/gauntlet', $gauntlet);
+	}
+	
+	public static function renderEmojisDiv() {
+		if(file_exists(__DIR__.'/templates/components/emojis_prerendered.html')) {
+			$emojisDiv = file_get_contents(__DIR__.'/templates/components/emojis_prerendered.html');
+			
+			return $emojisDiv;
+		}
+		
+		$emojisDivs = [];
+		$emojisDiv = '';
+		
+		$emojisJSONArray = self::loadJSON("icons/emojis/list");
+		$emojisOrder = self::loadJSON("icons/emojis/order");
+		
+		foreach($emojisJSONArray AS $emojisCategory => $emojisCategoryValue) {
+			if(!$emojisDivs[$emojisCategory]) $emojisDivs[$emojisCategory] = '';
+			
+			foreach($emojisCategoryValue AS &$emoji) {
+				$emojisDivs[$emojisCategory] .= self::getEmojiImg($emojisCategory, $emoji, true);
+			}
+		}
+		
+		foreach($emojisOrder AS $emojiCategory => $emojis) {
+			$emojisDiv .= '<div class="horisontal">
+				<h3>'.$emojis[0].' '.self::getEmojiImg($emojiCategory, $emojis[1]).'</h3>'.
+				$emojisDivs[$emojiCategory]
+			.'</div>';
+		}
+		
+		file_put_contents(__DIR__.'/templates/components/emojis_prerendered.html', $emojisDiv);
+		
+		return $emojisDiv;
+	}
+	
+	public static function renderUserCard($user, $person) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$isPersonThemselves = $person['accountID'] == $user['extID'];
+	
+		$userName = $user ? $user['userName'] : 'Undefined';
+		$userMetadata = self::getUserMetadata($user);
+
+		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $user['userID']);
+
+		$contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+		$user['USER_CARD'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes'], false);
+		
+		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		
+		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
+		
+		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+		
+		$user['USER_CONTEXT_MENU'] = self::renderTemplate('components/menus/user', $contextMenuData);
+		
+		return self::renderTemplate('components/user', $user);
 	}
 }
 ?>

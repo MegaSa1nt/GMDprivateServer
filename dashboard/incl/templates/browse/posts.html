@@ -26,15 +26,25 @@
 	</div>
 </div>
 
+<form onsubmit="return false;" class="inlineForm" name="uploadPostForm" autocomplete="off" dashboard-show="%PROFILE_CAN_POST%">
+	<div class="emojisInput" dashboard-emojis-div>
+		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" />
+		
+		<button class="eyeButton emojisButton" onclick="toggleEmojisDiv()">
+			<i class="fa-solid fa-face-smile-beam"></i>
+		</button>
+		
+		<div class="box emojisDiv">
+			%POST_EMOJIS_DIV%
+		</div>
+	</div>
+	
+	<button dashboard-submit class="button bordered" type="button"onclick="postPage('manage/uploadPost', 'uploadPostForm')"><i class="fa-solid fa-paper-plane"></i></button>
+</form>
+
 <div class="nothingOnPageDiv" dashboard-show="%PROFILE_NO_POSTS%">
 	<i class="fa-solid fa-comment-slash nothing-icon"></i>
 	<h1>%TEXT_noPosts%</h1>
 </div>
 
 %ADDITIONAL_PAGE%
-
-<form class="inlineForm" name="uploadPostForm" autocomplete="off" dashboard-show="%PROFILE_CAN_POST%">
-	<input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" />
-	
-	<button class="button bordered" type="button" onclick="postPage('manage/uploadPost', 'uploadPostForm')"><i class="fa-solid fa-paper-plane"></i></button>
-</form>

@@ -12,10 +12,13 @@ $orderMapPacksByStars = true;
 	
 	This is April Fools joke by Cvolton, when leaderboards would fill with SAKUJES players and have 999 stats
 	
-	True — Enable this joke
-	False — Keep leaderboards normal on April Fools
+	$sakujes — April Fools joke
+		True — Enable this joke
+		False — Keep leaderboards normal on April Fools
+	$sakujesUsername — username, that will appear in leaderboards
 */
 $sakujes = true;
+$sakujesUsername = 'sakujes';
 
 /*
 	Count unlisted rated levels in the creator points calculation (cron.php / fixcps.php)
@@ -261,10 +264,33 @@ $disallowDeletingUpdateLockedLevel = true;
 /*
 	Banning person from uploading levels also disallows deleting level
 	
-	Should persons banned from uploading levels be not able to delete levels too?
+	Should person banned from uploading levels be not able to delete levels too?
 	
 	True — Disallow deleting if person is banned from uploading levels
 	False — Allow deleting if person is banned from uploading levels
 */
 $disallowDeletingLevelByBannedPerson = true;
+
+/*
+	Save level versions
+	
+	Should core save old level versions? This can be useful if person got hacked or maliciously updated their level
+	
+	$saveLevelVersions — save level versions when person updates their level
+		True — enable saving level versions
+		False — disable saving level versions
+	$maxLevelVersionsSaves — how much level versions should be stored? Once limit is reached, core will delete older level versions
+*/
+$saveLevelVersions = true;
+$maxLevelVersionsSaves = 10;
+
+/*
+	"Force" flag when running dangerous commands
+	
+	Should core ask for -f flag when running some dangerous commands? (!delete, !setacc, etc)
+	
+	True — core requires adding -f flag to execute dangerous commands
+	False — you can run dangerous commands without -f flag
+*/
+$forceCommandFlag = true;
 ?>

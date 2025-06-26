@@ -209,12 +209,16 @@ switch($parameters[1]) {
 				
 		if($pageCount == 0) $pageCount = 1;
 		
+		$emojisDiv = Dashboard::renderEmojisDiv();
+		
 		$additionalData = [
 			'ADDITIONAL_PAGE' => $additionalPage,
 			'PROFILE_NO_POSTS' => !$accountComments['count'] ? 'true' : 'false',
 			'POST_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
 			
 			'PROFILE_CAN_POST' => $userID == $user['userID'] ? 'true' : 'false',
+			
+			'POST_EMOJIS_DIV' => $emojisDiv,
 			
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',

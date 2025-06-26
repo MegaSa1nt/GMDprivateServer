@@ -119,6 +119,8 @@ if($_GET['id']) {
 			
 			if($pageCount == 0) $pageCount = 1;
 			
+			$emojisDiv = Dashboard::renderEmojisDiv();
+			
 			$additionalData = [
 				'ADDITIONAL_PAGE' => $additionalPage,
 				'COMMENT_NO_COMMENTS' => !$comments['count'] ? 'true' : 'false',
@@ -126,6 +128,8 @@ if($_GET['id']) {
 				'LEVEL_ID' => $listID * -1,
 				
 				'COMMENT_CAN_POST' => 'true',
+				
+				'COMMENT_EMOJIS_DIV' => $emojisDiv,
 				
 				'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 				'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',

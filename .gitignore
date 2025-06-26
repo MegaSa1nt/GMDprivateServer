@@ -51,3 +51,4 @@ sfx/*.json
 test.php
 config/proxies.txt
 config/vpns.txt
+dashboard/incl/templates/components/emojis_prerendered.html

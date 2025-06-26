@@ -1648,6 +1648,20 @@ class Library {
 		return $GLOBALS['core_cache']['profileStatsCount'][$userID];
 	}
 	
+	public static function getAccounts($filters, $order, $orderSorting, $pageOffset, $noLimit = false) {
+		require __DIR__."/connection.php";
+
+		$accounts = $db->prepare("SELECT * FROM users INNER JOIN accounts ON users.extID = accounts.accountID WHERE (".implode(") AND (", $filters).") ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".(!$noLimit ? "LIMIT 10 OFFSET ".$pageOffset : ''));
+		$accounts->execute();
+		$accounts = $accounts->fetchAll();
+		
+		$accountsCount = $db->prepare("SELECT count(*) FROM users INNER JOIN accounts ON users.extID = accounts.accountID WHERE (".implode(" ) AND ( ", $filters).")");
+		$accountsCount->execute();
+		$accountsCount = $accountsCount->fetchColumn();
+		
+		return ["accounts" => $accounts, "count" => $accountsCount];
+	}
+	
 	/*
 		Levels-related functions
 	*/
@@ -1714,19 +1728,32 @@ class Library {
 		$userID = $person['userID'];
 		$IP = $person['IP'];
 		
+		$timestamp = time();
+		
 		if(!Security::validateLevel($levelString, $levelDetails['gameVersion'])) {
 			self::logAction($person, Action::LevelMalicious, $levelName, $levelDetails['levelDesc'], $levelID);
 			return ['success' => false, 'error' => LevelUploadError::FailedToWriteLevel];
 		}
 		
-		$checkLevelExistenceByID = $db->prepare("SELECT updateLocked, starStars FROM levels WHERE levelID = :levelID AND userID = :userID AND isDeleted = 0");
+		$checkLevelExistenceByID = $db->prepare("SELECT updateLocked, starStars, levelVersion FROM levels WHERE levelID = :levelID AND userID = :userID AND isDeleted = 0");
 		$checkLevelExistenceByID->execute([':levelID' => $levelID, ':userID' => $userID]);
 		$checkLevelExistenceByID = $checkLevelExistenceByID->fetch();
 		if($checkLevelExistenceByID) {
 			if($checkLevelExistenceByID['updateLocked'] || (!$ratedLevelsUpdates && $checkLevelExistenceByID['starStars'] > 0 && !in_array($levelID, $ratedLevelsUpdatesExceptions))) return ['success' => false, 'error' => LevelUploadError::UploadingDisabled];
 			
-			$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$levelID, $levelString);
+			$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, $levelString);
 			if(!$writeFile) return ['success' => false, 'error' => LevelUploadError::FailedToWriteLevel];
+			
+			if($saveLevelVersions) {
+				$levelVersion = (int)$checkLevelExistenceByID['levelVersion'];
+				
+				rename(__DIR__.'/../../data/levels/'.$levelID, __DIR__.'/../../data/levels/versions/'.$levelID.'_'.$levelVersion);
+				
+				$oldLevelVersionPath = realpath(__DIR__.'/../../data/levels/versions/'.$levelID.'_'.($levelVersion - $maxLevelVersionsSaves));
+				if(file_exists($oldLevelVersionPath)) unlink($oldLevelVersionPath);
+			}
+			
+			rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$levelID);
 			
 			$updateLevel = $db->prepare('UPDATE levels SET gameVersion = :gameVersion, binaryVersion = :binaryVersion, levelDesc = :levelDesc, levelVersion = levelVersion + 1, levelLength = :levelLength, audioTrack = :audioTrack, auto = :auto, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, coins = :coins, requestedStars = :requestedStars, extraString = :extraString, levelString = "", levelInfo = :levelInfo, unlisted = :unlisted, IP = :IP, isLDM = :isLDM, wt = :wt, wt2 = :wt2, unlisted2 = :unlisted, settingsString = :settingsString, songIDs = :songIDs, sfxIDs = :sfxIDs, ts = :ts, password = :password, updateDate = :timestamp WHERE levelID = :levelID');
 			$updateLevel->execute([':levelID' => $levelID, ':gameVersion' => $levelDetails['gameVersion'], ':binaryVersion' => $levelDetails['binaryVersion'], ':levelDesc' => $levelDetails['levelDesc'], ':levelLength' => $levelDetails['levelLength'], ':audioTrack' => $levelDetails['audioTrack'], ':auto' => $levelDetails['auto'], ':original' => $levelDetails['original'], ':twoPlayer' => $levelDetails['twoPlayer'], ':songID' => $levelDetails['songID'], ':objects' => $levelDetails['objects'], ':coins' => $levelDetails['coins'], ':requestedStars' => $levelDetails['requestedStars'], ':extraString' => $levelDetails['extraString'], ':levelInfo' => $levelDetails['levelInfo'], ':unlisted' => $levelDetails['unlisted'], ':isLDM' => $levelDetails['isLDM'], ':wt' => $levelDetails['wt'], ':wt2' => $levelDetails['wt2'], ':settingsString' => $levelDetails['settingsString'], ':songIDs' => $levelDetails['songIDs'], ':sfxIDs' => $levelDetails['sfxIDs'], ':ts' => $levelDetails['ts'], ':password' => $levelDetails['password'], ':timestamp' => time(), ':IP' => $IP]);
@@ -1735,14 +1762,25 @@ class Library {
 			return ["success" => true, "levelID" => (string)$levelID];
 		}
 		
-		$checkLevelExistenceByName = $db->prepare("SELECT levelID, updateLocked, starStars FROM levels WHERE levelName LIKE :levelName AND userID = :userID AND isDeleted = 0 ORDER BY levelID DESC LIMIT 1");
+		$checkLevelExistenceByName = $db->prepare("SELECT levelID, updateLocked, starStars, levelVersion FROM levels WHERE levelName LIKE :levelName AND userID = :userID AND isDeleted = 0 ORDER BY levelID DESC LIMIT 1");
 		$checkLevelExistenceByName->execute([':levelName' => $levelName, ':userID' => $userID]);
 		$checkLevelExistenceByName = $checkLevelExistenceByName->fetch();
 		if($checkLevelExistenceByName) {
 			if($checkLevelExistenceByName['updateLocked'] || (!$ratedLevelsUpdates && $checkLevelExistenceByName['starStars'] > 0 && !in_array($checkLevelExistenceByName['levelID'], $ratedLevelsUpdatesExceptions))) return ['success' => false, 'error' => LevelUploadError::UploadingDisabled];
 			
-			$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID'], $levelString);
+			$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, $levelString);
 			if(!$writeFile) return ['success' => false, 'error' => LevelUploadError::FailedToWriteLevel];
+			
+			if($saveLevelVersions) {
+				$levelVersion = (int)$checkLevelExistenceByName['levelVersion'];
+				
+				rename(__DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID'], __DIR__.'/../../data/levels/versions/'.$checkLevelExistenceByName['levelID'].'_'.$levelVersion);
+				
+				$oldLevelVersionPath = __DIR__.'/../../data/levels/versions/'.$checkLevelExistenceByName['levelID'].'_'.($levelVersion - $maxLevelVersionsSaves);
+				if(file_exists($oldLevelVersionPath)) unset($oldLevelVersionPath);
+			}
+			
+			rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID']);
 			
 			$updateLevel = $db->prepare('UPDATE levels SET gameVersion = :gameVersion, binaryVersion = :binaryVersion, levelDesc = :levelDesc, levelVersion = levelVersion + 1, levelLength = :levelLength, audioTrack = :audioTrack, auto = :auto, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, coins = :coins, requestedStars = :requestedStars, extraString = :extraString, levelString = "", levelInfo = :levelInfo, unlisted = :unlisted, IP = :IP, isLDM = :isLDM, wt = :wt, wt2 = :wt2, unlisted2 = :unlisted, settingsString = :settingsString, songIDs = :songIDs, sfxIDs = :sfxIDs, ts = :ts, password = :password, updateDate = :timestamp WHERE levelID = :levelID AND isDeleted = 0');
 			$updateLevel->execute([':levelID' => $checkLevelExistenceByName['levelID'], ':gameVersion' => $levelDetails['gameVersion'], ':binaryVersion' => $levelDetails['binaryVersion'], ':levelDesc' => $levelDetails['levelDesc'], ':levelLength' => $levelDetails['levelLength'], ':audioTrack' => $levelDetails['audioTrack'], ':auto' => $levelDetails['auto'], ':original' => $levelDetails['original'], ':twoPlayer' => $levelDetails['twoPlayer'], ':songID' => $levelDetails['songID'], ':objects' => $levelDetails['objects'], ':coins' => $levelDetails['coins'], ':requestedStars' => $levelDetails['requestedStars'], ':extraString' => $levelDetails['extraString'], ':levelInfo' => $levelDetails['levelInfo'], ':unlisted' => $levelDetails['unlisted'], ':isLDM' => $levelDetails['isLDM'], ':wt' => $levelDetails['wt'], ':wt2' => $levelDetails['wt2'], ':settingsString' => $levelDetails['settingsString'], ':songIDs' => $levelDetails['songIDs'], ':sfxIDs' => $levelDetails['sfxIDs'], ':ts' => $levelDetails['ts'], ':password' => $levelDetails['password'], ':timestamp' => time(), ':IP' => $IP]);
@@ -1751,7 +1789,6 @@ class Library {
 			return ["success" => true, "levelID" => (string)$checkLevelExistenceByName['levelID']];
 		}
 		
-		$timestamp = time();
 		$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, $levelString);
 		if(!$writeFile) return ['success' => false, 'error' => LevelUploadError::FailedToWriteLevel];
 		

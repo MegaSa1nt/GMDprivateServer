@@ -34,6 +34,7 @@ $language['favouriteSongsTitle'] = 'Favourite songs';
 $language['yourSFXsTitle'] = 'Your SFXs';
 
 $language['browse'] = 'Browse';
+$language['accountsTitle'] = 'Accounts'; // "Accounts" as page title
 $language['levelsTitle'] = 'Levels'; // "Levels" as page title
 $language['listsTitle'] = 'Lists';
 $language['mapPacksTitle'] = 'Map Packs';

@@ -34,6 +34,7 @@ $language['favouriteSongsTitle'] = 'Любимые песни';
 $language['yourSFXsTitle'] = 'Ваши звуковые эффекты';
 
 $language['browse'] = 'Просмотр';
+$language['accountsTitle'] = 'Аккаунты'; // "Accounts" as page title
 $language['levelsTitle'] = 'Уровни'; // "Levels" as page title
 $language['listsTitle'] = 'Списки уровней';
 $language['mapPacksTitle'] = 'Мап-Паки';
