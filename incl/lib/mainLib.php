@@ -4664,5 +4664,50 @@ class Library {
 		
 		return "1:".$user["userName"].":2:".$user["userID"].":9:".$user['icon'].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":32:".$user["ID"].":35:".$user["comment"].":41:".$user["isNew"].":37:".$user['uploadTime'];
 	}
+	public static function getStats() {
+		require_once __DIR__."/connection.php";
+
+    	// 2592000 seconds = 30d
+    	$query = $db->prepare("SELECT
+    		(SELECT COUNT(*) FROM users) AS users,
+    		(SELECT COUNT(*) FROM users WHERE lastPlayed > :time - 2592000) AS activeUsers, 
+    		(SELECT COUNT(*) FROM levels) AS levels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1) AS ratedLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 0) AS featuredLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 1) AS epicLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 2) AS legendaryLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 3) AS mythicLevels,
+    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 0) AS dailies,
+    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 1) AS weeklies,
+    		(SELECT COUNT(*) FROM gauntlets) AS gauntlets,
+    		(SELECT COUNT(*) FROM mappacks) AS mapPacks,
+    		(SELECT COUNT(*) FROM lists) AS lists,
+    		(SELECT SUM(downloads) FROM levels) AS downloads,
+    		(SELECT COUNT(*) FROM songs) AS songs,
+    		(SELECT COUNT(*) FROM songs WHERE reuploadID = 0) AS newgroundsSongs,
+    		(SELECT COUNT(*) FROM songs WHERE reuploadID != 0) AS reuploadedSongs,
+    		(SELECT name FROM songs ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSongName,
+    		(SELECT levelsCount FROM songs ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSongLevelsCount,
+    		(SELECT SUM(objects) FROM levels) AS objects,
+    		(SELECT SUM(likes) FROM levels) AS likes,
+    		(SELECT (SELECT COUNT(*) FROM comments) + (SELECT COUNT(*) FROM acccomments)) AS totalComments,
+    		(SELECT COUNT(*) FROM comments) AS comments,
+    		(SELECT COUNT(*) FROM acccomments) AS posts,
+    		(SELECT COUNT(*) FROM replies) AS postReplies,
+    		(SELECT SUM(stars) FROM users WHERE " . self::getBannedPeopleQuery(0) . ") AS stars,
+    		(SELECT SUM(creatorPoints) FROM users WHERE " . self::getBannedPeopleQuery(1) . ") AS creatorPoints,
+			(SELECT COUNT(*) FROM bans) AS bannedPlayers,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 0) AS accountIDBans,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 1) AS userIDBans,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 2) AS IPBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 0) AS leaderboardBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 1) AS creatorBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 2) AS levelUploadBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 3) AS commentBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 4) AS accountBans
+		");
+    	$query->execute([':time' => time()]);
+    	return $query->fetch(PDO::FETCH_ASSOC);
+	}
 }
 ?>
