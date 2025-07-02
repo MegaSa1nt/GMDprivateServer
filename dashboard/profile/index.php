@@ -242,11 +242,13 @@ $user['PROFILE_REGISTER_DATE'] = $account['registerDate'];
 
 $user['PROFILE_USERNAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($account['userName']);
 $user['PROFILE_TITLE'] = sprintf(Dashboard::string("userProfile"), htmlspecialchars($account['userName']));
+$user['PROFILE_ATTRIBUTES'] = $userMetadata['userAttributes'];
 
 $user['PROFILE_HAS_CLAN'] = $accountClan ? 'true' : 'false';
-$user['PROFILE_CLAN_NAME'] = $accountClan ? $accountClan['clan'] : Dashboard::string('notInClan');
-$user['PROFILE_CLAN_COLOR'] = $accountClan ? "color: #".$accountClan['color']."" : '';
-$user['PROFILE_CLAN_TITLE'] = $accountClan ? sprintf(Dashboard::string("clanProfile"), htmlspecialchars($accountClan['clan'])) : '';
+$user['PROFILE_CLAN_NAME'] = $accountClan ? $accountClan['clanName'] : Dashboard::string('notInClan');
+$user['PROFILE_CLAN_COLOR'] = $accountClan ? "color: #".$accountClan['clanColor']."; text-shadow: 0px 0px 20px #".$accountClan['clanColor']."61;" : '';
+$user['PROFILE_CLAN_TITLE'] = $accountClan ? sprintf(Dashboard::string("clanProfile"), htmlspecialchars($accountClan['clanName'])) : '';
+$user['PROFILE_CLAN_STRING'] = $accountClan ? Dashboard::getClanString($person, $accountClan['clanID']) : '';
 
 $user['PROFILE_HAS_BADGE'] =  $userMetadata["userAppearance"]["modBadgeLevel"] > 0 ? 'true' : 'false';
 $user['PROFILE_MODERATOR_BADGE'] = $userMetadata["userAppearance"]["modBadgeLevel"];

@@ -7,13 +7,13 @@ $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
 
-$order = "reuploadTime";
+$order = "registerDate";
 $orderSorting = "DESC";
 $filters = ["accounts.isActive != 0"];
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
 
-$accounts = Library::getAccounts($filters, 'registerDate', 'DESC', $pageOffset, false);
+$accounts = Library::getAccounts($filters, $order, $orderSorting, $pageOffset, false);
 
 foreach($accounts['accounts'] AS &$account) $page .= Dashboard::renderUserCard($account, $person);
 

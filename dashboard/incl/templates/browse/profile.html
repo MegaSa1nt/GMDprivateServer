@@ -8,9 +8,9 @@
 			<div class="vertical">
 				<div class="horisontal spaceBetween flexStart">
 					<div class="profileTitle">
-						<h1>%PROFILE_USERNAME%</h1>
+						<h1 %PROFILE_ATTRIBUTES%>%PROFILE_USERNAME%</h1>
 						<img dashboard-show="%PROFILE_HAS_BADGE%" src="incl/icons/badge_%PROFILE_MODERATOR_BADGE%.png" />
-						<p style="%PROFILE_CLAN_COLOR%" dashboard-show="%PROFILE_HAS_CLAN%" title="%PROFILE_CLAN_TITLE%" href="clan/%PROFILE_CLAN_NAME%">%PROFILE_CLAN_NAME%</p>
+						%PROFILE_CLAN_STRING%
 					</div>
 					
 					<h1 title="%TEXT_rank%" dashboard-score="%PROFILE_RANK%" dashboard-show="%PROFILE_HAS_RANK%">
@@ -57,6 +57,11 @@
 					<text dashboard-copy>%userID%</text>
 				</text>
 			</div>
+		
+			<text class="levelStat" title="%TEXT_registerDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%PROFILE_REGISTER_DATE%" dashboard-full></text>
+			</text>
 			
 			<div class="levelStat" title="%TEXT_stars%">
 				<i class="fa-solid fa-star"></i>
@@ -92,11 +97,6 @@
 				<i class="fa-solid fa-screwdriver-wrench"></i>
 				%creatorPoints%
 			</div>
-		
-			<text class="levelStat" title="%TEXT_registerDate%">
-				<i class="fa-solid fa-calendar"></i>
-				<text dashboard-date="%PROFILE_REGISTER_DATE%" dashboard-full></text>
-			</text>
 			
 			<div class="levelStat several" title="%TEXT_personPosts%">
 				<text>

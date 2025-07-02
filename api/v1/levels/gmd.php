@@ -1,4 +1,5 @@
 <?php
+@header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 
@@ -14,7 +15,7 @@ if(!$person["success"]) {
     exit(json_encode(['success' => false, 'cause' => 'Invalid credentials']));
 }
 
-$levelID = Escape::number($_POST['levelID']);
+$levelID = Escape::number($_GET['levelID']);
 
 // Check if the level ID is valid (if its empty before/after checks)
 if(!$levelID) {

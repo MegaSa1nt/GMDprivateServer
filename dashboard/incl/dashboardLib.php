@@ -369,11 +369,23 @@ class Dashboard {
 		global $dbPath;
 		require __DIR__."/../".$dbPath."config/dashboard.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
 		if(!is_array($dataArray)) $dataArray = ['PAGE' => $dataArray];
 		
+		$isInClan = false;
+		$clanName = '';
+		
 		$person = self::loginDashboardUser();
 		$userID = $person['userID'];
+		$user = Library::getUserByID($userID);
+		
+		if($user['clanID']) {
+			$isInClan = true;
+			$clan = Library::getClanByID($user['clanID']);
+			
+			$clanName = $clan['clanName'];
+		}
 		
 		if(!file_exists(__DIR__."/templates/main.html") || !file_exists(__DIR__."/templates/".$template.".html") || !is_array($dataArray)) return false;
 		
@@ -401,8 +413,10 @@ class Dashboard {
 			'LANGUAGE' => Escape::latin_no_spaces($_COOKIE['lang'], 2) ?: "EN",
 			
 			'IS_LOGGED_IN' => $person['success'] ? 'true' : 'false',
-			'USERNAME' => $person['success'] ? $person['userName'] : '',
+			'USERNAME' => $person['success'] ? htmlspecialchars($person['userName']) : '',
 			'PROFILE_ICON' => $person['success'] ? $iconKit['main'] : '',
+			'IS_IN_CLAN' => $isInClan ? 'true' : 'false',
+			'CLAN_NAME' => htmlspecialchars($clanName),
 			
 			'FOOTER' => ""
 		];
@@ -543,6 +557,35 @@ class Dashboard {
 		$listnameData['LISTNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/list', $contextMenuData);
 		
 		return self::renderTemplate('components/listname', $listnameData);
+	}
+	
+	public static function getClanString($person, $clanID) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$accountID = $person['accountID'];
+		
+		$clan = Library::getClanByID($clanID);
+		if(!$clan) return false;
+		
+		$isClanOwner = $clan['clanOwner'] == $accountID; 
+		
+		$clannameData = $contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'true';
+		
+		$clannameData['CLANNAME_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($clan['clanName']);
+		$clannameData['CLANNAME_TITLE'] = sprintf(self::string('clanProfile'), $clannameData['CLANNAME_NAME']);
+			
+		$clannameData['CLANNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = 'style="color: #'.$clan['clanColor'].'; text-shadow: 0px 0px 20px #'.$clan['clanColor'].'61;"';
+		
+		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageClans")) ? 'true' : 'false';
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = $contextMenuData['MENU_CAN_MANAGE'] == 'true' ? 'true' : 'false';
+		
+		$clannameData['CLANNAME_CONTEXT_MENU'] = self::renderTemplate('components/menus/clan', $contextMenuData);
+		
+		return self::renderTemplate('components/clanname', $clannameData);
 	}
 	
 	public static function renderLevelCard($level, $person) {
@@ -882,7 +925,7 @@ class Dashboard {
 		return $emojisDiv;
 	}
 	
-	public static function renderUserCard($user, $person) {
+	public static function renderUserCard($user, $person, $extraIcon = '', $extraIconTitle = '') {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
@@ -898,6 +941,10 @@ class Dashboard {
 		$contextMenuData['MENU_SHOW_NAME'] = 'false';
 		
 		$user['USER_CARD'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes'], false);
+		
+		$user['USER_SHOW_EXTRA_ICON'] = $extraIcon ? 'true' : 'false';
+		$user['USER_EXTRA_ICON'] = htmlspecialchars($extraIcon);
+		$user['USER_EXTRA_ICON_TITLE'] = htmlspecialchars($extraIconTitle);
 		
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		

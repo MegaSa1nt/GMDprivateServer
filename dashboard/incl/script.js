@@ -149,8 +149,8 @@ async function updateNavbar() {
 	navbarButtons.forEach(navbarButton => {
 		const href = navbarButton.getAttribute("href");
 		const dropdown = navbarButton.getAttribute("dashboard-dropdown");
-		
-		if(href != null && ((window.location.href.endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) navbarButton.classList.add("current");
+
+		if(href != null && ((decodeURIComponent(window.location.href).endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) navbarButton.classList.add("current");
 		
 		if(dropdown != null) {
 			const navbarDropdown = document.querySelector("#" + dropdown + " .dropdown-items");

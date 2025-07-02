@@ -274,4 +274,17 @@ $language['viewGauntlet'] = 'Посмотреть Гаунтлет';
 $language['manageGauntlet'] = 'Управление Гаунтлетом';
 $language['deleteGauntlet'] = 'Удалить Гаунтлет';
 $language['noGauntlets'] = 'Гаунтлетов нет!';
+
+$language['clanID'] = 'ID клана';
+$language['creationDate'] = 'Дата создания';
+$language['clanOwnerTitle'] = 'Владелец клана %1$s';
+$language['clanClosed'] = 'Закрытый клан';
+$language['yourClan'] = 'Ваш клан';
+$language['clanMembers'] = 'Участники клана';
+$language['clanPosts'] = 'Посты клана';
+$language['clanSettings'] = 'Настройки клана';
+$language['noClanPosts'] = 'Постов клана нет!';
+$language['joinClan'] = 'Присоединиться к клану';
+$language['sendClanJoinRequest'] = 'Отправить заявку на вступление';
+$language['viewClan'] = 'Посмотреть клан';
 ?>

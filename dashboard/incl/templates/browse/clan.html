@@ -1,0 +1,125 @@
+<div class="wideBox levelPage">
+	<div class="contentDiv" dashboard-context-div>
+		<div class="horisontal bigGap">
+			<div class="vertical">
+				<div class="horisontal spaceBetween flexStart">
+					<div class="profileTitle vertical flexStart">
+						<h1 style="%CLAN_COLOR%">%CLAN_NAME% [%CLAN_TAG%]</h1>
+						
+						<h2 class="extraIcon" dashboard-show="%CLAN_IS_CLOSED%" title="%TEXT_clanClosed%">
+							<i class="fa-solid fa-lock"></i>
+						</h2>
+					</div>
+					
+					<h1 title="%TEXT_rank%" dashboard-score="%clanRank%" dashboard-show="%CLAN_HAS_RANK%">
+						<i dashboard-show="%CLAN_IS_TOP_100%" class="fa-solid fa-trophy"></i>
+						<i dashboard-hide="%CLAN_IS_TOP_100%" class="fa-solid fa-hashtag"></i>
+						%clanRank%
+					</h1>
+				</div>
+				
+				<div class="horisontal stats">
+					<div class="songCard">
+						<div class="contents userButton">%CLAN_OWNER_CARD%</div>
+					</div>
+					
+					<div class="levelStats card">
+						<button class="button short titleToRight" type="button" onclick="copyElementContent('clan/%CLAN_NAME%', true)">
+							<i class="fa-solid fa-chain"></i>
+							%TEXT_copyLink%
+						</button>
+						
+						<button class="button short titleToRight" type="button" dashboard-show="%CLAN_CAN_JOIN%">
+							<i class="fa-solid fa-arrow-right-to-bracket"></i>
+							
+							<text dashboard-hide="%CLAN_IS_CLOSED%">%TEXT_joinClan%</text>
+							<text dashboard-show="%CLAN_IS_CLOSED%">%TEXT_sendClanJoinRequest%</text>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		%CLAN_CONTEXT_MENU%
+	</div>
+	
+	<div class="horisontal">
+		<div class="levelStats">
+			<div class="levelStat" title="%TEXT_clanID%">
+				<i class="fa-solid fa-shield-halved"></i>
+				<text dashboard-copy>%clanID%</text>
+			</div>
+		
+			<text class="levelStat" title="%TEXT_creationDate%">
+				<i class="fa-solid fa-calendar"></i>
+				<text dashboard-date="%CLAN_CREATION_DATE%" dashboard-full></text>
+			</text>
+			
+			<div class="levelStat" title="%TEXT_stars%">
+				<i class="fa-solid fa-star"></i>
+				%CLAN_STARS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_moons%">
+				<i class="fa-solid fa-moon"></i>
+				%CLAN_MOONS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_diamonds%">
+				<i class="fa-solid fa-gem"></i>
+				%CLAN_DIAMONDS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_goldCoins%">
+				<i class="fa-solid fa-coins goldCoins"></i>
+				%CLAN_COINS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_userCoins%">
+				<i class="fa-solid fa-coins"></i>
+				%CLAN_USER_COINS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_demons%">
+				<i class="fa-solid fa-dragon"></i>
+				%CLAN_DEMONS_COUNT%
+			</div>
+			
+			<div class="levelStat" title="%TEXT_creatorPoints%">
+				<i class="fa-solid fa-screwdriver-wrench"></i>
+				%CLAN_CREATOR_POINTS_COUNT%
+			</div>
+			
+			<div class="levelStat several" title="%TEXT_clanMembers%">
+				<text>
+					<i class="fa-solid fa-user"></i>
+					%CLAN_MEMBERS_COUNT%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('clan/%CLAN_NAME%')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+			
+			<div class="levelStat several" title="%TEXT_clanPosts%">
+				<text>
+					<i class="fa-solid fa-comment-dots"></i>
+					%CLAN_POSTS_COUNT%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('clan/%CLAN_NAME%/posts')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+			
+			<div class="levelStat several" dashboard-show="%CLAN_CAN_OPEN_SETTINGS%" title="%TEXT_clanSettings%">
+				<text>
+					<i class="fa-solid fa-gear"></i>
+					%TEXT_settings%
+				</text>
+				
+				<button type="button" class="eyeButton" onclick="getPage('clan/%CLAN_NAME%/settings')"><i class="fa-solid fa-eye"></i></button>
+			</div>
+		</div>
+		
+		<div class="commentsDiv" dashboard-page-div>
+			%CLAN_ADDITIONAL_PAGE%
+		</div>
+	</div>
+</div>

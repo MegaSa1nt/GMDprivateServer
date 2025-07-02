@@ -859,6 +859,102 @@ class Automod {
 	}
 	
 	/*
+		Automod::checkCommentsSpamming($userID)
+		
+		This function checks last clan posts for spamming
+		
+		$userID — user ID of latest post author (Number)
+		
+		Return value:
+			true — everything is good, no spamming
+			false — spamming detected!
+	*/
+	public static function checkClanPostsSpamming($userID) {
+		require __DIR__."/../../config/security.php";
+		require __DIR__."/connection.php";
+		require_once __DIR__."/mainLib.php";
+		require_once __DIR__."/exploitPatch.php";
+		
+		$returnValue = true;
+		
+		$comments = $db->prepare('SELECT comment, userID FROM clancomments WHERE timestamp > :time ORDER BY timestamp DESC');
+		$comments->execute([':time' => time() - $commentsCheckPeriod]);
+		$comments = $comments->fetchAll();
+		$commentsCount = count($comments);
+		
+		$similarity = 0;
+		$x = 1;
+		$similarCommentsCount = 0;
+		$similarCommentsAuthors = [];
+		
+		foreach($comments AS &$comment) {
+			if(!isset($comments[$x])) break;
+			
+			$comment1 = Escape::prepare_for_checking(Escape::url_base64_decode($comment['comment']));
+			$comment2 = Escape::prepare_for_checking(Escape::url_base64_decode($comments[$x]['comment']));
+			
+			$sim = self::similarity($comment1, $comment2);
+			if($sim > 0.5) {
+				$similarCommentsAuthors[] = $comment['userID'];
+				$similarCommentsCount++;
+			}
+			
+			$similarity += $sim;
+			$x++;
+		}
+		
+		if($similarity > $commentsCount / 3 && $similarCommentsCount > 5) {
+			$isWarned = self::getLastAutomodAction(10, true);
+			
+			if(!$isWarned) {
+				$similarCommentsAuthors = array_unique($similarCommentsAuthors);
+				self::logAutomodActions(10, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
+				
+				if($commentsSpamUploadDisable) self::changeLevelsAutomodState(1, true, time() + $commentsSpamUploadDisable);
+				
+				//$gs->sendCommentsSpammingWarningWebhook($similarCommentsCount, $similarCommentsAuthors);
+			}
+			
+			$returnValue = false;
+		}
+		
+		$comments = $db->prepare('SELECT comment FROM clancomments WHERE timestamp > :time AND userID = :userID ORDER BY timestamp DESC');
+		$comments->execute([':time' => time() - $commentsCheckPeriod, ':userID' => $userID]);
+		$comments = $comments->fetchAll();
+		$commentsCount = count($comments);
+		
+		$similarity = 0;
+		$x = 1;
+		$similarCommentsCount = 0;
+		
+		foreach($comments AS &$comment) {
+			if(!isset($comments[$x])) break;
+			
+			$comment1 = Escape::prepare_for_checking(Escape::url_base64_decode($comment['comment']));
+			$comment2 = Escape::prepare_for_checking(Escape::url_base64_decode($comments[$x]['comment']));
+			
+			$sim = self::similarity($comment1, $comment2);
+			if($sim > 0.5) $similarCommentsCount++;
+			
+			$similarity += $sim;
+			$x++;
+		}
+		
+		if($similarity > $commentsCount / 3 && $similarCommentsCount > 3) {
+			$isWarned = self::getLastAutomodAction(11, true);
+			
+			if(!$isWarned) {
+				self::logAutomodActions(11, $similarCommentsCount, $similarity, $commentsCount, $userID);
+				//$gs->sendCommentsSpammerWarningWebhook($similarCommentsCount, $userID);
+			}
+			
+			$returnValue = false;
+		}
+		
+		return $returnValue;
+	}
+	
+	/*
 		Automod::checkStatsSpeed($accountID)
 		
 		This function checks how fast user gains stats

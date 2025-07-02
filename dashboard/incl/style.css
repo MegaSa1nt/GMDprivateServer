@@ -681,7 +681,8 @@ span.username {
 h1.username[href],
 .contextMenuButton.contextMenuTitle,
 .levelTitle.colored h2,
-.levelStat .colored {
+.levelStat .colored,
+.profileTitle h1 {
 	color: var(--href-color);
 	text-shadow: 0px 0px 20px var(--href-shadow-color);
 }
@@ -2392,4 +2393,17 @@ body:has(.modalPage.show) span.background {
 	
 	max-height: 30px;
 	max-width: 30px;
+}
+
+.extraIcon {
+	display: flex;
+	justify-content: center;
+}
+
+.username {
+	font-size: 25px;
+}
+
+.profileTitle .username {
+	font-size: 30px;
 }

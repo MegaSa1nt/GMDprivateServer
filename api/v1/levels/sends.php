@@ -1,4 +1,5 @@
 <?php
+@header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 
@@ -24,7 +25,7 @@ if(!$levelExists) {
 $sendsInfo = Library::getLatestSendsByLevelID($levelID);
 if(!$sendsInfo) {
     http_response_code(404);
-    exit(json_encode(['success' => false, 'message' => "This level was never sent"]));
+    exit(json_encode(['success' => false, 'cause' => "This level was never sent"]));
 }
 
 $sends = [];

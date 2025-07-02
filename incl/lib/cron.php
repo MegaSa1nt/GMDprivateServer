@@ -407,6 +407,52 @@ class Cron {
 		return true;
 	}
 	
+	public static function updateClansRanks($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
+		require __DIR__."/connection.php";
+		require_once __DIR__."/mainLib.php";
+		
+		if($checkForTime) {
+			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 59 AND timestamp >= :timestamp");
+			$check->execute([':timestamp' => time() - 30]);
+			$check = $check->fetchColumn();
+			if($check) return false;
+		}
+		
+		/*
+			Clear clans ranks
+		*/
+		
+		$db->query("UPDATE clans SET clanRank = 0");
+		
+		/*
+			Get clans leaderboard
+		*/
+		
+		$clansStats = $db->prepare("SELECT * FROM (
+				SELECT users.clanID, SUM(stars) AS stars, SUM(moons) AS moons FROM users INNER JOIN clans ON users.clanID = clans.clanID GROUP BY users.clanID ASC
+			) stats
+			WHERE stats.stars + stats.moons >= :leaderboardMinStars
+			ORDER BY stats.stars + stats.moons DESC");
+		$clansStats->execute([':leaderboardMinStars' => $leaderboardMinStars]);
+		$clansStats = $clansStats->fetchAll();
+		
+		/*
+			Update clans ranks
+		*/
+		
+		$clanRank = 0;
+		foreach($clansStats AS &$clan) {
+			$clanRank++;
+			
+			$updateClanRank = $db->prepare("UPDATE clans SET clanRank = :clanRank WHERE clanID = :clanID");
+			$updateClanRank->execute([':clanRank' => $clanRank, ':clanID' => $clan['clanID']]);
+		}
+		
+		Library::logAction($person, Action::CronClansRanks, count($clansStats));
+		return true;
+	}
+	
 	public static function doEverything($person, $checkForTime) {
 		if(
 			!self::autoban($person, $checkForTime) ||
@@ -414,8 +460,10 @@ class Cron {
 			!self::fixUsernames($person, $checkForTime) ||
 			!self::updateFriendsCount($person, $checkForTime) ||
 			!self::miscFixes($person, $checkForTime) ||
-			!self::updateSongsUsage($person, $checkForTime)
+			!self::updateSongsUsage($person, $checkForTime) ||
+			!self::updateClansRanks($person, $checkForTime)
 		) return false;
+		
 		return true;
 	}
 }

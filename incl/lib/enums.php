@@ -67,7 +67,7 @@ class CommentsError {
 	const NothingFound = "-2";
 }
 
-class Action { // Last action ID is 58
+class Action { // Last action ID is 61
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -101,6 +101,9 @@ class Action { // Last action ID is 58
 	const CommentUpload = 15;
 	const CommentDeletion = 13;
 	
+	const ClanCommentUpload = 60;
+	const ClanCommentDeletion = 61;
+	
 	const ListUpload = 17;
 	const ListChange = 18;
 	const ListDeletion = 19;
@@ -133,6 +136,7 @@ class Action { // Last action ID is 58
 	const CronFriendsCount = 42;
 	const CronMisc = 43;
 	const CronSongsUsage = 44;
+	const CronClansRanks = 59;
 	
 	const LevelVoteNormal = 45;
 	const LevelVoteDemon = 46;

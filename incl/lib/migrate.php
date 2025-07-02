@@ -2,8 +2,12 @@
 if(!isset($db)) global $db;
 
 require __DIR__."/../../config/dashboard.php";
+require_once __DIR__."/cron.php";
+require_once __DIR__."/ip.php";
 require_once __DIR__."/mainLib.php";
 require_once __DIR__."/security.php";
+
+$IP = IP::getIP();
 
 if(!$installed) {
 	$check = $db->query("SHOW TABLES LIKE 'replies'");
@@ -141,6 +145,65 @@ if(!$installed) {
 			
 			foreach($extIDs AS &$udid) Security::hashUDID($udid['userID'], $udid['extID']);
 		}
+	$check = $db->query("SHOW TABLES LIKE 'clancomments'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) {
+			$db->query("CREATE TABLE `clancomments` (
+				`commentID` INT(11) NOT NULL AUTO_INCREMENT,
+				`comment` varchar(1024) NOT NULL DEFAULT '',
+				`userID` INT(11) NOT NULL DEFAULT '0',
+				`clanID` INT(11) NOT NULL DEFAULT '0',
+				`likes` INT(11) NOT NULL DEFAULT '0',
+				`dislikes` INT(11) NOT NULL DEFAULT '0',
+				`timestamp` INT(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`commentID`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+			
+			$db->query("ALTER TABLE clans CHANGE `ID` `clanID` INT NOT NULL AUTO_INCREMENT");
+			$db->query("ALTER TABLE clans CHANGE `clan` `clanName` varchar(255) NOT NULL DEFAULT ''");
+			$db->query("ALTER TABLE clans CHANGE `desc` `clanDesc` varchar(2048) NOT NULL DEFAULT ''");
+			$db->query("ALTER TABLE clans CHANGE `color` `clanColor` varchar(6) NOT NULL DEFAULT 'FFFFFF'");
+			
+			$check = $db->query("SHOW COLUMNS FROM `clans` LIKE 'tag'");
+				$exist = $check->fetchAll();
+				if(!empty($exist)) $db->query("ALTER TABLE clans CHANGE `tag` `clanTag` varchar(15) NOT NULL DEFAULT ''");
+				else $db->query("ALTER TABLE clans ADD clanTag varchar(15) NOT NULL DEFAULT '' AFTER clanID");
+				
+			$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'clan'");
+				$exist = $check->fetchAll();
+				if(!empty($exist)) $db->query("ALTER TABLE users CHANGE `clan` `clanID` INT NOT NULL DEFAULT 0");
+				else $db->query("ALTER TABLE users ADD clanID INT NOT NULL DEFAULT '0' AFTER userName");
+								
+			$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'joinedAt'");
+				$exist = $check->fetchAll();
+				if(empty($exist)) $db->query("ALTER TABLE users ADD joinedAt INT NOT NULL DEFAULT '0' AFTER clanID");
+			
+			$db->query("ALTER TABLE clans ADD `clanMembers` varchar(2048) NOT NULL DEFAULT '' AFTER `clanOwner`");
+			$db->query("ALTER TABLE clans ADD `clanRank` INT NOT NULL DEFAULT 0 AFTER `clanColor`");
+			
+			$clanMembersArray = [];
+			$clanMembers = $db->prepare("SELECT extID, clanID FROM users WHERE clanID != 0 ORDER BY joinedAt ASC");
+			$clanMembers->execute();
+			$clanMembers = $clanMembers->fetchAll();
+			
+			foreach($clanMembers AS &$clanMember) {
+				$clanMembersArray[$clanMember['clanID']][] = $clanMember['extID'];
+			}
+			
+			foreach($clanMembersArray AS $clanID => $accounts) {
+				$insertClan = $db->prepare('UPDATE clans SET clanMembers = "'.implode(',', $accounts).'" WHERE clanID = :clanID');
+				$insertClan->execute([':clanID' => $clanID]);
+			}
+			
+			$cronPerson = [
+				'accountID' => 0,
+				'userID' => 0,
+				'userName' => "Undefined",
+				'IP' => $IP
+			];
+			
+			Cron::updateClansRanks($cronPerson, false);
+		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardLevelPackCreate'");
     	$exist = $check->fetchAll();
     	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools");
@@ -162,12 +225,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistApprove'");
 		$exist = $check->fetchAll();
     	if(!empty($exist)) $db->query("ALTER TABLE roles DROP `demonlistApprove`");
-	$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'clan'");
-   		$exist = $check->fetchAll();
-   		if(empty($exist)) $db->query("ALTER TABLE users ADD clan INT NOT NULL DEFAULT '0' AFTER userName");
-	$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'joinedAt'");
-   		$exist = $check->fetchAll();
-   		if(empty($exist)) $db->query("ALTER TABLE users ADD joinedAt INT NOT NULL DEFAULT '0' AFTER clan");
 	$check = $db->query("SHOW COLUMNS FROM `users` LIKE 'dlPoints'");
    		$exist = $check->fetchAll();
    		if(!empty($exist)) $db->query("ALTER TABLE users DROP `dlPoints`");
@@ -183,9 +240,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'passCode'");
    		$exist = $check->fetchAll();
    		if(empty($exist)) $db->query("ALTER TABLE accounts ADD passCode varchar(255) NOT NULL DEFAULT '' AFTER auth");
-	$check = $db->query("SHOW COLUMNS FROM `clans` LIKE 'tag'");
-   		$exist = $check->fetchAll();
-   		if(empty($exist)) $db->query("ALTER TABLE clans ADD tag varchar(15) NOT NULL DEFAULT '' AFTER clan");
 	$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'timezone'");
    		$exist = $check->fetchAll();
    		if(empty($exist)) $db->query("ALTER TABLE accounts ADD timezone varchar(255) NOT NULL DEFAULT '' AFTER passCode");
@@ -551,6 +605,9 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageLevels'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageLevels` INT NOT NULL DEFAULT '0' AFTER `dashboardDeleteLeaderboards`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageClans'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageClans` INT NOT NULL DEFAULT '0' AFTER `dashboardManageLevels`");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

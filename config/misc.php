@@ -104,7 +104,7 @@ $showAllLevels = true;
 /*
 	Amount of stars for leaderboards
 
-	$leaderboardMinStars - Minimum amount of stars for players to be displayed in the leaderboard, default is 10
+	$leaderboardMinStars - Minimum amount of stars for players/clans to be displayed in the leaderboard, default is 10
 */
 $leaderboardMinStars = 10;
 

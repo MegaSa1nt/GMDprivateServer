@@ -1,7 +1,13 @@
 <div class="contentDiv" dashboard-context-div>
 	<div class="horisontal">
 		<div class="levelTitle">
-			<h2>%USER_CARD%</h2>
+			<h2 class="horisontal">
+				%USER_CARD%
+				
+				<span class="extraIcon" title="%USER_EXTRA_ICON_TITLE%">
+					<i dashboard-show="%USER_SHOW_EXTRA_ICON%" class="fa-solid fa-%USER_EXTRA_ICON%" ></i>
+				</span>
+			</h2>
 		</div>
 	</div>
 	
@@ -23,6 +29,11 @@
 				<i class="fa-solid fa-calendar"></i>
 				<text dashboard-date="%registerDate%"></text>
 			</text>
+		
+			<div class="levelStat" title="%TEXT_stars%">
+				<i class="fa-solid fa-star"></i>
+				%stars%
+			</div>
 		
 			<div class="levelStat" title="%TEXT_moons%">
 				<i class="fa-solid fa-moon"></i>

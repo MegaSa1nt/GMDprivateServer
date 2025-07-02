@@ -1417,6 +1417,7 @@ class Library {
 			'dashboardManageAccounts',
 			'dashboardDeleteLeaderboards',
 			'dashboardManageLevels',
+			'dashboardManageClans',
 			'dashboardManageAutomod',
 			'dashboardVaultCodesManage'
 		];
@@ -4374,6 +4375,179 @@ class Library {
 	}
 	
 	/*
+		Clans-related functions
+	*/
+	
+	public static function getClanByID($clanID, $column = "*") {
+	    require __DIR__."/connection.php";
+		
+		if(isset($GLOBALS['core_cache']['clan']['ID'][$clanID])) {
+			if($column != "*" && $GLOBALS['core_cache']['clan']['ID'][$clanID]) return $GLOBALS['core_cache']['clan']['ID'][$clanID][$column];
+			return $GLOBALS['core_cache']['clan']['ID'][$clanID];
+		}
+
+	    $clanInfo = $db->prepare("SELECT * FROM clans WHERE clanID = :clanID");
+	    $clanInfo->execute([':clanID' => $clanID]);
+	    $clanInfo = $clanInfo->fetch();
+
+	    if(empty($clanInfo)) {
+			$GLOBALS['core_cache']['clan']['ID'][$clanID] = false;
+			return false;
+		}
+
+		$clanInfo['clanName'] = base64_decode($clanInfo["clanName"]);
+		$clanInfo['clanTag'] = base64_decode($clanInfo["clanTag"]);
+		$clanInfo['clanDesc'] = base64_decode($clanInfo["clanDesc"]);
+
+		$GLOBALS['core_cache']['clan']['ID'][$clanID] = $clanInfo;
+		$GLOBALS['core_cache']['clan']['name'][$clanInfo['clanName']] = $clanInfo;
+
+		if($column != "*") return $clanInfo[$column];
+		
+		return ["clanID" => $clanInfo["clanID"], "clanName" => $clanInfo["clanName"], "clanTag" => $clanInfo["clanTag"], "clanDesc" => $clanInfo["clanDesc"], "clanOwner" => $clanInfo["clanOwner"], "clanMembers" => $clanInfo["clanMembers"], "clanColor" => $clanInfo["clanColor"], "clanRank" => $clanInfo["clanRank"], "isClosed" => $clanInfo["isClosed"], "creationDate" => $clanInfo["creationDate"]];
+	}
+	
+	public static function makeClanUsername($accountID) {
+		require __DIR__."/../../config/dashboard.php";
+		
+		if(isset($GLOBALS['core_cache']['accountClanUsername'][$accountID])) return $GLOBALS['core_cache']['accountClanUsername'][$accountID];
+		
+		if(!isset($clansTagPosition)) $clansTagPosition = '[%2$s] %1$s';
+		
+		$user = self::getUserByAccountID($accountID);
+		
+		if($clansEnabled && $user['clanID'] > 0 && !isset($_REQUEST['noClan'])) {
+			$clanTag = self::getClanByID($user['clanID'], 'clanTag');
+			
+			$clanUsername = !empty($clanTag) ? sprintf($clansTagPosition, $user['userName'], $clanTag) : $user['userName'];
+			
+			$GLOBALS['core_cache']['accountClanUsername'][$accountID] = $clanUsername;
+			
+			return $clanUsername;
+		}
+		
+		$GLOBALS['core_cache']['accountClanUsername'][$accountID] = $user['userName'];
+		
+		return $user['userName'];
+	}
+	
+	public static function getAccountClan($accountID) {
+		require __DIR__."/../../config/dashboard.php";
+		
+		if(isset($GLOBALS['core_cache']['accountClan'][$accountID])) return $GLOBALS['core_cache']['accountClan'][$accountID];
+		
+		$user = self::getUserByAccountID($accountID);
+		
+		if($clansEnabled && $user['clanID'] > 0) {
+			$clan = self::getClanByID($user['clanID']);
+			
+			$GLOBALS['core_cache']['accountClan'][$accountID] = $clan;
+			
+			return $clan;
+		}
+		
+		return false;
+	}
+	
+	public static function getClanByName($clanName, $column = "*") {
+	    require __DIR__."/connection.php";
+		
+		if(isset($GLOBALS['core_cache']['clan']['name'][$clanName])) {
+			if($column != "*" && $GLOBALS['core_cache']['clan']['name'][$clanName]) return $GLOBALS['core_cache']['clan']['name'][$clanName][$column];
+			return $GLOBALS['core_cache']['clan']['name'][$clanName];
+		}
+
+	    $clanInfo = $db->prepare("SELECT * FROM clans WHERE clanName LIKE :clanName");
+	    $clanInfo->execute([':clanName' => base64_encode($clanName)]);
+	    $clanInfo = $clanInfo->fetch();
+
+	    if(empty($clanInfo)) {
+			$GLOBALS['core_cache']['clan']['name'][$clanName] = false;
+			return false;
+		}
+
+		$clanInfo['clanName'] = base64_decode($clanInfo["clanName"]);
+		$clanInfo['clanTag'] = base64_decode($clanInfo["clanTag"]);
+		$clanInfo['clanDesc'] = base64_decode($clanInfo["clanDesc"]);
+
+		$GLOBALS['core_cache']['clan']['ID'][$clanInfo['clanID']] = $clanInfo;
+		$GLOBALS['core_cache']['clan']['name'][$clanName] = $clanInfo;
+
+		if($column != "*") return $clanInfo[$column];
+		
+		return ["clanID" => $clanInfo["clanID"], "clanName" => $clanInfo["clanName"], "clanTag" => $clanInfo["clanTag"], "clanDesc" => $clanInfo["clanDesc"], "clanOwner" => $clanInfo["clanOwner"], "clanMembers" => $clanInfo["clanMembers"], "clanColor" => $clanInfo["clanColor"], "clanRank" => $clanInfo["clanRank"], "isClosed" => $clanInfo["isClosed"], "creationDate" => $clanInfo["creationDate"]];
+	}
+	
+	public static function getClanStatsCount($person, $clanID) {
+		require __DIR__."/connection.php";
+		
+		if(isset($GLOBALS['core_cache']['clanStatsCount'][$clanID])) return $GLOBALS['core_cache']['clanStatsCount'][$clanID];
+		
+		$clan = self::getClanByID($clanID);
+		if(!$clan) {
+			$GLOBALS['core_cache']['clanStatsCount'][$clanID] = ['stars' => 0, 'moons' => 0, 'diamonds' => 0, 'coins' => 0, 'userCoins' => 0, 'demons' => 0, 'creatorPoints' => 0, 'members' => 0, 'posts' => 0];
+			return $GLOBALS['core_cache']['clanStatsCount'][$clanID];
+		}
+		
+		$queryText = self::getBannedPeopleQuery(0, true);
+		
+		$clanStats = $db->prepare("SELECT SUM(stars) AS stars, SUM(moons) AS moons, SUM(diamonds) AS diamonds, SUM(coins) AS coins, SUM(userCoins) AS userCoins, SUM(demons) AS demons, SUM(creatorPoints) AS creatorPoints FROM users INNER JOIN clans ON users.clanID = clans.clanID WHERE ".$queryText." clans.clanID = :clanID");
+		$clanStats->execute([':clanID' => $clanID]);
+		$clanStats = $clanStats->fetch();
+		
+		$clanMembersArray = explode(',', $clan['clanMembers']);
+		$clanMembersCount = count($clanMembersArray);
+		
+		$clanPostsCount = $db->prepare("SELECT count(*) FROM clancomments WHERE clanID = :clanID");
+		$clanPostsCount->execute([':clanID' => $clanID]);
+		$clanPostsCount = $clanPostsCount->fetchColumn();
+		
+		$GLOBALS['core_cache']['clanStatsCount'][$clanID] = ['stars' => $clanStats['stars'], 'moons' => $clanStats['moons'], 'diamonds' => $clanStats['diamonds'], 'coins' => $clanStats['coins'], 'userCoins' => $clanStats['userCoins'], 'demons' => $clanStats['demons'], 'creatorPoints' => $clanStats['creatorPoints'], 'members' => $clanMembersCount, 'posts' => $clanPostsCount];
+		
+		return $GLOBALS['core_cache']['clanStatsCount'][$clanID];
+	}
+	
+	public static function getCommentsOfClan($clanID, $sortMode, $pageOffset, $count = 10) {
+		require __DIR__."/connection.php";
+		
+		$comments = $db->prepare("SELECT * FROM clans INNER JOIN clancomments ON clancomments.clanID = clans.clanID WHERE clans.clanID = :clanID ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
+		$comments->execute([':clanID' => $clanID]);
+		$comments = $comments->fetchAll();
+		
+		$commentsCount = $db->prepare("SELECT count(*) FROM clans INNER JOIN clancomments ON clancomments.clanID = clans.clanID WHERE clans.clanID = :clanID");
+		$commentsCount->execute([':clanID' => $clanID]);
+		$commentsCount = $commentsCount->fetchColumn();
+		
+		return ["comments" => $comments, "count" => $commentsCount];
+	}
+	
+	public static function uploadClanComment($person, $clanID, $comment) {
+		require __DIR__."/connection.php";
+		require_once __DIR__."/exploitPatch.php";
+		require_once __DIR__."/automod.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$userID = $person['userID'];
+		$userName = $person['userName'];
+		
+		if($enableCommentLengthLimiter) $comment = mb_substr($comment, 0, $maxAccountCommentLength);
+		
+		$comment = Escape::url_base64_encode($comment);
+		
+		$uploadClanComment = $db->prepare("INSERT INTO clancomments (userID, clanID, comment, timestamp)
+			VALUES (:userID, :clanID, :comment, :timestamp)");
+		$uploadClanComment->execute([':userID' => $userID, ':clanID' => $clanID, ':comment' => $comment, ':timestamp' => time()]);
+		$commentID = $db->lastInsertId();
+
+		self::logAction($person, Action::ClanCommentUpload, $userName, $comment, $commentID, $clanID);
+		
+		Automod::checkClanPostsSpamming($userID);
+		
+		return $commentID;
+	}
+	
+	/*
 		Utils-related functions
 	*/
 	
@@ -4512,76 +4686,6 @@ class Library {
 		return true;
 	}
 	
-	public static function getClanInfo($clan, $column = "*") {
-	    require __DIR__."/connection.php";
-		
-		if(isset($GLOBALS['core_cache']['clan'][$clan])) {
-			if($column != "*" && $GLOBALS['core_cache']['clan'][$clan]) return $GLOBALS['core_cache']['clan'][$clan][$column];
-			return $GLOBALS['core_cache']['clan'][$clan];
-		}
-
-	    $clanInfo = $db->prepare("SELECT * FROM clans WHERE ID = :clanID");
-	    $clanInfo->execute([':clanID' => $clan]);
-	    $clanInfo = $clanInfo->fetch();
-
-	    if(empty($clanInfo)) {
-			$GLOBALS['core_cache']['clan'][$clan] = false;
-			return false;
-		}
-
-		$clanInfo['clan'] = base64_decode($clanInfo["clan"]);
-		$clanInfo['tag'] = base64_decode($clanInfo["tag"]);
-		$clanInfo['desc'] = base64_decode($clanInfo["desc"]);
-
-		$GLOBALS['core_cache']['clan'][$clan] = $clanInfo;
-
-		if($column != "*") return $clanInfo[$column];
-		
-		return ["ID" => $clanInfo["ID"], "clan" => $clanInfo["clan"], "tag" => $clanInfo["tag"], "desc" => $clanInfo["desc"], "clanOwner" => $clanInfo["clanOwner"], "color" => $clanInfo["color"], "isClosed" => $clanInfo["isClosed"], "creationDate" => $clanInfo["creationDate"]];
-	}
-	
-	public static function makeClanUsername($accountID) {
-		require __DIR__."/../../config/dashboard.php";
-		
-		if(isset($GLOBALS['core_cache']['accountClanUsername'][$accountID])) return $GLOBALS['core_cache']['accountClanUsername'][$accountID];
-		
-		if(!isset($clansTagPosition)) $clansTagPosition = '[%2$s] %1$s';
-		
-		$user = self::getUserByAccountID($accountID);
-		
-		if($clansEnabled && $user['clan'] > 0 && !isset($_REQUEST['noClan'])) {
-			$clan = self::getClanInfo($user['clan'], 'tag');
-			
-			$clanUsername = !empty($clan) ? sprintf($clansTagPosition, $user['userName'], $clan) : $user['userName'];
-			
-			$GLOBALS['core_cache']['accountClanUsername'][$accountID] = $clanUsername;
-			
-			return $clanUsername;
-		}
-		
-		$GLOBALS['core_cache']['accountClanUsername'][$accountID] = $user['userName'];
-		
-		return $user['userName'];
-	}
-	
-	public static function getAccountClan($accountID) {
-		require __DIR__."/../../config/dashboard.php";
-		
-		if(isset($GLOBALS['core_cache']['accountClan'][$accountID])) return $GLOBALS['core_cache']['accountClan'][$accountID];
-		
-		$user = self::getUserByAccountID($accountID);
-		
-		if($clansEnabled && $user['clan'] > 0) {
-			$clan = self::getClanInfo($user['clan']);
-			
-			$GLOBALS['core_cache']['accountClan'][$accountID] = $clan;
-			
-			return $clan;
-		}
-		
-		return false;
-	}
-	
 	public static function getPersonActions($person, $filters, $limit = false) {
 		require __DIR__."/connection.php";
 		
@@ -4638,6 +4742,74 @@ class Library {
 		return '<c'.$color.'>'.$text.'</c>';
 	}
 	
+	public static function getStats() {
+		require __DIR__."/connection.php";
+		
+		$leaderboardBannedQuery = self::getBannedPeopleQuery(0, false);
+		$creatorsBannedQuery = self::getBannedPeopleQuery(1, false);
+		
+    	// 2592000 seconds = 30d
+    	$stats = $db->prepare("SELECT
+    		(SELECT COUNT(*) FROM users) AS users,
+    		(SELECT COUNT(*) FROM users WHERE lastPlayed > :time - 2592000) AS activeUsers,
+			
+    		(SELECT COUNT(*) FROM levels WHERE isDeleted = 0) AS levels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND isDeleted = 0) AS ratedLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 0 AND isDeleted = 0) AS featuredLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 1 AND isDeleted = 0) AS epicLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 2 AND isDeleted = 0) AS legendaryLevels,
+    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 3 AND isDeleted = 0) AS mythicLevels,
+			
+    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 0) AS dailies,
+    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 1) AS weeklies,
+    		(SELECT COUNT(*) FROM events) AS events,
+			
+    		(SELECT COUNT(*) FROM gauntlets) AS gauntlets,
+    		(SELECT COUNT(*) FROM mappacks) AS mapPacks,
+    		(SELECT COUNT(*) FROM lists) AS lists,
+			
+    		(SELECT SUM(downloads) FROM levels WHERE isDeleted = 0) AS downloads,
+    		(SELECT SUM(objects) FROM levels WHERE isDeleted = 0) AS objects,
+    		(SELECT SUM(likes) FROM levels WHERE isDeleted = 0) AS likes,
+    		(SELECT SUM(dislikes) FROM levels WHERE isDeleted = 0) AS dislikes,
+			
+    		(SELECT COUNT(*) FROM songs WHERE reuploadID = 0 AND isDisabled = 0) AS newgroundsSongs,
+    		(SELECT COUNT(*) FROM songs WHERE reuploadID != 0 AND isDisabled = 0) AS reuploadedSongs,
+			
+    		(SELECT COUNT(*) FROM comments) AS comments,
+    		(SELECT COUNT(*) FROM acccomments) AS posts,
+    		(SELECT COUNT(*) FROM clancomments) AS clanPosts,
+    		(SELECT COUNT(*) FROM replies) AS postReplies,
+			
+    		(SELECT SUM(stars) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS stars,
+    		(SELECT SUM(moons) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS moons,
+    		(SELECT SUM(creatorPoints) FROM users ".($creatorsBannedQuery ? "WHERE ".$creatorsBannedQuery  : '').") AS creatorPoints,
+			
+			(SELECT COUNT(*) FROM bans) AS allBans,
+			(SELECT COUNT(*) FROM bans WHERE isActive != 0) AS activeBans,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 0) AS accountIDBans,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 1) AS userIDBans,
+			(SELECT COUNT(personType) FROM bans WHERE personType = 2) AS IPBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 0) AS leaderboardBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 1) AS creatorBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 2) AS levelUploadBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 3) AS commentBans,
+			(SELECT COUNT(banType) FROM bans WHERE banType = 4) AS accountBans,
+			
+			mostUsedSong.ID AS mostUsedSongID,
+			mostUsedSong.authorName AS mostUsedSongAuthor,
+			mostUsedSong.name AS mostUsedSongName,
+			mostUsedSong.levelsCount AS mostUsedSongLevelsCount,
+			mostUsedSong.size AS mostUsedSongSize,
+			IF(mostUsedSong.reuploadID = 0, 0, 1) AS mostUsedSongIsReupload
+			FROM (SELECT ID, authorName, name, size, levelsCount, reuploadID, IF(reuploadID = 0, 0, 1) AS isReupload FROM songs WHERE isDisabled = 0 ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSong
+		");
+    	$stats->execute([':time' => time()]);
+    	$stats = $stats->fetch();
+		
+		return $stats;
+	}
+	
 	/*
 		Return to Geometry Dash-related functions
 	*/
@@ -4663,51 +4835,6 @@ class Library {
 		$user['userName'] = self::makeClanUsername($user['extID']);
 		
 		return "1:".$user["userName"].":2:".$user["userID"].":9:".$user['icon'].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":32:".$user["ID"].":35:".$user["comment"].":41:".$user["isNew"].":37:".$user['uploadTime'];
-	}
-	public static function getStats() {
-		require_once __DIR__."/connection.php";
-
-    	// 2592000 seconds = 30d
-    	$query = $db->prepare("SELECT
-    		(SELECT COUNT(*) FROM users) AS users,
-    		(SELECT COUNT(*) FROM users WHERE lastPlayed > :time - 2592000) AS activeUsers, 
-    		(SELECT COUNT(*) FROM levels) AS levels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1) AS ratedLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 0) AS featuredLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 1) AS epicLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 2) AS legendaryLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 3) AS mythicLevels,
-    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 0) AS dailies,
-    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 1) AS weeklies,
-    		(SELECT COUNT(*) FROM gauntlets) AS gauntlets,
-    		(SELECT COUNT(*) FROM mappacks) AS mapPacks,
-    		(SELECT COUNT(*) FROM lists) AS lists,
-    		(SELECT SUM(downloads) FROM levels) AS downloads,
-    		(SELECT COUNT(*) FROM songs) AS songs,
-    		(SELECT COUNT(*) FROM songs WHERE reuploadID = 0) AS newgroundsSongs,
-    		(SELECT COUNT(*) FROM songs WHERE reuploadID != 0) AS reuploadedSongs,
-    		(SELECT name FROM songs ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSongName,
-    		(SELECT levelsCount FROM songs ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSongLevelsCount,
-    		(SELECT SUM(objects) FROM levels) AS objects,
-    		(SELECT SUM(likes) FROM levels) AS likes,
-    		(SELECT (SELECT COUNT(*) FROM comments) + (SELECT COUNT(*) FROM acccomments)) AS totalComments,
-    		(SELECT COUNT(*) FROM comments) AS comments,
-    		(SELECT COUNT(*) FROM acccomments) AS posts,
-    		(SELECT COUNT(*) FROM replies) AS postReplies,
-    		(SELECT SUM(stars) FROM users WHERE " . self::getBannedPeopleQuery(0) . ") AS stars,
-    		(SELECT SUM(creatorPoints) FROM users WHERE " . self::getBannedPeopleQuery(1) . ") AS creatorPoints,
-			(SELECT COUNT(*) FROM bans) AS bannedPlayers,
-			(SELECT COUNT(personType) FROM bans WHERE personType = 0) AS accountIDBans,
-			(SELECT COUNT(personType) FROM bans WHERE personType = 1) AS userIDBans,
-			(SELECT COUNT(personType) FROM bans WHERE personType = 2) AS IPBans,
-			(SELECT COUNT(banType) FROM bans WHERE banType = 0) AS leaderboardBans,
-			(SELECT COUNT(banType) FROM bans WHERE banType = 1) AS creatorBans,
-			(SELECT COUNT(banType) FROM bans WHERE banType = 2) AS levelUploadBans,
-			(SELECT COUNT(banType) FROM bans WHERE banType = 3) AS commentBans,
-			(SELECT COUNT(banType) FROM bans WHERE banType = 4) AS accountBans
-		");
-    	$query->execute([':time' => time()]);
-    	return $query->fetch(PDO::FETCH_ASSOC);
 	}
 }
 ?>

@@ -274,4 +274,17 @@ $language['viewGauntlet'] = 'View Gauntlet';
 $language['manageGauntlet'] = 'Manage Gauntlet';
 $language['deleteGauntlet'] = 'Delete Gauntlet';
 $language['noGauntlets'] = 'No Gauntlets!';
+
+$language['clanID'] = 'Clan ID';
+$language['creationDate'] = 'Creation date';
+$language['clanOwnerTitle'] = 'Owner of clan %1$s';
+$language['clanClosed'] = 'Closed clan';
+$language['yourClan'] = 'Your clan';
+$language['clanMembers'] = 'Clan members';
+$language['clanPosts'] = 'Clan posts';
+$language['clanSettings'] = 'Clan settings';
+$language['noClanPosts'] = 'No clan posts!';
+$language['joinClan'] = 'Join clan';
+$language['sendClanJoinRequest'] = 'Send join request';
+$language['viewClan'] = 'View clan';
 ?>
