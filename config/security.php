@@ -2,7 +2,7 @@
 /*
 	Session grants
 	
-	Validating password/GJP2 takes 100-200 milliseconds every request. Should core grant "session" to successfully logged IP?
+	Validating password/GJP2 takes 50-100 milliseconds every request. Should core grant "session" to successfully logged IP?
 		True — if you successfully logged in, core won't validate password/GJP2 for this account from your IP for next hour
 		False — password/GJP2 will be validated every request
 */

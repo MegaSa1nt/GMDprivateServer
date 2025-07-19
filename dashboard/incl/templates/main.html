@@ -10,11 +10,24 @@
 		<link async rel="stylesheet" href="incl/icons/css/all.min.css">
 		<link async rel="stylesheet" href="incl/toast/toast.css">
 		<script type="text/javascript" id="dashboardScript">
-			const dbPath = "%DATABASE_PATH%";
+			window.dbPath = "%DATABASE_PATH%";
 			
-			const failedToLoadText = "%FAILED_TO_LOAD_TEXT%";
-			const copiedText = "%COPIED_TEXT%";
-			const nothingIsPlayingText = "%TEXT_nothingIsPlaying%";
+			window.maxSongSize = %MAX_SONG_SIZE% * 1024 * 1024;
+			window.maxSFXSize = %MAX_SFX_SIZE% * 1024 * 1024;
+			
+			window.failedToLoadText = "%FAILED_TO_LOAD_TEXT%";
+			window.copiedText = "%COPIED_TEXT%";
+			
+			window.nothingIsPlayingText = "%TEXT_nothingIsPlaying%";
+			
+			window.loadingText = "%TEXT_loadingTitle%";
+			window.couldntReadFileText = "%TEXT_errorCouldntReadFile%";
+			window.notAnAudioText = "%TEXT_errorIsNotAnAudio%";
+			
+			window.maxSongSizeText = "%MAX_SONG_SIZE_TEXT%";
+			window.maxSFXSizeText = "%MAX_SFX_SIZE_TEXT%";
+			
+			window.xIcon = '<i class="fa-solid fa-xmark"></i>';
 			
 			localStorage.language = "%LANGUAGE%";
 		</script>
@@ -26,6 +39,10 @@
 		<script async src="incl/script.js?%SCRIPT_TIMESTAMP%" type="text/javascript"></script>
 		<script async src="incl/player.js" type="text/javascript"></script>
 		<script async src="incl/toast/toast.js" type="text/javascript"></script>
+		<script async type="module" type="text/javascript">
+			import { fileTypeFromBuffer } from "https://cdn.jsdelivr.net/npm/file-type@21.0.0/+esm";
+			window.getFileType = fileTypeFromBuffer;
+		</script>
 	</head>
 	<body id="dashboard-body">
 		<div id="dashboard-loader" class="dashboard-loader">
@@ -47,6 +64,7 @@
 						<text>%TEXT_account%</text>
 						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
 					</button>
+					
 					<div class="dropdown-items">
 						<button title="%TEXT_changeUsernameTitle%" type="button" href="account/changeUsername">
 							<i class="fa-solid fa-circle-user"></i>
@@ -88,9 +106,10 @@
 				<div class="dropdown" id="browseDropdown">
 					<button title="%TEXT_browse%" type="button" dashboard-dropdown="browseDropdown">
 						<i class="fa-solid fa-magnifying-glass"></i>
-						<text>%TEXT_browse% (X)</text>
+						<text>%TEXT_browse%</text>
 						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
 					</button>
+					
 					<div class="dropdown-items">
 						<button title="%TEXT_accountsTitle%" type="button" href="browse/accounts">
 							<i class="fa-solid fa-user"></i>
@@ -128,6 +147,26 @@
 						</button>
 					</div>
 				</div>
+				
+				<div class="dropdown" id="uploadDropdown" dashboard-show="%IS_LOGGED_IN%">
+					<button title="%TEXT_upload%" type="button" dashboard-dropdown="uploadDropdown">
+						<i class="fa-solid fa-arrow-up-from-bracket"></i>
+						<text>%TEXT_upload% (X)</text>
+						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
+					</button>
+					
+					<div class="dropdown-items">
+						<button title="%TEXT_uploadSongTitle%" type="button" href="upload/song">
+							<i class="fa-solid fa-music"></i>
+							<text>%TEXT_uploadSongTitle%</text>
+						</button>
+						
+						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx">
+							<i class="fa-solid fa-drum"></i>
+							<text>%TEXT_uploadSFXTitle% (X)</text>
+						</button>
+					</div>
+				</div>
 			</div>
 			
 			<div class="navbar-buttons up">
@@ -142,6 +181,7 @@
 						<text>%TEXT_profile%</text>
 						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
 					</button>
+					
 					<div class="dropdown-items">
 						<button title="%TEXT_settings%" type="button" href="settings">
 							<i class="fa-solid fa-gear"></i>
@@ -161,6 +201,7 @@
 						<text>%USERNAME%</text>
 						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
 					</button>
+					
 					<div class="dropdown-items">
 						<button title="%TEXT_yourProfileTitle%" type="button" href="profile/%USERNAME%">
 							<i class="fa-solid fa-user"></i>

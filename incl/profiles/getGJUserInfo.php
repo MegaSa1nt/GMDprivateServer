@@ -19,7 +19,7 @@ if($isBlocked) exit(CommonError::InvalidRequest);
 $user = Library::getUserByID($targetUserID);
 $account = Library::getAccountByID($targetAccountID);
 
-$queryText = Library::getBannedPeopleQuery(0, true);
+$queryText = Library::getBannedPeopleQuery(Ban::Leaderboards, true);
 
 $targetPerson = [
 	'accountID' => $targetAccountID,
@@ -27,7 +27,7 @@ $targetPerson = [
 	'IP' => $user['IP']
 ];
 
-$checkBan = Library::getPersonBan($targetPerson, 0);
+$checkBan = Library::getPersonBan($targetPerson, Ban::Leaderboards);
 $user['rank'] = !$checkBan ? Library::getUserRank($user['stars'], $user['moons'], $user['userName']) : 0;
 $user['creatorPoints'] = round($user["creatorPoints"], PHP_ROUND_HALF_DOWN);
 

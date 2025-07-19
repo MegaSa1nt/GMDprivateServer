@@ -102,7 +102,7 @@ function changePage(response, href, skipCheck = false) {
 		
 		if(newPage == null) {
 			const toastBody = newPageBody.getElementById("toast");
-			if(toastBody != null) return r(showToast(toastBody));
+			if(toastBody != null) return r(showToastOutOfPage(toastBody));
 			
 			Toastify({
 				text: failedToLoadText,
@@ -124,6 +124,7 @@ function changePage(response, href, skipCheck = false) {
 		document.querySelector("title").replaceWith(newPageBody.querySelector("title"));
 		document.querySelector("nav").replaceWith(newPageBody.querySelector("nav"));
 		document.getElementById("dashboardScript").replaceWith(newPageBody.getElementById("dashboardScript"));
+		eval(document.getElementById("dashboardScript").textContent);
 		document.getElementById("dashboardStyle").replaceWith(newPageBody.getElementById("dashboardStyle"));
 		
 		if(newPageScript != null) {
@@ -168,7 +169,7 @@ function toggleDropdown(dropdown) {
 	document.getElementById(dropdown).classList.toggle("show");
 }
 
-function showToast(toastBody) {
+function showToastOutOfPage(toastBody) {
 	Toastify({
 		text: toastBody.innerHTML,
 		duration: 2000,
@@ -177,7 +178,18 @@ function showToast(toastBody) {
 		className: toastBody.getAttribute("state"),
 	}).showToast();
 	
-	const dateElements = document.querySelector(".toastify").querySelectorAll('[dashboard-date]');
+	const toastifyBody = document.querySelector(".toastify");
+	
+	const copyElements = toastifyBody.querySelectorAll('[dashboard-copy]');
+	copyElements.forEach(async (element) => {
+		const textToCopy = element.innerHTML;
+	
+		if(!textToCopy.length) return;
+			
+		element.addEventListener("click", async (event) => copyElementContent(textToCopy));
+	});
+	
+	const dateElements = toastifyBody.querySelectorAll('[dashboard-date]');
 	dateElements.forEach(async (element) => {
 		const dateTime = element.getAttribute("dashboard-date");
 		
@@ -206,6 +218,16 @@ function showToast(toastBody) {
 	}
 	
 	return true;
+}
+
+async function showToast(toastText, toastStyle) {
+	Toastify({
+		text: toastText,
+		duration: 2000,
+		position: "center",
+		escapeMarkup: false,
+		className: toastStyle,
+	}).showToast();
 }
 
 async function updatePage() {
@@ -365,7 +387,7 @@ async function updatePage() {
 				if(event.keyCode == 13) applyFilters(modalID);
 			});
 		}
-	});	
+	});
 	
 	const selectSearchElements = document.querySelectorAll("[dashboard-select-search]");
 	selectSearchElements.forEach(async (element) => {
@@ -407,7 +429,7 @@ async function updatePage() {
 				for await (const song of searchResults) {
 					const searchOption = document.createElement("div");
 					searchOption.classList.add("option");
-					searchOption.innerHTML = song.icon.length ? song.icon + " " + escapeHTML(song.name) : escapeHTML(song.name);
+					searchOption.innerHTML = song.icon.length ? song.icon + " <text>" + escapeHTML(song.name) + "</text>" : "<text>" + escapeHTML(song.name) + "</text>";
 					
 					searchOption.onclick = () => {
 						searchInput.value = escapeHTML(song.name);
@@ -419,6 +441,79 @@ async function updatePage() {
 					searchOptions.appendChild(searchOption);
 				}
 			}, 500);
+		}
+	});
+	
+	const selectElements = document.querySelectorAll("[dashboard-select]");
+	selectElements.forEach(async (element) => {
+		const selectName = element.getAttribute("dashboard-select");
+		const selectInput = element.querySelector("[dashboard-select-input]");
+		const selectValueInput = element.querySelector("[dashboard-select-value]");
+		const selectOptions = element.querySelectorAll("[dashboard-select-option]");
+		
+		element.addEventListener("focusin", () => element.classList.add("show"));
+		document.addEventListener("click", (e) => {
+			if(!element.contains(e.target) && element != e.target) element.classList.remove("show");
+		});
+		
+		selectOptions.forEach(async (selectOption) => {
+			const selectOptionValue = selectOption.getAttribute("value");
+			const selectOptionTitle = selectOption.getAttribute("dashboard-select-option");
+			
+			selectOption.onclick = () => {
+				selectValueInput.value = selectOptionValue;
+				selectInput.value = escapeHTML(selectOptionTitle);
+				
+				selectOptions.forEach(async (element) => element.classList.remove("hide"));
+				
+				if(selectName.length) {
+					const selectTypeElements = document.querySelectorAll(`[dashboard-select-type="${selectName}"]`);
+					
+					selectTypeElements.forEach((element) => {
+						const selectTypeElementValue = element.getAttribute("value");
+						const selectTypeInput = element.querySelector("input");
+						
+						if(selectOptionValue != selectTypeElementValue) {
+							element.classList.add("hide");
+							if(selectTypeInput != null) selectTypeInput.disabled = true;
+						} else {
+							element.classList.remove("hide");
+							if(selectTypeInput != null) selectTypeInput.disabled = false;
+						}
+					});
+				}
+				
+				element.classList.remove("show");
+			}
+		});
+		
+		selectInput.oninput = async (e) => {
+			const searchValue = e.target.value.trim();
+			
+			selectOptions.forEach(async (selectOption) => selectOption.classList.remove("hide"));
+			if(selectName.length) {
+				const selectTypeElements = document.querySelectorAll(`[dashboard-select-type="${selectName}"]`);
+				
+				selectTypeElements.forEach((element) => {
+					const selectTypeInput = element.querySelector("input");
+					
+					element.classList.add("hide");
+					if(selectTypeInput != null) selectTypeInput.disabled = true;
+				});
+			}
+			
+			if(!searchValue.length) return;
+			
+			const searchValueSplit = "(" + searchValue.replaceAll(" ", ")(?=.*") + ")";
+			const searchValueRegex = new RegExp(searchValueSplit, 'gi');
+			
+			selectOptions.forEach(async (selectOption) => {
+				const selectOptionTitle = selectOption.getAttribute("dashboard-select-option");
+				
+				const selectOptionRegex = selectOptionTitle.match(searchValueRegex);
+				
+				if(selectOptionRegex == null) selectOption.classList.add("hide");
+			});
 		}
 	});
 	
@@ -534,10 +629,71 @@ async function updatePage() {
 			event.preventDefault();
 			event.stopPropagation();
 			
-			if(event.keyCode == 13) submitFormButton.click()
+			if(event.keyCode == 13) submitFormButton.click();
 			
 			return false;
 		});
+	});
+	
+	const fileInputElements = document.querySelectorAll("[dashboard-file-input]");
+	fileInputElements.forEach(async (element) => {
+		const fileInputText = element.querySelector("h4");
+		const fileInputElement = element.querySelector("input");
+		
+		fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
+		fileInputText.classList.add("empty");
+		
+		fileInputElement.onclick = () => {
+			fileInputText.innerHTML = loadingText;
+			fileInputText.classList.add("empty");
+		}
+		
+		fileInputElement.onchange = async (e) => {
+			const insertedFile = e.target.files[0];
+			
+			if(!insertedFile || insertedFile == undefined) {
+				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
+				fileInputElement.value = null;
+				
+				return;
+			}
+			
+			const fileName = escapeHTML(insertedFile.name);
+			
+			const fileData = await getFileData(insertedFile);
+			if(!fileData) {
+				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
+				fileInputElement.value = null;
+				
+				showToast(xIcon + couldntReadFileText, "error");
+				
+				return;
+			}
+			
+			if(fileData.byteLength > maxSongSize) {
+				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
+				fileInputElement.value = null;
+				
+				showToast(xIcon + maxSongSizeText, "error");
+				
+				return;
+			}
+			
+			const allowedFileTypes = ["audio/mpeg", "audio/ogg", "audio/wav", "audio/webm"];
+			
+			const fileType = await getFileType(fileData);
+			if(!fileType || !allowedFileTypes.includes(fileType.mime)) {
+				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
+				fileInputElement.value = null;
+				
+				showToast(xIcon + notAnAudioText, "error");
+				
+				return;
+			}
+			
+			fileInputText.innerHTML = fileName;
+			fileInputText.classList.remove("empty");
+		}
 	});
 }
 
@@ -703,7 +859,8 @@ async function getForm(form) {
 	
 	for(const entry of formEntries) {
 		const isOptional = formElement.querySelector("input[dashboard-not-required][name=" + entry[0] + "]");
-		if(!entry[1].trim().length && isOptional == null) {
+		
+		if(((typeof entry[1] == 'string' && !entry[1].trim().length) || (typeof entry[1] == 'object' && !entry[1].name.trim().length)) && isOptional == null) {
 			formElement.classList.add("empty-fields");
 			return false;
 		}
@@ -788,4 +945,32 @@ async function toggleEmojisDiv() {
 	if(emojisDiv == null) return;
 	
 	emojisDiv.classList.toggle("show");
+}
+
+async function getFileData(file) {
+	return new Promise(async (r) => {
+		const fileReader = new FileReader();
+		
+		fileReader.onload = () => r(fileReader.result);
+		
+		fileReader.onerror = async () => {
+			console.error(fileReader.error);
+			r(false);
+		}
+		
+		fileReader.readAsArrayBuffer(file);
+	});
+}
+
+async function handleSongUpload(form) {
+	const formData = await getForm(form);
+	if(!formData) return false;
+	
+	const songType = formData.get("songType");
+	
+	if(songType == 1) return postPage('upload/song', form);
+	
+	// Convert song if its not OGG, later
+	
+	return postPage('upload/song', form);
 }

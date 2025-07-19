@@ -42,6 +42,10 @@ $language['gauntletsTitle'] = 'Гаунтлеты';
 $language['songsTitle'] = 'Песни';
 $language['sfxsTitle'] = 'Звуковые эффекты';
 
+$language['upload'] = 'Загрузка';
+$language['uploadSongTitle'] = 'Загрузить песню';
+$language['uploadSFXTitle'] = 'Загрузить звуковой эффект';
+
 $language['messengerTitle'] = 'Мессенджер';
 $language['loginToAccountTitle'] = 'Войти в аккаунт';
 $language['yourProfileTitle'] = 'Ваш профиль';
@@ -80,6 +84,13 @@ $language['errorSongNotFound'] = 'Песня не найдена!';
 
 $language['errorListNotFound'] = 'Список уровней не найден!';
 
+$language['errorCouldntReadFile'] = 'Произошла ошибка при чтении этого файла!';
+$language['errorIsNotAnAudio'] = 'Этот файл — не аудиофайл!';
+$language['errorMaxFileSize'] = 'Максимальный размер файла — %1$s МБ!';
+$language['errorFileIsEmpty'] = 'Этот файл пустой!';
+$language['errorInvalidURL'] = 'Неверная ссылка на песню!';
+$language['errorAlreadyReuploaded'] = 'Эта песня уже существует под ID <text dashboard-copy>%1$s</text>!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
 
@@ -100,6 +111,8 @@ $language['successAppliedSettings'] = 'Вы успешно применили н
 
 $language['successDeletedPost'] = 'Вы удалили этот пост!';
 $language['successUploadedPost'] = 'Вы успешно выложили пост!';
+
+$language['successUploadedSong'] = 'Вы успешно выложили песню!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
@@ -287,4 +300,18 @@ $language['noClanPosts'] = 'Постов клана нет!';
 $language['joinClan'] = 'Присоединиться к клану';
 $language['sendClanJoinRequest'] = 'Отправить заявку на вступление';
 $language['viewClan'] = 'Посмотреть клан';
+
+$language['uploadSongViaFile'] = 'Загрузить песню файлом';
+$language['uploadSongViaURL'] = 'Загрузить песню ссылкой';
+
+$language['uploadType'] = 'Тип загрузки';
+$language['chooseUploadType'] = 'Выберите тип загрузки...';
+$language['loadingTitle'] = 'Загрузка...';
+$language['songFile'] = 'Файл песни';
+$language['songURL'] = 'Ссылка на песню';
+$language['chooseSong'] = 'Выберите песню...';
+$language['songArtistText'] = 'Автор песни';
+$language['songTitleText'] = 'Название песни';
+$language['songSize'] = 'Размер песни';
+$language['songSizeTemplate'] = '%1$s МБ';
 ?>

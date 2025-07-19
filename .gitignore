@@ -41,15 +41,26 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
 data/
+
 music/gdps.*
 music/s*.*
 music/*.json
+
 sfx/gdps.*
 sfx/s*.*
 sfx/*.json
+
 test.php
+
 config/proxies.txt
 config/vpns.txt
+
 dashboard/incl/templates/components/emojis_prerendered.html
+
 api/v1/misc/stats.json
+
+dashboard/songs/*.mp3
+dashboard/songs/*.ogg
+dashboard/sfxs/*.ogg

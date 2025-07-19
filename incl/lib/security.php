@@ -21,22 +21,16 @@ class Security {
 		if(!$account) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
 		
 		if($sessionGrants) {
-			$searchPerson = [
-				'accountID' => 0,
-				'userID' => 0,
-				'userName' => '',
-				'IP' => $IP
-			];
-			
+			$searchIP = Library::convertIPForSearching($IP, true);
 			$hourAgo = time() - 3600;
 			
-			$searchFilters = ['type = '.Action::PasswordChange, 'timestamp >= '.$hourAgo];
-			$passwordChanges = Library::getPersonActions($searchPerson, $searchFilters, 1);
+			$searchFilters = ['type = '.Action::PasswordChange, 'timestamp >= '.$hourAgo, 'account = '.$accountID, "IP REGEXP '((\\\D[^.])|^)(".$searchIP.")(\\\D[^$])'"];
+			$passwordChanges = Library::getActions($searchFilters, 1);
 			
 			$sessionTimeToCheck = $passwordChanges && $passwordChanges[0]['timestamp'] >= $hourAgo ? $passwordChanges[0]['timestamp'] : $hourAgo;
 			
-			$searchFilters = ['type = '.Action::GJPSessionGrant, 'timestamp >= '.$sessionTimeToCheck, 'account = '.$accountID];
-			$session = Library::getPersonActions($searchPerson, $searchFilters, 1);
+			$searchFilters = ['type = '.Action::GJPSessionGrant, 'timestamp >= '.$sessionTimeToCheck, 'account = '.$accountID, "IP REGEXP '((\\\D[^.])|^)(".$searchIP.")(\\\D[^$])'"];
+			$session = Library::getActions($searchFilters, 1);
 			
 			if($session) $skipValidating = true;
 		}
@@ -253,7 +247,7 @@ class Security {
 		
 		$person = ["success" => true, "accountID" => $loginToAccount['accountID'], "userID" => $loginToAccount['userID'], "userName" => $loginToAccount["userName"], "IP" => $loginToAccount['IP'], 'auth' => $auth];
 		
-		$checkBan = Library::getPersonBan($person, 4);
+		$checkBan = Library::getPersonBan($person, Ban::Account);
 		if($checkBan) return ["success" => false, "error" => LoginError::AccountIsBanned, "accountID" => $loginToAccount['accountID'], "IP" => $loginToAccount['IP']];
 		
 		return $person;
@@ -450,7 +444,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($globalLevelsUploadDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$globalLevelsUploadDelay." * ".$rateLimitBanMultiplier.", global)");
+						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", Ban::UploadingLevels, Person::IP, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$globalLevelsUploadDelay." * ".$rateLimitBanMultiplier.", global)");
 					}
 					
 					return false;
@@ -471,7 +465,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($perUserLevelsUploadDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", 2, 2, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$perUserLevelsUploadDelay." * ".$rateLimitBanMultiplier.", per user)");
+						Library::banPerson(0, $person, "You exceeded rate limit for uploading levels.", Ban::UploadingLevels, Person::IP, (time() + $rateLimitBanTime), "Person tried to upload too many levels. (".count($isRateLimited)." > ".$perUserLevelsUploadDelay." * ".$rateLimitBanMultiplier.", per user)");
 					}
 					
 					return false;
@@ -492,7 +486,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($accountsRegisterDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded rate limit for registering accounts.", 4, 2, (time() + $rateLimitBanTime), "Person tried to register too many accounts. (".count($isRateLimited)." > ".$accountsRegisterDelay." * ".$rateLimitBanMultiplier.")");
+						Library::banPerson(0, $person, "You exceeded rate limit for registering accounts.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person tried to register too many accounts. (".count($isRateLimited)." > ".$accountsRegisterDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -512,7 +506,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > ($usersCreateDelay * $rateLimitBanMultiplier)) {
-						Library::banPerson(0, $person, "You exceeded rate limit for creating users.", 4, 2, (time() + $rateLimitBanTime), "Person tried to create too many users. (".count($isRateLimited)." > ".$usersCreateDelay." * ".$rateLimitBanMultiplier.")");
+						Library::banPerson(0, $person, "You exceeded rate limit for creating users.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person tried to create too many users. (".count($isRateLimited)." > ".$usersCreateDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -526,7 +520,7 @@ class Security {
 				$isRateLimited = Library::getPersonActions($person, $searchFilters);
 				
 				if(count($isRateLimited) > $filterRateLimitBan) {
-					Library::banPerson(0, $person, "You swore too much.", 3, 2, (time() + $rateLimitBanTime), "Person triggered filters too much. (".count($isRateLimited)." > ".$filterRateLimitBan.")");
+					Library::banPerson(0, $person, "You swore too much.", Ban::Commenting, Person::IP, (time() + $rateLimitBanTime), "Person triggered filters too much. (".count($isRateLimited)." > ".$filterRateLimitBan.")");
 					return false;
 				}
 				
@@ -538,7 +532,7 @@ class Security {
 				$isRateLimited = Library::getPersonActions($person, $searchFilters);
 				
 				if(count($isRateLimited) > $maxLoginTries) {
-					Library::banPerson(0, $person, "You exceeded rate limit for logging in.", 4, 2, (time() + $rateLimitBanTime), "Person failed to login too much. (".count($isRateLimited)." > ".$maxLoginTries.")");
+					Library::banPerson(0, $person, "You exceeded rate limit for logging in.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person failed to login too much. (".count($isRateLimited)." > ".$maxLoginTries.")");
 					return false;
 				}
 				
@@ -550,7 +544,7 @@ class Security {
 				$isRateLimited = Library::getPersonActions($person, $searchFilters);
 				
 				if(count($isRateLimited) > $maxACEExploitTries) {
-					Library::banPerson(0, $person, "You exceeded rate limit for posting malicious levels.", 4, 2, (time() + $rateLimitBanTime), "Person tried to post malicious levels too much. (".count($isRateLimited)." > ".$maxACEExploitTries.")");
+					Library::banPerson(0, $person, "You exceeded rate limit for posting malicious levels.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person tried to post malicious levels too much. (".count($isRateLimited)." > ".$maxACEExploitTries.")");
 					return false;
 				}
 				
@@ -568,7 +562,7 @@ class Security {
 					$isRateLimited = Library::getPersonActions($person, $searchFilters);
 					
 					if(count($isRateLimited) > $backupAccountDelay * $rateLimitBanMultiplier) {
-						Library::banPerson(0, $person, "You exceeded rate limit for backuping account.", 4, 2, (time() + $rateLimitBanTime), "Person tried to backup their account too much. (".count($isRateLimited)." > ".$backupAccountDelay." * ".$rateLimitBanMultiplier.")");
+						Library::banPerson(0, $person, "You exceeded rate limit for backuping account.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person tried to backup their account too much. (".count($isRateLimited)." > ".$backupAccountDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -581,6 +575,7 @@ class Security {
 	public static function checkFilterViolation($person, $content, $type) {
 		require __DIR__.'/../../config/security.php';
 		require_once __DIR__.'/exploitPatch.php';
+		require_once __DIR__."/enums.php";
 		require_once __DIR__.'/mainLib.php';
 		
 		switch($type) {

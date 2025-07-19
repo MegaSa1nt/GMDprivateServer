@@ -55,7 +55,7 @@ $maxAccountCommentLength = 140;
 	Usually, daily levels can be played for 1 day and weekly levels can be played for 1 week.
 	After that these levels should 'expire' and no one can play them again (in daily/weekly tab)
 	
-	True —When the daily/weekly level expires, still show it for players, until the new level is set. (default)
+	True — When the daily/weekly level expires, still show it for players, until the new level is set. (default)
 	False — When the daily/weekly level expires, show no level and a timer, until the new level is set.
 	
 	Note: if you select "true" and daily level is not updated, it still can be beaten only once, then the player will see only a timer.
@@ -175,14 +175,22 @@ $ratedLevelsInSent = false;
 $moderatorsListInGlobal = false;
 
 /*
-	Run Cron automatically
+	Cron settings
+
+	A few settings for Cron
 	
-	This setting will enable automatic Cron
-	
-	True — Cron should run automatically
-	False — Cron should run manually in dashboard
+	$automaticCron — enable automatic Cron
+		True — Cron should run automatically
+		False — Cron should run manually in dashboard
+	$cronTimeout — minimun time in seconds before Cron could be run again
+		Default is 30 seconds
+	$enableTimeoutForAutomaticCron — if automatic Cron is enabled, should core still check for timeout?
+		True — Check timeout for automatic Cron
+		False — Ignore timeout for automatic Cron
 */
 $automaticCron = false;
+$cronTimeout = 30;
+$enableTimeoutForAutomaticCron = false;
 
 /*
 	Show level ID in comments if mentioned
@@ -226,8 +234,8 @@ $enableUserLevelsSearching = true;
 	
 	GDPS core has favourite songs feature, but if you dont want to show them in-game, you can turn on this config
 	
-	True — real Geometry Dash will show instead of showing player's favourite songs
-	False — favourite songs will show in top artists page
+	True — Real Geometry Dash will show instead of showing player's favourite songs
+	False — Favourite songs will show in top artists page
 */
 $topArtistsFromGD = false;
 
@@ -236,8 +244,8 @@ $topArtistsFromGD = false;
 	
 	Moderators with rate permissions can rate any levels, but what if you need to disallow them rating their own levels?
 	
-	True — moderators are not allowed to rate their own levels
-	False — moderators can rate their own levels
+	True — Moderators are not allowed to rate their own levels
+	False — Moderators can rate their own levels
 */
 $dontRateYourOwnLevels = false;
 
@@ -277,8 +285,8 @@ $disallowDeletingLevelByBannedPerson = true;
 	Should core save old level versions? This can be useful if person got hacked or maliciously updated their level
 	
 	$saveLevelVersions — save level versions when person updates their level
-		True — enable saving level versions
-		False — disable saving level versions
+		True — Enable saving level versions
+		False — Disable saving level versions
 	$maxLevelVersionsSaves — how much level versions should be stored? Once limit is reached, core will delete older level versions
 */
 $saveLevelVersions = true;
@@ -289,8 +297,18 @@ $maxLevelVersionsSaves = 10;
 	
 	Should core ask for -f flag when running some dangerous commands? (!delete, !setacc, etc)
 	
-	True — core requires adding -f flag to execute dangerous commands
-	False — you can run dangerous commands without -f flag
+	True — Core requires adding -f flag to execute dangerous commands
+	False — You can run dangerous commands without -f flag
 */
 $forceCommandFlag = true;
+
+/*
+	"Unknown level" when searching for level ID
+	
+	Should core return "Unknown level" when user tries to search for deleted, unexistent or unlisted level? This can fix issue when moderators delete rated level
+	
+	True — Return "Unknown level"
+	False — Return nothing
+*/
+$showUnknownLevel = true;
 ?>

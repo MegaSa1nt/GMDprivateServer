@@ -673,6 +673,7 @@ class Automod {
 		require __DIR__."/../../config/security.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/ip.php";
+		require_once __DIR__."/enums.php";
 		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/exploitPatch.php";
 		
@@ -754,7 +755,7 @@ class Automod {
 			if(!$isWarned) {
 				self::logAutomodActions(13, $similarCommentsCount, $similarity, $commentsCount, $userID);
 				
-				if($commentsSpamUploadDisable) Library::banPerson(0, $banPerson, "No spamming!", 3, 1, (time() + $commentsSpamUploadDisable), "Person tried to spam comments. (".$similarity." > ".$commentsCount." / 3)");
+				if($commentsSpamUploadDisable) Library::banPerson(0, $banPerson, "No spamming!", Ban::Commenting, Person::UserID, (time() + $commentsSpamUploadDisable), "Person tried to spam comments. (".$similarity." > ".$commentsCount." / 3)");
 				
 				//$gs->sendAccountPostsSpammerWarningWebhook($similarCommentsCount, $userID);
 			}
@@ -859,7 +860,7 @@ class Automod {
 	}
 	
 	/*
-		Automod::checkCommentsSpamming($userID)
+		Automod::checkClanPostsSpamming($userID)
 		
 		This function checks last clan posts for spamming
 		
@@ -968,6 +969,7 @@ class Automod {
 	public static function checkStatsSpeed($person) {
 		require __DIR__."/../../config/security.php";
 		require __DIR__."/connection.php";
+		require_once __DIR__."/enums.php";
 		require_once __DIR__."/mainLib.php";
 		
 		$accountID = $person['accountID'];
@@ -1014,7 +1016,7 @@ class Automod {
 		if($starsRatio > $maxStarsPossible || $moonsRatio > $maxMoonsPossible || $userCoinsRatio > $maxUserCoinsPossible || $demonsRatio > $maxDemonsPossible) {
 			$maxText = 'Max in '.$statsTimeCheck.' seconds: ⭐'.$maxStarsPossible.' • 🌙'.$maxMoonsPossible.' • 🪙'.$maxUserCoinsPossible.' • 👿'.$maxDemonsPossible.' | User stats ratio: ⭐'.$starsRatio.' • 🌙'.$moonsRatio.' • 🪙'.$userCoinsRatio.' • 👿'.$demonsRatio;
 			
-			Library::banPerson(0, $person, "You're too good at gaining stats.", 0, 0, 2147483647, "Person gained too much stats in short time. (".$maxText.")");
+			Library::banPerson(0, $person, "You're too good at gaining stats.", Ban::Leaderboards, Person::AccountID, 2147483647, "Person gained too much stats in short time. (".$maxText.")");
 			return false;
 		}
 		

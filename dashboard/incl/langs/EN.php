@@ -42,13 +42,17 @@ $language['gauntletsTitle'] = 'Gauntlets';
 $language['songsTitle'] = 'Songs';
 $language['sfxsTitle'] = 'SFXs';
 
+$language['upload'] = 'Uploads';
+$language['uploadSongTitle'] = 'Add a song';
+$language['uploadSFXTitle'] = 'Add a SFX';
+
 $language['messengerTitle'] = 'Messenger';
 $language['loginToAccountTitle'] = 'Login to account';
 $language['yourProfileTitle'] = 'Your profile';
 $language['logoutFromAccountTitle'] = 'Logout';
 
 /* Error strings */
-$language['errorTitle'] = 'Error has occured';
+$language['errorTitle'] = 'An error has occured';
 
 $language['errorNoPermission'] = 'You have no permission to view this page.';
 
@@ -79,6 +83,15 @@ $language['errorPostingIsDisabled'] = 'Creating posts is disabled.';
 $language['errorSongNotFound'] = 'Song wasn\'t found!';
 
 $language['errorListNotFound'] = 'List wasn\'t found!';
+
+$language['errorCouldntReadFile'] = 'An error has occured when processing this file!';
+$language['errorIsNotAnAudio'] = 'This file is not an audio!';
+$language['errorMaxFileSize'] = 'Maximum file size is %1$s MB!';
+$language['errorFileIsEmpty'] = 'This file is empty!';
+$language['errorInvalidURL'] = 'Invalid song URL!';
+$language['errorAlreadyReuploaded'] = 'This song already exists under ID <text dashboard-copy>%1$s</text>!';
+
+$language['successUploadedSong'] = 'You successfully uploaded a song!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -287,4 +300,18 @@ $language['noClanPosts'] = 'No clan posts!';
 $language['joinClan'] = 'Join clan';
 $language['sendClanJoinRequest'] = 'Send join request';
 $language['viewClan'] = 'View clan';
+
+$language['uploadSongViaFile'] = 'Upload song via file';
+$language['uploadSongViaURL'] = 'Upload song via URL';
+
+$language['uploadType'] = 'Upload type';
+$language['chooseUploadType'] = 'Choose upload type...';
+$language['loadingTitle'] = 'Loading...';
+$language['songFile'] = 'Song file';
+$language['songURL'] = 'Song URL';
+$language['chooseSong'] = 'Choose song...';
+$language['songArtistText'] = 'Song artist';
+$language['songTitleText'] = 'Song title';
+$language['songSize'] = 'Song size';
+$language['songSizeTemplate'] = '%1$s MB';
 ?>

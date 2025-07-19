@@ -27,6 +27,11 @@
 				<text dashboard-copy>%ID%</text>
 			</text>
 		
+			<text class="levelStat" title="%TEXT_songSize%">
+				<i class="fa-solid fa-weight-hanging"></i>
+				<text>%SONG_SIZE%</text>
+			</text>
+		
 			<text class="levelStat" title="%TEXT_uploadDate%">
 				<i class="fa-solid fa-calendar"></i>
 				<text dashboard-date="%reuploadTime%"></text>
@@ -35,7 +40,7 @@
 			<button class="button" type="button" title="%TEXT_usageCount%" href="browse/levels?customSong=1&song=%ID%">
 				<text class="levelStat">
 					<i class="fa-solid fa-gamepad"></i>
-					%levelsCount%
+					%SONG_LEVELS_COUNT%
 				</text>
 			</button>
 			
@@ -43,7 +48,7 @@
 				<text class="levelStat">
 					<i class="fa-solid fa-heart" dashboard-show="%SONG_IS_FAVOURITE%"></i>
 					<i class="fa-regular fa-heart" dashboard-hide="%SONG_IS_FAVOURITE%"></i>
-					<span>%favouritesCount%</span>
+					<span>%SONG_FAVORITES_COUNT%</span>
 				</text>
 			</button>
 		</div>

@@ -126,6 +126,7 @@ $clan['CLAN_PAGE_TEXT'] = sprintf(Dashboard::string('pageText'), $pageNumber, $p
 $clan['CLAN_CREATION_DATE'] = $clan['creationDate'];
 
 $clan['CLAN_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($clan['clanName']);
+$clan['CLAN_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars($clan['clanDesc'])) ?: "<i>".Dashboard::string('noDescription')."</i>";
 $clan['CLAN_TITLE'] = sprintf(Dashboard::string("clanProfile"), htmlspecialchars($clan['clanName']));
 $clan['CLAN_COLOR'] = "color: #".$clan['clanColor']."; text-shadow: 0px 0px 20px #".$clan['clanColor']."61;";
 $clan['CLAN_TAG'] = htmlspecialchars($clan['clanTag']);

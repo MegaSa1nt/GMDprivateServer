@@ -17,10 +17,10 @@ $dataArray = [
 	'SETTING_LANGUAGE_RU_DEFAULT' => $_COOKIE['lang'] == 'RU' ? 'true' : 'false',
 	
 	'ACCOUNT_COLOR' => "color: rgb(".str_replace(",", " ", $personAppearance['commentColor']).")",
-	'CLAN_NAME' => $accountClan ? $accountClan['clan'] : Dashboard::string('notInClan'),
-	'CLAN_COLOR' => $accountClan ? "color: #".$accountClan['color']."" : '',
+	'CLAN_NAME' => $accountClan ? $accountClan['clanName'] : Dashboard::string('notInClan'),
+	'CLAN_COLOR' => $accountClan ? "color: #".$accountClan['clanColor']."; text-shadow: 0px 0px 20px #".$accountClan['clanColor']."61;" : '',
 	
-	'CLAN_TITLE' => $accountClan ? sprintf(Dashboard::string("clanProfile"), $accountClan['clan']) : '',
+	'CLAN_TITLE' => $accountClan ? sprintf(Dashboard::string("clanProfile"), $accountClan['clanName']) : '',
 	'PROFILE_TITLE' => $person['accountID'] ? sprintf(Dashboard::string("userProfile"), $person['userName']) : '',
 	
 	'DASHBOARD_SETTINGS_BUTTON_ONCLICK' => "postPage('settings', 'dashboardSettingsForm')"

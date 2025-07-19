@@ -144,25 +144,20 @@ class Dashboard {
 
 			switch($firstChar) {
 				case '@':
-					if(in_array($element, $players)) break;
-
 					$player = Escape::latin($element);
-					if(empty($player)) break;
+					
+					if(substr($element, 0, strlen($player)) != $player || empty($player) || in_array($player, $players)) break;
 					
 					$players[] = $player;
-					
-					$body = str_replace([' @'.$player, ' @'.$player.' ', '@'.$player.' '], ['&nbsp;@'.$player, '&nbsp;@'.$player.'&nbsp;', '@'.$player.'&nbsp;'], $body);
 
 					break;
 				case '#':
-					if(!is_numeric($element) || in_array($element, $levels)) break;
-
 					$level = Escape::number($element);
+					
+					if(substr($element, 0, strlen($level)) != $level || !is_numeric($level) || in_array($level, $levels)) break;
 					
 					if($level >= 0) $levels[] = $level;
 					else $lists[] = $level * -1;
-					
-					$body = str_replace([' #'.$level, ' #'.$level.' ', '#'.$level.' '], ['&nbsp;#'.$level, '&nbsp;#'.$level.'&nbsp;', '#'.$level.'&nbsp;'], $body);
 
 					break;
 			}
@@ -175,8 +170,6 @@ class Dashboard {
 				foreach($emojiArray AS &$emojiName) {				
 					$emoji = Escape::text(strtolower($emojiName));
 					$emojis[] = $emoji;
-						
-					$body = str_replace([' :'.$emoji.':', ' :'.$emoji.': ', ':'.$emoji.': '], ['&nbsp;:'.$emoji.':', '&nbsp;:'.$emoji.':&nbsp;', ':'.$emoji.':&nbsp;'], $body);
 				}
 			}
 		}
@@ -407,6 +400,12 @@ class Dashboard {
 			'STYLE_TIMESTAMP' => filemtime(__DIR__."/style.css"),
 			'SCRIPT_TIMESTAMP' => filemtime(__DIR__."/script.js"),
 			
+			'MAX_SONG_SIZE' => $songSize,
+			'MAX_SFX_SIZE' => $sfxSize,
+			
+			'MAX_SONG_SIZE_TEXT' => sprintf(self::string("errorMaxFileSize"), $songSize),
+			'MAX_SFX_SIZE_TEXT' => sprintf(self::string("errorMaxFileSize"), $sfxSize),
+			
 			'FAILED_TO_LOAD_TEXT' => "<i class='fa-solid fa-xmark'></i>".self::string("errorFailedToLoadPage"),
 			'COPIED_TEXT' => "<i class='fa-solid fa-copy'></i>".self::string("successCopiedText"),
 			
@@ -442,6 +441,7 @@ class Dashboard {
 		$dataArray = [
 			'INFO_TITLE' => self::string("errorTitle"),
 			'INFO_DESCRIPTION' => $error,
+			'INFO_EXTRA' => '',
 			'INFO_BUTTON_TEXT' => self::string("home"),
 			'INFO_BUTTON_ONCLICK' => "getPage('')"
 		];
@@ -767,6 +767,11 @@ class Dashboard {
 		$song['SONG_AUTHOR'] = $contextMenuData['MENU_SONG_AUTHOR'] = htmlspecialchars($song['authorName']);
 		$song['SONG_NAME'] = $contextMenuData['MENU_SONG_NAME'] = htmlspecialchars($song['name']);
 		$song['SONG_URL'] = $contextMenuData['MENU_SONG_URL'] = htmlspecialchars($downloadLink);
+		
+		$song['SONG_SIZE'] = sprintf(self::string("songSizeTemplate"), $song['size'] ?: 0);
+		
+		$song['SONG_LEVELS_COUNT'] = $song['levelsCount'] ?: 0;
+		$song['SONG_FAVORITES_COUNT'] = $song['favoritesCount'] ?: 0;
 		
 		$song['SONG_IS_FAVOURITE'] = (is_array($favouriteSongs) && in_array($song['ID'], $favouriteSongs)) || (!is_array($favouriteSongs) && $favouriteSongs) ? 'true' : 'false';
 		

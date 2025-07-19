@@ -1,12 +1,14 @@
 <?php
 class Cron {
 	public static function autoban($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
+		require_once __DIR__."/enums.php";
 		require_once __DIR__."/mainLib.php";
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 39 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -66,7 +68,7 @@ class Cron {
 				'IP' => $getUser['IP'],
 			];
 			
-			Library::banPerson(0, $banPerson, "You're too good at gaining stats.", 0, 1, 2147483647, $maxText);
+			Library::banPerson(0, $banPerson, "You're too good at gaining stats.", Ban::Leaderboards, Person::UserID, 2147483647, $maxText);
 		}
 		
 		Library::logAction($person, Action::CronAutoban, $stars, $coins, $demons, $moons, count($getCheaters));
@@ -80,7 +82,7 @@ class Cron {
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 40 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -220,12 +222,13 @@ class Cron {
 	}
 	
 	public static function fixUsernames($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 41 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -242,12 +245,13 @@ class Cron {
 	}
 	
 	public static function updateFriendsCount($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 42 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -272,12 +276,13 @@ class Cron {
 	}
 	
 	public static function miscFixes($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 43 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -309,12 +314,13 @@ class Cron {
 	}
 	
 	public static function updateSongsUsage($person, $checkForTime) {
+		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 44 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}
@@ -414,7 +420,7 @@ class Cron {
 		
 		if($checkForTime) {
 			$check = $db->prepare("SELECT count(*) FROM actions WHERE type = 59 AND timestamp >= :timestamp");
-			$check->execute([':timestamp' => time() - 30]);
+			$check->execute([':timestamp' => time() - $cronTimeout]);
 			$check = $check->fetchColumn();
 			if($check) return false;
 		}

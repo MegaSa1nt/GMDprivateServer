@@ -4,6 +4,7 @@ if(!isset($db)) global $db;
 require __DIR__."/../../config/dashboard.php";
 require_once __DIR__."/cron.php";
 require_once __DIR__."/ip.php";
+require_once __DIR__."/enums.php";
 require_once __DIR__."/mainLib.php";
 require_once __DIR__."/security.php";
 
@@ -278,16 +279,16 @@ if(!$installed) {
 				
 				switch(true) {
 					case $ban['isBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], 0, 1, 2147483647);
+						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Leaderboards, Person::UserID, 2147483647);
 						break;
 					case $ban['isCreatorBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], 1, 1, 2147483647);
+						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Creators, Person::UserID, 2147483647);
 						break;
 					case $ban['isUploadBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], 2, 1, 2147483647);
+						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::UploadingLevels, Person::UserID, 2147483647);
 						break;
 					case $ban['isCommentBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], 3, 1, 2147483647);
+						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Commenting, Person::UserID, 2147483647);
 						break;
 				}
 			}

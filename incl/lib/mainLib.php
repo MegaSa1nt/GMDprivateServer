@@ -503,23 +503,23 @@ class Library {
 		];
 		
 		switch($personType) {
-			case 0:
+			case Person::AccountID:
 				$person = $person['accountID'];
 				
-				if($banType == 4) {
+				if($banType == Ban::Account) {
 					$removeAuth = $db->prepare('UPDATE accounts SET auth = "" WHERE accountID = :accountID');
 					$removeAuth->execute([':accountID' => $person]);
 				}
 				
 				break;
-			case 1:
+			case Person::UserID:
 				$person = $person['userID'];
 				
 				break;
-			case 2:
+			case Person::IP:
 				$person = self::convertIPForSearching($person['IP']);
 				
-				if($banType == 4) {
+				if($banType == Ban::Account) {
 					$banIP = $db->prepare("INSERT INTO bannedips (IP) VALUES (:IP)");
 					$banIP->execute([':IP' => $person]);
 				}
@@ -569,7 +569,7 @@ class Library {
 		$ban = self::getBanByID($banID);
 		if(!$ban) return false;
 		
-		if($ban['personType'] == 2 && $ban['banType'] == 4) {
+		if($ban['personType'] == Person::IP && $ban['banType'] == Ban::Account) {
 			$banIP = $db->prepare("DELETE FROM bannedips WHERE IP = :IP");
 			$banIP->execute([':IP' => $ban['person']]);
 		}
@@ -806,14 +806,14 @@ class Library {
 		
 		switch($type) {
 			case 'top':
-				$queryText = self::getBannedPeopleQuery(0, true);
+				$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 				
 				$leaderboard = $db->prepare("SELECT * FROM users WHERE ".$queryText." stars + moons >= :stars ORDER BY stars + moons DESC, userName ASC LIMIT 100");
 				$leaderboard->execute([':stars' => $leaderboardMinStars]);
 				
 				break;
 			case 'creators':
-				$queryText = self::getBannedPeopleQuery(1, true);
+				$queryText = self::getBannedPeopleQuery(Ban::Creators, true);
 				
 				$leaderboard = $db->prepare("SELECT * FROM users WHERE ".$queryText." creatorPoints > 0 ORDER BY creatorPoints DESC, userName ASC LIMIT 100");
 				$leaderboard->execute();
@@ -830,7 +830,7 @@ class Library {
 					break;
 				}
 				
-				$queryText = self::getBannedPeopleQuery(0, true);
+				$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 				
 				$count = floor($count / 2);
 				
@@ -866,7 +866,7 @@ class Library {
 				$leaderboard->execute();
 				break;
 			case 'week':
-				$queryText = self::getBannedPeopleQuery(0, true);
+				$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 
 				$leaderboard = $db->prepare("SELECT users.*, SUM(actions.value) AS stars, SUM(actions.value2) AS coins, SUM(actions.value3) AS demons FROM actions
 					INNER JOIN users ON actions.account = users.extID WHERE type = '9' AND ".$queryText." timestamp > :time AND stars > 0
@@ -886,7 +886,7 @@ class Library {
 		
 		if($stars + $moons < $leaderboardMinStars) return 0;
 		
-		$queryText = self::getBannedPeopleQuery(0, true);
+		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		
 		$rank = $db->prepare("SELECT count(*) FROM users WHERE ".$queryText." stars + moons >= :stars AND IF(stars + moons = :stars, userName <= :userName, 1)");
 		$rank->execute([':stars' => $stars + $moons, ':userName' => $userName]);
@@ -951,7 +951,7 @@ class Library {
 			return false;
 		}
 		
-		$checkBan = self::getPersonBan($person, 3);
+		$checkBan = self::getPersonBan($person, Ban::Commenting);
 		if($checkBan) {
 			$GLOBALS['core_cache']['canSendMessage'][$person['accountID']][$toAccountID] = false;
 			return false;
@@ -1693,7 +1693,7 @@ class Library {
 		$userID = $person['userID'];
 		$IP = $person['IP'];
 		
-		$checkBan = self::getPersonBan($person, 2);
+		$checkBan = self::getPersonBan($person, Ban::UploadingLevels);
 		if($checkBan) return ["success" => false, "error" => CommonError::Banned];
 		
 		if(is_numeric($accountID)) { // Numeric account ID = registered account
@@ -2080,7 +2080,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelRate, $realDifficulty['difficulty'], $stars, $levelID, $featuredValue, $starCoins);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return $realDifficulty['name'];
 	}
@@ -2113,7 +2113,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelDailySet, 1, $dailyTime, $levelID, $type);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return $dailyTime;
 	}
@@ -2161,7 +2161,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelEventSet, $eventTime + $duration, $rewards, $levelID);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return $eventTime;
 	}
@@ -2252,7 +2252,7 @@ class Library {
 		$removeDaily = $db->prepare("UPDATE dailyfeatures SET timestamp = timestamp * -1 WHERE feaID = :feaID");
 		$removeDaily->execute([':feaID' => $isDaily]);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2270,7 +2270,7 @@ class Library {
 		$removeEvent = $db->prepare("UPDATE events SET duration = duration * -1 WHERE feaID = :feaID");
 		$removeEvent->execute([':feaID' => $isEvent]);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2291,7 +2291,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelCreatorChange, $targetUserName, $targetUserID, $levelID);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2377,7 +2377,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelChangeSong, $songID, $level['songID'], $levelID);
 		
-		if($automaticCron) Cron::updateSongsUsage($person, false);
+		if($automaticCron) Cron::updateSongsUsage($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2437,7 +2437,7 @@ class Library {
 		
 		self::logModeratorAction($person, ModeratorAction::LevelCreatorPointsShare, $targetUserID, '', $levelID);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2465,7 +2465,7 @@ class Library {
 		
 		$accountID = $person['accountID'];
 		
-		$checkBan = self::getPersonBan($person, 3);
+		$checkBan = self::getPersonBan($person, Ban::Commenting);
 		if($checkBan) return ["success" => false, "error" => CommonError::Banned, "info" => $checkBan];
 		
 		if(is_numeric($accountID)) { // Numeric account ID = registered account
@@ -2491,7 +2491,7 @@ class Library {
 		
 		if($person['accountID'] == 0 || $person['userID'] == 0) return ["success" => false, "error" => LoginError::WrongCredentials];
 		
-		$checkBan = self::getPersonBan($person, 3);
+		$checkBan = self::getPersonBan($person, Ban::Commenting);
 		if($checkBan) return ["success" => false, "error" => CommonError::Banned, "info" => $checkBan];
 		
 		if(is_numeric($accountID)) { // Numeric account ID = registered account
@@ -2520,7 +2520,7 @@ class Library {
 		if($disallowDeletingUpdateLockedLevel && $level['updateLocked']) return false;
 		
 		if($disallowDeletingLevelByBannedPerson) {
-			$checkBan = self::getPersonBan($person, 2);
+			$checkBan = self::getPersonBan($person, Ban::UploadingLevels);
 			if($checkBan) return false;
 		}
 		
@@ -2532,7 +2532,7 @@ class Library {
 		
 		if(file_exists(__DIR__."/../../data/levels/".$levelID)) rename(__DIR__."/../../data/levels/".$levelID, __DIR__."/../../data/levels/deleted/".$levelID);
 		
-		if($automaticCron) Cron::updateCreatorPoints($person, false);
+		if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 		
 		return true;
 	}
@@ -2576,7 +2576,7 @@ class Library {
 		
 		if($person['accountID'] == 0 || $person['userID'] == 0 || Automod::isLevelsDisabled(2)) return false;
 		
-		$checkBan = self::getPersonBan($person, 0);
+		$checkBan = self::getPersonBan($person, Ban::Leaderboards);
 		if($checkBan) return false;
 		
 		$accountID = $person['accountID'];
@@ -2584,11 +2584,11 @@ class Library {
 		$level = self::getLevelByID($levelID);
 		
 		if($coins < 0 || $coins > $level['coins']) {
-			self::banPerson(0, $person, "Good level score, buddy!", 0, 0, 2147483647, "Person tried to post level score with invalid coins value. (".$coins.")");
+			self::banPerson(0, $person, "Good level score, buddy!", Ban::Leaderboards, Person::AccountID, 2147483647, "Person tried to post level score with invalid coins value. (".$coins.")");
 			return false;
 		}
 		if($percent < 0 || $percent > 100) {
-			self::banPerson(0, $person, "Good level score, buddy!", 0, 0, 2147483647, "Person tried to post level score with invalid percent value. (".$percent.")");
+			self::banPerson(0, $person, "Good level score, buddy!", Ban::Leaderboards, Person::AccountID, 2147483647, "Person tried to post level score with invalid percent value. (".$percent.")");
 			return false;
 		}
 		
@@ -2597,7 +2597,7 @@ class Library {
 		if(!empty($progressesArray)) foreach($progressesArray AS &$progressValue) $progressesPercent += $progressValue;
 
 		if($percent != $progressesPercent) {
-			self::banPerson(0, $person, "Good level score, buddy!", 0, 0, 2147483647, "Person tried to post level score with invalid progresses value. (".$percent.", \"".$progresses."\" -> ".$progressesPercent.")");
+			self::banPerson(0, $person, "Good level score, buddy!", Ban::Leaderboards, Person::AccountID, 2147483647, "Person tried to post level score with invalid progresses value. (".$percent.", \"".$progresses."\" -> ".$progressesPercent.")");
 			return false;
 		}
 		
@@ -2630,7 +2630,7 @@ class Library {
 		$accountID = $person['accountID'];
 		$condition = $dailyID ? ">" : "=";
 		
-		$queryText = self::getBannedPeopleQuery(0, true);
+		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		
 		switch($type) {
 			case 0:
@@ -2675,7 +2675,7 @@ class Library {
 		
 		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
 		
-		$checkBan = self::getPersonBan($person, 0);
+		$checkBan = self::getPersonBan($person, Ban::Leaderboards);
 		if($checkBan) return false;
 		
 		$accountID = $person['accountID'];
@@ -2683,12 +2683,12 @@ class Library {
 		$level = self::getLevelByID($levelID);
 		
 		if($coins > $level['coins']) {
-			self::banPerson(0, $person, "Good level score, buddy!", 0, 0, 2147483647, "Person tried to post level score with invalid coins value. (".$coins.")");
+			self::banPerson(0, $person, "Good level score, buddy!", Ban::Leaderboards, Person::AccountID, 2147483647, "Person tried to post level score with invalid coins value. (".$coins.")");
 			return false;
 		}
 		
 		if($scores['time'] < 0 || $scores['points'] < 0) {
-			self::banPerson(0, $person, "Good level score, buddy!", 0, 0, 2147483647, "Person tried to post level score with invalid scores value. (time: ".$scores['time'].", points: ".$scores['points'].")");
+			self::banPerson(0, $person, "Good level score, buddy!", Ban::Leaderboards, Person::AccountID, 2147483647, "Person tried to post level score with invalid scores value. (time: ".$scores['time'].", points: ".$scores['points'].")");
 			return false;
 		}
 		
@@ -2724,7 +2724,7 @@ class Library {
 		$condition = $dailyID ? ">" : "=";
 		$order = $mode == 'time' ? 'ASC' : 'DESC';
 		
-		$queryText = self::getBannedPeopleQuery(0, true);
+		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		
 		switch($type) {
 			case 0:
@@ -2853,7 +2853,7 @@ class Library {
 		$commentsCount->execute([':levelID' => $levelID]);
 		$commentsCount = $commentsCount->fetchColumn();
 		
-		$queryText = self::getBannedPeopleQuery(0, true);
+		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		
 		$levelScoresCount = $db->prepare("SELECT count(*) FROM ".($level['levelLength'] == 5 ? 'plat' : 'level')."scores INNER JOIN users ON users.extID = ".($level['levelLength'] == 5 ? 'plat' : 'level')."scores.accountID WHERE ".$queryText." levelID = :levelID");
 		$levelScoresCount->execute([':levelID' => $levelID]);
@@ -3737,7 +3737,7 @@ class Library {
 			$versionUrl = $server.'/'.$types[$type].'/'.$types[$type].'library_version'.($types[$type] == 'music' ? '_02' : '').'.txt';
 			$dataUrl = $server.'/'.$types[$type].'/'.$types[$type].'library'.($types[$type] == 'music' ? '_02' : '').'.dat';
 
-			$oldVersion = file_exists(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt') ? file_get_contents(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt') : [0, 0];
+			$oldVersion = file_exists(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt') ? explode(', ', file_get_contents(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt')) : [0, 0];
 			$times[] = (int)$oldVersion[1];
 			
 			if((int)$oldVersion[1] + 600 > time()) continue; // Download library only once per 10 minutes
@@ -3751,15 +3751,16 @@ class Library {
 			$newVersion = (int)abs(Escape::number(curl_exec($curl)));
 			curl_close($curl);
 			
+			file_put_contents(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt', $newVersion.', '.time());
+			
 			if($newVersion > $oldVersion[0] || !$oldVersion[0]) {
-				file_put_contents(__DIR__.'/../../'.$types[$type].'/'.$key.'.txt', $newVersion.', '.time());
-				
 				$download = curl_init($dataUrl.'?token='.$token.'&expires='.$expires.'&dashboard=1');
 				curl_setopt_array($download, [
 					CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
 					CURLOPT_RETURNTRANSFER => 1,
 					CURLOPT_FOLLOWLOCATION => 1
 				]);
+				
 				$dat = curl_exec($download);
 				$resultStatus = curl_getinfo($download, CURLINFO_HTTP_CODE);
 				curl_close($download);
@@ -4374,6 +4375,89 @@ class Library {
 		return $library['originalIDs'][$server][$audioID];
 	}
 	
+	public static function uploadSong($person, $songType, $songAuthor, $songTitle, $songFile = false, $songURL = false, $pathToSongsFolder = '') {
+		require __DIR__."/../../config/dashboard.php";
+	    require __DIR__."/connection.php";
+		
+		$accountID = $person['accountID'];
+		
+		$checkBan = self::getPersonBan($person, Ban::UploadingAudio);
+		if($checkBan) return ['success' => false, 'error' => SongError::Banned, "info" => $checkBan];
+		
+		$songID = false;
+		
+		do { // If randomized ID picks existing song ID
+			$tempSongID = rand(99, 7999999);
+			
+			$checkID = $db->prepare('SELECT count(*) FROM songs WHERE ID = :id');
+			$checkID->execute([':id' => $tempSongID]);
+			$checkID = $checkID->fetchColumn();
+			
+			if(!$checkID) $songID = $tempSongID;
+		} while(!$songID);
+		
+		switch($songType) {
+			case 0:
+				if($songFile['error'] != UPLOAD_ERR_OK) return ['success' => false, 'error' => SongError::InvalidFile];
+				
+				if($songFile['size'] == 0) return ['success' => false, 'error' => SongError::UnknownError];
+				if($songFile['size'] > $songSize * 1024 * 1024) return ['success' => false, 'error' => SongError::TooBig];
+				
+				$fileData = file_get_contents($songFile['tmp_name']);
+				
+				$finfo = new finfo(FILEINFO_MIME_TYPE);
+				$fileType = $finfo->buffer($fileData);
+				
+				if($fileType != "audio/ogg") return ['success' => false, 'error' => SongError::NotAnAudio];
+				
+				$filePath = $pathToSongsFolder.'/'.$songID.'.ogg';
+				$songSize = round($songFile['size'] / 1048576, 2);
+				
+				move_uploaded_file($songFile['tmp_name'], $filePath);
+				
+				$songInfo = self::getAudioInfo($filePath);
+				$songDuration = isset($songInfo['playtime_seconds']) ? (int)$songInfo['playtime_seconds'] : 0;
+				
+				$songAuthor = Escape::text($songAuthor, 40) ?: Escape::text($songInfo['tags']["vorbiscomment"]['artist'][0]) ?: 'Reupload';
+				$songTitle = Escape::text($songTitle, 35) ?: Escape::text($songInfo['tags']["vorbiscomment"]['title'][0]) ?: 'Unknown';
+				
+				$songURL = (isset($_SERVER['HTTPS']) ? "https" : "http")."://".$_SERVER["HTTP_HOST"].dirname(dirname($_SERVER["REQUEST_URI"]))."/songs/".$songID.".ogg";
+				
+				break;
+			case 1:
+				if(!filter_var($songURL, FILTER_VALIDATE_URL)) return ['success' => false, 'error' => SongError::InvalidURL];
+				
+				$songExists = $db->prepare("SELECT ID FROM songs WHERE download = :download");
+				$songExists->execute([':download' => $songURL]);	
+				$songExists = $songExists->fetchColumn();
+				if($songExists) return ['success' => false, 'error' => SongError::AlreadyUploaded, 'songID' => $songExists];
+				
+				$songAuthor = Escape::text($songAuthor, 40) ?: 'Reupload';
+				$songTitle = Escape::text($songTitle, 35) ?: 'Unknown';
+				
+				$songDuration = 0;
+				
+				break;
+			default:
+				 return ['success' => false, 'error' => SongError::UnknownError];
+		}
+		
+		$insertSong = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, duration, download, hash, reuploadTime, reuploadID, isDisabled) VALUES (:id, :name, '0', :author, :size, :duration, :download, '', :reuploadTime, :reuploadID, :isDisabled)");
+		$insertSong->execute([':id' => $songID, ':name' => $songTitle, ':download' => $songURL, ':author' => $songAuthor, ':size' => $songSize, ':duration' => $songDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSongs ? 0 : 1)]);
+		
+		self::logAction($person, Action::SongUpload, $songID, $songAuthor, $songTitle, $songURL, $songDuration, ($preenableSongs ? 0 : 1));
+		
+		return ['success' => true, 'songID' => $songID];
+	}
+	public static function getAudioInfo($file) {
+		require_once __DIR__.'/../../config/getid3/getid3.php';
+		$getID3 = new getID3;
+		
+		$info = $getID3->analyze($file);
+		
+		return $info;
+	}
+	
 	/*
 		Clans-related functions
 	*/
@@ -4489,7 +4573,7 @@ class Library {
 			return $GLOBALS['core_cache']['clanStatsCount'][$clanID];
 		}
 		
-		$queryText = self::getBannedPeopleQuery(0, true);
+		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		
 		$clanStats = $db->prepare("SELECT SUM(stars) AS stars, SUM(moons) AS moons, SUM(diamonds) AS diamonds, SUM(coins) AS coins, SUM(userCoins) AS userCoins, SUM(demons) AS demons, SUM(creatorPoints) AS creatorPoints FROM users INNER JOIN clans ON users.clanID = clans.clanID WHERE ".$queryText." clans.clanID = :clanID");
 		$clanStats->execute([':clanID' => $clanID]);
@@ -4745,8 +4829,8 @@ class Library {
 	public static function getStats() {
 		require __DIR__."/connection.php";
 		
-		$leaderboardBannedQuery = self::getBannedPeopleQuery(0, false);
-		$creatorsBannedQuery = self::getBannedPeopleQuery(1, false);
+		$leaderboardBannedQuery = self::getBannedPeopleQuery(Ban::Leaderboards, false);
+		$creatorsBannedQuery = self::getBannedPeopleQuery(Ban::Creators, false);
 		
     	// 2592000 seconds = 30d
     	$stats = $db->prepare("SELECT

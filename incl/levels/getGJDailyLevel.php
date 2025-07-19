@@ -68,7 +68,7 @@ if(!$daily['webhookSent']) {
 		'IP' => $IP
 	];
 	
-	if($automaticCron) Cron::updateCreatorPoints($person, false);
+	if($automaticCron) Cron::updateCreatorPoints($person, $enableTimeoutForAutomaticCron);
 }
 
 exit($dailyID."|".$timeLeft.$stringToAdd);

@@ -1,0 +1,71 @@
+<div class="box">
+	<form name="uploadSongForm" autocomplete="gdps-dashboard">
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-arrow-up-from-bracket"></i>
+				%TEXT_uploadType%
+			</h2>
+			
+			<div class="select view" dashboard-select="songType">
+				<input type="hidden" name="songType" dashboard-select-value required>
+				<input type="text" placeholder="%TEXT_chooseUploadType%" dashboard-select-input>
+					
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+				<div class="options" dashboard-select-options>
+					<div class="option" value="0" dashboard-select-option="%TEXT_uploadSongViaFile%">
+						<i class="fa-solid fa-file-import"></i>
+						<text>%TEXT_uploadSongViaFile%</text>
+					</div>
+					
+					<div class="option" value="1" dashboard-select-option="%TEXT_uploadSongViaURL%">
+						<i class="fa-solid fa-link"></i>
+						<text>%TEXT_uploadSongViaURL%</text>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="inputDiv hide" dashboard-select-type="songType" value="0">
+			<h2>
+				<i class="fa-solid fa-file-import"></i>
+				%TEXT_songFile%
+			</h2>
+			
+			<label for="songFile" class="inputStyle" dashboard-file-input>
+				<h4 dashboard-file-empty="%TEXT_chooseSong%"></h4>
+			
+				<input type="file" name="songFile" id="songFile" accept="audio/mpeg, audio/ogg, audio/wav, audio/webm" required disabled />
+			</label>
+		</div>
+		
+		<div class="inputDiv hide" dashboard-select-type="songType" value="1">
+			<h2>
+				<i class="fa-solid fa-link"></i>
+				%TEXT_songURL%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="songURL" autocomplete="gdps-dashboard-songArtist" placeholder="https://example.com/verycoolsong.mp3" disabled />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-user"></i>
+				%TEXT_songArtistText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="songAuthor" autocomplete="gdps-dashboard-songArtist" placeholder="Artist the Cool" dashboard-not-required />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-pen-to-square"></i>
+				%TEXT_songTitleText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="songTitle" autocomplete="gdps-dashboard-songTitle" placeholder="The Incredible Song Title" dashboard-not-required />
+		</div>
+		
+		<button class="button" type="button" onclick="%UPLOAD_SONG_BUTTON_ONCLICK%">%TEXT_uploadSongTitle%</button>
+	</form>
+</div>
