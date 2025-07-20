@@ -63,35 +63,39 @@ async function getPage(href, skipCheck = false) {
 }
 
 async function postPage(href, form, showLoadingCircle = true) {
-	const formData = await getForm(form);
-	if(!formData) return false;
+	return new Promise(async (r) => {
+		const formData = await getForm(form);
+		if(!formData) return r(false);
 
-	if(showLoadingCircle) dashboardLoader.classList.remove("hide");
-	
-	switch(true) {
-		case href == '@':
-			href = window.location.href;
-			break;
-		case href.startsWith('@'):
-			const newParameter = href.substring(1).split("=");
-			
-			const urlParams = new URLSearchParams(window.location.search);
-			urlParams.set(newParameter[0], newParameter[1])
-			
-			break;
-	}
-	
-	const pageRequest = await fetch(href, {
-		method: "POST",
-		body: formData
+		if(showLoadingCircle) dashboardLoader.classList.remove("hide");
+		
+		switch(true) {
+			case href == '@':
+				href = window.location.href;
+				break;
+			case href.startsWith('@'):
+				const newParameter = href.substring(1).split("=");
+				
+				const urlParams = new URLSearchParams(window.location.search);
+				urlParams.set(newParameter[0], newParameter[1])
+				
+				break;
+		}
+		
+		const pageRequest = await fetch(href, {
+			method: "POST",
+			body: formData
+		});
+		const response = await pageRequest.text();
+		
+		href = pageRequest.url;
+		
+		const updatePageDetails = await changePage(response, href);
+		
+		if(updatePageDetails && showLoadingCircle) dashboardLoader.classList.add("hide");
+		
+		r(true);
 	});
-	const response = await pageRequest.text();
-	
-	href = pageRequest.url;
-	
-	const updatePageDetails = await changePage(response, href);
-	
-	if(updatePageDetails && showLoadingCircle) dashboardLoader.classList.add("hide");
 }
 
 function changePage(response, href, skipCheck = false) {
@@ -637,6 +641,7 @@ async function updatePage() {
 	
 	const fileInputElements = document.querySelectorAll("[dashboard-file-input]");
 	fileInputElements.forEach(async (element) => {
+		const fileInputType = element.getAttribute("dashboard-file-input");
 		const fileInputText = element.querySelector("h4");
 		const fileInputElement = element.querySelector("input");
 		
@@ -670,11 +675,11 @@ async function updatePage() {
 				return;
 			}
 			
-			if(fileData.byteLength > maxSongSize) {
+			if(fileData.byteLength > (fileInputType == "song" ? maxSongSize : maxSFXSize)) {
 				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
 				fileInputElement.value = null;
 				
-				showToast(xIcon + maxSongSizeText, "error");
+				showToast(xIcon + (fileInputType == "song" ? maxSongSizeText : maxSFXSizeText), "error");
 				
 				return;
 			}
@@ -968,9 +973,123 @@ async function handleSongUpload(form) {
 	
 	const songType = formData.get("songType");
 	
-	if(songType == 1) return postPage('upload/song', form);
+	showLoaderProgressBar(true, uploadSongProcessingText, 0, 0, 3);
 	
-	// Convert song if its not OGG, later
+	if(songType == 1 || !converterAPIs.length) {
+		showLoaderProgressBar(true, uploadSongUploadingText, 2, 0, 3);
+		
+		return postPage('upload/song', form, false).then(() => {
+			showLoaderProgressBar(true, doneText, 3, 0, 3);
+			setTimeout(() => showLoaderProgressBar(false), 200);
+		});
+	}
 	
-	return postPage('upload/song', form);
+	const originalSongFile = formData.get("songFile");
+	
+	const fileData = await getFileData(originalSongFile);
+	if(!fileData) return;
+	
+	const fileType = await getFileType(fileData);
+	if(fileType.mime != "audio/ogg") {
+		showLoaderProgressBar(true, uploadSongConvertingText, 1, 0, 3);
+		
+		const convertedSongFile = await getConvertedSong(fileData);
+		if(typeof convertedSongFile == 'string') {
+			showLoaderProgressBar(false);
+			
+			return showToast(xIcon + convertedSongFile, "error");
+		}
+		
+		formData.set("songFile", new File([convertedSongFile], "song.ogg"));
+	}
+	
+	showLoaderProgressBar(true, uploadSongUploadingText, 2, 0, 3);
+	
+	return postPage('upload/song', formData, false).then(() => {
+		showLoaderProgressBar(true, doneText, 3, 0, 3);
+		setTimeout(() => showLoaderProgressBar(false), 200);
+	});
+}
+
+async function getConvertedSong(fileBuffer) {
+	return new Promise(async (r) => {
+		const converterAPI = converterAPIs[random(0, converterAPIs.length - 1)];
+		if(!converterAPI) return r(false);
+		
+		const fileRequest = await fetch(converterAPI + "/?format=ogg", {
+			method: "POST",
+			body: fileBuffer
+		});
+		
+		if(!fileRequest.ok) {
+			const errorMessage = await fileRequest.text();
+			return r(errorMessage);
+		}
+		
+		convertedFile = await fileRequest.arrayBuffer();
+		
+		return r(convertedFile);
+	});
+}
+
+function random(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+async function showLoaderProgressBar(show, text = '', value = 0, min = 0, max = 100) {
+	const loaderProgressElement = document.getElementById("dashboard-loader-progress");
+	const progressTextElement = loaderProgressElement.querySelector("h1");
+	const progressElement = loaderProgressElement.querySelector("progress");
+	
+	if(!show) return loaderProgressElement.classList.add("hide");
+	
+	loaderProgressElement.classList.remove("hide");
+	
+	progressTextElement.innerHTML = escapeHTML(text.toString());
+	
+	progressElement.value = value;
+	progressElement.min = min;
+	progressElement.max = max;
+}
+
+async function handleSFXUpload(form) {
+	const formData = await getForm(form);
+	if(!formData) return false;
+	
+	showLoaderProgressBar(true, uploadSongProcessingText, 0, 0, 3);
+	
+	if(!converterAPIs.length) {
+		showLoaderProgressBar(true, uploadSongUploadingText, 2, 0, 3);
+		
+		return postPage('upload/sfx', form, false).then(() => {
+			showLoaderProgressBar(true, doneText, 3, 0, 3);
+			setTimeout(() => showLoaderProgressBar(false), 200);
+		});
+	}
+	
+	const originalSFXFile = formData.get("sfxFile");
+	
+	const fileData = await getFileData(originalSFXFile);
+	if(!fileData) return;
+	
+	const fileType = await getFileType(fileData);
+	if(fileType.mime != "audio/ogg") {
+		showLoaderProgressBar(true, uploadSongConvertingText, 1, 0, 3);
+		
+		const convertedSFXFile = await getConvertedSong(fileData);
+		if(typeof convertedSFXFile == 'string') {
+			showLoaderProgressBar(false);
+			
+			return showToast(xIcon + convertedSFXFile, "error");
+		}
+		
+		formData.set("sfxFile", new File([convertedSFXFile], "sfx.ogg"));
+	}
+	
+	showLoaderProgressBar(true, uploadSongUploadingText, 2, 0, 3);
+	
+	return postPage('upload/sfx', formData, false).then(() => {
+		showLoaderProgressBar(true, doneText, 3, 0, 3);
+		setTimeout(() => showLoaderProgressBar(false), 200);
+	});
 }

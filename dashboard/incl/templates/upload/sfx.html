@@ -1,0 +1,27 @@
+<div class="box">
+	<form name="uploadSFXForm" autocomplete="gdps-dashboard">
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-file-import"></i>
+				%TEXT_sfxFile%
+			</h2>
+			
+			<label for="sfxFile" class="inputStyle" dashboard-file-input="sfx">
+				<h4 dashboard-file-empty="%TEXT_chooseSFX%"></h4>
+			
+				<input type="file" name="sfxFile" id="sfxFile" accept="audio/mpeg, audio/ogg, audio/wav, audio/webm" required />
+			</label>
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-pen-to-square"></i>
+				%TEXT_sfxTitleText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="sfxTitle" autocomplete="gdps-dashboard-sfxTitle" placeholder="The Incredible SFX Title" />
+		</div>
+		
+		<button class="button" type="button" onclick="%UPLOAD_SFX_BUTTON_ONCLICK%">%TEXT_uploadSFXTitle%</button>
+	</form>
+</div>

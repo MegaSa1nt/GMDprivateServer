@@ -24,7 +24,7 @@ class Library {
 			'IP' => $IP,
 		];
 		
-		$checkRegisterRateLimit = Security::checkRateLimits($logPerson, 2);
+		$checkRegisterRateLimit = Security::checkRateLimits($logPerson, RateLimit::AccountsRegister);
 		if(!$checkRegisterRateLimit) return ["success" => false, "error" => CommonError::Automod];
 		
 		if($maxAccountsFromIP) {
@@ -162,7 +162,7 @@ class Library {
 		];
 		
 		if(!$bypassRateLimit) {
-			$checkCreateRateLimit = Security::checkRateLimits($logPerson, 3);
+			$checkCreateRateLimit = Security::checkRateLimits($logPerson, RateLimit::UsersCreation);
 			if($checkCreateRateLimit) return false;
 		}
 		
@@ -1701,13 +1701,13 @@ class Library {
 			if($account && $account['registerDate'] > time() - $minAccountDate) return ["success" => false, "error" => LevelUploadError::TooFast];
 		}
 		
-		$checkGlobalRateLimit = Security::checkRateLimits($person, 0);
+		$checkGlobalRateLimit = Security::checkRateLimits($person, RateLimit::GlobalLevelsUpload);
 		if(!$checkGlobalRateLimit) return ["success" => false, "error" => LevelUploadError::TooFast];
 		
-		$checkPerUserRateLimit = Security::checkRateLimits($person, 1);
+		$checkPerUserRateLimit = Security::checkRateLimits($person, RateLimit::PerUserLevelsUpload);
 		if(!$checkPerUserRateLimit) return ["success" => false, "error" => LevelUploadError::TooFast];
 		
-		$checkACEExploitRateLimit = Security::checkRateLimits($person, 6);
+		$checkACEExploitRateLimit = Security::checkRateLimits($person, RateLimit::ACEExploit);
 		if(!$checkACEExploitRateLimit) return ["success" => false, "error" => CommonError::Automod];
 		
 		if(Security::checkFilterViolation($person, $levelName, 3) || Security::checkFilterViolation($person, $levelDesc, 3)) return ["success" => false, "error" => CommonError::Filter];
@@ -2833,7 +2833,7 @@ class Library {
 
 		$difficulty = self::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
 		$diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
-        $diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
+		$diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
 		
 		return $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 	}
@@ -3461,7 +3461,7 @@ class Library {
 		$starsIcon = $list['starFeatured'] ? 'featured' : 'stars';
 		
 		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-easy', '7' => 'demon-medium', '8' => 'demon-hard', '9' => 'demon-insane', '10' => 'demon-extreme'];
-        $diffIcon = $diffArray[(string)$list['starDifficulty']] ?: 'na';
+		$diffIcon = $diffArray[(string)$list['starDifficulty']] ?: 'na';
 		
 		return $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 	}
@@ -3501,7 +3501,7 @@ class Library {
 		require __DIR__."/../../config/discord.php";
 		
 		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-easy', '7' => 'demon-medium', '8' => 'demon-hard', '9' => 'demon-insane', '10' => 'demon-extreme'];
-        $diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'na';
+		$diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'na';
 		
 		return $difficultiesURL.'stars/'.$diffIcon.'.png';
 	}
@@ -4298,7 +4298,7 @@ class Library {
 		$favouritedSong->execute([':songID' => $songID, ':accountID' => $accountID]);
 		$favouritedSong = $favouritedSong->fetchColumn();
 		
-		if($favouritedSong) { // Song is favourited
+		if($favouritedSong) {
 			$removeFavourite = $db->prepare("DELETE FROM favsongs WHERE songID = :songID AND accountID = :accountID");
 			$removeFavourite->execute([':songID' => $songID, ':accountID' => $accountID]);
 			
@@ -4306,7 +4306,7 @@ class Library {
 			$decreaseFavouriteCount->execute([':songID' => $songID]);
 			
 			return '-1';
-		} else { // Song is not favourited
+		} else {
 			$addFavourite = $db->prepare("INSERT INTO favsongs (songID, accountID, timestamp) VALUES (:songID, :accountID, :timestamp)");
 			$addFavourite->execute([':songID' => $songID, ':accountID' => $accountID, ':timestamp' => time()]);
 			
@@ -4377,12 +4377,16 @@ class Library {
 	
 	public static function uploadSong($person, $songType, $songAuthor, $songTitle, $songFile = false, $songURL = false, $pathToSongsFolder = '') {
 		require __DIR__."/../../config/dashboard.php";
-	    require __DIR__."/connection.php";
+		require __DIR__."/connection.php";
+		require_once __DIR__."/security.php";
 		
 		$accountID = $person['accountID'];
 		
 		$checkBan = self::getPersonBan($person, Ban::UploadingAudio);
 		if($checkBan) return ['success' => false, 'error' => SongError::Banned, "info" => $checkBan];
+		
+		$checkUploadingAudioRateLimit = Security::checkRateLimits($person, RateLimit::AudioUpload);
+		if(!$checkUploadingAudioRateLimit) return ['success' => false, 'error' => SongError::RateLimit];
 		
 		$songID = false;
 		
@@ -4397,7 +4401,9 @@ class Library {
 		} while(!$songID);
 		
 		switch($songType) {
-			case 0:
+			case 0: // File
+				if(strpos($songEnabled, '1') === false) return ['success' => false, 'error' => SongError::Disabled];
+					
 				if($songFile['error'] != UPLOAD_ERR_OK) return ['success' => false, 'error' => SongError::InvalidFile];
 				
 				if($songFile['size'] == 0) return ['success' => false, 'error' => SongError::UnknownError];
@@ -4411,7 +4417,7 @@ class Library {
 				if($fileType != "audio/ogg") return ['success' => false, 'error' => SongError::NotAnAudio];
 				
 				$filePath = $pathToSongsFolder.'/'.$songID.'.ogg';
-				$songSize = round($songFile['size'] / 1048576, 2);
+				$realSongSize = round($songFile['size'] / 1048576, 2);
 				
 				move_uploaded_file($songFile['tmp_name'], $filePath);
 				
@@ -4424,18 +4430,31 @@ class Library {
 				$songURL = (isset($_SERVER['HTTPS']) ? "https" : "http")."://".$_SERVER["HTTP_HOST"].dirname(dirname($_SERVER["REQUEST_URI"]))."/songs/".$songID.".ogg";
 				
 				break;
-			case 1:
+			case 1: // URL
+				if(strpos($songEnabled, '2') === false) return ['success' => false, 'error' => SongError::Disabled];
+				
 				if(!filter_var($songURL, FILTER_VALIDATE_URL)) return ['success' => false, 'error' => SongError::InvalidURL];
+				
+				$songURL = str_replace('www.dropbox.com', 'dl.dropboxusercontent.com', $songURL);
 				
 				$songExists = $db->prepare("SELECT ID FROM songs WHERE download = :download");
 				$songExists->execute([':download' => $songURL]);	
 				$songExists = $songExists->fetchColumn();
 				if($songExists) return ['success' => false, 'error' => SongError::AlreadyUploaded, 'songID' => $songExists];
 				
+				$fileInfo = self::getURLFileInfo($songURL);
+				
+				$allowedFileTypes = ["audio/mpeg", "audio/ogg", "audio/wav"];
+				
+				$fileType = $fileInfo['mime'];
+				if(!in_array($fileType, $allowedFileTypes)) return ['success' => false, 'error' => SongError::NotAnAudio];
+				
+				$realSongSize = round($fileInfo['size'] / 1048576, 2);
+				
 				$songAuthor = Escape::text($songAuthor, 40) ?: 'Reupload';
 				$songTitle = Escape::text($songTitle, 35) ?: 'Unknown';
 				
-				$songDuration = 0;
+				$songDuration = 0; // We can't get duration of an audio from URL
 				
 				break;
 			default:
@@ -4443,19 +4462,107 @@ class Library {
 		}
 		
 		$insertSong = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, duration, download, hash, reuploadTime, reuploadID, isDisabled) VALUES (:id, :name, '0', :author, :size, :duration, :download, '', :reuploadTime, :reuploadID, :isDisabled)");
-		$insertSong->execute([':id' => $songID, ':name' => $songTitle, ':download' => $songURL, ':author' => $songAuthor, ':size' => $songSize, ':duration' => $songDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSongs ? 0 : 1)]);
+		$insertSong->execute([':id' => $songID, ':name' => $songTitle, ':download' => $songURL, ':author' => $songAuthor, ':size' => $realSongSize, ':duration' => $songDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSongs ? 0 : 1)]);
 		
 		self::logAction($person, Action::SongUpload, $songID, $songAuthor, $songTitle, $songURL, $songDuration, ($preenableSongs ? 0 : 1));
 		
 		return ['success' => true, 'songID' => $songID];
 	}
+	
+	public static function uploadSFX($person, $sfxTitle, $sfxFile, $pathToSFXsFolder = '') {
+		require __DIR__."/../../config/dashboard.php";
+		require __DIR__."/connection.php";
+		require_once __DIR__."/security.php";
+		
+		$accountID = $person['accountID'];
+		$userName = $person['userName'];
+		
+		$time = time();
+		
+		$checkBan = self::getPersonBan($person, Ban::UploadingAudio);
+		if($checkBan) return ['success' => false, 'error' => SongError::Banned, "info" => $checkBan];
+		
+		$checkUploadingAudioRateLimit = Security::checkRateLimits($person, RateLimit::AudioUpload);
+		if(!$checkUploadingAudioRateLimit) return ['success' => false, 'error' => SongError::RateLimit];
+
+		if(!$sfxEnabled) return ['success' => false, 'error' => SongError::Disabled];
+			
+		if($sfxFile['error'] != UPLOAD_ERR_OK) return ['success' => false, 'error' => SongError::InvalidFile];
+		
+		if($sfxFile['size'] == 0) return ['success' => false, 'error' => SongError::UnknownError];
+		if($sfxFile['size'] > $sfxSize * 1024 * 1024) return ['success' => false, 'error' => SongError::TooBig];
+		
+		$fileData = file_get_contents($sfxFile['tmp_name']);
+		
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$fileType = $finfo->buffer($fileData);
+		
+		if($fileType != "audio/ogg") return ['success' => false, 'error' => SongError::NotAnAudio];
+		
+		$filePath = $pathToSFXsFolder.'/'.$accountID.'_'.$time.'.ogg';
+		$realSFXSize = round($sfxFile['size'] / 1048576, 2);
+		
+		move_uploaded_file($sfxFile['tmp_name'], $filePath);
+		
+		$sfxInfo = self::getAudioInfo($filePath);
+		$sfxDuration = isset($sfxInfo['playtime_seconds']) ? (int)$sfxInfo['playtime_seconds'] * 1000 : 0;
+		
+		$sfxTitle = Escape::text($sfxTitle, 40) ?: Escape::text($sfxInfo['tags']["vorbiscomment"]['title'][0]) ?: 'Unknown';
+				
+		$insertSFX = $db->prepare("INSERT INTO sfxs (ID, name, authorName, size, milliseconds, download, reuploadTime, reuploadID, isDisabled) VALUES (:id, :name, :author, :size, :duration, :download, :reuploadTime, :reuploadID, :isDisabled)");
+		$insertSFX->execute([':id' => $sfxID, ':name' => $sfxTitle, ':download' => '', ':author' => $userName, ':size' => $realSFXSize, ':duration' => $sfxDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSFXs ? 0 : 1)]);
+		$sfxID = $db->lastInsertId();
+		
+		$realFilePath = $pathToSFXsFolder.'/'.$sfxID.'.ogg';
+
+		$sfxURL = (isset($_SERVER['HTTPS']) ? "https" : "http")."://".$_SERVER["HTTP_HOST"].dirname(dirname($_SERVER["REQUEST_URI"]))."/sfxs/".$sfxID.".ogg";
+		
+		rename($filePath, $realFilePath);
+		
+		$updateSFX = $db->prepare("UPDATE sfxs SET download = :sfxURL WHERE ID = :sfxID");
+		$updateSFX->execute([':sfxURL' => $sfxURL, ':sfxID' => $sfxID]);
+		
+		self::logAction($person, Action::SFXUpload, $sfxID, $sfxTitle, $sfxURL, $sfxDuration, ($preenableSFXs ? 0 : 1));
+		
+		return ['success' => true, 'sfxID' => $sfxID];
+	}
+	
 	public static function getAudioInfo($file) {
 		require_once __DIR__.'/../../config/getid3/getid3.php';
-		$getID3 = new getID3;
+		$getID3 = new getID3();
 		
 		$info = $getID3->analyze($file);
 		
 		return $info;
+	}
+	
+	public static function getURLFileInfo($url) { // Thanks to MigMatos
+		$size = 0;
+		$mime = '';
+	
+		$headers = get_headers($url, 1);
+		
+		if(isset($headers['Content-Length'])) $size = $headers['Content-Length'];
+		if(isset($headers['Content-Type'])) $mime = $headers['Content-Type'];
+	
+		if(empty($mime) || empty($size)) {
+			$ch = curl_init($url);
+			
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_HEADER, TRUE);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+			curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+			
+			curl_exec($ch);
+			
+			$size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+			$mime = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+			
+			curl_close($ch);
+		}
+	
+		return ['size' => $size ?: 0, 'mime' => $mime ?: ''];
 	}
 	
 	/*
@@ -4463,18 +4570,18 @@ class Library {
 	*/
 	
 	public static function getClanByID($clanID, $column = "*") {
-	    require __DIR__."/connection.php";
+		require __DIR__."/connection.php";
 		
 		if(isset($GLOBALS['core_cache']['clan']['ID'][$clanID])) {
 			if($column != "*" && $GLOBALS['core_cache']['clan']['ID'][$clanID]) return $GLOBALS['core_cache']['clan']['ID'][$clanID][$column];
 			return $GLOBALS['core_cache']['clan']['ID'][$clanID];
 		}
 
-	    $clanInfo = $db->prepare("SELECT * FROM clans WHERE clanID = :clanID");
-	    $clanInfo->execute([':clanID' => $clanID]);
-	    $clanInfo = $clanInfo->fetch();
+		$clanInfo = $db->prepare("SELECT * FROM clans WHERE clanID = :clanID");
+		$clanInfo->execute([':clanID' => $clanID]);
+		$clanInfo = $clanInfo->fetch();
 
-	    if(empty($clanInfo)) {
+		if(empty($clanInfo)) {
 			$GLOBALS['core_cache']['clan']['ID'][$clanID] = false;
 			return false;
 		}
@@ -4534,18 +4641,18 @@ class Library {
 	}
 	
 	public static function getClanByName($clanName, $column = "*") {
-	    require __DIR__."/connection.php";
+		require __DIR__."/connection.php";
 		
 		if(isset($GLOBALS['core_cache']['clan']['name'][$clanName])) {
 			if($column != "*" && $GLOBALS['core_cache']['clan']['name'][$clanName]) return $GLOBALS['core_cache']['clan']['name'][$clanName][$column];
 			return $GLOBALS['core_cache']['clan']['name'][$clanName];
 		}
 
-	    $clanInfo = $db->prepare("SELECT * FROM clans WHERE clanName LIKE :clanName");
-	    $clanInfo->execute([':clanName' => base64_encode($clanName)]);
-	    $clanInfo = $clanInfo->fetch();
+		$clanInfo = $db->prepare("SELECT * FROM clans WHERE clanName LIKE :clanName");
+		$clanInfo->execute([':clanName' => base64_encode($clanName)]);
+		$clanInfo = $clanInfo->fetch();
 
-	    if(empty($clanInfo)) {
+		if(empty($clanInfo)) {
 			$GLOBALS['core_cache']['clan']['name'][$clanName] = false;
 			return false;
 		}
@@ -4832,42 +4939,42 @@ class Library {
 		$leaderboardBannedQuery = self::getBannedPeopleQuery(Ban::Leaderboards, false);
 		$creatorsBannedQuery = self::getBannedPeopleQuery(Ban::Creators, false);
 		
-    	// 2592000 seconds = 30d
-    	$stats = $db->prepare("SELECT
-    		(SELECT COUNT(*) FROM users) AS users,
-    		(SELECT COUNT(*) FROM users WHERE lastPlayed > :time - 2592000) AS activeUsers,
+		// 2592000 seconds = 30d
+		$stats = $db->prepare("SELECT
+			(SELECT COUNT(*) FROM users) AS users,
+			(SELECT COUNT(*) FROM users WHERE lastPlayed > :time - 2592000) AS activeUsers,
 			
-    		(SELECT COUNT(*) FROM levels WHERE isDeleted = 0) AS levels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND isDeleted = 0) AS ratedLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 0 AND isDeleted = 0) AS featuredLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 1 AND isDeleted = 0) AS epicLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 2 AND isDeleted = 0) AS legendaryLevels,
-    		(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 3 AND isDeleted = 0) AS mythicLevels,
+			(SELECT COUNT(*) FROM levels WHERE isDeleted = 0) AS levels,
+			(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND isDeleted = 0) AS ratedLevels,
+			(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 0 AND isDeleted = 0) AS featuredLevels,
+			(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 1 AND isDeleted = 0) AS epicLevels,
+			(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 2 AND isDeleted = 0) AS legendaryLevels,
+			(SELECT COUNT(*) FROM levels WHERE starStars >= 1 AND starFeatured >= 1 AND starEpic = 3 AND isDeleted = 0) AS mythicLevels,
 			
-    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 0) AS dailies,
-    		(SELECT COUNT(*) FROM dailyfeatures WHERE type = 1) AS weeklies,
-    		(SELECT COUNT(*) FROM events) AS events,
+			(SELECT COUNT(*) FROM dailyfeatures WHERE type = 0) AS dailies,
+			(SELECT COUNT(*) FROM dailyfeatures WHERE type = 1) AS weeklies,
+			(SELECT COUNT(*) FROM events) AS events,
 			
-    		(SELECT COUNT(*) FROM gauntlets) AS gauntlets,
-    		(SELECT COUNT(*) FROM mappacks) AS mapPacks,
-    		(SELECT COUNT(*) FROM lists) AS lists,
+			(SELECT COUNT(*) FROM gauntlets) AS gauntlets,
+			(SELECT COUNT(*) FROM mappacks) AS mapPacks,
+			(SELECT COUNT(*) FROM lists) AS lists,
 			
-    		(SELECT SUM(downloads) FROM levels WHERE isDeleted = 0) AS downloads,
-    		(SELECT SUM(objects) FROM levels WHERE isDeleted = 0) AS objects,
-    		(SELECT SUM(likes) FROM levels WHERE isDeleted = 0) AS likes,
-    		(SELECT SUM(dislikes) FROM levels WHERE isDeleted = 0) AS dislikes,
+			(SELECT SUM(downloads) FROM levels WHERE isDeleted = 0) AS downloads,
+			(SELECT SUM(objects) FROM levels WHERE isDeleted = 0) AS objects,
+			(SELECT SUM(likes) FROM levels WHERE isDeleted = 0) AS likes,
+			(SELECT SUM(dislikes) FROM levels WHERE isDeleted = 0) AS dislikes,
 			
-    		(SELECT COUNT(*) FROM songs WHERE reuploadID = 0 AND isDisabled = 0) AS newgroundsSongs,
-    		(SELECT COUNT(*) FROM songs WHERE reuploadID != 0 AND isDisabled = 0) AS reuploadedSongs,
+			(SELECT COUNT(*) FROM songs WHERE reuploadID = 0 AND isDisabled = 0) AS newgroundsSongs,
+			(SELECT COUNT(*) FROM songs WHERE reuploadID != 0 AND isDisabled = 0) AS reuploadedSongs,
 			
-    		(SELECT COUNT(*) FROM comments) AS comments,
-    		(SELECT COUNT(*) FROM acccomments) AS posts,
-    		(SELECT COUNT(*) FROM clancomments) AS clanPosts,
-    		(SELECT COUNT(*) FROM replies) AS postReplies,
+			(SELECT COUNT(*) FROM comments) AS comments,
+			(SELECT COUNT(*) FROM acccomments) AS posts,
+			(SELECT COUNT(*) FROM clancomments) AS clanPosts,
+			(SELECT COUNT(*) FROM replies) AS postReplies,
 			
-    		(SELECT SUM(stars) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS stars,
-    		(SELECT SUM(moons) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS moons,
-    		(SELECT SUM(creatorPoints) FROM users ".($creatorsBannedQuery ? "WHERE ".$creatorsBannedQuery  : '').") AS creatorPoints,
+			(SELECT SUM(stars) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS stars,
+			(SELECT SUM(moons) FROM users ".($leaderboardBannedQuery ? "WHERE ".$leaderboardBannedQuery  : '').") AS moons,
+			(SELECT SUM(creatorPoints) FROM users ".($creatorsBannedQuery ? "WHERE ".$creatorsBannedQuery  : '').") AS creatorPoints,
 			
 			(SELECT COUNT(*) FROM bans) AS allBans,
 			(SELECT COUNT(*) FROM bans WHERE isActive != 0) AS activeBans,
@@ -4888,8 +4995,8 @@ class Library {
 			IF(mostUsedSong.reuploadID = 0, 0, 1) AS mostUsedSongIsReupload
 			FROM (SELECT ID, authorName, name, size, levelsCount, reuploadID, IF(reuploadID = 0, 0, 1) AS isReupload FROM songs WHERE isDisabled = 0 ORDER BY levelsCount DESC LIMIT 1) AS mostUsedSong
 		");
-    	$stats->execute([':time' => time()]);
-    	$stats = $stats->fetch();
+		$stats->execute([':time' => time()]);
+		$stats = $stats->fetch();
 		
 		return $stats;
 	}

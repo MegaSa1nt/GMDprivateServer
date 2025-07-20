@@ -85,11 +85,14 @@ $language['errorSongNotFound'] = 'Песня не найдена!';
 $language['errorListNotFound'] = 'Список уровней не найден!';
 
 $language['errorCouldntReadFile'] = 'Произошла ошибка при чтении этого файла!';
-$language['errorIsNotAnAudio'] = 'Этот файл — не аудиофайл!';
+$language['errorIsNotAnAudio'] = 'Это не аудиофайл!';
 $language['errorMaxFileSize'] = 'Максимальный размер файла — %1$s МБ!';
 $language['errorFileIsEmpty'] = 'Этот файл пустой!';
 $language['errorInvalidURL'] = 'Неверная ссылка на песню!';
 $language['errorAlreadyReuploaded'] = 'Эта песня уже существует под ID <text dashboard-copy>%1$s</text>!';
+
+$language['errorPageIsDisabled'] = 'Эта страница отключена!';
+$language['errorSongRateLimit'] = 'Вы слишком быстро загружаете аудио, попробуйте ещё раз через несколько минут!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -314,4 +317,13 @@ $language['songArtistText'] = 'Автор песни';
 $language['songTitleText'] = 'Название песни';
 $language['songSize'] = 'Размер песни';
 $language['songSizeTemplate'] = '%1$s МБ';
+
+$language['uploadSongProcessing'] = 'Обрабатываем ваше аудио...';
+$language['uploadSongConverting'] = 'Конвертируем ваше аудио в правильный формат...';
+$language['uploadSongUploading'] = 'Загружаем ваше аудио...';
+$language['done'] = 'Готово!';
+
+$language['sfxFile'] = 'Файл звукового эффекта';
+$language['chooseSFX'] = 'Выберите звуковой эффект...';
+$language['sfxTitleText'] = 'Название звукового эффекта';
 ?>

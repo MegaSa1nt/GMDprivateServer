@@ -409,7 +409,12 @@ class Dashboard {
 			'FAILED_TO_LOAD_TEXT' => "<i class='fa-solid fa-xmark'></i>".self::string("errorFailedToLoadPage"),
 			'COPIED_TEXT' => "<i class='fa-solid fa-copy'></i>".self::string("successCopiedText"),
 			
+			'CONVERTER_APIS' => json_encode($convertSFXAPI),
+			
 			'LANGUAGE' => Escape::latin_no_spaces($_COOKIE['lang'], 2) ?: "EN",
+			
+			'UPLOAD_SONG_PAGE_ENABLED' => strpos($songEnabled, '1') !== false || strpos($songEnabled, '2') !== false ? 'true' : 'false',
+			'UPLOAD_SFX_PAGE_ENABLED' => $sfxEnabled ? 'true' : 'false',
 			
 			'IS_LOGGED_IN' => $person['success'] ? 'true' : 'false',
 			'USERNAME' => $person['success'] ? htmlspecialchars($person['userName']) : '',
@@ -808,7 +813,7 @@ class Dashboard {
 		$sfx['SFX_NAME'] = $contextMenuData['MENU_SFX_NAME'] = htmlspecialchars($sfx['name']);
 		$sfx['SFX_URL'] = $contextMenuData['MENU_SFX_URL'] = htmlspecialchars($downloadLink);
 		
-		$contextMenuData['MENU_ID'] = $sfx['ID'];
+		$sfx['SFX_ID'] = $contextMenuData['MENU_ID'] = $sfx['ID'] ?: $sfx['originalID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
 		$contextMenuData['MENU_CAN_CHANGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';

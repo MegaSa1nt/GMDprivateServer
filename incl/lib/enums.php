@@ -67,7 +67,7 @@ class CommentsError {
 	const NothingFound = "-2";
 }
 
-class Action { // Last action ID is 67
+class Action { // Last action ID is 68
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -147,6 +147,7 @@ class Action { // Last action ID is 67
 	const UserCreateRateLimit = 55;
 	const FilterRateLimit = 56;
 	const AccountBackupRateLimit = 58;
+	const AudioUploadRateLimit = 68;
 	
 	const SongUpload = 62;
 	const SongDeletion = 63;
@@ -249,12 +250,30 @@ class Ban {
 }
 
 class SongError {
-	const Banned = "-1";
-	const InvalidURL = "-2";
-	const AlreadyUploaded = "-3";
-	const InvalidFile = "-4";
-	const TooBig = "-5";
 	const UnknownError = "-6";
+
+	const Banned = "-1";
+	const Disabled = "-8";
+	const RateLimit = "-9";
+	
+	const InvalidURL = "-2";
+	const InvalidFile = "-4";
 	const NotAnAudio = "-7";
+
+	const AlreadyUploaded = "-3";
+
+	const TooBig = "-5";
+}
+
+class RateLimit {
+	const GlobalLevelsUpload = 0;
+	const PerUserLevelsUpload = 1;
+	const AccountsRegister = 2;
+	const UsersCreation = 3;
+	const Filter = 4;
+	const LoginTries = 5;
+	const ACEExploit = 6;
+	const AccountBackup = 7;
+	const AudioUpload = 8;
 }
 ?>

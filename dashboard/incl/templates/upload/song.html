@@ -13,12 +13,12 @@
 				<i class="fa-solid fa-caret-right" dashboard-caret></i>
 					
 				<div class="options" dashboard-select-options>
-					<div class="option" value="0" dashboard-select-option="%TEXT_uploadSongViaFile%">
+					<div class="option" value="0" dashboard-select-option="%TEXT_uploadSongViaFile%" dashboard-show="%UPLOAD_SONG_FILE_ENABLED%">
 						<i class="fa-solid fa-file-import"></i>
 						<text>%TEXT_uploadSongViaFile%</text>
 					</div>
 					
-					<div class="option" value="1" dashboard-select-option="%TEXT_uploadSongViaURL%">
+					<div class="option" value="1" dashboard-select-option="%TEXT_uploadSongViaURL%" dashboard-show="%UPLOAD_SONG_URL_ENABLED%">
 						<i class="fa-solid fa-link"></i>
 						<text>%TEXT_uploadSongViaURL%</text>
 					</div>
@@ -26,26 +26,26 @@
 			</div>
 		</div>
 		
-		<div class="inputDiv hide" dashboard-select-type="songType" value="0">
+		<div class="inputDiv hide" dashboard-select-type="songType" value="0" dashboard-show="%UPLOAD_SONG_FILE_ENABLED%">
 			<h2>
 				<i class="fa-solid fa-file-import"></i>
 				%TEXT_songFile%
 			</h2>
 			
-			<label for="songFile" class="inputStyle" dashboard-file-input>
+			<label for="songFile" class="inputStyle" dashboard-file-input="song">
 				<h4 dashboard-file-empty="%TEXT_chooseSong%"></h4>
 			
 				<input type="file" name="songFile" id="songFile" accept="audio/mpeg, audio/ogg, audio/wav, audio/webm" required disabled />
 			</label>
 		</div>
 		
-		<div class="inputDiv hide" dashboard-select-type="songType" value="1">
+		<div class="inputDiv hide" dashboard-select-type="songType" value="1" dashboard-show="%UPLOAD_SONG_URL_ENABLED%">
 			<h2>
 				<i class="fa-solid fa-link"></i>
 				%TEXT_songURL%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="songURL" autocomplete="gdps-dashboard-songArtist" placeholder="https://example.com/verycoolsong.mp3" disabled />
+			<input class="inputStyle" type="text" name="songURL" autocomplete="gdps-dashboard-songURL" placeholder="https://example.com/verycoolsong.mp3" disabled />
 		</div>
 		
 		<div class="inputDiv">

@@ -27,7 +27,14 @@
 			window.maxSongSizeText = "%MAX_SONG_SIZE_TEXT%";
 			window.maxSFXSizeText = "%MAX_SFX_SIZE_TEXT%";
 			
+			window.uploadSongProcessingText = "%TEXT_uploadSongProcessing%";
+			window.uploadSongConvertingText = "%TEXT_uploadSongConverting%";
+			window.uploadSongUploadingText = "%TEXT_uploadSongUploading%";
+			window.doneText = "%TEXT_done%";
+			
 			window.xIcon = '<i class="fa-solid fa-xmark"></i>';
+			
+			window.converterAPIs = %CONVERTER_APIS%;
 			
 			localStorage.language = "%LANGUAGE%";
 		</script>
@@ -47,6 +54,12 @@
 	<body id="dashboard-body">
 		<div id="dashboard-loader" class="dashboard-loader">
 			<i class="fa-solid fa-circle-notch fa-spin"></i>
+		</div>
+		
+		<div id="dashboard-loader-progress" class="dashboard-loader hide">
+			<i class="fa-solid fa-circle-notch fa-spin"></i>
+			<h1></h1>
+			<progress min="0" max="100" value="30" />
 		</div>
 		
 		<span class="background"></span>
@@ -156,14 +169,14 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_uploadSongTitle%" type="button" href="upload/song">
+						<button title="%TEXT_uploadSongTitle%" type="button" href="upload/song" dashboard-show="%UPLOAD_SONG_PAGE_ENABLED%">
 							<i class="fa-solid fa-music"></i>
 							<text>%TEXT_uploadSongTitle%</text>
 						</button>
 						
-						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx">
+						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx" dashboard-show="%UPLOAD_SFX_PAGE_ENABLED%">
 							<i class="fa-solid fa-drum"></i>
-							<text>%TEXT_uploadSFXTitle% (X)</text>
+							<text>%TEXT_uploadSFXTitle%</text>
 						</button>
 					</div>
 				</div>

@@ -85,13 +85,16 @@ $language['errorSongNotFound'] = 'Song wasn\'t found!';
 $language['errorListNotFound'] = 'List wasn\'t found!';
 
 $language['errorCouldntReadFile'] = 'An error has occured when processing this file!';
-$language['errorIsNotAnAudio'] = 'This file is not an audio!';
+$language['errorIsNotAnAudio'] = 'This is not an audio!';
 $language['errorMaxFileSize'] = 'Maximum file size is %1$s MB!';
 $language['errorFileIsEmpty'] = 'This file is empty!';
 $language['errorInvalidURL'] = 'Invalid song URL!';
 $language['errorAlreadyReuploaded'] = 'This song already exists under ID <text dashboard-copy>%1$s</text>!';
 
 $language['successUploadedSong'] = 'You successfully uploaded a song!';
+
+$language['errorPageIsDisabled'] = 'This page is disabled!';
+$language['errorSongRateLimit'] = 'You\'re uploading audio too fast, try again in a few minutes!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -314,4 +317,13 @@ $language['songArtistText'] = 'Song artist';
 $language['songTitleText'] = 'Song title';
 $language['songSize'] = 'Song size';
 $language['songSizeTemplate'] = '%1$s MB';
+
+$language['uploadSongProcessing'] = 'Processing your audio...';
+$language['uploadSongConverting'] = 'Converting your audio to the proper format...';
+$language['uploadSongUploading'] = 'Uploading your audio...';
+$language['done'] = 'Done!';
+
+$language['sfxFile'] = 'SFX file';
+$language['chooseSFX'] = 'Choose SFX...';
+$language['sfxTitleText'] = 'SFX title';
 ?>

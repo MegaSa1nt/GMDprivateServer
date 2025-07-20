@@ -166,7 +166,7 @@ class Security {
 			];
 			
 			Library::logAction($logPerson, Action::FailedLogin);
-			self::checkRateLimits($logPerson, 5);
+			self::checkRateLimits($logPerson, RateLimit::LoginTries);
 			
 			return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => $logPerson['accountID'], "IP" => $IP];
 		}
@@ -197,7 +197,7 @@ class Security {
 					
 					if(!empty($udid)) {
 						Library::logAction($logPerson, Action::FailedLogin);
-						self::checkRateLimits($logPerson, 5);
+						self::checkRateLimits($logPerson, RateLimit::LoginTries);
 					}
 					
 					return ["success" => true, "accountID" => "0", "userID" => "0", "userName" => "Undefined", "IP" => $IP];
@@ -223,7 +223,7 @@ class Security {
 				'IP' => $IP
 			];
 
-			self::checkRateLimits($logPerson, 5);
+			self::checkRateLimits($logPerson, RateLimit::LoginTries);
 			
 			return ["success" => false, "error" => LoginError::GenericError, "accountID" => $accountID, "IP" => $IP];
 		}
@@ -238,7 +238,7 @@ class Security {
 			];
 			
 			Library::logAction($logPerson, Action::FailedLogin);
-			self::checkRateLimits($logPerson, 5);
+			self::checkRateLimits($logPerson, RateLimit::LoginTries);
 			
 			return ["success" => false, "error" => $loginToAccount['error'], "accountID" => $accountID, "IP" => $IP];
 		}
@@ -430,7 +430,7 @@ class Security {
 		$IP = $person['IP'];
 		
 		switch($type) {
-			case 0:
+			case RateLimit::GlobalLevelsUpload:
 				if(!$globalLevelsUploadDelay) return true;
 			
 				$lastUploadedLevel = $db->prepare('SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0');
@@ -451,7 +451,7 @@ class Security {
 				}
 				
 				return true;
-			case 1:
+			case RateLimit::PerUserLevelsUpload:
 				if(!$perUserLevelsUploadDelay) return true;
 			
 				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])'))");
@@ -472,7 +472,7 @@ class Security {
 				}
 				
 				return true;
-			case 2:
+			case RateLimit::AccountsRegister:
 				if(!$accountsRegisterDelay) return true;
 			
 				$checkRegister = $db->prepare("SELECT count(*) FROM accounts WHERE registerDate >= :time");
@@ -493,7 +493,7 @@ class Security {
 				}
 				
 				return true;
-			case 3:
+			case RateLimit::UsersCreation:
 				if(!$usersCreateDelay) return true;
 			
 				$actionsFilter = ['type = '.Action::UserCreate, 'timestamp >= '.(time() - $usersCreateDelay)];
@@ -513,7 +513,7 @@ class Security {
 				}
 				
 				return true;
-			case 4:
+			case RateLimit::Filter:
 				if(!$filterRateLimitBan) return true;
 				
 				$searchFilters = ["type = ".Action::FilterRateLimit, 'timestamp >= '.(time() - $filterTimeCheck)];
@@ -525,7 +525,7 @@ class Security {
 				}
 				
 				return true;
-			case 5:
+			case RateLimit::LoginTries:
 				if(!$maxLoginTries) return true;
 				
 				$searchFilters = ['type = '.Action::FailedLogin, 'timestamp >= '.time() - $rateLimitBanTime];
@@ -537,7 +537,7 @@ class Security {
 				}
 				
 				return true;
-			case 6:
+			case RateLimit::ACEExploit:
 				if(!$maxACEExploitTries) return true;
 				
 				$searchFilters = ['type = '.Action::LevelMalicious, 'timestamp >= '.time() - $ACEExploitTimeCheck];
@@ -549,7 +549,7 @@ class Security {
 				}
 				
 				return true;
-			case 7:
+			case RateLimit::AccountBackup:
 				if(!$backupAccountDelay) return true;
 				
 				$searchFilters = ['type = '.Action::SuccessfulAccountBackup, 'timestamp >= '.time() - $backupAccountDelay];
@@ -563,6 +563,26 @@ class Security {
 					
 					if(count($isRateLimited) > $backupAccountDelay * $rateLimitBanMultiplier) {
 						Library::banPerson(0, $person, "You exceeded rate limit for backuping account.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person tried to backup their account too much. (".count($isRateLimited)." > ".$backupAccountDelay." * ".$rateLimitBanMultiplier.")");
+					}
+					
+					return false;
+				}
+				
+				return true;
+			case RateLimit::AudioUpload:
+				if(!$uploadAudioDelay) return true;
+				
+				$searchFilters = ['type IN ('.Action::SongUpload.','.Action::SFXUpload.')', 'timestamp >= '.time() - $uploadAudioDelay];
+				$checkSongs = Library::getPersonActions($person, $searchFilters);
+				
+				if($checkSongs) {
+					Library::logAction($person, Action::AudioUploadRateLimit);
+					
+					$searchFilters = ['type = '.Action::AudioUploadRateLimit, 'timestamp >= '.time() - $rateLimitBanTime];
+					$isRateLimited = Library::getPersonActions($person, $searchFilters);
+					
+					if(count($isRateLimited) > $uploadAudioDelay * $rateLimitBanMultiplier) {
+						Library::banPerson(0, $person, "You exceeded rate limit for uploading audio.", Ban::UploadingAudio, Person::IP, (time() + $rateLimitBanTime), "Person tried to upload too many audio. (".count($isRateLimited)." > ".$uploadAudioDelay." * ".$rateLimitBanMultiplier.")");
 					}
 					
 					return false;
@@ -606,7 +626,7 @@ class Security {
 				case 1:
 					if(in_array(strtolower($content), $filterBannedWords) && !in_array(strtolower($content), $whitelistedWords)) {
 						Library::logAction($person, Action::FilterRateLimit);
-						self::checkRateLimits($person, 4);
+						self::checkRateLimits($person, RateLimit::Filter);
 						
 						return true;
 					}
@@ -632,7 +652,7 @@ class Security {
 								}
 								
 								Library::logAction($person, Action::FilterRateLimit);
-								self::checkRateLimits($person, 4);
+								self::checkRateLimits($person, RateLimit::Filter);
 								
 								return true;
 							}

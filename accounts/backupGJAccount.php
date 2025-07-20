@@ -24,7 +24,7 @@ if(!$person["success"]) {
 $accountID = $person["accountID"];
 $userName = $person['userName'];
 
-$checkRateLimit = Library::checkRateLimits($person, $type);
+$checkRateLimit = Library::checkRateLimits($person, RateLimit::AccountBackup);
 if(!$checkRateLimit) exit(CommonError::InvalidRequest);
 
 if(strlen($saveData) > $maxBackupFileSize) {

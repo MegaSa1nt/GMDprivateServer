@@ -18,7 +18,7 @@ if(isset($_POST['clanID']) && isset($_POST['comment'])) {
 	if(!$ableToComment['success']) {
 		switch($ableToComment['error']) {
 			case CommonError::Banned:
-				exit(Dashboard::renderToast("gavel", sprintf(Dashboard::string("bannedToast"), Escape::url_base64_decode($ableToComment['info']['reason']), '<text dashboard-date="'.$ableToComment['info']['expires'].'"></text>'), "error"));
+				exit(Dashboard::renderToast("gavel", sprintf(Dashboard::string("bannedToast"), htmlspecialchars(Escape::url_base64_decode($ableToComment['info']['reason'])), '<text dashboard-date="'.$ableToComment['info']['expires'].'"></text>'), "error"));
 			case CommonError::Filter:
 				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadPost"), "error"));
 			case CommonError::Automod:

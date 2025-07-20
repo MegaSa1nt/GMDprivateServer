@@ -23,12 +23,10 @@ $installed = true; // Like i said, it changed!
 	$sfxEnabled — is SFX upload tool enabled
 		True — SFX upload tool is enabled
 		False — SFX upload tool is disabled
-	$convertEnabled — is converting new SFXs enabled
-		True — converting new SFXs is enabled
-		False — converting new SFXs is disabled
 		
 	$songSize — maximum song size user can upload via file
 	$sfxSize — maximum SFX size user can upload via file
+	-- WARNING -- Be careful when increasing this value! If you make it too high, you will exceed size limit of converters below!
 	
 	$timeType — how time shows in-game
 		0 — time, as in Cvolton's core (06/02/2024 22.18)
@@ -59,7 +57,6 @@ $msgEnabled = true;
 $clansEnabled = true;
 $songEnabled = 12;
 $sfxEnabled = true;
-$convertEnabled = true;
 
 $songSize = 8;
 $sfxSize = 4.5;
@@ -116,16 +113,17 @@ $customLibrary[] = [4, 'Song File Hub', 'https://api.songfilehub.com', 1];
 
 /*
 	SFX converter API's
-	https://github.com/MegaSa1nt/GDPS-ConvertSFX
+	https://github.com/M336G/audio-converter
 	
 	$convertSFXAPI[] = "link to converter";
 */
-$convertSFXAPI[] = "https://niko.gcs.icu";
-$convertSFXAPI[] = "https://lamb.gcs.icu";
-$convertSFXAPI[] = "https://omori.gcs.icu"; // You're welcome
-$convertSFXAPI[] = "https://im.gcs.icu";
-$convertSFXAPI[] = "https://hat.gcs.icu";
-$convertSFXAPI[] = "https://converter.m336.dev";
+$convertSFXAPI[] = "https://m336-audio.gcs.icu"; // Will update APIs below on new core release
+//$convertSFXAPI[] = "https://niko.gcs.icu";
+//$convertSFXAPI[] = "https://lamb.gcs.icu";
+//$convertSFXAPI[] = "https://omori.gcs.icu";
+//$convertSFXAPI[] = "https://im.gcs.icu";
+//$convertSFXAPI[] = "https://hat.gcs.icu";
+//$convertSFXAPI[] = "https://converter.m336.dev";
 
 /*
 	Level reupload tool

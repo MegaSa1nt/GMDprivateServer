@@ -136,6 +136,8 @@ $vpns['vpn'] = 'https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/v
 		0 — turned off
 	$backupAccountDelay — if last account backup was created X seconds ago, new one can't be done
 		0 — turned off
+	$uploadAudioDelay — if last song/SFX was uploaded X seconds ago, new one can't be uploaded
+		0 — turned off
 	
 	$maxBackupFileSize — maximum size of backup, that can be uploaded to GDPS
 	
@@ -179,6 +181,8 @@ $vpns['vpn'] = 'https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/v
 	$whitelistedCommon — list of whitelisted words in common things
 */
 
+// -- SECURITY --
+
 $rateLimitBanMultiplier = 2;
 $rateLimitBanTime = 3600;
 
@@ -196,6 +200,8 @@ $enableACEExploitCheck = true;
 $maxUncompressedLevelSize = 104857600;
 $maxACEExploitTries = 2;
 $ACEExploitTimeCheck = 3600;
+
+// -- ANTI-SPAM --
 
 $warningsPeriod = 302400;
 
@@ -215,11 +221,14 @@ $perUserLevelsUploadDelay = 5;
 $accountsRegisterDelay = 5;
 $usersCreateDelay = 10;
 $backupAccountDelay = 10;
+$uploadAudioDelay = 30;
 
 $maxBackupFileSize = 33554432;
 
 $filterTimeCheck = 60;
 $filterRateLimitBan = 10;
+
+// -- CONTENT FILTERS -- 
 
 $filterUsernames = 2;
 $bannedUsernames = [
