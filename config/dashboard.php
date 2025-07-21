@@ -126,19 +126,13 @@ $convertSFXAPI[] = "https://m336-audio.gcs.icu"; // Will update APIs below on ne
 //$convertSFXAPI[] = "https://converter.m336.dev";
 
 /*
-	Level reupload tool
+	Disallow reuploading not user levels
 	
-	These confing will allow you to customize level reupload tool
-	
-	$requireAccountForReuploading — if user must enter their account credentials to reupload level
-		True — require logging in
-		False — don't require to login
-	$disallowReuploadingNotUserLevels — if user should be allowed to reupload only their levels
+	Should user be allowed to reupload only their levels?
 		True — allow reuploading only their levels
 		False — allow reuploading any levels
 */
-$requireAccountForReuploading = false;
-$disallowReuploadingNotUserLevels = false;
+$disallowReuploadingNotUserLevels = true;
 
 /*
 	Cobalt API

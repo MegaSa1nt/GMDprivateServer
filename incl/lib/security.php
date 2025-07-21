@@ -295,6 +295,26 @@ class Security {
 		return sha1($levelString."pC26fpYaQCtg");
 	}
 	
+	public static function generateLevelSeed2($levelString) {
+		$hash = "aaaaa";
+		
+		$len = strlen($levelString);
+		$divided = intval($len / 50);
+		
+		$p = 0;
+		
+		for($k = 0; $k < $len; $k = $k + $divided) {
+			if($p > 49) break;
+			
+			$hash[$p] = $levelString[$k]; 
+			$p++;
+		}
+		
+		$hash = sha1($hash."xI25fpAapCQg");
+		
+		return $hash;
+	}
+	
 	public static function verifyUDID($userID, $udid, $userName) {
 		require __DIR__."/connection.php";
 		require_once __DIR__."/mainLib.php";

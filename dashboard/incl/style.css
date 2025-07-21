@@ -1358,7 +1358,7 @@ h1[title],
 	content: attr(title);
 	position: absolute;
 	
-	transform: translateY(-55px);
+	transform: translateY(-100%);
 	
 	color: white !important;
 	font-size: 23px;
@@ -1379,8 +1379,10 @@ h1[title],
 	
 	pointer-events: none;
 	
-	white-space: nowrap;
 	box-sizing: border-box;
+	
+	width: max-content;
+	max-width: 30vw;
 }
 
 [title]:hover::after {
@@ -1866,26 +1868,44 @@ select:open::picker-icon {
 	
 	left: 0px;
 	top: calc(100% + 10px);
-	
-	background: #86868624;
-	border: 1px solid #86868634;
 	border-radius: 10px;
 	
 	z-index: 5;
-	
-	backdrop-filter: blur(5px);
 	
 	width: 100%;
 	
 	transition: 0.2s;
 }
 
-.options :first-child {
+.options::after {
+	content: '';
+	
+	position: absolute;
+	
+	top: 0px;
+	z-index: -1;
+	
+	width: 100%;
+	height: 100%;
+	
+	border-radius: 10px;
+	
+	background: #86868624;
+	border: 1px solid #86868634;
+	
+	box-sizing: border-box;
+	
+	transition: 0.2s;
+	
+	backdrop-filter: blur(5px);
+}
+
+.options > :first-child {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
 
-.options :last-child {
+.options > :last-child {
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
@@ -2561,4 +2581,16 @@ progress::-webkit-progress-value {
 
 .dashboard-loader progress {
 	width: 50%;
+}
+
+.infoIcon {
+	display: flex;
+	justify-content: center;
+	
+	width: max-content;
+	height: max-content;
+}
+
+.infoIcon::after {
+	z-index: 3;
 }

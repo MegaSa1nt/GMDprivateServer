@@ -373,7 +373,7 @@ class Dashboard {
 		$userID = $person['userID'];
 		$user = Library::getUserByID($userID);
 		
-		if($user['clanID']) {
+		if($clansEnabled && $user['clanID']) {
 			$isInClan = true;
 			$clan = Library::getClanByID($user['clanID']);
 			
@@ -415,6 +415,7 @@ class Dashboard {
 			
 			'UPLOAD_SONG_PAGE_ENABLED' => strpos($songEnabled, '1') !== false || strpos($songEnabled, '2') !== false ? 'true' : 'false',
 			'UPLOAD_SFX_PAGE_ENABLED' => $sfxEnabled ? 'true' : 'false',
+			'REUPLOAD_LEVEL_PAGE_ENABLED' => $lrEnabled ? 'true' : 'false',
 			
 			'IS_LOGGED_IN' => $person['success'] ? 'true' : 'false',
 			'USERNAME' => $person['success'] ? htmlspecialchars($person['userName']) : '',

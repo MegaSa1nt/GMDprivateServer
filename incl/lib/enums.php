@@ -52,22 +52,30 @@ class CommonError {
 	
 	const Filter = "-15";
 	const Automod = "-16";
+	
+	const BannedByServer = "-17";
 }
 
 class LevelUploadError {
 	const Success = "1";
+	
+	const NothingFound = "-2";
 
 	const UploadingDisabled = "-2";
+	const ReuploadingDisabled = "-19";
 	const TooFast = "-3";
 	
 	const FailedToWriteLevel = "-5";
+	
+	const NotYourLevel = "-14";
+	const SameServer = "-18";
 }
 
 class CommentsError {
 	const NothingFound = "-2";
 }
 
-class Action { // Last action ID is 68
+class Action { // Last action ID is 70
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -155,6 +163,9 @@ class Action { // Last action ID is 68
 	const SFXUpload = 65;
 	const SFXDeletion = 66;
 	const SFXChange = 67;
+	
+	const ReuploadLevelToGDPS = 69;
+	const ReuploadLevelFromGDPS = 70;
 	
 	// Unused
 	const LevelReport = 20;

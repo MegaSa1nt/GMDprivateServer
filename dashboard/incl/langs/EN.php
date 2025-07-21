@@ -45,6 +45,8 @@ $language['sfxsTitle'] = 'SFXs';
 $language['upload'] = 'Uploads';
 $language['uploadSongTitle'] = 'Add a song';
 $language['uploadSFXTitle'] = 'Add a SFX';
+$language['reuploadLevelTitle'] = 'Reupload a level';
+$language['runCron'] = 'Run Cron';
 
 $language['messengerTitle'] = 'Messenger';
 $language['loginToAccountTitle'] = 'Login to account';
@@ -91,10 +93,20 @@ $language['errorFileIsEmpty'] = 'This file is empty!';
 $language['errorInvalidURL'] = 'Invalid song URL!';
 $language['errorAlreadyReuploaded'] = 'This song already exists under ID <text dashboard-copy>%1$s</text>!';
 
-$language['successUploadedSong'] = 'You successfully uploaded a song!';
-
 $language['errorPageIsDisabled'] = 'This page is disabled!';
-$language['errorSongRateLimit'] = 'You\'re uploading audio too fast, try again in a few minutes!';
+$language['errorSongRateLimit'] = 'You\'re uploading too many audio in a short amount of time, try again in a few minutes!';
+
+$language['errorReuploadSameServer'] = 'You specified same server for reuploading!';
+$language['errorReuploadTooFast'] = 'You\'re reuploading too many levels in a short amount of time, try again in a few minutes!';
+$language['errorReuploadAutomod'] = 'You may not reupload levels for now!';
+$language['errorUploadingLevelsDisabled'] = 'Uploading levels is currently disabled!';
+$language['errorServerBanned'] = 'You may not reupload levels to this server, as it banned yours!';
+$language['errorIncorrectCredentials'] = 'You entered incorrect credentials for your account!';
+$language['errorServerConnection'] = 'An error has occured while trying to connect to this server!';
+$language['errorNotYourLevel'] = 'This level is not yours!';
+$language['errorFailedToWriteLevel'] = 'An error has occured while trying to save reuploaded level!';
+
+$language['errorCronTooFast'] = 'Please wait a few minutes before running Cron again!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -116,6 +128,14 @@ $language['successAppliedSettings'] = 'You successfully applied settings!';
 
 $language['successDeletedPost'] = 'You deleted this post!';
 $language['successUploadedPost'] = 'You successfully created a post!';
+
+$language['successUploadedSong'] = 'You successfully uploaded a song!';
+$language['successUploadedSFX'] = 'You successfully uploaded a SFX!';
+
+$language['successReuploadToServer'] = 'You successfully reuploaded a level to this server!';
+$language['successReuploadFromServer'] = 'You successfully reuploaded a level to another server! Level ID: <text dashboard-copy>%1$s</text>';
+
+$language['successRanCron'] = 'You successfully executed Cron!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -303,6 +323,7 @@ $language['noClanPosts'] = 'No clan posts!';
 $language['joinClan'] = 'Join clan';
 $language['sendClanJoinRequest'] = 'Send join request';
 $language['viewClan'] = 'View clan';
+$language['clan'] = 'Clan';
 
 $language['uploadSongViaFile'] = 'Upload song via file';
 $language['uploadSongViaURL'] = 'Upload song via URL';
@@ -326,4 +347,13 @@ $language['done'] = 'Done!';
 $language['sfxFile'] = 'SFX file';
 $language['chooseSFX'] = 'Choose SFX...';
 $language['sfxTitleText'] = 'SFX title';
+
+$language['reuploadType'] = 'Reupload type';
+$language['chooseReuploadType'] = 'Choose reupload type...';
+$language['reuploadLevelToServer'] = 'Reupload a level to %1$s'; // Reupload level to *GDPS NAME*
+$language['reuploadLevelFromServer'] = 'Reupload a level from %1$s'; // Reupload level from *GDPS NAME*
+$language['serverURL'] = 'Server URL';
+
+$language['reuploadLevelToServerDesc'] = 'Reupload a level from another GDPS to the current GDPS';
+$language['reuploadLevelFromServerDesc'] = 'Reupload a level from the current GDPS to another GDPS';
 ?>

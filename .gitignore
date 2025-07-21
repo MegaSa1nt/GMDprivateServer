@@ -64,3 +64,4 @@ api/v1/misc/stats.json
 dashboard/songs/*.mp3
 dashboard/songs/*.ogg
 dashboard/sfxs/*.ogg
+incl/misc/topArtists.cache

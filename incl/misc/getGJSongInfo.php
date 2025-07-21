@@ -16,6 +16,7 @@ if(!$song) {
 	
 	if(!$song) exit(CommonError::InvalidRequest);
 }
+
 if($song['isDisabled']) exit(CommonError::Disabled);
 
 $songString = Library::getSongString($songID);

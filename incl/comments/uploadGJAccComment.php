@@ -31,6 +31,8 @@ if(!$ableToComment['success']) {
 			exit(Library::showCommentsBanScreen("Your post contains a ".Library::textColor("bad", Color::Red)." word.", 0));
 		case CommonError::Automod:
 			exit(Library::showCommentsBanScreen("Posting account comments is currently ".Library::textColor("disabled", Color::Red).".", 0));
+		default:
+			exit(Library::showCommentsBanScreen("Unknown error has occured.", 0));
 	}
 }
 

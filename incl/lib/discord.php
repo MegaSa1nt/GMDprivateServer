@@ -132,12 +132,12 @@ class Discord {
 		$data = ["recipient_id" => $discordID];
 		$headers = ['Content-type: application/json', 'Authorization: Bot '.$bottoken];
 		
-		$recipient = json_decode(Library::sendRequest("https://discord.com/api/v10/users/@me/channels", json_encode($data), $headers, "POST", true), true);
+		$recipient = json_decode(Library::sendRequest("https://discord.com/api/v10/users/@me/channels", json_encode($data), $headers, "POST"), true);
 		if(!$recipient || !$recipient['id']) return false;
 	
 		$channelID = $recipient['id'];		
 		
-		$sendMessage = json_decode(Library::sendRequest("https://discord.com/api/v10/channels/".$channelID."/messages", json_encode($content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $headers, "POST", true), true);
+		$sendMessage = json_decode(Library::sendRequest("https://discord.com/api/v10/channels/".$channelID."/messages", json_encode($content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $headers, "POST"), true);
 		if(!$sendMessage) return false;
 		
 		return $recipient['recipients'][0]['username'];

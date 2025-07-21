@@ -1,0 +1,75 @@
+<div class="box">
+	<form name="reuploadLevelForm" autocomplete="gdps-dashboard">
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-arrow-up-from-bracket"></i>
+				%TEXT_reuploadType%
+			</h2>
+			
+			<div class="select view" dashboard-select="reuploadType">
+				<input type="hidden" name="reuploadType" dashboard-select-value required>
+				<input type="text" placeholder="%TEXT_chooseReuploadType%" dashboard-select-input>
+					
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+				<div class="options" dashboard-select-options>
+					<div class="option" value="0" dashboard-select-option="%REUPLOAD_LEVEL_TO_TEXT%">
+						<i class="fa-solid fa-arrow-down"></i>
+						<text>%REUPLOAD_LEVEL_TO_TEXT%</text>
+						
+						<span class="infoIcon" title="%TEXT_reuploadLevelToServerDesc%">
+							<i class="fa-solid fa-circle-info"></i>
+						</span>
+					</div>
+					
+					<div class="option" value="1" dashboard-select-option="%REUPLOAD_LEVEL_FROM_TEXT%">
+						<i class="fa-solid fa-arrow-up"></i>
+						<text>%REUPLOAD_LEVEL_FROM_TEXT%</text>
+						
+						<span class="infoIcon" title="%TEXT_reuploadLevelFromServerDesc%">
+							<i class="fa-solid fa-circle-info"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-link"></i>
+				%TEXT_serverURL%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="serverURL" autocomplete="gdps-dashboard-serverURL" value="https://www.boomlings.com/database/" placeholder="https://example.com/database/" />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-gamepad"></i>
+				%TEXT_levelID%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="levelID" autocomplete="gdps-dashboard-reupload-levelID" placeholder="68848817" />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-user"></i>
+				%TEXT_userName%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="reuploadUserName" autocomplete="gdps-dashboard-reupload-username" placeholder="YourVeryPrettyUsername" />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-key"></i>
+				%TEXT_password%
+			</h2>
+			
+			<input class="inputStyle" type="password" name="reuploadPassword" autocomplete="gdps-dashboard-reupload-password" placeholder="•••••••••••••" />
+		</div>
+		
+		<button class="button" type="button" onclick="%REUPLOAD_LEVEL_BUTTON_ONCLICK%">%TEXT_reuploadLevelTitle%</button>
+	</form>
+</div>

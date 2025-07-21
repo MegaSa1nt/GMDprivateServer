@@ -45,6 +45,8 @@ $language['sfxsTitle'] = 'Звуковые эффекты';
 $language['upload'] = 'Загрузка';
 $language['uploadSongTitle'] = 'Загрузить песню';
 $language['uploadSFXTitle'] = 'Загрузить звуковой эффект';
+$language['reuploadLevelTitle'] = 'Перенести уровень';
+$language['runCron'] = 'Выполнить Крон';
 
 $language['messengerTitle'] = 'Мессенджер';
 $language['loginToAccountTitle'] = 'Войти в аккаунт';
@@ -94,6 +96,18 @@ $language['errorAlreadyReuploaded'] = 'Эта песня уже существу
 $language['errorPageIsDisabled'] = 'Эта страница отключена!';
 $language['errorSongRateLimit'] = 'Вы слишком быстро загружаете аудио, попробуйте ещё раз через несколько минут!';
 
+$language['errorReuploadSameServer'] = 'Вы указали тот же сервер для переноса!';
+$language['errorReuploadTooFast'] = 'Вы слишком быстро переносите уровни, попробуйте ещё раз через несколько минут!';
+$language['errorReuploadAutomod'] = 'Вы пока не можете переносить уровни!';
+$language['errorUploadingLevelsDisabled'] = 'Загрузка уровней отключена!';
+$language['errorServerBanned'] = 'Вы не можете использовать этот сервер для переноса, так как он забанил ваш сервер!';
+$language['errorIncorrectCredentials'] = 'Вы ввели неправильные данные от вашего аккаунта!';
+$language['errorServerConnection'] = 'Произошла ошибка при подключении к этому серверу!';
+$language['errorNotYourLevel'] = 'Этот уровень не ваш!';
+$language['errorFailedToWriteLevel'] = 'Произошла ошибка при попытке сохранить перенесённый уровень!';
+
+$language['errorCronTooFast'] = 'Пожалуйста, подождите пару минут перед повторным запуском Крона!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
 
@@ -116,6 +130,12 @@ $language['successDeletedPost'] = 'Вы удалили этот пост!';
 $language['successUploadedPost'] = 'Вы успешно выложили пост!';
 
 $language['successUploadedSong'] = 'Вы успешно выложили песню!';
+$language['successUploadedSFX'] = 'Вы успешно выложили звуковой эффект!';
+
+$language['successReuploadToServer'] = 'Вы успешно перенесли уровень на этот сервер!';
+$language['successReuploadFromServer'] = 'Вы успешно перенесли уровень с этого сервера на другой! ID уровня: <text dashboard-copy>%1$s</text>';
+
+$language['successRanCron'] = 'Вы успешно выполнили Крон!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
@@ -303,6 +323,7 @@ $language['noClanPosts'] = 'Постов клана нет!';
 $language['joinClan'] = 'Присоединиться к клану';
 $language['sendClanJoinRequest'] = 'Отправить заявку на вступление';
 $language['viewClan'] = 'Посмотреть клан';
+$language['clan'] = 'Клан';
 
 $language['uploadSongViaFile'] = 'Загрузить песню файлом';
 $language['uploadSongViaURL'] = 'Загрузить песню ссылкой';
@@ -326,4 +347,13 @@ $language['done'] = 'Готово!';
 $language['sfxFile'] = 'Файл звукового эффекта';
 $language['chooseSFX'] = 'Выберите звуковой эффект...';
 $language['sfxTitleText'] = 'Название звукового эффекта';
+
+$language['reuploadType'] = 'Тип переноса';
+$language['chooseReuploadType'] = 'Выберите тип переноса...';
+$language['reuploadLevelToServer'] = 'Перенести уровень на %1$s'; // Reupload level to *GDPS NAME*
+$language['reuploadLevelFromServer'] = 'Перенести уровень с %1$s'; // Reupload level from *GDPS NAME*
+$language['serverURL'] = 'Ссылка на сервер';
+
+$language['reuploadLevelToServerDesc'] = 'Вы перенесёте уровень с сервера, который указан ссылкой ниже на текущий';
+$language['reuploadLevelFromServerDesc'] = 'Вы перенесёте уровень с текущего сервера на тот, который указан ссылкой ниже';
 ?>

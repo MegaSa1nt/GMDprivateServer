@@ -22,6 +22,8 @@ if(isset($_POST['comment'])) {
 				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadPost"), "error"));
 			case CommonError::Automod:
 				exit(Dashboard::renderToast("xmark", Dashboard::string("errorPostingIsDisabled"), "error"));
+			default:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 		}
 	}
 	

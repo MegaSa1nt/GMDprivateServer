@@ -23,6 +23,8 @@ $dataArray = [
 	'CLAN_TITLE' => $accountClan ? sprintf(Dashboard::string("clanProfile"), $accountClan['clanName']) : '',
 	'PROFILE_TITLE' => $person['accountID'] ? sprintf(Dashboard::string("userProfile"), $person['userName']) : '',
 	
+	'SHOW_CLAN' => $accountClan ? 'true' : 'false',
+	
 	'DASHBOARD_SETTINGS_BUTTON_ONCLICK' => "postPage('settings', 'dashboardSettingsForm')"
 ];
 

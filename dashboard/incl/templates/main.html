@@ -164,7 +164,7 @@
 				<div class="dropdown" id="uploadDropdown" dashboard-show="%IS_LOGGED_IN%">
 					<button title="%TEXT_upload%" type="button" dashboard-dropdown="uploadDropdown">
 						<i class="fa-solid fa-arrow-up-from-bracket"></i>
-						<text>%TEXT_upload% (X)</text>
+						<text>%TEXT_upload%</text>
 						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
 					</button>
 					
@@ -177,6 +177,16 @@
 						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx" dashboard-show="%UPLOAD_SFX_PAGE_ENABLED%">
 							<i class="fa-solid fa-drum"></i>
 							<text>%TEXT_uploadSFXTitle%</text>
+						</button>
+						
+						<button title="%TEXT_reuploadLevelTitle%" type="button" href="upload/level" dashboard-show="%REUPLOAD_LEVEL_PAGE_ENABLED%">
+							<i class="fa-solid fa-gamepad"></i>
+							<text>%TEXT_reuploadLevelTitle%</text>
+						</button>
+						
+						<button title="%TEXT_runCron%" type="button" href="manage/runCron">
+							<i class="fa-solid fa-bars-progress"></i>
+							<text>%TEXT_runCron%</text>
 						</button>
 					</div>
 				</div>

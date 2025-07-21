@@ -1,9 +1,12 @@
 <?php
+require __DIR__."/../../config/dashboard.php";
 require_once __DIR__."/../incl/dashboardLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
+
+if(!$clansEnabled) exit(Dashboard::renderErrorPage(Dashboard::string("clan"), Dashboard::string("errorPageIsDisabled")));
 
 $person = Dashboard::loginDashboardUser();
 $accountID = $person['accountID'];

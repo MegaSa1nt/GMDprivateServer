@@ -88,7 +88,7 @@ class IP {
 		
 		if($checkTime > $lastUpdate) {
 			foreach($proxies AS $url) {
-				$IPs = Library::sendRequest($url, "", [], "GET", true);
+				$IPs = Library::sendRequest($url, "", [], "GET");
 				$proxy = preg_split('/\r\n|\r|\n/', $IPs);
 				foreach($proxy AS $ip) $allProxies .= explode(':', $ip)[0].PHP_EOL;
 			}
@@ -119,7 +119,7 @@ class IP {
 		
 		if($checkTime > $lastUpdate) {
 			foreach($vpns AS $url) {
-				$IPs = Library::sendRequest($url, "", [], "GET", true);
+				$IPs = Library::sendRequest($url, "", [], "GET");
 				$allVPNs .= $IPs.PHP_EOL;
 			}
 			file_put_contents(__DIR__ .'/../../config/vpns.txt', $allVPNs);

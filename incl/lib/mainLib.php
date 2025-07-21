@@ -1613,7 +1613,7 @@ class Library {
 		$postsCount->execute([':userID' => $userID]);
 		$postsCount = $postsCount->fetchColumn();
 		
-		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $userID);
+		$canSeeCommentHistory = self::canSeeCommentsHistory($person, $userID);
 		if($canSeeCommentHistory) {		
 			$levelsCommentsCount = $db->prepare("SELECT count(*) FROM users INNER JOIN comments ON comments.userID = users.userID INNER JOIN levels ON levels.levelID = comments.levelID WHERE users.userID = :userID AND levels.unlisted = 0");
 			$levelsCommentsCount->execute([':userID' => $userID]);
@@ -1694,7 +1694,7 @@ class Library {
 		$IP = $person['IP'];
 		
 		$checkBan = self::getPersonBan($person, Ban::UploadingLevels);
-		if($checkBan) return ["success" => false, "error" => CommonError::Banned];
+		if($checkBan) return ["success" => false, "error" => CommonError::Banned, "info" => $checkBan];
 		
 		if(is_numeric($accountID)) { // Numeric account ID = registered account
 			$account = self::getAccountByID($accountID);
@@ -1710,9 +1710,9 @@ class Library {
 		$checkACEExploitRateLimit = Security::checkRateLimits($person, RateLimit::ACEExploit);
 		if(!$checkACEExploitRateLimit) return ["success" => false, "error" => CommonError::Automod];
 		
-		if(Security::checkFilterViolation($person, $levelName, 3) || Security::checkFilterViolation($person, $levelDesc, 3)) return ["success" => false, "error" => CommonError::Filter];
+		if((!empty($levelName) && Security::checkFilterViolation($person, $levelName, 3)) || (!empty($levelDesc) && Security::checkFilterViolation($person, $levelDesc, 3))) return ["success" => false, "error" => CommonError::Filter];
 		
-		if(Automod::isLevelsDisabled(0)) return ["success" => false, "error" => CommonError::Automod];
+		if(Automod::isLevelsDisabled(0)) return ["success" => false, "error" => LevelUploadError::UploadingDisabled];
 		
 		return ["success" => true];
 	}
@@ -1754,6 +1754,7 @@ class Library {
 				if(file_exists($oldLevelVersionPath)) unlink($oldLevelVersionPath);
 			}
 			
+			if(file_exists(__DIR__.'/../../data/levels/'.$levelID)) unlink(__DIR__.'/../../data/levels/'.$levelID);
 			rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$levelID);
 			
 			$updateLevel = $db->prepare('UPDATE levels SET gameVersion = :gameVersion, binaryVersion = :binaryVersion, levelDesc = :levelDesc, levelVersion = levelVersion + 1, levelLength = :levelLength, audioTrack = :audioTrack, auto = :auto, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, coins = :coins, requestedStars = :requestedStars, extraString = :extraString, levelString = "", levelInfo = :levelInfo, unlisted = :unlisted, IP = :IP, isLDM = :isLDM, wt = :wt, wt2 = :wt2, unlisted2 = :unlisted, settingsString = :settingsString, songIDs = :songIDs, sfxIDs = :sfxIDs, ts = :ts, password = :password, updateDate = :timestamp WHERE levelID = :levelID');
@@ -1781,6 +1782,7 @@ class Library {
 				if(file_exists($oldLevelVersionPath)) unset($oldLevelVersionPath);
 			}
 			
+			if(file_exists(__DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID'])) unlink(__DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID']);
 			rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$checkLevelExistenceByName['levelID']);
 			
 			$updateLevel = $db->prepare('UPDATE levels SET gameVersion = :gameVersion, binaryVersion = :binaryVersion, levelDesc = :levelDesc, levelVersion = levelVersion + 1, levelLength = :levelLength, audioTrack = :audioTrack, auto = :auto, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, coins = :coins, requestedStars = :requestedStars, extraString = :extraString, levelString = "", levelInfo = :levelInfo, unlisted = :unlisted, IP = :IP, isLDM = :isLDM, wt = :wt, wt2 = :wt2, unlisted2 = :unlisted, settingsString = :settingsString, songIDs = :songIDs, sfxIDs = :sfxIDs, ts = :ts, password = :password, updateDate = :timestamp WHERE levelID = :levelID AND isDeleted = 0');
@@ -1798,7 +1800,9 @@ class Library {
 		$uploadLevel->execute([':userID' => $userID, ':accountID' => $accountID, ':gameVersion' => $levelDetails['gameVersion'], ':binaryVersion' => $levelDetails['binaryVersion'], ':levelName' => $levelName, ':levelDesc' => $levelDetails['levelDesc'], ':levelLength' => $levelDetails['levelLength'], ':audioTrack' => $levelDetails['audioTrack'], ':auto' => $levelDetails['auto'], ':original' => $levelDetails['original'], ':twoPlayer' => $levelDetails['twoPlayer'], ':songID' => $levelDetails['songID'], ':objects' => $levelDetails['objects'], ':coins' => $levelDetails['coins'], ':requestedStars' => $levelDetails['requestedStars'], ':extraString' => $levelDetails['extraString'], ':levelInfo' => $levelDetails['levelInfo'], ':unlisted' => $levelDetails['unlisted'], ':isLDM' => $levelDetails['isLDM'], ':wt' => $levelDetails['wt'], ':wt2' => $levelDetails['wt2'], ':settingsString' => $levelDetails['settingsString'], ':songIDs' => $levelDetails['songIDs'], ':sfxIDs' => $levelDetails['sfxIDs'], ':ts' => $levelDetails['ts'], ':password' => $levelDetails['password'], ':timestamp' => $timestamp, ':IP' => $IP]);
 		$levelID = $db->lastInsertId();
 		
+		if(file_exists(__DIR__.'/../../data/levels/'.$levelID)) unlink(__DIR__.'/../../data/levels/'.$levelID);
 		rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$levelID);
+		
 		self::logAction($person, Action::LevelUpload, $levelName, $levelDetails['levelDesc'], $levelID);
 		
 		Automod::checkLevelsCount();
@@ -3024,6 +3028,198 @@ class Library {
 		return ['scores' => $levelScores, 'count' => $levelScoresCount];
 	}
 	
+	public static function reuploadLevel($person, $reuploadType, $serverURL, $levelID, $reuploadUserName, $reuploadPassword) {
+		require __DIR__."/../../config/dashboard.php";
+		require __DIR__."/connection.php";
+		require_once __DIR__."/security.php";
+		require_once __DIR__."/XOR.php";
+		
+		$accountID = $person['accountID'];
+		$userID = $person['userID'];
+		$IP = $person['IP'];
+		
+		if(mb_substr($serverURL, -1) != '/') $serverURL .= '/';
+		
+		if(!$lrEnabled) return ['success' => false, 'error' => LevelUploadError::ReuploadingDisabled];
+		
+		$parsedURL = parse_url($serverURL);
+		$serverHost = $parsedURL["host"];
+		
+		if($serverHost == $_SERVER['SERVER_NAME']) return ['success' => false, 'error' => LevelUploadError::SameServer];
+		
+		$isAbleToUploadLevel = self::isAbleToUploadLevel($person, '', '');
+		if(!$isAbleToUploadLevel['success']) return ['success' => false, 'error' => $isAbleToUploadLevel['error'], 'info' => $isAbleToUploadLevel['info'] ?: []];
+		
+		$reuploadAccount = self::loginToCustomServer($serverURL, $reuploadUserName, $reuploadPassword);
+		if(!$reuploadAccount['success']) return ['success' => false, 'error' => $reuploadAccount['error']];
+		
+		switch($reuploadType) {
+			case 0: // To GDPS
+				$requestData = ['gameVersion' => '22', 'binaryVersion' => '45', 'uuid' => $reuploadAccount['userID'], 'accountID' => $reuploadAccount['accountID'], 'gjp2' => $reuploadAccount['gjp2'], 'levelID' => $levelID, 'secret' => 'Wmfd2893gb7'];
+				$headers = ['Content-Type: application/x-www-form-urlencoded'];
+		
+				$request = self::sendRequest($serverURL.'downloadGJLevel22.php', http_build_query($requestData), $headers, "POST", false);
+				$requestArray = Security::mapGDString(explode("#", $request)[0], ":");
+				
+				$reuploadLevelString = $requestArray[4] ?: '';
+				$reuploadUserID = $requestArray[6] ?: 0;
+				$reuploadLevelID = $requestArray[1] ?: 0;
+				
+				if(!$request || $request == "-1" || $request == "No no no" || empty($reuploadLevelString)) {
+					if(empty($reuploadLevelString) && strpos($request, "1005") !== false) return ['success' => false, 'error' => CommonError::BannedByServer];
+					
+					switch($request) {
+						case "No no no":
+							return ['success' => false, 'error' => CommonError::BannedByServer];
+						case "-1":
+							return ['success' => false, 'error' => LevelUploadError::NothingFound];
+						default:
+							return ['success' => false, 'error' => CommonError::InvalidRequest];
+					}
+				}
+				
+				if($disallowReuploadingNotUserLevels && $reuploadUserID != $reuploadAccount['userID']) return ['success' => false, 'error' => LevelUploadError::NotYourLevel];
+				
+				if(substr($levelString, 0, 2) == 'eJ') $levelString = gzuncompress(Escape::url_base64_decode($levelString));
+				
+				$levelName = Escape::text($requestArray[2]);
+				if(Security::checkFilterViolation($person, $levelName, 3)) $levelName = 'Level with bad name';
+				
+				$levelDesc = Escape::text(Escape::url_base64_decode($requestArray[3]));
+				if(Security::checkFilterViolation($person, $levelDesc, 3)) $levelDesc = 'Level with bad description';
+				$levelDesc = Escape::url_base64_encode($levelDesc);
+				
+				$levelLength = Escape::number($requestArray[15]) ?: 0;
+				$audioTrack = Escape::number($requestArray[12]) ?: 0;
+				$twoPlayer = Escape::number($requestArray[31]) ?: 0;
+				$songID = Escape::number($requestArray[35]) ?: 0;
+				$objects = Escape::number($requestArray[45]) ?: 0;
+				$coins = Escape::number($requestArray[37]) ?: 0;
+				$requestedStars = Escape::number($requestArray[39]) ?: 0;
+				$extraString = Escape::text($requestArray[36]) ?: '';
+				$isLDM = Escape::number($requestArray[40]) ?: 0;
+				$levelPassword = Escape::text($requestArray[27]) ?: 0;
+				$songIDs = Escape::multiple_ids($requestArray[52]) ?: '';
+				$sfxIDs = Escape::multiple_ids($requestArray[53]) ?: '';
+				$ts = Escape::number($requestArray[57]) ?: 0;
+				if($levelPassword) $levelPassword = XORCipher::cipher(Escape::url_base64_decode($levelPassword), 26364);
+				
+				if($automaticID) {
+					$reuploadAccountID = $accountID;
+					$reuploadUserID = $userID;
+				}
+				
+				$reuploadedLevel = self::getReuploadedLevelByID($reuploadLevelID, $serverHost);
+				
+				$timestamp = time();
+				
+				$writeFile = file_put_contents(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, $reuploadLevelString);
+				if(!$writeFile) return ['success' => false, 'error' => LevelUploadError::FailedToWriteLevel];
+				
+				if(!$reuploadedLevel) {
+					$reuploadLevel = $db->prepare("INSERT INTO levels (levelName, gameVersion, binaryVersion, levelDesc, levelVersion, levelLength, audioTrack, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, uploadDate, originalReup, originalServer, userID, extID, IP, isLDM, songIDs, sfxIDs, ts, auto, levelInfo, updateDate, unlisted) VALUES (:levelName, '22', '45', :levelDesc, '1', :levelLength, :audioTrack, :password, :original, :twoPlayer, :songID, :objects, :coins, :requestedStars, :extraString, :uploadDate, :originalReup, :originalServer, :userID, :extID, :IP, :isLDM, :songIDs, :sfxIDs, :ts, '0', '', '0', '0')");
+					$reuploadLevel->execute([':levelName' => $levelName, ':levelDesc' => $levelDesc, ':levelLength' => $levelLength, ':audioTrack' => $audioTrack, ':password' => $levelPassword, ':original' => $reuploadLevelID, ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':objects' => $objects, ':coins' => $coins, ':requestedStars' => $requestedStars, ':extraString' => $extraString, ':uploadDate' => time(), ':originalReup' => $levelID, ':originalServer' => $serverHost, ':userID' => $reuploadUserID, ':extID' => $reuploadAccountID, ':IP' => $IP, ':isLDM' =>$isLDM, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
+					
+					$realLevelID = $db->lastInsertId();
+				} else {
+					$realAccountID = $reuploadedLevel['extID'];
+					$realLevelID = $reuploadedLevel['levelID'];
+					$levelName = $reuploadedLevel['levelName'];
+					
+					if($realAccountID != $accountID) return ['success' => false, 'error' => LevelUploadError::NotYourLevel];
+					
+					$reuploadLevel = $db->prepare("UPDATE levels SET levelDesc = :levelDesc, levelVersion = levelVersion + 1, levelLength = :levelLength, audioTrack = :audioTrack, password = :password, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, coins = :coins, requestedStars = :requestedStars, extraString = :extraString, updateDate = :updateDate, IP = :IP, isLDM = :isLDM, songIDs = :songIDs, sfxIDs = :sfxIDs, ts = :ts WHERE levelID = :levelID");
+					$reuploadLevel->execute([':levelID' => $realLevelID, ':levelDesc' => $levelDesc, ':levelLength' => $levelLength, ':audioTrack' => $audioTrack, ':password' => $levelPassword, ':original' => $reuploadLevelID, ':twoPlayer' => $twoPlayer, ':songID' => $songID, ':objects' => $objects, ':coins' => $coins, ':requestedStars' => $requestedStars, ':extraString' => $extraString, ':updateDate' => time(), ':IP' => $IP, ':isLDM' =>$isLDM, ':songIDs' => $songIDs, ':sfxIDs' => $sfxIDs, ':ts' => $ts]);
+				}
+				
+				if(file_exists(__DIR__.'/../../data/levels/'.$realLevelID)) unlink(__DIR__.'/../../data/levels/'.$realLevelID);
+				rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$realLevelID);
+				
+				self::logAction($person, Action::ReuploadLevelToGDPS, $serverHost, $levelID, $levelName, $levelDesc, $realLevelID);
+				
+				break;
+			case 1: // From GDPS
+				$levelInfo = self::getLevelByID($levelID);
+				if(!$levelInfo) return ['success' => false, 'error' => LevelUploadError::NothingFound];
+				
+				if($disallowReuploadingNotUserLevels && $levelInfo['userID'] != $userID) return ['success' => false, 'error' => LevelUploadError::NotYourLevel];
+				
+				$levelString = file_get_contents(__DIR__.'/../../data/levels/'.$levelID);
+				$seed2 = Escape::url_base64_encode(XORCipher::cipher(Security::generateLevelSeed2($levelString), 41274));
+				
+				$requestData = [
+					'gameVersion' => $levelInfo["gameVersion"], 
+					'binaryVersion' => $levelInfo["binaryVersion"], 
+					'gdw' => "0", 
+					'accountID' => $reuploadAccount['accountID'], 
+					'gjp2' => $reuploadAccount['gjp2'],
+					'userName' => $reuploadUserName,
+					'levelID' => "0",
+					'levelName' => strip_tags($levelInfo["levelName"]),
+					'levelDesc' => strip_tags($levelInfo["levelDesc"]),
+					'levelVersion' => $levelInfo["levelVersion"],
+					'levelLength' => $levelInfo["levelLength"],
+					'audioTrack' => $levelInfo["audioTrack"],
+					'auto' => $levelInfo["auto"],
+					'password' => $levelInfo["password"],
+					'original' => $levelID,
+					'twoPlayer' => $levelInfo["twoPlayer"],
+					'songID' => $levelInfo["songID"],
+					'objects' => $levelInfo["objects"],
+					'coins' => $levelInfo["coins"],
+					'requestedStars' => $levelInfo["requestedStars"],
+					'unlisted' => "0",
+					'wt' => "0",
+					'wt2' => "3",
+					'extraString' => $levelInfo["extraString"],
+					'seed' => "v2R5VPi53f",
+					'seed2' => $seed2,
+					'levelString' => $levelString,
+					'levelInfo' => $levelInfo["levelInfo"],
+					'songIDs' => $levelInfo['songIDs'],
+					'sfxIDs' => $levelInfo['sfxIDs'],
+					'ts' => $levelInfo['ts'],
+					'secret' => "Wmfd2893gb7"
+				];
+				$headers = ['Content-Type: application/x-www-form-urlencoded'];
+		
+				$request = self::sendRequest($serverURL.'uploadGJLevel21.php', http_build_query($requestData), $headers, "POST", false);
+				
+				if(!$request || $request == "-1" || $request == "No no no") {
+					switch($request) {
+						case "No no no":
+							return ['success' => false, 'error' => CommonError::BannedByServer];
+						case "-1":
+							return ['success' => false, 'error' => LevelUploadError::NothingFound];
+						default:
+							return ['success' => false, 'error' => CommonError::InvalidRequest];
+					}
+				}
+				
+				$realLevelID = Escape::number($request);
+				
+				self::logAction($person, Action::ReuploadLevelFromGDPS, $serverHost, $realLevelID, strip_tags($levelInfo["levelName"]), strip_tags($levelInfo["levelDesc"]), $levelID);
+				
+				break;
+			default:
+				 return ['success' => false, 'error' => CommonError::InvalidRequest];
+		}
+		
+		return ['success' => true, 'levelID' => $realLevelID];
+	}
+	
+	public static function getReuploadedLevelByID($reuploadLevelID, $serverHost) {
+		require __DIR__."/connection.php";
+		
+		$level = $db->prepare('SELECT * FROM levels WHERE originalReup = :reuploadLevelID AND originalServer = :serverHost AND isDeleted = 0');
+		$level->execute([':reuploadLevelID' => $reuploadLevelID, ':serverHost' => $serverHost]);
+		$level = $level->fetch();
+		
+		if($level) $GLOBALS['core_cache']['levels'][$level['levelID']] = $level;
+		
+		return $level;
+	}
+	
 	/*
 		Lists-related functions
 	*/
@@ -4213,19 +4409,19 @@ class Library {
 	
 	public static function saveNewgroundsSong($songID) {
 		require __DIR__."/connection.php";
+		require_once __DIR__."/security.php";
 		
-		$data = ['songID' => $songID, 'secret' => 'Wmfd2893gb7'];
-		$headers = ['Content-type: application/x-www-form-urlencoded'];
+		$data = ['gameVersion' => '22', 'binaryVersion' => '45', 'songID' => $songID, 'secret' => 'Wmfd2893gb7'];
+		$headers = ['Content-Type: application/x-www-form-urlencoded'];
 		
-		$request = self::sendRequest('http://www.boomlings.com/database/getGJSongInfo.php', http_build_query($data), $headers, "POST", false);
+		$request = self::sendRequest('https://www.boomlings.com/database/getGJSongInfo.php', http_build_query($data), $headers, "POST", false);
 		if(!$request || is_numeric($request)) return false;
 		
-		// Will replace with function later
-		$resultarray = explode('~|~', $request);
-		$uploadDate = time();
-		$query = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, download)
+		$songArray = Security::mapGDString($songString, "~|~");
+		
+		$saveNewgroundsSong = $db->prepare("INSERT INTO songs (ID, name, authorID, authorName, size, download)
 		VALUES (:id, :name, :authorID, :authorName, :size, :download)");
-		$query->execute([':id' => $songID, ':name' => $resultarray[3], ':authorID' => $resultarray[5], ':authorName' => $resultarray[7], ':size' => $resultarray[9], ':download' => $resultarray[13]]);
+		$saveNewgroundsSong->execute([':id' => $songID, ':name' => $songArray[2], ':authorID' => $resultarray[3], ':authorName' => $resultarray[4], ':size' => $resultarray[5], ':download' => $resultarray[10]]);
 		
 		unset($GLOBALS['core_cache']['songs'][$songID]);
 		
@@ -4900,7 +5096,7 @@ class Library {
 		return $getActions;
 	}
 	
-	public static function sendRequest($url, $data, $headers, $method, $includeUserAgent = false) {
+	public static function sendRequest($url, $data, $headers = [], $method = "GET", $includeUserAgent = true) {
 		require __DIR__."/../../config/proxy.php";
 		
 		$curl = curl_init($url);
@@ -4912,7 +5108,10 @@ class Library {
 			if($proxytype == 2) curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 		}
 		
-		if(!$includeUserAgent) curl_setopt($curl, CURLOPT_USERAGENT, "");
+		if(!$includeUserAgent) {
+			curl_setopt($curl, CURLOPT_USERAGENT, "");
+			curl_setopt($curl, CURLOPT_COOKIE, "gd=1;");
+		}
 		else $headers[] = 'User-Agent: GMDprivateServer (https://github.com/MegaSa1nt/GMDprivateServer, 2.0)';
 		
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
@@ -4924,6 +5123,7 @@ class Library {
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		
 		$result = curl_exec($curl);
+		
 		curl_close($curl);
 		
 		return $result;
@@ -4999,6 +5199,32 @@ class Library {
 		$stats = $stats->fetch();
 		
 		return $stats;
+	}
+	
+	public static function loginToCustomServer($serverURL, $userName, $password) {
+		require_once __DIR__."/security.php";
+		
+		if(mb_substr($serverURL, -1) != '/') $serverURL .= '/';
+		
+		$gjp2 = Security::GJP2FromPassword($password);
+		$udid = "S".mt_rand(111111111,999999999).mt_rand(111111111,999999999).mt_rand(111111111,999999999).mt_rand(111111111,999999999).mt_rand(1,9);
+		$sid = mt_rand(111111111,999999999).mt_rand(11111111,99999999);
+		
+		$requestData = ['udid' => $udid, 'userName' => $userName, 'gjp2' => $gjp2, 'sID' => $sid, 'secret' => 'Wmfv3899gc9'];
+		$headers = ['Content-Type: application/x-www-form-urlencoded'];
+		
+		$request = self::sendRequest($serverURL.'accounts/loginGJAccount.php', http_build_query($requestData), $headers, "POST", false);
+		
+		$requestArray = explode(',', $request);
+		if(!is_numeric($requestArray[0]) || !is_numeric($requestArray[1])) {
+			if(strpos($request, "1005") !== false) return ['success' => false, 'error' => CommonError::BannedByServer];
+			
+			if($request == LoginError::WrongCredentials) return ['success' => false, 'error' => LoginError::WrongCredentials];
+			
+			return ['success' => false, 'error' => CommonError::InvalidRequest];
+		}
+		
+		return ['success' => true, 'accountID' => $requestArray[0], 'userID' => $requestArray[1], 'gjp2' => $gjp2];
 	}
 	
 	/*

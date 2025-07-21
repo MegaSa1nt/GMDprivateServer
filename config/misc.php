@@ -237,7 +237,7 @@ $enableUserLevelsSearching = true;
 	True — Real Geometry Dash will show instead of showing player's favourite songs
 	False — Favourite songs will show in top artists page
 */
-$topArtistsFromGD = false;
+$topArtistsFromGD = true;
 
 /*
 	Disallow rating your own levels
