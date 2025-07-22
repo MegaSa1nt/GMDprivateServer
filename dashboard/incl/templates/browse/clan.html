@@ -4,7 +4,10 @@
 			<div class="vertical">
 				<div class="horisontal spaceBetween flexStart">
 					<div class="profileTitle vertical flexStart">
-						<h1 style="%CLAN_COLOR%">%CLAN_NAME% [%CLAN_TAG%]</h1>
+						<h1 style="%CLAN_COLOR%">
+							%CLAN_NAME%
+							<text dashboard-show="%CLAN_HAS_TAG%">[%CLAN_TAG%]</text>
+						</h1>
 						
 						<h2 class="extraIcon" dashboard-show="%CLAN_IS_CLOSED%" title="%TEXT_clanClosed%">
 							<i class="fa-solid fa-lock"></i>

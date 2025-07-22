@@ -279,7 +279,72 @@ if($_GET['id']) {
 				break;
 			case 'manage':
 				if(!Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("levelsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
-				$level['LEVEL_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/manage', $additionalData);
+				
+				$levelRateTypes = [Dashboard::string('noRating'), 'Featured', 'Epic', 'Legendary', 'Mythic'];
+				$songTypes = [Dashboard::string('officialSong'), Dashboard::string('customSong')];
+				$levelPrivacyNames = [Dashboard::string('publicLevel'), Dashboard::string('levelOnlyForFriends'), Dashboard::string('unlistedLevel')];
+				
+				$levelAuthor = Library::getUserByAccountID($level['extID']);
+				
+				$levelRateType = $level['starEpic'] + ($level['starFeatured'] ? 1 : 0);
+				$levelRateTypeName = $levelRateTypes[$levelRateType];
+				
+				$songType = $level['songID'] != 0 ? 1 : 0;
+				$songTypeName = $songTypes[$songType];
+				
+				$audioTrack = Library::getAudioTrack($level['audioTrack']);
+				$audioTrackName = $audioTrack['authorName'].' - '.$audioTrack['name'];
+				
+				$songID = $level['songID'];
+				$song = $songType ? Library::getSongByID($songID) : false;
+				$songName = $song ? $song['authorName'].' - '.$song['name'] : '';
+				
+				$levelPrivacy = $level['unlisted'];
+				$levelPrivacyName = $levelPrivacyNames[$levelPrivacy];
+				
+				$difficulty = Escape::latin_no_spaces(Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']));
+				$difficultyArray = Library::getLevelDifficulty($difficulty);
+				$difficultyName = $difficultyArray['name'];
+				
+				$additionalData = [
+					'LEVEL_ID' => $level['levelID'],
+					
+					'LEVEL_NAME' => htmlspecialchars($level['levelName']),
+					'LEVEL_DESC' => htmlspecialchars(Escape::url_base64_decode($level['levelDesc'])),
+					
+					'LEVEL_AUTHOR_ID' => $level['extID'],
+					'LEVEL_AUTHOR_NAME' => htmlspecialchars($levelAuthor['userName']),
+					
+					'LEVEL_STARS' => $level['starStars'],
+					'LEVEL_RATE_TYPE' => $levelRateType,
+					'LEVEL_RATE_TYPE_NAME' => $levelRateTypeName,
+					
+					'SONG_TYPE' => $songType,
+					'SONG_TYPE_NAME' => $songTypeName,
+					'AUDIO_TRACK' => $level['audioTrack'],
+					'AUDIO_TRACK_NAME' => $audioTrackName,
+					'SONG_ID' => $songID,
+					'SONG_NAME' => htmlspecialchars($songName),
+					
+					'LEVEL_PASSWORD' => substr($level['password'], 1),
+					
+					'LEVEL_PRIVACY' => $levelPrivacy,
+					'LEVEL_PRIVACY_NAME' => $levelPrivacyName,
+					
+					'DIFFICULTY' => $difficulty,
+					'DIFFICULTY_NAME' => $difficultyName,
+					
+					'SILVER_COINS_VALUE' => $level["starCoins"] ? 1 : 0,
+					'SILVER_COINS_REMOVE_CHECK' => !$level["starCoins"] ? 'checked' : '',
+					
+					'UPDATES_LOCK_VALUE' => $level["updateLocked"] ? 1 : 0,
+					'UPDATES_LOCK_REMOVE_CHECK' => !$level["updateLocked"] ? 'checked' : '',
+					
+					'COMMENTING_LOCK_VALUE' => $level["commentLocked"] ? 1 : 0,
+					'COMMENTING_LOCK_REMOVE_CHECK' => !$level["commentLocked"] ? 'checked' : '',
+				];
+				
+				$level['LEVEL_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/level', $additionalData);
 				break;
 			default:
 				exit(http_response_code(404));

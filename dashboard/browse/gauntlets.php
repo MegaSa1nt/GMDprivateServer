@@ -87,7 +87,7 @@ if($_GET['id']) {
 		case 'manage':
 			$pageBase = '../../../';
 			if(!Library::checkPermission($person, "dashboardGauntletCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
-			$gauntlet['GAUNTLET_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/manage', $additionalData);
+			$gauntlet['GAUNTLET_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/gauntlet', $additionalData);
 			break;
 		default:
 			exit(http_response_code(404));

@@ -48,6 +48,9 @@ $language['uploadSFXTitle'] = 'Загрузить звуковой эффект'
 $language['reuploadLevelTitle'] = 'Перенести уровень';
 $language['runCron'] = 'Выполнить Крон';
 
+$language['clans'] = 'Кланы';
+$language['clansListTitle'] = 'Список кланов';
+
 $language['messengerTitle'] = 'Мессенджер';
 $language['loginToAccountTitle'] = 'Войти в аккаунт';
 $language['yourProfileTitle'] = 'Ваш профиль';
@@ -107,6 +110,10 @@ $language['errorNotYourLevel'] = 'Этот уровень не ваш!';
 $language['errorFailedToWriteLevel'] = 'Произошла ошибка при попытке сохранить перенесённый уровень!';
 
 $language['errorCronTooFast'] = 'Пожалуйста, подождите пару минут перед повторным запуском Крона!';
+
+$language['errorPlayerNotFound'] = 'Игрок не найден!';
+$language['errorBadLevelName'] = 'Пожалуйста, выберите другое название уровня!';
+$language['errorBadLevelDesc'] = 'Пожалуйста, выберите другое описание уровню!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -356,4 +363,36 @@ $language['serverURL'] = 'Ссылка на сервер';
 
 $language['reuploadLevelToServerDesc'] = 'Вы перенесёте уровень с сервера, который указан ссылкой ниже на текущий';
 $language['reuploadLevelFromServerDesc'] = 'Вы перенесёте уровень с текущего сервера на тот, который указан ссылкой ниже';
+
+$language['clanMembersCount'] = 'Количество участников клана';
+
+$language['registeredPlayer'] = 'Зарегистрированный игрок';
+$language['unregisteredPlayer'] = 'Незарегистрированный игрок';
+
+$language['levelName'] = 'Название уровня';
+$language['levelAuthor'] = 'Автор уровня';
+$language['levelDesc'] = 'Описание уровня';
+$language['levelRateType'] = 'Тип оценки уровня';
+$language['chooseRateType'] = 'Выберите тип оценки уровня...';
+$language['noRating'] = 'Нет оценки';
+$language['songType'] = 'Тип песни';
+$language['chooseSongType'] = 'Выберите тип песни...';
+$language['officialSong'] = 'Официальная песня';
+$language['customSong'] = 'Кастомная песня';
+$language['song'] = 'Песня';
+$language['levelPrivacy'] = 'Приватность уровня';
+$language['chooseLevelPrivacy'] = 'Выберите приватность уровня...';
+$language['publicLevel'] = 'Открытый уровень';
+$language['privateLevel'] = 'Приватный уровень';
+$language['unlistedLevel'] = 'Скрытый уровень';
+$language['onlyForFriends'] = 'Только для друзей';
+$language['levelDifficulty'] = 'Сложность уровня';
+$language['chooseLevelDifficulty'] = 'Выберите сложность уровня...';
+$language['silverCoins'] = 'Серебряные монетки';
+$language['silverCoinsDesc'] = 'Должны ли монетки на уровне быть серебряными';
+$language['updatesLock'] = 'Заблокировать обновления';
+$language['updatesLockDesc'] = 'Если включить эту настройку, автор уровня больше не сможет обновить его';
+$language['commentingLock'] = 'Заблокировать комментирование';
+$language['commentingLockDesc'] = 'Если включить эту настройку, игроки больше не смогут написать комментарий к уровню';
+$language['passwordRemoveHint'] = 'Укажите 0 или ничего, если хотите убрать пароль';
 ?>

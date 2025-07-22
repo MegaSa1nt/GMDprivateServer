@@ -342,23 +342,8 @@ async function updatePage() {
 		element.innerHTML = convertSeconds(timeValue);
 	});
 	
-	const checkChangeForms = document.querySelectorAll("[dashboard-change-form]");
-	checkChangeForms.forEach(element => element.onchange = async () => {
-		const checkChangeButtons = document.querySelector("[dashboard-change-buttons]");
-		const formData = new FormData(element);
-		var isFormChanged = false;
-		
-		for await (const entry of formData.entries()) {
-			const entryName = entry[0];
-			const entryValue = entry[1];
-			
-			const elementDefaultValue = element.querySelector(`[name="${entryName}"][dashboard-change-default]`);
-			if(elementDefaultValue != null && entryValue != elementDefaultValue.getAttribute("value")) isFormChanged = true;
-		}
-		
-		if(isFormChanged) checkChangeButtons.classList.add("show");
-		else checkChangeButtons.classList.remove("show");
-	});
+	const checkChangeForm = document.querySelector("[dashboard-change-form]");
+	if(checkChangeForm != null) checkChangeForm.oninput = async () => checkFormSettingsChange(checkChangeForm);
 	
 	const pageButtonsElement = document.querySelector("[dashboard-page-buttons]");
 	const pageButtonsDiv = document.querySelector("[dashboard-page-div]");
@@ -399,13 +384,15 @@ async function updatePage() {
 		const searchToggle = document.querySelector(`[dashboard-select-show="${searchID}"]`);
 		const searchValueInput = element.querySelector("[dashboard-select-value]");
 		
-		searchToggle.onchange = (e) => {
-			if(e.target.checked) {
-				element.classList.add("view");
-				searchValueInput.disabled = false;
-			} else {
-				element.classList.remove("view");
-				searchValueInput.disabled = true;
+		if(searchToggle != null) {
+			searchToggle.onchange = (e) => {
+				if(e.target.checked) {
+					element.classList.remove("hide");
+					searchValueInput.disabled = false;
+				} else {
+					element.classList.add("hide");
+					searchValueInput.disabled = true;
+				}
 			}
 		}
 		
@@ -430,16 +417,23 @@ async function updatePage() {
 				
 				if(!searchResults.length) return;
 				
-				for await (const song of searchResults) {
+				for await (const searchResult of searchResults) {
 					const searchOption = document.createElement("div");
+					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : false;
+					const searchIconAfter = typeof searchResult.iconAfter != "undefined" ? searchResult.iconAfter : false;
+					
+					const searchText = "<text " + (searchAttributes ? searchAttributes : '') + ">" + escapeHTML(searchResult.name) + "</text>" + (searchIconAfter ? searchIconAfter : '');
+					
 					searchOption.classList.add("option");
-					searchOption.innerHTML = song.icon.length ? song.icon + " <text>" + escapeHTML(song.name) + "</text>" : "<text>" + escapeHTML(song.name) + "</text>";
+					searchOption.innerHTML = searchResult.icon.length ? searchResult.icon + " " + searchText : searchText;
 					
 					searchOption.onclick = () => {
-						searchInput.value = escapeHTML(song.name);
-						searchValueInput.value = song.ID;
+						searchInput.value = escapeHTML(searchResult.name);
+						searchValueInput.value = searchResult.ID;
 						
 						element.classList.remove("show");
+						
+						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
 					}
 					
 					searchOptions.appendChild(searchOption);
@@ -488,8 +482,13 @@ async function updatePage() {
 				}
 				
 				element.classList.remove("show");
+				
+				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
 			}
 		});
+		
+		const selectValue = selectValueInput.getAttribute("value");
+		if(selectValue != null) element.querySelector("[dashboard-select-option][value='" + selectValue + "']").click();
 		
 		selectInput.oninput = async (e) => {
 			const searchValue = e.target.value.trim();
@@ -506,7 +505,10 @@ async function updatePage() {
 				});
 			}
 			
-			if(!searchValue.length) return;
+			if(!searchValue.length) {
+				selectValueInput.value = "";
+				return;
+			}
 			
 			const searchValueSplit = "(" + searchValue.replaceAll(" ", ")(?=.*") + ")";
 			const searchValueRegex = new RegExp(searchValueSplit, 'gi');
@@ -698,6 +700,15 @@ async function updatePage() {
 			
 			fileInputText.innerHTML = fileName;
 			fileInputText.classList.remove("empty");
+		}
+	});
+	
+	const toggleElements = document.querySelectorAll("[dashboard-toggle]");
+	toggleElements.forEach(async (element) => {
+		const toggleInput = element.querySelector("input");
+		
+		element.onclick = (event) => {
+			if(event.target != toggleInput) toggleInput.click();
 		}
 	});
 }
@@ -930,11 +941,27 @@ async function resetSettings() {
 	
 	const defaultValuesElements = settingsFormElement.querySelectorAll("[dashboard-change-default]");
 	defaultValuesElements.forEach(async(element) => {
-		element.click();
-		element.value = element.getAttribute("value");
+		const inputType = element.getAttribute("type");
+		
+		var defaultValue = element.getAttribute("dashboard-change-default");
+		if(!defaultValue.length) defaultValue = element.getAttribute("value");
+		
+		
+		if(inputType != "checkbox" || inputType == 'checkbox' && ((defaultValue == false && element.checked) || (defaultValue == true && !element.checked))) element.click();
+		element.value = defaultValue;
 		
 		settingsForm.set(element.name, element.value);
+		
+		const selectValueCheck = element.getAttribute("dashboard-select-value");
+		if(selectValueCheck != null) {
+			const selectElement = settingsFormElement.querySelector("[dashboard-select='" + element.name + "']:has([dashboard-select-value][dashboard-change-default]) [dashboard-select-option][value='" + element.value + "']");
+			
+			if(selectElement != null) selectElement.click();
+		}
 	});
+	
+	const saveSettingsButtonsDiv = document.querySelector("[dashboard-change-buttons]");
+	if(saveSettingsButtonsDiv != null) saveSettingsButtonsDiv.classList.remove("show");
 }
 
 async function addEmojiToInput(emojiName) {
@@ -1092,4 +1119,33 @@ async function handleSFXUpload(form) {
 		showLoaderProgressBar(true, doneText, 3, 0, 3);
 		setTimeout(() => showLoaderProgressBar(false), 200);
 	});
+}
+
+function checkFormSettingsChange(element) {
+	if(element == null) return;
+	
+	const checkChangeButtons = document.querySelector("[dashboard-change-buttons]");
+	const formData = new FormData(element);
+	const formElements = element.querySelectorAll("input");
+	var isFormChanged = false;
+	
+	formElements.forEach(async (element) => {
+		const entryName = element.name;
+		var entryValue = element.value;
+		
+		var defaultValue = element.getAttribute("dashboard-change-default");
+		if(defaultValue != null) {
+			if(!defaultValue.length) defaultValue = element.getAttribute("value");
+			
+			const inputType = element.getAttribute("type");
+			if(inputType == 'checkbox') entryValue = element.checked;
+			
+			const formDataValue = formData.get(entryName);
+			
+			if(entryValue != defaultValue || (formDataValue != null && entryValue != formDataValue)) isFormChanged = true;
+		}
+	});
+	
+	if(isFormChanged) checkChangeButtons.classList.add("show");
+	else checkChangeButtons.classList.remove("show");
 }

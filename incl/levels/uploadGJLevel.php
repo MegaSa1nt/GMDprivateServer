@@ -11,8 +11,8 @@ if(!$person["success"]) exit(CommonError::InvalidRequest);
 
 $gameVersion = abs(Escape::number($_POST["gameVersion"]));
 $levelID = Escape::number($_POST["levelID"]);
-$levelName = Escape::latin($_POST["levelName"]) ?: 'Unnamed level';
-$levelDesc = $gameVersion >= 20 ? Escape::translit(Escape::text(Escape::url_base64_decode($_POST["levelDesc"]))) : Escape::translit(Escape::text($_POST["levelDesc"]));
+$levelName = Escape::latin($_POST["levelName"], 25) ?: 'Unnamed level';
+$levelDesc = $gameVersion >= 20 ? Escape::translit(Escape::text(Escape::url_base64_decode($_POST["levelDesc"]), 300)) : Escape::translit(Escape::text($_POST["levelDesc"], 300));
 $levelDesc = Escape::url_base64_encode(Library::escapeDescriptionCrash($levelDesc));
 $levelLength = abs(Escape::number($_POST["levelLength"]));
 $audioTrack = abs(Escape::number($_POST["audioTrack"]));

@@ -80,16 +80,20 @@ class Dashboard {
 		return ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => $userName, "IP" => $IP];
 	}
 	
-	public static function getUserIconKit($userID) {
+	public static function getUserIconKit($user) {
 		global $dbPath;
 		require __DIR__."/../".$dbPath."config/dashboard.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		if(!is_array($user)) {
+			$userID = $user;
+			$user = Library::getUserByID($userID);
+		} else $userID = $user['userID'];
 		
 		if(isset($GLOBALS['core_cache']['dashboard']['iconKit'][$userID])) return $GLOBALS['core_cache']['dashboard']['iconKit'][$userID];
 		
 		$iconTypes = ['cube', 'ship', 'ball', 'ufo', 'wave', 'robot', 'spider', 'swing', 'jetpack'];
 		
-		$user = Library::getUserByID($userID);
 		if(!$user) {
 			$iconKit = [
 				"main" => $iconsRendererServer."/icon.png?type=cube&value=1&color1=0&color2=3",
@@ -267,7 +271,7 @@ class Dashboard {
 			'userID' => $user['userID'],
 			'IP' => $user['IP'],
 		];
-		$iconKit = self::getUserIconKit($user['userID']);
+		$iconKit = self::getUserIconKit($user);
 		$userAppearance = Library::getPersonCommentAppearance($userPerson);
 		$userColor = str_replace(",", " ", $userAppearance['commentColor']);
 		
@@ -971,6 +975,44 @@ class Dashboard {
 		$user['USER_CONTEXT_MENU'] = self::renderTemplate('components/menus/user', $contextMenuData);
 		
 		return self::renderTemplate('components/user', $user);
+	}
+	
+	public static function renderClanCard($clan, $person) {
+		global $dbPath;
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		$isClanOwner = $person['accountID'] == $clan['clanOwner'];
+	
+		$ownerUser = Library::getUserByAccountID($clan['clanOwner']);
+		$ownerUserName = $ownerUser ? $ownerUser['userName'] : 'Undefined';
+		$userMetadata = self::getUserMetadata($ownerUser);
+
+		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $ownerUser['userID']);
+
+		$contextMenuData = [];
+		
+		$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+		$clan['CLAN_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($clan['clanName']);
+		$clan['CLAN_DESCRIPTION'] = self::parseMentions($person, htmlspecialchars($clan['clanDesc'])) ?: "<i>".self::string('noDescription')."</i>";
+		$clan['CLAN_TITLE'] = sprintf(self::string("clanProfile"), htmlspecialchars($clan['clanName']));
+		$clan['CLAN_COLOR'] = "color: #".$clan['clanColor']."; text-shadow: 0px 0px 20px #".$clan['clanColor']."61;";
+		
+		$clan['CLAN_TAG'] = htmlspecialchars($clan['clanTag']);
+		$clan['CLAN_HAS_TAG'] = !empty($clan['CLAN_TAG']) ? 'true' : 'false';
+
+		$clan['CLAN_HAS_RANK'] = $clan['clanRank'] != 0 ? 'true' : 'false';
+		$clan['CLAN_IS_TOP_100'] = $clan['clanRank'] <= 100 ? 'true' : 'false';
+
+		$clan['CLAN_IS_CLOSED'] = $clan['isClosed'] ? 'true' : 'false';
+
+		$clan['CLAN_OWNER_CARD'] = self::getUsernameString($person, $ownerUser, $ownerUserName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
+		
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = $contextMenuData['MENU_CAN_MANAGE'] == 'true' ? 'true' : 'false';
+		
+		$clan['CLAN_CONTEXT_MENU'] = self::renderTemplate('components/menus/clan', $contextMenuData);
+		
+		return self::renderTemplate('components/clan', $clan);
 	}
 }
 ?>

@@ -109,14 +109,18 @@ $vpns['vpn'] = 'https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/v
 
 	$warningsPeriod — period of time in seconds, when new warnings of same type won't show to prevent warn spamming
 
-	$levelsCountModifier — modifier to levels before count to avoid small levels increase warning
+	$levelsWarnCountModifier — modifier to levels before count to avoid warning on small levels increase
 		if(Levels after > Levels before * Levels modifier) WARNING;
+	$levelsDisableCountModifier — modifier to levels before count to avoid disabling uploading levels on small levels increase
+		if(Levels after > Levels before * Levels modifier) DISABLE UPLOADING LEVELS;
 	$levelsDaysCheckPeriod — average levels count last X days will be used to compare to amount today
 	$levelsSpamUploadDisable — for how many seconds level uploading should be automatically disabled if spamming detected
 		0 — turned off
 
-	$accountsCountModifier — modifier to accounts before count to avoid small accounts increase warning
+	$accountsWarnCountModifier — modifier to accounts before count to avoid warning on small accounts increase 
 		if(Accounts after > Accounts before * Accounts modifier) WARNING;
+	$accountsDisableCountModifier — modifier to accounts before count to avoid disabling creating accounts on small accounts increase
+		if(Accounts after > Accounts before * Accounts modifier) DISABLE CREATING ACCOUNTS;
 	$accountsDaysCheckPeriod — average levels count last X days will be used to compare to amount today
 	$accountsSpamUploadDisable — for how many seconds account registering should be automatically disabled if spamming detected
 		0 — turned off
@@ -205,11 +209,13 @@ $ACEExploitTimeCheck = 3600;
 
 $warningsPeriod = 302400;
 
-$levelsCountModifier = 1.3;
+$levelsWarnCountModifier = 1.8;
+$levelsDisableCountModifier = 2.5;
 $levelsDaysCheckPeriod = 7;
 $levelsSpamUploadDisable = 1200;
 
-$accountsCountModifier = 1.3;
+$accountsWarnCountModifier = 1.5;
+$accountsDisableCountModifier = 2.5;
 $accountsDaysCheckPeriod = 7;
 $accountsSpamUploadDisable = 1200;
 

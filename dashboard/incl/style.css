@@ -385,7 +385,8 @@ form {
 	width: 100%;
 }
 
-.inputDiv.hide {
+.inputDiv.hide,
+.settingDescription.hide {
 	display: none;
 }
 
@@ -694,7 +695,8 @@ h1.username[href],
 .contextMenuButton.contextMenuTitle,
 .levelTitle.colored h2,
 .levelStat .colored,
-.profileTitle h1 {
+.profileTitle h1,
+.option:has(text[style]) text {
 	color: var(--href-color);
 	text-shadow: 0px 0px 20px var(--href-shadow-color);
 }
@@ -1030,7 +1032,8 @@ h1.username[href],
 	display: none;
 }
 
-i[onclick] {
+i[onclick],
+[dashboard-toggle] {
 	cursor: pointer;
 }
 
@@ -1044,6 +1047,7 @@ i[onclick] {
 	align-items: flex-start;
 	
 	width: max-content;
+	min-width: 300px;
 }
 
 .levelPage .levelStats:not(.card) .levelStat {
@@ -1448,7 +1452,8 @@ nav [title]::after,
 	transition: 0.2s;
 }
 
-.toggle:active::after {
+.toggle:active::after,
+[dashboard-toggle]:active .toggle::after {
 	scale: 0.9;
 	transform: translateX(-55%);
 }
@@ -1464,7 +1469,8 @@ nav [title]::after,
 	background-color: var(--href-color);
 }
 
-.toggle:checked:active::after {
+.toggle:checked:active::after,
+[dashboard-toggle]:active .toggle:checked::after {
 	scale: 0.9;
 	transform: translateX(55%);
 }
@@ -1503,6 +1509,10 @@ nav [title]::after,
 }
 
 .settingDescription h2 {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	
 	word-break: break-word;
 	
 	font-size: 30px;
@@ -1682,6 +1692,10 @@ nav [title]::after,
 	justify-content: flex-start;
 }
 
+.titleToCenter[title] {
+	justify-content: center;
+}
+
 .titleToRight[title] {
 	justify-content: flex-end;
 }
@@ -1774,13 +1788,14 @@ span.background {
 	display: none;
 }
 
-.option i {
+.option i,
+.option img {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	
-	width: 20px;
-	height: 20px;
+	width: 25px;
+	max-height: 30px;
 }
 
 select::picker-icon {
@@ -1833,10 +1848,10 @@ select:open::picker-icon {
 	box-sizing: border-box;
 	
 	cursor: pointer;
-	opacity: 0;
-	visibility: hidden;
+	opacity: 1;
+	visibility: initial;
 	
-	margin-top: -55px;
+	margin-top: 0px;
 
 	transition: 0.2s;
 }
@@ -1943,15 +1958,15 @@ i[dashboard-caret]::before {
 	}
 }
 
-.select.view {
-	opacity: 1;
-	visibility: initial;
-	margin-top: 0px;
+.select.hide {
+	opacity: 0;
+	visibility: hidden;
+	margin-top: -55px;
 	
 	@starting-style {
-		opacity: 0;
-		visibility: hidden;
-		margin-top: -55px;
+		opacity: 1;
+		visibility: initial;
+		margin-top: 0px;
 	}
 }
 
@@ -2152,6 +2167,8 @@ body:has(.modalPage.show) span.background {
 	
 	transform: translateY(200%);
 	transition: 0.2s;
+	
+	backdrop-filter: blur(5px);
 }
 
 .saveSettingsButtons.show {

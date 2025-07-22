@@ -1,10 +1,7 @@
 <?php
 require_once __DIR__."/../incl/dashboardLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
-require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
-require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
-$sec = new Security();
 
 $songs = [];
 
@@ -15,6 +12,7 @@ if(isset($_GET['search'])) {
 	$filters = ['name LIKE "%'.$search.'%" OR authorName LIKE "%'.$search.'%" OR ID LIKE "'.$search.'"', "reuploadID > 0"];
 	
 	$songsArray = Library::getSongs($filters, false, '', '', 0, 5);
+	if(!$songsArray['songs']) exit(json_encode([]));
 	
 	foreach($songsArray['songs'] AS &$song) {
 		$songs[] = [

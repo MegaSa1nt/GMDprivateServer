@@ -48,6 +48,9 @@ $language['uploadSFXTitle'] = 'Add a SFX';
 $language['reuploadLevelTitle'] = 'Reupload a level';
 $language['runCron'] = 'Run Cron';
 
+$language['clans'] = 'Clans';
+$language['clansListTitle'] = 'Clans list';
+
 $language['messengerTitle'] = 'Messenger';
 $language['loginToAccountTitle'] = 'Login to account';
 $language['yourProfileTitle'] = 'Your profile';
@@ -107,6 +110,10 @@ $language['errorNotYourLevel'] = 'This level is not yours!';
 $language['errorFailedToWriteLevel'] = 'An error has occured while trying to save reuploaded level!';
 
 $language['errorCronTooFast'] = 'Please wait a few minutes before running Cron again!';
+
+$language['errorPlayerNotFound'] = 'Player wasn\'t found!';
+$language['errorBadLevelName'] = 'Please choose another name!';
+$language['errorBadLevelDesc'] = 'Please choose another description!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -356,4 +363,36 @@ $language['serverURL'] = 'Server URL';
 
 $language['reuploadLevelToServerDesc'] = 'Reupload a level from another GDPS to the current GDPS';
 $language['reuploadLevelFromServerDesc'] = 'Reupload a level from the current GDPS to another GDPS';
+
+$language['clanMembersCount'] = 'Clan members count';
+
+$language['registeredPlayer'] = 'Registered player';
+$language['unregisteredPlayer'] = 'Unregistered player';
+
+$language['levelName'] = 'Level name';
+$language['levelAuthor'] = 'Level author';
+$language['levelDesc'] = 'Level description';
+$language['levelRateType'] = 'Level rate type';
+$language['chooseRateType'] = 'Choose level rate type...';
+$language['noRating'] = 'No rating';
+$language['songType'] = 'Song type';
+$language['chooseSongType'] = 'Choose song type...';
+$language['officialSong'] = 'Official song';
+$language['customSong'] = 'Custom song';
+$language['song'] = 'Song';
+$language['levelPrivacy'] = 'Level privacy';
+$language['chooseLevelPrivacy'] = 'Choose level privacy...';
+$language['publicLevel'] = 'Public level';
+$language['privateLevel'] = 'Private level';
+$language['unlistedLevel'] = 'Unlisted level';
+$language['onlyForFriends'] = 'Only for friends';
+$language['levelDifficulty'] = 'Level difficulty';
+$language['chooseLevelDifficulty'] = 'Choose level difficulty...';
+$language['silverCoins'] = 'Silver coins';
+$language['silverCoinsDesc'] = 'Should coins on a level be silver';
+$language['updatesLock'] = 'Lock updates';
+$language['updatesLockDesc'] = 'If you enable this setting, level author won\'t be able to update this level anymore';
+$language['commentingLock'] = 'Lock commenting';
+$language['commentingLockDesc'] = 'If you enable this setting, players wouldn\'t be able to comment on this level anymore';
+$language['passwordRemoveHint'] = 'Set 0 or nothing, if you want to remove password';
 ?>

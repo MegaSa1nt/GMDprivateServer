@@ -18,17 +18,24 @@ class Automod {
 		$levelsBefore = $levelsCount['before'];
 		$levelsAfter = $levelsCount['after'];
 		
-		$levelsBeforeModified = $levelsBefore * $levelsCountModifier + 4;
+		$levelsBeforeModified = ($levelsBefore * $levelsWarnCountModifier) + 4;
+		$levelsBeforeModifiedDisable = ($levelsBefore * $levelsDisableCountModifier) + 4;
 
 		if($levelsAfter > $levelsBeforeModified) {
-			$isWarned = self::getLastAutomodAction(1, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::LevelsSpamWarning, true);
+			
 			if(!$isWarned) {
-				self::logAutomodActions(1, $levelsBefore, $levelsAfter, $levelsBeforeModified);
-				
-				if($levelsSpamUploadDisable) self::changeLevelsAutomodState(0, true, time() + $levelsSpamUploadDisable);
+				self::logAutomodActions(AutomodAction::LevelsSpamWarning, $levelsBefore, $levelsAfter, $levelsBeforeModified);
 				
 				//$gs->sendLevelsWarningWebhook($levelsBefore, $levelsAfter);
 			}
+			
+			if($levelsSpamUploadDisable) {
+				$isDisabled = self::getLastAutomodAction(AutomodAction::LevelUploadingDisable, true);
+				
+				if(!$isDisabled && $levelsAfter > $levelsBeforeModifiedDisable) self::changeLevelsAutomodState(0, true, time() + $levelsSpamUploadDisable);
+			}
+			
 			return false;
 		}
 
@@ -225,7 +232,22 @@ class Automod {
 			Array — array of public action types
 	*/
 	private static function getPublicActionTypes() {
-		return [1, 5, 10, 11, 12, 13, 14, 15];
+		return [
+			AutomodAction::LevelsSpamWarning,
+			AutomodAction::AccountsSpamWarning,
+			
+			AutomodAction::CommentsSpammingWarning,
+			AutomodAction::CommentsSpammerWarning,
+			
+			AutomodAction::AccountPostsSpammingWarning,
+			AutomodAction::AccountPostsSpammerWarning,
+			
+			AutomodAction::PostRepliesSpammingWarning,
+			AutomodAction::PostRepliesSpammerWarning,
+			
+			AutomodAction::ClanPostsSpammingWarning,
+			AutomodAction::ClanPostsSpammerWarning
+		];
 	}
 	
 	/*
@@ -242,11 +264,11 @@ class Automod {
 		require_once __DIR__."/mainLib.php";
 		
 		$levelsPeriod = time() - ($levelsDaysCheckPeriod * 86400);
-		$levelsCount = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND uploadDate <= :time2 ORDER BY uploadDate DESC");
+		$levelsCount = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND uploadDate <= :time2 AND isDeleted = 0 ORDER BY uploadDate DESC");
 		$levelsCount->execute([':time' => $levelsPeriod, ':time2' => time() - 86400]);
 		$levelsBefore = $levelsCount->fetchColumn() / $levelsDaysCheckPeriod;
 		
-		$levelsCount = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time ORDER BY uploadDate DESC");
+		$levelsCount = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 ORDER BY uploadDate DESC");
 		$levelsCount->execute([':time' => time() - 86400]);
 		$levelsAfter = $levelsCount->fetchColumn();
 		
@@ -262,7 +284,7 @@ class Automod {
 			Array — array of level disables types
 	*/
 	private static function getLevelsDisableTypes() {
-		return [2, 3, 4];
+		return [AutomodAction::LevelUploadingDisable, AutomodAction::LevelCommentingDisable, AutomodAction::LevelLeaderboardDisable];
 	}
 	
 	/*
@@ -350,17 +372,24 @@ class Automod {
 		$accountsBefore = $levelsCount['before'];
 		$accountsAfter = $levelsCount['after'];
 		
-		$accountsBeforeModified = $accountsBefore * $accountsCountModifier + 3;
+		$accountsBeforeModified = ($accountsBefore * $accountsWarnCountModifier) + 3;
+		$accountsBeforeModifiedDisable = ($accountsBefore * $accountsDisableCountModifier) + 3;
 		
 		if($accountsAfter > $accountsBeforeModified) {
-			$isWarned = self::getLastAutomodAction(5, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::AccountsSpamWarning, true);
+			
 			if(!$isWarned) {
-				self::logAutomodActions(5, $accountsBefore, $accountsAfter, $accountsBeforeModified);
+				self::logAutomodActions(AutomodAction::AccountsSpamWarning, $accountsBefore, $accountsAfter, $accountsBeforeModified);
 				
-				if($accountsSpamUploadDisable) self::changeAccountsAutomodState(0, true, time() + $accountsSpamUploadDisable);
-					
 				//$gs->sendAccountsWarningWebhook($accountsBefore, $accountsAfter);
 			}
+			
+			if($accountsSpamUploadDisable) {
+				$isDisabled = self::getLastAutomodAction(AutomodAction::AccountRegisteringDisable, true);
+				
+				if($isDisabled && $accountsAfter > $accountsBeforeModifiedDisable) self::changeAccountsAutomodState(0, true, time() + $accountsSpamUploadDisable);
+			}
+			
 			return false;
 		}
 		
@@ -388,7 +417,12 @@ class Automod {
 			Array — array of account disables types
 	*/
 	private static function getAccountsDisableTypes() {
-		return [6, 7, 8, 9];
+		return [
+			AutomodAction::AccountRegisteringDisable,
+			AutomodAction::AccountPostingDisable,
+			AutomodAction::AccountUpdatingStatsDisable,
+			AutomodAction::AccountMessagingDisable
+		];
 	}
 	
 	/*
@@ -608,11 +642,11 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 5) {
-			$isWarned = self::getLastAutomodAction(10, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::CommentsSpammingWarning, true);
 			
 			if(!$isWarned) {
 				$similarCommentsAuthors = array_unique($similarCommentsAuthors);
-				self::logAutomodActions(10, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
+				self::logAutomodActions(AutomodAction::CommentsSpammingWarning, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
 				
 				if($commentsSpamUploadDisable) self::changeLevelsAutomodState(1, true, time() + $commentsSpamUploadDisable);
 				
@@ -645,10 +679,10 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 3) {
-			$isWarned = self::getLastAutomodAction(11, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::CommentsSpammerWarning, true);
 			
 			if(!$isWarned) {
-				self::logAutomodActions(11, $similarCommentsCount, $similarity, $commentsCount, $userID);
+				self::logAutomodActions(AutomodAction::CommentsSpammerWarning, $similarCommentsCount, $similarity, $commentsCount, $userID);
 				//$gs->sendCommentsSpammerWarningWebhook($similarCommentsCount, $userID);
 			}
 			
@@ -713,11 +747,11 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 4) {
-			$isWarned = self::getLastAutomodAction(12, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::AccountPostsSpammingWarning, true);
 			
 			if(!$isWarned) {
 				$similarCommentsAuthors = array_unique($similarCommentsAuthors);
-				self::logAutomodActions(12, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
+				self::logAutomodActions(AutomodAction::AccountPostsSpammingWarning, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
 				
 				if($commentsSpamUploadDisable) self::changeAccountsAutomodState(1, true, time() + $commentsSpamUploadDisable);
 				
@@ -750,12 +784,12 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 4) {
-			$isWarned = self::getLastAutomodAction(13, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::AccountPostsSpammerWarning, true);
 			
 			if(!$isWarned) {
-				self::logAutomodActions(13, $similarCommentsCount, $similarity, $commentsCount, $userID);
+				self::logAutomodActions(AutomodAction::AccountPostsSpammerWarning, $similarCommentsCount, $similarity, $commentsCount, $userID);
 				
-				if($commentsSpamUploadDisable) Library::banPerson(0, $banPerson, "No spamming!", Ban::Commenting, Person::UserID, (time() + $commentsSpamUploadDisable), "Person tried to spam comments. (".$similarity." > ".$commentsCount." / 3)");
+				if($commentsSpamUploadDisable) Library::banPerson(0, $banPerson, "No spamming!", Ban::Commenting, Person::UserID, (time() + $commentsSpamUploadDisable), "Person tried to spam account posts. (".$similarity." > ".$commentsCount." / 3)");
 				
 				//$gs->sendAccountPostsSpammerWarningWebhook($similarCommentsCount, $userID);
 			}
@@ -812,11 +846,11 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 4) {
-			$isWarned = self::getLastAutomodAction(14, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::PostRepliesSpammingWarning, true);
 			
 			if(!$isWarned) {
 				$similarCommentsAuthors = array_unique($similarCommentsAuthors);
-				self::logAutomodActions(14, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
+				self::logAutomodActions(AutomodAction::PostRepliesSpammingWarning, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
 				//$gs->sendRepliesSpammingWarningWebhook($similarCommentsCount, $similarCommentsAuthors);
 			}
 			
@@ -846,10 +880,13 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 3) {
-			$isWarned = self::getLastAutomodAction(15, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::PostRepliesSpammerWarning, true);
 			
 			if(!$isWarned) {
-				self::logAutomodActions(15, $similarCommentsCount, $similarity, $commentsCount, $accountID);
+				self::logAutomodActions(AutomodAction::PostRepliesSpammerWarning, $similarCommentsCount, $similarity, $commentsCount, $accountID);
+				
+				if($commentsSpamUploadDisable) Library::banPerson(0, $banPerson, "No spamming!", Ban::Commenting, Person::UserID, (time() + $commentsSpamUploadDisable), "Person tried to spam replies. (".$similarity." > ".$commentsCount." / 3)");
+				
 				//$gs->sendRepliesSpammerWarningWebhook($similarCommentsCount, $accountID);
 			}
 			
@@ -905,11 +942,11 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 5) {
-			$isWarned = self::getLastAutomodAction(10, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::ClanPostsSpammingWarning, true);
 			
 			if(!$isWarned) {
 				$similarCommentsAuthors = array_unique($similarCommentsAuthors);
-				self::logAutomodActions(10, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
+				self::logAutomodActions(AutomodAction::ClanPostsSpammingWarning, $similarCommentsCount, $similarity, $commentsCount, implode(', ', $similarCommentsAuthors));
 				
 				if($commentsSpamUploadDisable) self::changeLevelsAutomodState(1, true, time() + $commentsSpamUploadDisable);
 				
@@ -942,10 +979,10 @@ class Automod {
 		}
 		
 		if($similarity > $commentsCount / 3 && $similarCommentsCount > 3) {
-			$isWarned = self::getLastAutomodAction(11, true);
+			$isWarned = self::getLastAutomodAction(AutomodAction::ClanPostsSpammerWarning, true);
 			
 			if(!$isWarned) {
-				self::logAutomodActions(11, $similarCommentsCount, $similarity, $commentsCount, $userID);
+				self::logAutomodActions(AutomodAction::ClanPostsSpammerWarning, $similarCommentsCount, $similarity, $commentsCount, $userID);
 				//$gs->sendCommentsSpammerWarningWebhook($similarCommentsCount, $userID);
 			}
 			

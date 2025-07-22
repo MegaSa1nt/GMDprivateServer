@@ -1,0 +1,28 @@
+<div class="pageDiv" dashboard-page-buttons>
+	<p>%CLAN_PAGE_TEXT%</p>
+	
+	<div class="pageButtons">
+		<button dashboard-disable="%IS_FIRST_PAGE%" class="pageButton" type="button" onclick="%FIRST_PAGE_BUTTON%">
+			<i class="fa-solid fa-backward"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_FIRST_PAGE%" class="pageButton" type="button" onclick="%PREVIOUS_PAGE_BUTTON%">
+			<i class="fa-solid fa-chevron-left"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_LAST_PAGE%" class="pageButton" type="button" onclick="%NEXT_PAGE_BUTTON%">
+			<i class="fa-solid fa-chevron-right"></i>
+		</button>
+		
+		<button dashboard-disable="%IS_LAST_PAGE%" class="pageButton" type="button" onclick="%LAST_PAGE_BUTTON%">
+			<i class="fa-solid fa-forward"></i>
+		</button>
+	</div>
+</div>
+
+<div class="nothingOnPageDiv" dashboard-show="%CLAN_NO_CLANS%">
+	<i class="fa-solid fa-shield-halved nothing-icon"></i>
+	<h1>%TEXT_noClans%</h1>
+</div>
+
+%ADDITIONAL_PAGE%

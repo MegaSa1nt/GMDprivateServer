@@ -93,7 +93,7 @@ if($_GET['id']) {
 		case 'manage':
 			$pageBase = '../../../';
 			if(!Library::checkPermission($person, "dashboardLevelPackCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), '../../../'));
-			$mapPack['MAPPACK_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/manage', $additionalData);
+			$mapPack['MAPPACK_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/mappack', $additionalData);
 			break;
 		default:
 			exit(http_response_code(404));

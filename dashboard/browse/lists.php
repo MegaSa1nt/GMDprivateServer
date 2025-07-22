@@ -146,7 +146,7 @@ if($_GET['id']) {
 			$pageBase = '../../../';
 			
 			if(!Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
-			$list['LIST_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/manage', $additionalData);
+			$list['LIST_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/list', $additionalData);
 			break;
 		default:
 			exit(http_response_code(404));

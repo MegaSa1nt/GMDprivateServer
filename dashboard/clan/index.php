@@ -132,6 +132,8 @@ $clan['CLAN_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($clan['cla
 $clan['CLAN_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars($clan['clanDesc'])) ?: "<i>".Dashboard::string('noDescription')."</i>";
 $clan['CLAN_TITLE'] = sprintf(Dashboard::string("clanProfile"), htmlspecialchars($clan['clanName']));
 $clan['CLAN_COLOR'] = "color: #".$clan['clanColor']."; text-shadow: 0px 0px 20px #".$clan['clanColor']."61;";
+
+$clan['CLAN_HAS_TAG'] = !empty($clan['CLAN_TAG']) ? 'true' : 'false';
 $clan['CLAN_TAG'] = htmlspecialchars($clan['clanTag']);
 
 $clan['CLAN_HAS_RANK'] = $clan['clanRank'] != 0 ? 'true' : 'false';

@@ -1316,7 +1316,7 @@ class Library {
 	public static function getUsers($str, $pageOffset) {
 		require __DIR__."/connection.php";
 		
-		$users = $db->prepare("SELECT * FROM users WHERE userID = :str OR userName LIKE CONCAT('%', :str, '%') ORDER BY stars DESC LIMIT 10 OFFSET ".$pageOffset);
+		$users = $db->prepare("SELECT * FROM users WHERE userID = :str OR userName LIKE CONCAT('%', :str, '%') LIMIT 10 OFFSET ".$pageOffset);
 		$users->execute([':str' => $str]);
 		$users = $users->fetchAll();
 		
@@ -2360,14 +2360,14 @@ class Library {
 		$level = self::getLevelByID($levelID);
 		
 		$changeLevelPassword = $db->prepare("UPDATE levels SET password = :password WHERE levelID = :levelID AND isDeleted = 0");
-		$changeLevelPassword->execute([':levelID' => $levelID, ':password' => "1".$newPassword]);
+		$changeLevelPassword->execute([':levelID' => $levelID, ':password' => $newPassword]);
 		
-		self::logModeratorAction($person, ModeratorAction::LevelPasswordChange, "1".$newPassword, $level['password'], $levelID);
+		self::logModeratorAction($person, ModeratorAction::LevelPasswordChange, $newPassword, $level['password'], $levelID);
 		
 		return true;
 	}
 	
-	public static function changeLevelSong($levelID, $person, $songID) {
+	public static function changeLevelSong($levelID, $person, $songID, $isCustomSong = 1) {
 		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		require_once __DIR__."/cron.php";
@@ -2376,10 +2376,15 @@ class Library {
 		
 		$level = self::getLevelByID($levelID);
 		
-		$changeLevelSong = $db->prepare("UPDATE levels SET songID = :songID WHERE levelID = :levelID AND isDeleted = 0");
-		$changeLevelSong->execute([':levelID' => $levelID, ':songID' => $songID]);
+		if(!$isCustomSong) {
+			$changeLevelSong = $db->prepare("UPDATE levels SET songID = 0, audioTrack = :songID WHERE levelID = :levelID AND isDeleted = 0");
+			$changeLevelSong->execute([':levelID' => $levelID, ':songID' => $songID]);
+		} else {
+			$changeLevelSong = $db->prepare("UPDATE levels SET songID = :songID, audioTrack = 0 WHERE levelID = :levelID AND isDeleted = 0");
+			$changeLevelSong->execute([':levelID' => $levelID, ':songID' => $songID]);
+		}
 		
-		self::logModeratorAction($person, ModeratorAction::LevelChangeSong, $songID, $level['songID'], $levelID);
+		self::logModeratorAction($person, ModeratorAction::LevelChangeSong, $songID, $level['songID'], $levelID, $isCustomSong);
 		
 		if($automaticCron) Cron::updateSongsUsage($person, $enableTimeoutForAutomaticCron);
 		
@@ -3031,6 +3036,7 @@ class Library {
 	public static function reuploadLevel($person, $reuploadType, $serverURL, $levelID, $reuploadUserName, $reuploadPassword) {
 		require __DIR__."/../../config/dashboard.php";
 		require __DIR__."/connection.php";
+		require_once __DIR__."/automod.php";
 		require_once __DIR__."/security.php";
 		require_once __DIR__."/XOR.php";
 		
@@ -3061,9 +3067,9 @@ class Library {
 				$request = self::sendRequest($serverURL.'downloadGJLevel22.php', http_build_query($requestData), $headers, "POST", false);
 				$requestArray = Security::mapGDString(explode("#", $request)[0], ":");
 				
-				$reuploadLevelString = $requestArray[4] ?: '';
-				$reuploadUserID = $requestArray[6] ?: 0;
-				$reuploadLevelID = $requestArray[1] ?: 0;
+				$reuploadLevelString = Escape::text($requestArray[4]) ?: '';
+				$reuploadUserID = Escape::number($requestArray[6]) ?: 0;
+				$reuploadLevelID = Escape::number($requestArray[1]) ?: 0;
 				
 				if(!$request || $request == "-1" || $request == "No no no" || empty($reuploadLevelString)) {
 					if(empty($reuploadLevelString) && strpos($request, "1005") !== false) return ['success' => false, 'error' => CommonError::BannedByServer];
@@ -3085,19 +3091,19 @@ class Library {
 				$levelName = Escape::text($requestArray[2]);
 				if(Security::checkFilterViolation($person, $levelName, 3)) $levelName = 'Level with bad name';
 				
-				$levelDesc = Escape::text(Escape::url_base64_decode($requestArray[3]));
+				$levelDesc = Escape::text(Escape::url_base64_decode($requestArray[3]), 300);
 				if(Security::checkFilterViolation($person, $levelDesc, 3)) $levelDesc = 'Level with bad description';
 				$levelDesc = Escape::url_base64_encode($levelDesc);
 				
-				$levelLength = Escape::number($requestArray[15]) ?: 0;
-				$audioTrack = Escape::number($requestArray[12]) ?: 0;
-				$twoPlayer = Escape::number($requestArray[31]) ?: 0;
+				$levelLength = Security::limitValue(0, Escape::number($requestArray[15]) ?: 0, 4);
+				$audioTrack = Security::limitValue(0, Escape::number($requestArray[12]) ?: 0, 21);
+				$twoPlayer = $requestArray[31] ? 1 : 0;
 				$songID = Escape::number($requestArray[35]) ?: 0;
 				$objects = Escape::number($requestArray[45]) ?: 0;
-				$coins = Escape::number($requestArray[37]) ?: 0;
-				$requestedStars = Escape::number($requestArray[39]) ?: 0;
+				$coins = Security::limitValue(0, Escape::number($requestArray[37]) ?: 0, 3);
+				$requestedStars = Security::limitValue(0, Escape::number($requestArray[39]) ?: 0, 10);
 				$extraString = Escape::text($requestArray[36]) ?: '';
-				$isLDM = Escape::number($requestArray[40]) ?: 0;
+				$isLDM = $requestArray[40] ? 1 : 0;
 				$levelPassword = Escape::text($requestArray[27]) ?: 0;
 				$songIDs = Escape::multiple_ids($requestArray[52]) ?: '';
 				$sfxIDs = Escape::multiple_ids($requestArray[53]) ?: '';
@@ -3136,6 +3142,8 @@ class Library {
 				rename(__DIR__.'/../../data/levels/'.$userID.'_'.$timestamp, __DIR__.'/../../data/levels/'.$realLevelID);
 				
 				self::logAction($person, Action::ReuploadLevelToGDPS, $serverHost, $levelID, $levelName, $levelDesc, $realLevelID);
+				
+				Automod::checkLevelsCount();
 				
 				break;
 			case 1: // From GDPS
@@ -4432,23 +4440,23 @@ class Library {
 		$songs = [
 			"Practice: Stay Inside Me by OcularNebula",
 			"Stereo Madness by ForeverBound",
-			"Back on Track by DJVI",
+			"Back On Track by DJVI",
 			"Polargeist by Step",
 			"Dry Out by DJVI",
-			"Base after Base by DJVI",
+			"Base After Base by DJVI",
 			"Can't Let Go by DJVI",
 			"Jumper by Waterflame",
 			"Time Machine by Waterflame",
 			"Cycles by DJVI",
 			"xStep by DJVI",
 			"Clutterfunk by Waterflame",
-			"Theory of Everything by DJ Nate",
+			"Theory of Everything by DJ-Nate",
 			"Electroman Adventures by Waterflame",
-			"Club Step by DJ Nate",
-			"Electrodynamix by DJ Nate",
+			"Clubstep by DJ-Nate",
+			"Electrodynamix by DJ-Nate",
 			"Hexagon Force by Waterflame",
 			"Blast Processing by Waterflame",
-			"Theory of Everything 2 by DJ Nate",
+			"Theory of Everything 2 by DJ-Nate",
 			"Geometrical Dominator by Waterflame",
 			"Deadlocked by F-777",
 			"Fingerbang by MDK",
@@ -4932,6 +4940,20 @@ class Library {
 		Automod::checkClanPostsSpamming($userID);
 		
 		return $commentID;
+	}
+	
+	public static function getClans($filters, $order, $orderSorting, $pageOffset, $limit = false) {
+		require __DIR__."/connection.php";
+
+		$clans = $db->prepare("SELECT clanID, FROM_BASE64(clanName) AS clanName, FROM_BASE64(clanDesc) AS clanDesc, FROM_BASE64(clanTag) AS clanTag, clanOwner, clanMembers, clanColor, clanRank, isClosed, creationDate, IF(clanMembers, LENGTH(clanMembers) - LENGTH(REPLACE(clanMembers, ',', '')) + 1, 0) AS clanMembersCount FROM clans ".($filters ? "WHERE (".implode(") AND (", $filters).") " : '')." ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
+		$clans->execute();
+		$clans = $clans->fetchAll();
+		
+		$clansCount = $db->prepare("SELECT count(*) FROM clans ".($filters ? "WHERE (".implode(") AND (", $filters).") " : ''));
+		$clansCount->execute();
+		$clansCount = $clansCount->fetchColumn();
+		
+		return ["clans" => $clans, "count" => $clansCount];
 	}
 	
 	/*

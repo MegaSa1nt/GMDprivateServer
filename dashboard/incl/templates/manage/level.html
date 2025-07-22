@@ -1,0 +1,389 @@
+<form class="wideBox" name="levelSettingsForm" dashboard-change-form>
+	<input type="hidden" name="levelID" value="%LEVEL_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-pen-to-square"></i>
+					%TEXT_levelName%
+				</h2>
+				
+				<input class="inputStyle" type="text" name="levelName" value="%LEVEL_NAME%" autocomplete="gdps-dashboard-levelName" dashboard-change-default placeholder="The Level Name" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user"></i>
+					%TEXT_levelAuthor%
+				</h2>
+				
+				<div class="select" dashboard-select-search="userSearch">
+					<input type="hidden" name="levelAuthor" dashboard-select-value value="%LEVEL_AUTHOR_ID%" dashboard-change-default="%LEVEL_AUTHOR_ID%" />
+					<input type="text" placeholder="%TEXT_searchText%" dashboard-select-value value="%LEVEL_AUTHOR_NAME%" dashboard-change-default="%LEVEL_AUTHOR_NAME%" dashboard-select-input="manage/getUsers" />
+					
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+					<div class="options" dashboard-select-options></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-comment-dots"></i>
+				%TEXT_levelDesc%
+			</h2>
+				
+			<input class="inputStyle" type="text" name="levelDesc" value="%LEVEL_DESC%" autocomplete="gdps-dashboard-levelDesc" dashboard-change-default placeholder="Cool description about this level, good good..." dashboard-not-required />
+		</div>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-star"></i>
+					%TEXT_stars%
+				</h2>
+				
+				<input class="inputStyle" type="number" min="0" max="10" name="stars" value="%LEVEL_STARS%" autocomplete="gdps-dashboard-levelStars" dashboard-change-default placeholder="10" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-face-smile"></i>
+					%TEXT_levelDifficulty%
+				</h2>
+				
+				<div class="select" dashboard-select="difficulty">
+					<input type="hidden" name="difficulty" value="%DIFFICULTY%" dashboard-change-default="%DIFFICULTY%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseLevelDifficulty%" value="%DIFFICULTY_NAME%" dashboard-change-default="%DIFFICULTY_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="na" dashboard-select-option="N/A">
+							<text>N/A</text>
+						</div>
+						
+						<div class="option" value="auto" dashboard-select-option="Auto">
+							<text>Auto</text>
+						</div>
+						
+						<div class="option" value="easy" dashboard-select-option="Easy">
+							<text>Easy</text>
+						</div>
+						
+						<div class="option" value="normal" dashboard-select-option="Normal">
+							<text>Normal</text>
+						</div>
+						
+						<div class="option" value="hard" dashboard-select-option="Hard">
+							<text>Hard</text>
+						</div>
+						
+						<div class="option" value="harder" dashboard-select-option="Harder">
+							<text>Harder</text>
+						</div>
+						
+						<div class="option" value="insane" dashboard-select-option="Insane">
+							<text>Insane</text>
+						</div>
+						
+						<div class="option" value="easydemon" dashboard-select-option="Easy Demon">
+							<text>Easy Demon</text>
+						</div>
+						
+						<div class="option" value="mediumdemon" dashboard-select-option="Medium Demon">
+							<text>Medium Demon</text>
+						</div>
+						
+						<div class="option" value="harddemon" dashboard-select-option="Hard Demon">
+							<text>Hard Demon</text>
+						</div>
+						
+						<div class="option" value="insanedemon" dashboard-select-option="Insane Demon">
+							<text>Insane Demon</text>
+						</div>
+						
+						<div class="option" value="extremedemon" dashboard-select-option="Extreme Demon">
+							<text>Extreme Demon</text>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-fire"></i>
+					%TEXT_levelRateType%
+				</h2>
+				
+				<div class="select" dashboard-select="levelRateType">
+					<input type="hidden" name="levelRateType" value="%LEVEL_RATE_TYPE%" dashboard-change-default="%LEVEL_RATE_TYPE%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseRateType%" value="%LEVEL_RATE_TYPE_NAME%" dashboard-change-default="%LEVEL_RATE_TYPE_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_noRating%">
+							<text>%TEXT_noRating%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="Featured">
+							<text>Featured</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="Epic">
+							<text>Epic</text>
+						</div>
+						
+						<div class="option" value="3" dashboard-select-option="Legendary">
+							<text>Legendary</text>
+						</div>
+						
+						<div class="option" value="4" dashboard-select-option="Mythic">
+							<text>Mythic</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-headphones"></i>
+					%TEXT_songType%
+				</h2>
+				
+				<div class="select" dashboard-select="songType">
+					<input type="hidden" name="songType" value="%SONG_TYPE%" dashboard-change-default="%SONG_TYPE%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseSongType%" value="%SONG_TYPE_NAME%" dashboard-change-default="%SONG_TYPE_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_officialSong%">
+							<text>%TEXT_officialSong%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="%TEXT_customSong%">
+							<text>%TEXT_customSong%</text>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="settingDescription hide" dashboard-select-type="songType" value="0">
+				<h2>
+					<i class="fa-solid fa-music"></i>
+					%TEXT_song%
+				</h2>
+				
+				<div class="select" dashboard-select="audioTrack">
+					<input type="hidden" name="audioTrack" value="%AUDIO_TRACK%" dashboard-change-default="%AUDIO_TRACK%" dashboard-select-value disabled required>
+					<input type="text" placeholder="%TEXT_chooseSong%" value="%AUDIO_TRACK_NAME%" dashboard-change-default="%AUDIO_TRACK_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="ForeverBound - Stereo Madness">
+							<text>ForeverBound - Stereo Madness</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="DJVI - Back On Track">
+							<text>DJVI - Back On Track</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="Step - Polargeist">
+							<text>Step - Polargeist</text>
+						</div>
+						
+						<div class="option" value="3" dashboard-select-option="DJVI - Dry Out">
+							<text>DJVI - Dry Out</text>
+						</div>
+						
+						<div class="option" value="4" dashboard-select-option="DJVI - Base After Base">
+							<text>DJVI - Base After Base</text>
+						</div>
+						
+						<div class="option" value="5" dashboard-select-option="DJVI - Can't Let Go">
+							<text>DJVI - Can't Let Go</text>
+						</div>
+						
+						<div class="option" value="6" dashboard-select-option="Waterflame - Jumper">
+							<text>Waterflame - Jumper</text>
+						</div>
+						
+						<div class="option" value="7" dashboard-select-option="Waterflame - Time Machine">
+							<text>Waterflame - Time Machine</text>
+						</div>
+						
+						<div class="option" value="8" dashboard-select-option="DJVI - Cycles">
+							<text>DJVI - Cycles</text>
+						</div>
+						
+						<div class="option" value="9" dashboard-select-option="DJVI - xStep">
+							<text>DJVI - xStep</text>
+						</div>
+						
+						<div class="option" value="10" dashboard-select-option="Waterflame - Clutterfunk">
+							<text>Waterflame - Clutterfunk</text>
+						</div>
+						
+						<div class="option" value="11" dashboard-select-option="DJ-Nate - Theory of Everything">
+							<text>DJ-Nate - Theory of Everything</text>
+						</div>
+						
+						<div class="option" value="12" dashboard-select-option="Waterflame - Electroman Adventures">
+							<text>Waterflame - Electroman Adventures</text>
+						</div>
+						
+						<div class="option" value="13" dashboard-select-option="DJ-Nate - Clubstep">
+							<text>DJ-Nate - Clubstep</text>
+						</div>
+						
+						<div class="option" value="14" dashboard-select-option="DJ-Nate - Electrodynamix">
+							<text>DJ-Nate - Electrodynamix</text>
+						</div>
+						
+						<div class="option" value="15" dashboard-select-option="Waterflame - Hexagon Force">
+							<text>Waterflame - Hexagon Force</text>
+						</div>
+						
+						<div class="option" value="16" dashboard-select-option="Waterflame - Blast Processing">
+							<text>Waterflame - Blast Processing</text>
+						</div>
+						
+						<div class="option" value="17" dashboard-select-option="DJ-Nate - Theory of Everything 2">
+							<text>DJ-Nate - Theory of Everything 2</text>
+						</div>
+						
+						<div class="option" value="18" dashboard-select-option="Waterflame - Geometrical Dominator">
+							<text>Waterflame - Geometrical Dominator</text>
+						</div>
+						
+						<div class="option" value="19" dashboard-select-option="F-777 - Deadlocked">
+							<text>F-777 - Deadlocked</text>
+						</div>
+						
+						<div class="option" value="20" dashboard-select-option="MDK - Fingerbang">
+							<text>MDK - Fingerbang</text>
+						</div>
+						
+						<div class="option" value="21" dashboard-select-option="MDK - Dash">
+							<text>MDK - Dash</text>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="settingDescription hide" dashboard-select-type="songType" value="1">
+				<h2>
+					<i class="fa-solid fa-music"></i>
+					%TEXT_song%
+				</h2>
+				
+				<div class="select" dashboard-select-search="songSearch">
+					<input type="hidden" name="songID" dashboard-select-value value="%SONG_ID%" dashboard-change-default="%SONG_ID%" disabled />
+					<input type="text" placeholder="%TEXT_searchText%" value="%SONG_NAME%" dashboard-change-default="%SONG_NAME%" dashboard-select-input="manage/getSongs" />
+					
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+					<div class="options" dashboard-select-options></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-key"></i>
+					%TEXT_password%
+					
+					<span class="infoIcon" title="%TEXT_passwordRemoveHint%">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<input class="inputStyle" type="number" name="levelPass" value="%LEVEL_PASSWORD%" autocomplete="gdps-dashboard-levelPass" dashboard-change-default dashboard-not-required placeholder="141412" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-eye"></i>
+					%TEXT_levelPrivacy%
+				</h2>
+				
+				<div class="select" dashboard-select="levelPrivacy">
+					<input type="hidden" name="levelPrivacy" value="%LEVEL_PRIVACY%" dashboard-change-default="%LEVEL_PRIVACY%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseLevelPrivacy%" value="%LEVEL_PRIVACY_NAME%" dashboard-change-default="%LEVEL_PRIVACY_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_publicLevel%">
+							<i class="fa-solid fa-eye"></i>
+							<text>%TEXT_publicLevel%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="%TEXT_privateLevel%">
+							<i class="fa-solid fa-lock"></i>
+							<text>%TEXT_privateLevel%</text>
+						
+							<span class="infoIcon" title="%TEXT_onlyForFriends%">
+								<i class="fa-solid fa-circle-info"></i>
+							</span>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="%TEXT_unlistedLevel%">
+							<i class="fa-solid fa-eye-slash"></i>
+							<text>%TEXT_unlistedLevel%</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-coins"></i>
+					%TEXT_silverCoins%
+				</h2>
+				<h3>%TEXT_silverCoinsDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="silverCoins" value="%SILVER_COINS_VALUE%" dashboard-change-default checked dashboard-remove="%SILVER_COINS_REMOVE_CHECK%"></input>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-lock"></i>
+					%TEXT_updatesLock%
+				</h2>
+				<h3>%TEXT_updatesLockDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="updatesLock" value="%UPDATES_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%UPDATES_LOCK_REMOVE_CHECK%"></input>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comment"></i>
+					%TEXT_commentingLock%
+				</h2>
+				<h3>%TEXT_commentingLockDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="commentingLock" value="%COMMENTING_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%COMMENTING_LOCK_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageLevel', 'levelSettingsForm')">%TEXT_applySettings%</button>
+	</div>
+</form>

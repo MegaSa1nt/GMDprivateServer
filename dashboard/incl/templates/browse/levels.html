@@ -39,7 +39,7 @@
 		
 		<div class="horisontal">
 			<div class="vertical">
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_originalLevelsTitle%</h2>
 						<h3>%TEXT_originalLevelsDesc%</h3>
@@ -48,7 +48,7 @@
 					<input class="toggle" type="checkbox" name="original" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_notRatedTitle%</h2>
 						<h3>%TEXT_notRatedDesc%</h3>
@@ -57,7 +57,7 @@
 					<input class="toggle" type="checkbox" name="noStar" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>Featured</h2>
 						<h3>%TEXT_featuredDesc%</h3>
@@ -66,7 +66,7 @@
 					<input class="toggle" type="checkbox" name="featured" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>Legendary</h2>
 						<h3>%TEXT_legendaryDesc%</h3>
@@ -75,16 +75,16 @@
 					<input class="toggle" type="checkbox" name="mythic" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_songSettingTitle%</h2>
 						<h3>%TEXT_songSettingDesc%</h3>
 					</div>
 					
 					<input class="toggle" type="checkbox" name="customSong" dashboard-select-show="songSearch" value="1"></input>
-					
 				</div>
-				<div class="select" dashboard-select-search="songSearch">
+				
+				<div class="select hide" dashboard-select-search="songSearch">
 					<input type="hidden" name="song" value="0" dashboard-select-value disabled />
 					<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getSongs" />
 					
@@ -95,7 +95,7 @@
 			</div>
 			
 			<div class="vertical">
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_coinsTitle%</h2>
 						<h3>%TEXT_coinsDesc%</h3>
@@ -104,7 +104,7 @@
 					<input class="toggle" type="checkbox" name="coins" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_ratedTitle%</h2>
 						<h3>%TEXT_ratedDesc%</h3>
@@ -113,7 +113,7 @@
 					<input class="toggle" type="checkbox" name="star" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>Epic</h2>
 						<h3>%TEXT_epicDesc%</h3>
@@ -122,7 +122,7 @@
 					<input class="toggle" type="checkbox" name="epic" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>Mythic</h2>
 						<h3>%TEXT_mythicDesc%</h3>
@@ -131,7 +131,7 @@
 					<input class="toggle" type="checkbox" name="legendary" value="1"></input>
 				</div>
 				
-				<div class="languageDiv">
+				<div class="languageDiv" dashboard-toggle>
 					<div class="settingDescription">
 						<h2>%TEXT_twoPlayerTitle%</h2>
 						<h3>%TEXT_twoPlayerDesc%</h3>

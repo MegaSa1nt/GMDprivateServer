@@ -59,7 +59,7 @@ class CommonError {
 class LevelUploadError {
 	const Success = "1";
 	
-	const NothingFound = "-2";
+	const NothingFound = "-20";
 
 	const UploadingDisabled = "-2";
 	const ReuploadingDisabled = "-19";
@@ -286,5 +286,32 @@ class RateLimit {
 	const ACEExploit = 6;
 	const AccountBackup = 7;
 	const AudioUpload = 8;
+}
+
+class AutomodAction {
+	const LevelsSpamWarning = 1;
+	
+	const LevelUploadingDisable = 2;
+	const LevelCommentingDisable = 3;
+	const LevelLeaderboardDisable = 4;
+	
+	const AccountsSpamWarning = 5;
+	
+	const AccountRegisteringDisable = 6;
+	const AccountPostingDisable = 7;
+	const AccountUpdatingStatsDisable = 8;
+	const AccountMessagingDisable = 9;
+	
+	const CommentsSpammingWarning = 10;
+	const CommentsSpammerWarning = 11;
+	
+	const AccountPostsSpammingWarning = 12;
+	const AccountPostsSpammerWarning = 13;
+	
+	const PostRepliesSpammingWarning = 14;
+	const PostRepliesSpammerWarning = 15;
+	
+	const ClanPostsSpammingWarning = 16;
+	const ClanPostsSpammerWarning = 17;
 }
 ?>

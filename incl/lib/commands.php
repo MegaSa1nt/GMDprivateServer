@@ -37,7 +37,7 @@ class Commands {
 				
 				if(!$difficulty || !is_numeric($stars) || !is_numeric($verifyCoins) || !is_numeric($featured)) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!rate ".Library::textColor("*difficulty*", Color::Orange)." ".Library::textColor("*stars*", Color::Orange)." ".Library::textColor("*are coins verified*", Color::Orange)." ".Library::textColor("*featured/epic/legendary/mythic*", Color::Orange).PHP_EOL
+						."!rate ".Library::textColor("*difficulty* *stars* *are coins verified* *featured/epic/legendary/mythic*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!rate harder 7 1 4", Color::LightYellow);
 				}
 
@@ -174,7 +174,7 @@ class Commands {
 			
 				if(!is_numeric($commentSplit[1])) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!event ".Library::textColor("*duration in minutes*", Color::Orange)." ".Library::textColor("*reward type*", Color::Orange)." ".Library::textColor("*reward amount*", Color::Orange).PHP_EOL
+						."!event ".Library::textColor("*duration in minutes* *reward type* *reward amount*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!event 60 7 1000 8 20 1001 379", Color::LightYellow);
 				}
 				$duration = abs(Escape::number($commentSplit[1])) * 60;
@@ -183,7 +183,7 @@ class Commands {
 				
 				if(!$duration || $duration < 0 || !$rewards || $rewards != Escape::multiple_ids($rewards)) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!event ".Library::textColor("*duration in minutes*", Color::Orange)." ".Library::textColor("*reward type*", Color::Orange)." ".Library::textColor("*reward amount*", Color::Orange).PHP_EOL
+						."!event ".Library::textColor("*duration in minutes* *reward type* *reward amount*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!event 60 7 1000 8 20 1001 379", Color::LightYellow);
 				}
 				
@@ -221,7 +221,7 @@ class Commands {
 				
 				if(!$difficulty || !$stars || !is_numeric($featured)) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!send ".Library::textColor("*difficulty*", Color::Orange)." ".Library::textColor("*stars*", Color::Orange)." ".Library::textColor("*featured/epic/legendary/mythic*", Color::Orange).PHP_EOL
+						."!send ".Library::textColor("*difficulty* *stars* *featured/epic/legendary/mythic*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!send harder 7 4", Color::LightYellow);
 				}
 				
@@ -311,22 +311,29 @@ class Commands {
 			case "!p":
 				if(!Library::checkPermission($person, 'commandPass') && $person['userID'] != $level['userID']) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
 				
-				if(!$commentSplit[1] || !is_numeric($commentSplit[1]) || strlen($commentSplit[1]) > 6) {
+				if(!is_numeric($commentSplit[1]) || strlen($commentSplit[1]) > 6) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
 						."!password ".Library::textColor("*level password*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!password 141412", Color::LightYellow).PHP_EOL
 						."Maximum password length is ".Library::textColor("6 characters", Color::Green);
 				}
 				
-				$newPassword = sprintf("%06d", abs(Escape::number($commentSplit[1])));
+				$newPassword = '1'.sprintf("%06d", abs(Escape::number($commentSplit[1])));
+				if($newPassword == "1000000") $newPassword = $level['gameVersion'] > 21 ? 1 : 0;
 				
-				if($level['password'] == '1'.$newPassword || $level['password'].'000000' == '1'.$newPassword) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this password!";
+				if($level['password'] == $newPassword) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this password!";
 				
-				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to change password of ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($newPassword, Color::Yellow)."?".PHP_EOL
-					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				if($forceCommandFlag && !$forceFlagSet) {
+					if($newPassword == 1 || $newPassword == 0) return "Are you sure you want to remove password from ".Library::textColor($level['levelName'], Color::SkyBlue)."?".PHP_EOL
+						.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+					
+					return "Are you sure you want to change password of ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor($newPassword, Color::Yellow)."?".PHP_EOL
+						.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				}
 				
 				Library::changeLevelPassword($levelID, $person, $newPassword);
 				
+				if($newPassword == 1 || $newPassword == 0) return "You ".Library::textColor("successfully", Color::Green)." removed password from ".Library::textColor($level['levelName'], Color::SkyBlue)."!";
 				return "You ".Library::textColor("successfully", Color::Green)." changed password of ".Library::textColor($level['levelName'], Color::SkyBlue).' to '.Library::textColor($newPassword, Color::Yellow)."!";
 			case "!song":
 			case "!s":
@@ -335,16 +342,19 @@ class Commands {
 				$songID = abs(Escape::number($commentSplit[1]));
 				if(!$songID) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!song ".Library::textColor("*song ID*", Color::Orange).PHP_EOL
-						."Example: ".Library::textColor("!song 1967605", Color::LightYellow);
+						."!song ".Library::textColor("*song ID* *is custom song*", Color::Orange).PHP_EOL
+						."Example: ".Library::textColor("!song 1967605 1", Color::LightYellow);
 				}
+				$isCustomSong = Escape::number($commentSplit[2]) ? 1 : 0;
 				
-				if($level["songID"] == $songID) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this song!";
+				if(($isCustomSong && $level["songID"] == $songID) || (!$isCustomSong && $level["audioTrack"] == $songID)) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this song!";
 				
-				$song = Library::getSongByID($songID);
-				if(!$song) return "This song ".Library::textColor("doesn't exist", Color::Red)."!";
+				if($isCustomSong) {
+					$song = Library::getSongByID($songID);
+					if(!$song) return "This song ".Library::textColor("doesn't exist", Color::Red)."!";
+				} else $song = Library::getAudioTrack($songID);
 				
-				Library::changeLevelSong($levelID, $person, $songID);
+				Library::changeLevelSong($levelID, $person, $songID, $isCustomSong);
 				
 				return "You ".Library::textColor("successfully", Color::Green)." changed song of ".Library::textColor($level['levelName'], Color::SkyBlue)." to ".Library::textColor(Escape::translit($song['authorName'])." - ".Escape::translit($song['name']), Color::Yellow)."!";
 			case "!description":
@@ -489,7 +499,7 @@ class Commands {
 				
 				if(!is_numeric($reward) || !$difficulty || !is_numeric($featured)) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!rate ".Library::textColor("*reward amount*", Color::Orange)." ".Library::textColor("*difficulty*", Color::Orange)." ".Library::textColor("*is featured*", Color::Orange)." ".Library::textColor("*required levels amount to complete list*", Color::Orange).PHP_EOL
+						."!rate ".Library::textColor("*reward amount* *difficulty* *is featured* *required levels amount to complete list*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!rate 50 harder 1 7", Color::LightYellow);
 				}
 
@@ -676,7 +686,7 @@ class Commands {
 				
 				if(!is_numeric($reward) || !$difficulty || !is_numeric($featured)) {
 					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
-						."!send ".Library::textColor("*reward amount*", Color::Orange)." ".Library::textColor("*difficulty*", Color::Orange)." ".Library::textColor("*is featured*", Color::Orange)." ".Library::textColor("*required levels amount to complete list*", Color::Orange).PHP_EOL
+						."!send ".Library::textColor("*reward amount* *difficulty* *is featured* *required levels amount to complete list*", Color::Orange).PHP_EOL
 						."Example: ".Library::textColor("!send 50 harder 1 7", Color::LightYellow);
 				}
 				
