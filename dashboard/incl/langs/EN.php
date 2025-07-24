@@ -55,6 +55,7 @@ $language['messengerTitle'] = 'Messenger';
 $language['loginToAccountTitle'] = 'Login to account';
 $language['yourProfileTitle'] = 'Your profile';
 $language['logoutFromAccountTitle'] = 'Logout';
+$language['registerAccountTitle'] = 'Register account';
 
 /* Error strings */
 $language['errorTitle'] = 'An error has occured';
@@ -115,6 +116,18 @@ $language['errorPlayerNotFound'] = 'Player wasn\'t found!';
 $language['errorBadLevelName'] = 'Please choose another name!';
 $language['errorBadLevelDesc'] = 'Please choose another description!';
 
+$language['errorAccountsAutomod'] = 'You may not create accounts for now!';
+$language['errorUsernameTooShort'] = 'This username is too short!';
+$language['errorPasswordTooShort'] = 'This password is too short!';
+$language['errorPasswordsDontMatch'] = 'Your passwords don\'t match!';
+$language['errorEmailsDontMatch'] = 'Your emails don\'t match!';
+$language['errorBadEmail'] = 'Please choose another email!';
+$language['errorEmailInUse'] = 'There is an account using this email!';
+
+$language['errorGauntletNotFound'] = 'Gauntlet wasn\'t found!';
+$language['errorGauntletWrongLevelsCount'] = 'Gauntlet can have only 5 levels!';
+$language['errorGauntletWrongLevels'] = 'You specified non-existing levels!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
 
@@ -144,6 +157,8 @@ $language['successReuploadFromServer'] = 'You successfully reuploaded a level to
 
 $language['successRanCron'] = 'You successfully executed Cron!';
 
+$language['successCreatedAccount'] = 'You successfully created an account!';
+
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
 $language['changeUsernameNew'] = 'New username';
@@ -154,6 +169,7 @@ $language['changePasswordOld'] = 'Old password';
 $language['changePasswordNew'] = 'New password';
 
 $language['levelTitle'] = '<text class="big">%1$s</text> by %2$s'; // %1$s — level name, %2$s — username
+$language['levelTitlePlain'] = '%1$s by %2$s'; // %1$s — level name, %2$s — username
 $language['stars'] = 'Stars';
 $language['requestedStars'] = 'Requested stars';
 $language['noDescription'] = 'No description provided';
@@ -395,4 +411,13 @@ $language['updatesLockDesc'] = 'If you enable this setting, level author won\'t 
 $language['commentingLock'] = 'Lock commenting';
 $language['commentingLockDesc'] = 'If you enable this setting, players wouldn\'t be able to comment on this level anymore';
 $language['passwordRemoveHint'] = 'Set 0 or nothing, if you want to remove password';
+
+$language['repeatPassword'] = 'Repeat password';
+$language['email'] = 'Email';
+$language['repeatEmail'] = 'Repeat email';
+$language['invalidPasswordHint'] = 'Your password contains symbols, that you can\'t write in Geometry Dash!';
+
+$language['public'] = 'Public';
+$language['private'] = 'Private';
+$language['unlisted'] = 'Unlisted';
 ?>

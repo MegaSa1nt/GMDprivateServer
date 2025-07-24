@@ -14,6 +14,7 @@ if(isset($_POST['userName']) && isset($_POST['password'])) {
 	if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorWrongLoginOrPassword"), "error"));
 	
 	$lastLocation = htmlspecialchars(Escape::text($_POST['lastLocation']));
+	if(mb_strpos($lastLocation, 'account/register') !== false || mb_strpos($lastLocation, 'account/login') !== false) $lastLocation = './';
 	
 	setcookie('auth', $person['auth'], 2147483647, '/');
 

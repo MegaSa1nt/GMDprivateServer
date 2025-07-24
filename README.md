@@ -16,6 +16,7 @@ Please go to [wiki page](https://github.com/MegaSa1nt/GMDprivateServer/wiki) to 
 - Translit — https://github.com/ashtokalo/php-translit — `config/translit`
 - Discord Webhooks — https://github.com/renzbobz/DiscordWebhook-PHP — `config/webhooks/DiscordWebhook.php`
 - Common VPNs list — https://github.com/X4BNet/lists_vpn — `config/vpns.txt`
+- Font — https://fonts.google.com/specimen/Inter — `dashboard/incl/fonts/inter`
 - Icons — https://fontawesome.com — `dashboard/incl/icons`
 - Toasts — https://github.com/apvarun/toastify-js — `dashboard/incl/toast`
 - Flags — https://www.svgrepo.com/vectors/flag — `dashboard/settings`

@@ -16,9 +16,9 @@ $echoString = $userString = $songsString = $queryJoin = '';
 $levelsStatsArray = [];
 $order = "uploadDate";
 $orderSorting = "DESC";
-$orderEnabled = $isIDSearch = $noLimit = false;
+$orderEnabled = $isIDSearch = false;
+$limit = 10;
 
-$str = Escape::text($_POST["str"]) ?: '';
 $gameVersion = abs(Escape::number($_POST["gameVersion"]) ?: 18);
 
 $pageOffset = is_numeric($_POST["page"]) ? abs(Escape::number($_POST["page"]) * 10) : 0;
@@ -26,6 +26,7 @@ $pageOffset = is_numeric($_POST["page"]) ? abs(Escape::number($_POST["page"]) * 
 $getFilters = Library::getLevelSearchFilters($_POST, $gameVersion, false, false);
 $filters = $getFilters['filters'];
 $type = $getFilters['type'];
+$str = $getFilters['str'];
 
 // Type detection
 switch($type) {
@@ -34,9 +35,7 @@ switch($type) {
 		$order = "likes";
 		if(!empty($str)) {
 			if(is_numeric($str)) {
-				$friendsArray = Library::getFriends($accountID);
-				$friendsArray[] = $accountID;
-				$friendsString = "'".implode("','", $friendsArray)."'";
+				$friendsString = Library::getFriendsQueryString($accountID);
 				
 				$filters = ["levelID = ".$str." AND (
 					unlisted != 1 OR
@@ -106,9 +105,7 @@ switch($type) {
 		END';
 		$orderSorting = 'ASC';
 		
-		$friendsArray = Library::getFriends($accountID);
-		$friendsArray[] = $accountID;
-		$friendsString = "'".implode("','", $friendsArray)."'";
+		$friendsString = Library::getFriendsQueryString($accountID);
 		
 		$filters[] = "levelID IN (".$str.") AND (
 				unlisted != 1 OR
@@ -128,6 +125,7 @@ switch($type) {
 	case 13: // Friends
 		$friendsArray = Library::getFriends($accountID);
 		$friendsString = "'".implode("','", $friendsArray)."'";
+		
 		$filters[] = $friendsString ? "extID IN (".$friendsString.")" : "1 != 1";
 		break;
 	case 21: // Daily safe
@@ -146,18 +144,28 @@ switch($type) {
 		$order = "events.feaID";
 		break;
 	case 25: // List levels
-		$listLevels = Library::getListLevels($str);
+		$list = Library::getListByID($str);
+		if(!$list) {
+			$filters[] = '1 != 1';
+			break;
+		}
 		
-		$friendsArray = Library::getFriends($accountID);
-		$friendsArray[] = $accountID;
-		$friendsString = "'".implode("','", $friendsArray)."'";
+		$canSeeList = Library::canAccountSeeList($person, $list);
+		if(!$canSeeList) {
+			$filters[] = '1 != 1';
+			break;
+		}
+		
+		$listLevels = $list['listlevels'];
+		
+		$friendsString = Library::getFriendsQueryString($accountID);
 		
 		$filters = ["levelID IN (".$listLevels.") AND (
 				unlisted != 1 OR
 				(unlisted = 1 AND (extID IN (".$friendsString.")))
 			)"];
 			
-		$noLimit = true;
+		$limit = true;
 		break;
 	case 27: // Sent levels
 		$queryJoin = "JOIN (SELECT suggestLevelId AS levelID, MAX(suggest.timestamp) AS timestamp FROM suggest GROUP BY levelID) suggest ON levels.levelID = suggest.levelID";
@@ -169,7 +177,7 @@ switch($type) {
 		break;
 }
 
-$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, $pageOffset, $noLimit);
+$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, $pageOffset, $limit);
 
 foreach($levels['levels'] as &$level) {
 	if(empty($level["levelID"])) continue;

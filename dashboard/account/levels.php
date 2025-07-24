@@ -19,7 +19,7 @@ $filters = $getFilters['filters'];
 
 $filters[] = "levels.userID = '".$userID."'";
 
-$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset, false);
+$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 
 foreach($levels['levels'] AS &$level) $page .= Dashboard::renderLevelCard($level, $person);
 

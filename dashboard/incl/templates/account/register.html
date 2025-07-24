@@ -1,0 +1,45 @@
+<div class="box">
+	<form name="registerForm" autocomplete="false">
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-user"></i>
+				%TEXT_userName%
+			</h2>
+			<input class="inputStyle" type="text" name="userName" autocomplete="gdps-dashboard-username" placeholder="YourVeryPrettyUsername" />
+		</div>
+		
+		<div class="inputDiv" dashboard-regex-title="%TEXT_invalidPasswordHint%">
+			<h2>
+				<i class="fa-solid fa-key"></i>
+				%TEXT_password%
+			</h2>
+			<input class="inputStyle" type="password" name="password" autocomplete="gdps-dashboard-password" placeholder="•••••••••••••" dashboard-regex-check="[^A-Za-z0-9\-\_ ]" />
+		</div>
+		
+		<div class="inputDiv" dashboard-regex-title="%TEXT_invalidPasswordHint%">
+			<h2>
+				<i class="fa-solid fa-key"></i>
+				%TEXT_repeatPassword%
+			</h2>
+			<input class="inputStyle" type="password" name="repeatPassword" autocomplete="new-password" placeholder="•••••••••••••" dashboard-regex-check="[^A-Za-z0-9\-\_ ]" />
+		</div>
+		
+		<div class="inputDiv" dashboard-show="%REGISTER_EMAIL_ENABLED%">
+			<h2>
+				<i class="fa-solid fa-at"></i>
+				%TEXT_email%
+			</h2>
+			<input class="inputStyle" type="email" name="email" autocomplete="gdps-dashboard-email" placeholder="username@example.com" />
+		</div>
+		
+		<div class="inputDiv" dashboard-show="%REGISTER_EMAIL_ENABLED%">
+			<h2>
+				<i class="fa-solid fa-at"></i>
+				%TEXT_repeatEmail%
+			</h2>
+			<input class="inputStyle" type="email" name="email" autocomplete="new-email" placeholder="username@example.com" />
+		</div>
+		
+		<button class="button" type="button" onclick="%REGISTER_BUTTON_ONCLICK%">%TEXT_registerAccountTitle%</button>
+	</form>
+</div>

@@ -1,5 +1,7 @@
 <?php
+require __DIR__."/../../config/misc.php";
 require_once __DIR__."/../lib/connection.php";
+require_once __DIR__."/../lib/cron.php";
 require_once __DIR__."/../lib/mainLib.php";
 require_once __DIR__."/../lib/security.php";
 require_once __DIR__."/../lib/exploitPatch.php";
@@ -105,7 +107,7 @@ $diamondsDifference = $diamonds - $user["diamonds"];
 $moonsDifference = $moons - $user["moons"];
 
 Library::logAction($person, Action::ProfileStatsChange, $starsDifference, $coinsDifference, $demonsDifference, $userCoinsDifference, $diamondsDifference, $moonsDifference);
-
+if($automaticCron) Cron::autoban($person, $enableTimeoutForAutomaticCron);
 Automod::checkStatsSpeed($person);
 
 if($gameVersion < 20 && !is_numeric($accountID) && $starsDifference + $coinsDifference + $demonsDifference + $userCoinsDifference + $diamondsDifference + $moonsDifference != 0) exit(CommonError::SubmitRestoreInfo);

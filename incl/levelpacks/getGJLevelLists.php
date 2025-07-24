@@ -28,15 +28,15 @@ switch($type) {
 		$order = "likes";
 		if(!empty($str)) {
 			if(is_numeric($str)) {
-				$friendsArray = Library::getFriends($accountID);
-				$friendsArray[] = $accountID;
-				$friendsString = "'".implode("','", $friendsArray)."'";
+				$friendsString = Library::getFriendsQueryString($accountID);
+
 				$filters = ["listID = ".$str." AND (
-					unlisted <> 1 OR
+					unlisted != 1 OR
 					(unlisted = 1 AND (accountID IN (".$friendsString.")))
 				)"];
 			} else {
-				$firstCharacter = $enableUserLevelsSearching ? substr($str, 0, 1) : 'd';
+				$firstCharacter = $enableUserLevelsSearching ? substr($str, 0, 1) : '';
+				
 				if($firstCharacter == 'a') {
 					$potentialAccountID = substr($str, 1);
 					if(is_numeric($potentialAccountID)) {
@@ -44,6 +44,7 @@ switch($type) {
 						break;
 					}
 				}
+				
 				$filters[] = "listName LIKE '%".$str."%'";
 				break;
 			}
@@ -82,6 +83,7 @@ switch($type) {
 	case 13: // Friends
 		$friendsArray = Library::getFriends($accountID);
 		$friendsString = "'".implode("','", $friendsArray)."'";
+		
 		$filters[] = $friendsString ? "lists.accountID IN (".$friendsString.")" : "1 != 1";
 		break;
 	case 27: // Sent

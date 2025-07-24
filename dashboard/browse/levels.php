@@ -70,6 +70,21 @@ if($_GET['id']) {
 	
 	$level['LEVEL_HAS_REQUESTED_STARS'] = $level['requestedStars'] ? 'true' : 'false';
 	
+	switch($level['unlisted']) {
+		case 0:
+			$level['LEVEL_PRIVACY_ICON'] = 'eye';
+			$level['LEVEL_PRIVACY_TEXT'] = Dashboard::string("public");
+			break;
+		case 1:
+			$level['LEVEL_PRIVACY_ICON'] = 'lock';
+			$level['LEVEL_PRIVACY_TEXT'] = Dashboard::string("onlyForFriends");
+			break;
+		default:
+			$level['LEVEL_PRIVACY_ICON'] = 'eye-slash';
+			$level['LEVEL_PRIVACY_TEXT'] = Dashboard::string("unlisted");
+			break;
+	}
+	
 	$levelStatsCount = Library::getLevelStatsCount($levelID);
 
 	$level['LEVEL_COMMENTS'] = $levelStatsCount['comments'];
@@ -282,7 +297,7 @@ if($_GET['id']) {
 				
 				$levelRateTypes = [Dashboard::string('noRating'), 'Featured', 'Epic', 'Legendary', 'Mythic'];
 				$songTypes = [Dashboard::string('officialSong'), Dashboard::string('customSong')];
-				$levelPrivacyNames = [Dashboard::string('publicLevel'), Dashboard::string('levelOnlyForFriends'), Dashboard::string('unlistedLevel')];
+				$levelPrivacyNames = [Dashboard::string('publicLevel'), Dashboard::string('privateLevel'), Dashboard::string('unlistedLevel')];
 				
 				$levelAuthor = Library::getUserByAccountID($level['extID']);
 				
@@ -363,9 +378,9 @@ $page = '';
 $getFilters = Library::getLevelSearchFilters($_GET, 22, true, false);
 $filters = $getFilters['filters'];
 
-$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset, false);
+$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 
-foreach($levels['levels'] AS &$level) $page .= Dashboard::renderLevelCard($level, $person);
+foreach($levels['levels'] AS &$level) $page .= Dashboard::renderLevelCard($level, $person, false);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 $pageCount = floor(($levels['count'] - 1) / 10) + 1;

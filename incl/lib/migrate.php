@@ -219,7 +219,7 @@ if(!$installed) {
     	if(empty($exist)) $db->query("ALTER TABLE songs ADD reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime");
 	$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'auth'");
     	$exist = $check->fetchAll();
-    	if(empty($exist)) $db->query("ALTER TABLE accounts ADD auth varchar(16) NOT NULL DEFAULT 'none' AFTER isActive");
+    	if(empty($exist)) $db->query("ALTER TABLE accounts ADD auth varchar(16) NOT NULL DEFAULT '' AFTER isActive");
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'demonlistAdd'");
     	$exist = $check->fetchAll();
     	if(!empty($exist)) $db->query("ALTER TABLE roles DROP `demonlistAdd`");
@@ -609,6 +609,8 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageClans'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageClans` INT NOT NULL DEFAULT '0' AFTER `dashboardManageLevels`");
+	$db->query("ALTER TABLE `accounts` CHANGE `auth` `auth` VARCHAR(64) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `accounts` CHANGE `mail` `mail` VARCHAR(64) NOT NULL DEFAULT ''");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

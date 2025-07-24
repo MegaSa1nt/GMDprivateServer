@@ -55,6 +55,7 @@ $language['messengerTitle'] = 'Мессенджер';
 $language['loginToAccountTitle'] = 'Войти в аккаунт';
 $language['yourProfileTitle'] = 'Ваш профиль';
 $language['logoutFromAccountTitle'] = 'Выйти из аккаунта';
+$language['registerAccountTitle'] = 'Зарегистрировать аккаунт';
 
 /* Error strings */
 $language['errorTitle'] = 'Произошла ошибка';
@@ -115,6 +116,18 @@ $language['errorPlayerNotFound'] = 'Игрок не найден!';
 $language['errorBadLevelName'] = 'Пожалуйста, выберите другое название уровня!';
 $language['errorBadLevelDesc'] = 'Пожалуйста, выберите другое описание уровню!';
 
+$language['errorAccountsAutomod'] = 'Вы пока не можете создавать аккаунты!';
+$language['errorUsernameTooShort'] = 'Этот никнейм слишком короткий!';
+$language['errorPasswordTooShort'] = 'Этот пароль слишком короткий!';
+$language['errorPasswordsDontMatch'] = 'Ваши пароли не совпадают!';
+$language['errorEmailsDontMatch'] = 'Ваши почты не совпадают!';
+$language['errorBadEmail'] = 'Пожалуйста, выберите другую почту!';
+$language['errorEmailInUse'] = 'Аккаунт, использующий эту почту, уже существует!';
+
+$language['errorGauntletNotFound'] = 'Гаунтлет не найден!';
+$language['errorGauntletWrongLevelsCount'] = 'В Гаунтлете может быть только 5 уровней!';
+$language['errorGauntletWrongLevels'] = 'Вы указали несуществующие уровни!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
 
@@ -144,6 +157,8 @@ $language['successReuploadFromServer'] = 'Вы успешно перенесли
 
 $language['successRanCron'] = 'Вы успешно выполнили Крон!';
 
+$language['successCreatedAccount'] = 'Вы успешно создали аккаунт!';
+
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
 $language['changeUsernameNew'] = 'Новый никнейм';
@@ -154,6 +169,7 @@ $language['changePasswordOld'] = 'Старый пароль';
 $language['changePasswordNew'] = 'Новый пароль';
 
 $language['levelTitle'] = '<text class="big">%1$s</text> от %2$s'; // %1$s — level name, %2$s — username
+$language['levelTitlePlain'] = '%1$s от %2$s'; // %1$s — level name, %2$s — username
 $language['stars'] = 'Звёзды';
 $language['requestedStars'] = 'Запрошенные звёзды';
 $language['noDescription'] = 'Нет описания';
@@ -395,4 +411,13 @@ $language['updatesLockDesc'] = 'Если включить эту настрой�
 $language['commentingLock'] = 'Заблокировать комментирование';
 $language['commentingLockDesc'] = 'Если включить эту настройку, игроки больше не смогут написать комментарий к уровню';
 $language['passwordRemoveHint'] = 'Укажите 0 или ничего, если хотите убрать пароль';
+
+$language['repeatPassword'] = 'Повторите пароль';
+$language['email'] = 'Почта';
+$language['repeatEmail'] = 'Повторите почту';
+$language['invalidPasswordHint'] = 'В вашем пароле есть символы, которые нельзя написать в Geometry Dash!';
+
+$language['public'] = 'Открыт';
+$language['private'] = 'Приватный';
+$language['unlisted'] = 'Скрыт';
 ?>

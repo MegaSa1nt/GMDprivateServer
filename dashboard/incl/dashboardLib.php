@@ -29,7 +29,7 @@ class Dashboard {
 		
 		$auth = Escape::latin($_COOKIE['auth']);
 		
-		if(empty($auth)) {
+		if(empty($auth) || $auth == 'none') {
 			$GLOBALS['core_cache']['dashboard']['person'] = ["success" => false, "accountID" => "0", "IP" => $IP];
 			return ["success" => false, "accountID" => "0", "IP" => $IP];
 		}
@@ -598,7 +598,7 @@ class Dashboard {
 		return self::renderTemplate('components/clanname', $clannameData);
 	}
 	
-	public static function renderLevelCard($level, $person) {
+	public static function renderLevelCard($level, $person, $showPrivacy = true) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -631,6 +631,27 @@ class Dashboard {
 		$level['LEVEL_SONG_TITLE'] = $song['name'] ?: '';
 		$level['LEVEL_SONG_URL'] = urlencode(urldecode($song['download'])) ?: '';
 		$level['LEVEL_IS_CUSTOM_SONG'] = isset($song['ID']) ? 'true' : 'false';
+		
+		$level['LEVEL_SHOW_PRIVACY'] = 'false';
+		$level['LEVEL_PRIVACY_ICON'] = $level['LEVEL_PRIVACY_TEXT'] = '';
+		if($showPrivacy) {
+			$level['LEVEL_SHOW_PRIVACY'] = 'true';
+			
+			switch($level['unlisted']) {
+				case 0:
+					$level['LEVEL_PRIVACY_ICON'] = 'eye';
+					$level['LEVEL_PRIVACY_TEXT'] = self::string("public");
+					break;
+				case 1:
+					$level['LEVEL_PRIVACY_ICON'] = 'lock';
+					$level['LEVEL_PRIVACY_TEXT'] = self::string("onlyForFriends");
+					break;
+				default:
+					$level['LEVEL_PRIVACY_ICON'] = 'eye-slash';
+					$level['LEVEL_PRIVACY_TEXT'] = self::string("unlisted");
+					break;
+			}
+		}
 		
 		$contextMenuData['MENU_SHOW_NAME'] = 'false';
 		
@@ -961,7 +982,7 @@ class Dashboard {
 		$user['USER_EXTRA_ICON'] = htmlspecialchars($extraIcon);
 		$user['USER_EXTRA_ICON_TITLE'] = htmlspecialchars($extraIconTitle);
 		
-		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
+		$user['USER_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
 		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
 		

@@ -20,7 +20,7 @@ if(isset($_GET['search'])) {
 			'ID' => $user['extID'],
 			'name' => htmlspecialchars($user['userName']),
 			'icon' => '<img loading="lazy" src="'.$userMetadata['mainIcon'].'"></img>',
-			'iconAfter' => '<span class="difficultyButton" title="'.($user['isRegistered'] ? Dashboard::string("registeredPlayer") : Dashboard::string("unregisteredPlayer")).'"><i class="fa-'.($user['isRegistered'] ? 'solid' : 'regular').' fa-user"></i></span>',
+			'elementAfter' => '<span class="difficultyButton" title="'.($user['isRegistered'] ? Dashboard::string("registeredPlayer") : Dashboard::string("unregisteredPlayer")).'"><i class="fa-'.($user['isRegistered'] ? 'solid' : 'regular').' fa-user"></i></span>',
 			'attributes' => $userMetadata['userAttributes']
 		];
 	}

@@ -1,0 +1,28 @@
+<form class="wideBox" name="gauntletSettingsForm" dashboard-change-form>
+	<input type="hidden" name="gauntletID" value="%GAUNTLET_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-gamepad"></i>
+				%TEXT_levels%
+			</h2>
+				
+			<div class="select" dashboard-select-search-multiple="levelSearch">
+				<input type="hidden" name="levels" dashboard-select-value value="%GAUNTLET_LEVELS%" dashboard-change-default="%GAUNTLET_LEVELS%" />
+				<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getLevels" />
+				
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+				
+				<div class="options" dashboard-select-options></div>
+			</div>
+			
+			<div class="select multiple" dashboard-select-multiple-list="levelSearch">%GAUNTLET_LEVELS_OPTIONS%</div>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageGauntlet', 'gauntletSettingsForm')">%TEXT_applySettings%</button>
+	</div>
+</form>

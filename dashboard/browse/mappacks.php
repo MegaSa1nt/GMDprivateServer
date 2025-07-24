@@ -43,9 +43,7 @@ if($_GET['id']) {
 		case '':
 			$mapPackLevels = Escape::multiple_ids($mapPack['levels']);
 			
-			$friendsArray = Library::getFriends($accountID);
-			$friendsArray[] = $accountID;
-			$friendsString = "'".implode("','", $friendsArray)."'";
+			$friendsString = Library::getFriendsQueryString($accountID);
 				
 			$filters = [
 				"levelID IN (".$mapPackLevels.")",
@@ -65,7 +63,7 @@ if($_GET['id']) {
 			END';
 			$orderSorting = 'ASC';
 			
-			$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset, false);
+			$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 			
 			foreach($levels['levels'] AS &$level) $additionalPage .= Dashboard::renderLevelCard($level, $person);
 

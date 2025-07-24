@@ -2,6 +2,7 @@ if(typeof localStorage.player_volume == "undefined") localStorage.player_volume 
 
 var dashboardLoader, dashboardBody, dashboardBase, dashboardBackground;
 var intervals = [];
+var searchLists = [];
 var updateFilters = true;
 
 window.addEventListener('load', () => {
@@ -419,10 +420,10 @@ async function updatePage() {
 				
 				for await (const searchResult of searchResults) {
 					const searchOption = document.createElement("div");
-					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : false;
-					const searchIconAfter = typeof searchResult.iconAfter != "undefined" ? searchResult.iconAfter : false;
+					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : '';
+					const searchElementAfter = typeof searchResult.elementAfter != "undefined" ? searchResult.elementAfter : '';
 					
-					const searchText = "<text " + (searchAttributes ? searchAttributes : '') + ">" + escapeHTML(searchResult.name) + "</text>" + (searchIconAfter ? searchIconAfter : '');
+					const searchText = "<text " + searchAttributes + ">" + escapeHTML(searchResult.name) + "</text>" + searchElementAfter;
 					
 					searchOption.classList.add("option");
 					searchOption.innerHTML = searchResult.icon.length ? searchResult.icon + " " + searchText : searchText;
@@ -711,6 +712,133 @@ async function updatePage() {
 			if(event.target != toggleInput) toggleInput.click();
 		}
 	});
+	
+	const regexElements = document.querySelectorAll("[dashboard-regex-check]");
+	regexElements.forEach(async (element) => {
+		element.oninput = () => {
+			const regexValue = element.getAttribute("dashboard-regex-check");
+			var regexPassed = true;
+			
+			element.classList.remove("regex-fail");
+			
+			if(regexValue != null) {
+				const regexMatch = element.value.match(new RegExp(regexValue, 'gi'));
+				if(regexMatch) regexPassed = false;
+			}
+			
+			if(!regexPassed) element.classList.add("regex-fail");
+		}
+	});
+	
+	const multipleSelectSearchElements = document.querySelectorAll("[dashboard-select-search-multiple]");
+	multipleSelectSearchElements.forEach(async (element) => {
+		const searchID = element.getAttribute("dashboard-select-search-multiple");
+		const searchToggle = document.querySelector(`[dashboard-select-show="${searchID}"]`);
+		const searchValueInput = element.querySelector("[dashboard-select-value]");
+		const searchOptions = element.querySelector("[dashboard-select-options]");
+		const searchListElement = document.querySelector("[dashboard-select-multiple-list='" + searchID + "']");
+		searchLists[searchID] = searchValueInput.value.length ? searchValueInput.value.split(',') : [];
+		
+		if(searchToggle != null) {
+			searchToggle.onchange = (e) => {
+				if(e.target.checked) {
+					element.classList.remove("hide");
+					searchValueInput.disabled = false;
+				} else {
+					element.classList.add("hide");
+					searchValueInput.disabled = true;
+				}
+			}
+		}
+		
+		const searchInput = element.querySelector("[dashboard-select-input]");
+		const searchURL = searchInput.getAttribute("dashboard-select-input");
+		
+		element.addEventListener("focusin", () => element.classList.add("show"));
+		document.addEventListener("click", (e) => {
+			if(!element.contains(e.target) && element != e.target) element.classList.remove("show");
+		});
+		
+		searchInput.oninput = async (e) => {
+			const searchValue = e.target.value;
+			clearTimeout(intervals[searchID]);
+			
+			intervals[searchID] = setTimeout(async () => {
+				const searchResults = await searchSomething(searchURL, searchValue);
+
+				searchOptions.innerHTML = "";
+				
+				if(!searchResults.length) return;
+				
+				for await (const searchResult of searchResults) {
+					if(searchLists[searchID].includes(searchResult.ID.toString())) continue;
+					
+					const searchOption = document.createElement("div");
+					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : '';
+					const searchElementAfter = typeof searchResult.elementAfter != "undefined" ? searchResult.elementAfter : '';
+					
+					const searchText = "<text " + searchAttributes + ">" + escapeHTML(searchResult.name) + "</text>" + searchElementAfter;
+					
+					searchOption.classList.add("option");
+					searchOption.innerHTML = searchResult.icon.length ? searchResult.icon + " " + searchText : searchText;
+					
+					searchOption.setAttribute("value", searchResult.ID);
+					
+					function addElementToList(searchValue) {
+						searchLists[searchID].push(searchValue);
+						searchValueInput.value = searchLists[searchID].join(',');
+						
+						element.classList.remove("show");
+						
+						searchOption.innerHTML += `<button type="button" class="eyeButton" style="margin-left: auto;">
+								<i class="fa-solid fa-xmark"></i>
+							</button>`;
+						searchOption.onclick = () => removeElementFromList(searchValue);
+						
+						searchListElement.appendChild(searchOption);
+						
+						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+					}
+					
+					function removeElementFromList(searchValue) {
+						const valueIndex = searchLists[searchID].indexOf(searchValue);
+						searchLists[searchID].splice(valueIndex, 1);
+						
+						searchValueInput.value = searchLists[searchID].join(',');
+						
+						searchOption.querySelector("button").remove();
+						searchOption.onclick = () => addElementToList(searchValue);
+						
+						searchOptions.appendChild(searchOption);
+						
+						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+					}
+					
+					searchOption.onclick = () => addElementToList(searchResult.ID);
+					
+					searchOptions.appendChild(searchOption);
+				}
+			}, 500);
+		}
+		
+		const searchListOptions = searchListElement.querySelectorAll(".option");
+		searchListOptions.forEach(async (element) => {
+			const searchValue = element.getAttribute("value");
+			
+			function removeElementFromList(searchValue) {
+				const valueIndex = searchLists[searchID].indexOf(searchValue);
+				searchLists[searchID].splice(valueIndex, 1);
+					
+				searchValueInput.value = searchLists[searchID].join(',');
+				
+				element.style.display = "none";
+				
+				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+			}
+			
+			element.onclick = () => removeElementFromList(searchValue);
+		});
+	});
 }
 
 function timeConverter(timestamp, textStyle = "short") {
@@ -872,15 +1000,33 @@ async function getForm(form) {
 	const formElement = document.querySelector("form[name=" + form + "]");
 	const formData = new FormData(formElement);
 	const formEntries = formData.entries();
+	var formPassed = true;
 	
 	for(const entry of formEntries) {
-		const isOptional = formElement.querySelector("input[dashboard-not-required][name=" + entry[0] + "]");
+		const entryElement = entry[1];
+		const entryValue = typeof entryElement == 'object' ? entryElement.name : entryElement;
 		
-		if(((typeof entry[1] == 'string' && !entry[1].trim().length) || (typeof entry[1] == 'object' && !entry[1].name.trim().length)) && isOptional == null) {
+		const formEntryElement = formElement.querySelector("input[name=" + entry[0] + "]");
+		const isOptional = formEntryElement.getAttribute("dashboard-not-required");
+		const regexValue = formEntryElement.getAttribute("dashboard-regex-check");
+		var regexPassed = true;
+		
+		formEntryElement.classList.remove("regex-fail");
+		
+		if(regexValue != null) {
+			const regexMatch = entryValue.match(new RegExp(regexValue, 'gi'));
+			if(regexMatch) regexPassed = false;
+		}
+		
+		if(!regexPassed) formEntryElement.classList.add("regex-fail");
+		
+		if((!entryValue.trim().length || !regexPassed) && isOptional == null) {
 			formElement.classList.add("empty-fields");
-			return false;
+			formPassed = false;
 		}
 	}
+	
+	if(!formPassed) return false;
 	
 	return formData;
 }
@@ -958,6 +1104,24 @@ async function resetSettings() {
 			
 			if(selectElement != null) selectElement.click();
 		}
+		
+		const selectMultipleCheck = settingsFormElement.querySelectorAll("[dashboard-select-multiple-list]");
+		selectMultipleCheck.forEach((element) => {
+			const searchID = element.getAttribute("dashboard-select-multiple-list");
+			
+			const selectBadElements = element.querySelectorAll(".option:not([dashboard-select-multiple-option])");
+			selectBadElements.forEach((element) => element.remove());
+			
+			const selectElements = element.querySelectorAll(".option");
+			
+			searchLists[searchID] = [];
+			
+			selectElements.forEach((element) => {
+				element.style = "";
+				
+				searchLists[searchID].push(element.getAttribute("value"));
+			});
+		})
 	});
 	
 	const saveSettingsButtonsDiv = document.querySelector("[dashboard-change-buttons]");
@@ -1149,3 +1313,4 @@ function checkFormSettingsChange(element) {
 	if(isFormChanged) checkChangeButtons.classList.add("show");
 	else checkChangeButtons.classList.remove("show");
 }
+

@@ -7,9 +7,7 @@ require __DIR__."/../../config/dashboard.php";
 require_once __DIR__."/ip.php";
 require_once __DIR__."/enums.php";
 
-if(function_exists('ini_set')) {
-	ini_set('display_errors', ($debugMode ? 'On' : 'Off'));
-}
+if(function_exists('ini_set')) ini_set('display_errors', ($debugMode ? 'On' : 'Off'));
 error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
 
 if(!isset($db)) global $db;

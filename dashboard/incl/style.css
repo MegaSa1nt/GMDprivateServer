@@ -1,20 +1,20 @@
 @font-face {
-	font-family: 'SF Pro Display';
-	src: url('fonts/sf-pro-display/regular.otf');
+	font-family: 'Inter';
+	src: url('fonts/inter/regular.ttf');
 	font-weight: 400;
 	font-style: normal;
 }
 
 @font-face {
-	font-family: 'SF Pro Display';
-	src: url('fonts/sf-pro-display/medium.otf');
+	font-family: 'Inter';
+	src: url('fonts/inter/medium.ttf');
 	font-weight: 700;
 	font-style: normal;
 }
 
 @font-face {
-	font-family: 'SF Pro Display';
-	src: url('fonts/sf-pro-display/bold.otf');
+	font-family: 'Inter';
+	src: url('fonts/inter/bold.ttf');
 	font-weight: 900;
 	font-style: normal;
 }
@@ -27,7 +27,7 @@
 }
 
 * {
-	font-family: 'SF Pro Display', sans-serif;
+	font-family: 'Inter', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -400,7 +400,8 @@ form {
 
 form.empty-fields .inputStyle:not([dashboard-not-required]):placeholder-shown,
 form.empty-fields label.inputStyle:has(input:not([dashboard-not-required]):invalid),
-form.empty-fields .select:has(input:not([dashboard-not-required]):placeholder-shown) {
+form.empty-fields .select:has(input:not([dashboard-not-required]):placeholder-shown),
+.inputStyle.regex-fail {
 	border: 2px solid #c93636 !important;
 }
 
@@ -636,7 +637,8 @@ nav::-webkit-scrollbar,
 	transition: 0.2s;
 }
 
-.contentDiv:hover {
+.contentDiv:hover,
+.levelPage .levelStats:not(.card) .levelStat:hover {
 	background-color: #86868624;
 	border: 1px solid #86868634;
 	box-shadow: 0px 0px 20px 0px #86868620;
@@ -1066,6 +1068,8 @@ i[onclick],
 	box-sizing: border-box;
 	
 	white-space: nowrap;
+	
+	transition: 0.2s;
 }
 
 .levelPage .levelStat.several {
@@ -1358,7 +1362,8 @@ h1[title],
 	gap: 5px;
 }
 
-[title]::after {
+[title]::after,
+.inputDiv:has(.regex-fail[dashboard-regex-check])::after {
 	content: attr(title);
 	position: absolute;
 	
@@ -1366,6 +1371,7 @@ h1[title],
 	
 	color: white !important;
 	font-size: 23px;
+	font-weight: 400;
 	text-align: center;
 	
 	background-color: #86868624;
@@ -1389,7 +1395,12 @@ h1[title],
 	max-width: 30vw;
 }
 
-[title]:hover::after {
+.inputDiv:has(.regex-fail[dashboard-regex-check])::after {
+	content: attr(dashboard-regex-title);
+}
+
+[title]:hover::after,
+.inputDiv:has(.regex-fail[dashboard-regex-check]):hover::after {
 	opacity: 1;
 }
 
@@ -1915,12 +1926,14 @@ select:open::picker-icon {
 	backdrop-filter: blur(5px);
 }
 
-.options > :first-child {
+.options > :first-child,
+.select.multiple > :first-child {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
 
-.options > :last-child {
+.options > :last-child,
+.select.multiple > :last-child {
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
@@ -2610,4 +2623,20 @@ progress::-webkit-progress-value {
 
 .infoIcon::after {
 	z-index: 3;
+}
+
+.select.multiple {
+	display: flex;
+	flex-direction: column;
+	
+	background-color: #86868614;
+	border: 1px solid #86868624;
+	
+	width: 100%;
+	
+	padding: 0px;
+}
+
+.select.multiple:empty {
+	display: none;
 }

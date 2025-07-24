@@ -26,6 +26,9 @@ if($_GET['id']) {
 	$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardGauntletCreate") ? 'true' : 'false';
 	
 	$gauntlet['GAUNTLET_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/gauntlet', $contextMenuData);
+	
+	$gauntletLevelsArray = [$gauntlet["level1"], $gauntlet["level2"], $gauntlet["level3"], $gauntlet["level4"], $gauntlet["level5"]];
+	$gauntletLevels = implode(',', $gauntletLevelsArray);
 		
 	$pageBase = '../../';
 	$gauntlet['GAUNTLET_ADDITIONAL_PAGE'] = '';
@@ -35,11 +38,7 @@ if($_GET['id']) {
 	
 	switch($parameters[1]) {
 		case '':
-			$gauntletLevels = $gauntlet["level1"].",".$gauntlet["level2"].",".$gauntlet["level3"].",".$gauntlet["level4"].",".$gauntlet["level5"];
-			
-			$friendsArray = Library::getFriends($accountID);
-			$friendsArray[] = $accountID;
-			$friendsString = "'".implode("','", $friendsArray)."'";
+			$friendsString = Library::getFriendsQueryString($accountID);
 				
 			$filters = [
 				"levelID IN (".$gauntletLevels.")",
@@ -49,17 +48,15 @@ if($_GET['id']) {
 				)"
 			];
 			
-			$levelsArray = explode(',', $gauntletLevels);
 			$levelsText = '';
-			
-			foreach($levelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+			foreach($gauntletLevelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
 			
 			$order = 'CASE
 				'.$levelsText.'
 			END';
 			$orderSorting = 'ASC';
 			
-			$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset, false);
+			$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 			
 			foreach($levels['levels'] AS &$level) $additionalPage .= Dashboard::renderLevelCard($level, $person);
 
@@ -86,7 +83,53 @@ if($_GET['id']) {
 			break; 
 		case 'manage':
 			$pageBase = '../../../';
-			if(!Library::checkPermission($person, "dashboardGauntletCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			if(!Library::checkPermission($person, "dashboardGauntletCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("gauntletsTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			
+			$friendsString = Library::getFriendsQueryString($accountID);
+				
+			$filters = [
+				"levelID IN (".$gauntletLevels.")",
+				"(
+					unlisted != 1 OR
+					(unlisted = 1 AND (levels.extID IN (".$friendsString.")))
+				)"
+			];
+			
+			$queryJoin = "INNER JOIN users ON levels.userID = users.userID";
+			
+			$levelsText = '';
+			foreach($gauntletLevelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+			
+			$order = 'CASE
+				'.$levelsText.'
+			END';
+			$orderSorting = 'ASC';
+			
+			$gauntletLevelsElements = '';
+			
+			$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, 0);
+			
+			foreach($levels['levels'] AS &$level) {
+				$userMetadata = Dashboard::getUserMetadata($level);
+				
+				$gauntletLevelsElements .= '<div class="option" value="'.$level['levelID'].'" dashboard-select-multiple-option>
+						<i class="fa-solid fa-gamepad"></i>
+						<text>'.sprintf(Dashboard::string("levelTitlePlain"), htmlspecialchars($level['levelName']), htmlspecialchars($level['userName'])).'</text>
+						<img loading="lazy" src="'.$userMetadata['mainIcon'].'">
+						
+						<button type="button" class="eyeButton" style="margin-left: auto;">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>';
+			}
+			
+			$additionalData = [
+				'GAUNTLET_ID' => $gauntletID,
+				
+				'GAUNTLET_LEVELS' => $gauntletLevels,
+				'GAUNTLET_LEVELS_OPTIONS' => $gauntletLevelsElements
+			];
+			
 			$gauntlet['GAUNTLET_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/gauntlet', $additionalData);
 			break;
 		default:
