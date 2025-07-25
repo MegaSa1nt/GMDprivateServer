@@ -47,7 +47,7 @@ if($_GET['id']) {
 	
 	$song = $level['songID'] ? Library::getSongByID($level['songID']) : Library::getAudioTrack($level['audioTrack']);
 	
-	if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'].(isset($song['ID']) ? " • <text dashboard-copy>".$song['ID'].'</text>' : '');
+	if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'];
 	else $level['LEVEL_SONG'] = Dashboard::string("unknownSong");
 	$level['LEVEL_SONG_ID'] = $song['ID'] ?: '';
 	$level['LEVEL_SONG_AUTHOR'] = $song['authorName'] ?: '';

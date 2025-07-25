@@ -194,6 +194,8 @@ class ModeratorAction { // Last action ID is 47
 	const PersonBanChange = 47;
 	
 	const GauntletChange = 22;
+
+	const MapPackChange = 21;
 	
 	// To be done with dashboard
 	const LevelSuggestRemove = 40;
@@ -201,7 +203,6 @@ class ModeratorAction { // Last action ID is 47
 	const GauntletCreate = 18;
 	const SongChange = 19;
 	const ModeratorPromote = 20;
-	const MapPackChange = 21;
 	const QuestChange = 23;
 	const ModeratorRoleChange = 24;
 	const QuestCreate = 25;

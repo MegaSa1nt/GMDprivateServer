@@ -624,7 +624,7 @@ class Dashboard {
 		$level['LEVEL_LIKES'] = abs($level['likes'] - $level['dislikes']);
 		$level['LEVEL_IS_DISLIKED'] = $level['dislikes'] > $level['likes'] ? 'true' : 'false';
 		
-		if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'].(isset($song['ID']) ? " • <text dashboard-copy>".$song['ID'].'</text>' : '');
+		if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'];
 		else $level['LEVEL_SONG'] = self::string("unknownSong");
 		$level['LEVEL_SONG_ID'] = $song['ID'] ?: '';
 		$level['LEVEL_SONG_AUTHOR'] = $song['authorName'] ?: '';

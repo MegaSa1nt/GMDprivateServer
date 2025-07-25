@@ -26,7 +26,11 @@
 			</button>
 			<i dashboard-hide="%LEVEL_IS_CUSTOM_SONG%" class="fa-solid fa-music"></i>
 			
-			<text>%LEVEL_SONG%</text>
+			<text dashboard-hide="%LEVEL_IS_CUSTOM_SONG%">%LEVEL_SONG%</text>
+			<text dashboard-running-text dashboard-show="%LEVEL_IS_CUSTOM_SONG%">%LEVEL_SONG%</text>
+			<span dashboard-show="%LEVEL_IS_CUSTOM_SONG%">
+				• <text dashboard-copy>%LEVEL_SONG_ID%</text>
+			</span>
 		</div>
 		
 		<div class="levelStats card">

@@ -113,8 +113,8 @@ $language['errorFailedToWriteLevel'] = 'Произошла ошибка при �
 $language['errorCronTooFast'] = 'Пожалуйста, подождите пару минут перед повторным запуском Крона!';
 
 $language['errorPlayerNotFound'] = 'Игрок не найден!';
-$language['errorBadLevelName'] = 'Пожалуйста, выберите другое название уровня!';
-$language['errorBadLevelDesc'] = 'Пожалуйста, выберите другое описание уровню!';
+$language['errorBadName'] = 'Пожалуйста, выберите другое название!';
+$language['errorBadDesc'] = 'Пожалуйста, выберите другое описание!';
 
 $language['errorAccountsAutomod'] = 'Вы пока не можете создавать аккаунты!';
 $language['errorUsernameTooShort'] = 'Этот никнейм слишком короткий!';
@@ -127,6 +127,8 @@ $language['errorEmailInUse'] = 'Аккаунт, использующий эту 
 $language['errorGauntletNotFound'] = 'Гаунтлет не найден!';
 $language['errorGauntletWrongLevelsCount'] = 'В Гаунтлете может быть только 5 уровней!';
 $language['errorGauntletWrongLevels'] = 'Вы указали несуществующие уровни!';
+
+$language['errorFailedToGetGMD'] = 'Произошла ошибка при получении данных уровня!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -158,6 +160,8 @@ $language['successReuploadFromServer'] = 'Вы успешно перенесли
 $language['successRanCron'] = 'Вы успешно выполнили Крон!';
 
 $language['successCreatedAccount'] = 'Вы успешно создали аккаунт!';
+
+$language['successDownloadNow'] = 'Загрузка начнётся через пару секунд...';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
@@ -402,8 +406,8 @@ $language['publicLevel'] = 'Открытый уровень';
 $language['privateLevel'] = 'Приватный уровень';
 $language['unlistedLevel'] = 'Скрытый уровень';
 $language['onlyForFriends'] = 'Только для друзей';
-$language['levelDifficulty'] = 'Сложность уровня';
-$language['chooseLevelDifficulty'] = 'Выберите сложность уровня...';
+$language['difficulty'] = 'Сложность';
+$language['chooseDifficulty'] = 'Выберите сложность...';
 $language['silverCoins'] = 'Серебряные монетки';
 $language['silverCoinsDesc'] = 'Должны ли монетки на уровне быть серебряными';
 $language['updatesLock'] = 'Заблокировать обновления';
@@ -420,4 +424,10 @@ $language['invalidPasswordHint'] = 'В вашем пароле есть симв
 $language['public'] = 'Открыт';
 $language['private'] = 'Приватный';
 $language['unlisted'] = 'Скрыт';
+
+$language['downloadLevel'] = 'Скачать уровень';
+
+$language['mapPackName'] = 'Название Мап-Пака';
+$language['textColor'] = 'Цвет текста';
+$language['barColor'] = 'Цвет полоски';
 ?>

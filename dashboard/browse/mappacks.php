@@ -20,7 +20,7 @@ if($_GET['id']) {
 	
 	$mapPackColor = str_replace(',', ' ', $mapPack['rgbcolors']);
 	
-	$mapPack['MAPPACK_TITLE'] =  htmlspecialchars($mapPack['name']);
+	$mapPack['MAPPACK_TITLE'] = htmlspecialchars($mapPack['name']);
 	$mapPack['MAPPACK_DIFFICULTY_IMAGE'] = Library::getMapPackDifficultyImage($mapPack);
 	
 	$mapPack['MAPPACK_ATTRIBUTES'] = 'style="--href-color: rgb('.$mapPackColor.'); --href-shadow-color: rgb('.$mapPackColor.' / 38%)"';
@@ -37,12 +37,13 @@ if($_GET['id']) {
 	$mapPack['MAPPACK_ADDITIONAL_PAGE'] = '';
 	$additionalPage = '';
 		
+	$mapPackLevels = Escape::multiple_ids($mapPack['levels']);
+	$mapPackLevelsArray = explode(',', $mapPackLevels);
+	
 	$pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 	
 	switch($parameters[1]) {
 		case '':
-			$mapPackLevels = Escape::multiple_ids($mapPack['levels']);
-			
 			$friendsString = Library::getFriendsQueryString($accountID);
 				
 			$filters = [
@@ -90,7 +91,65 @@ if($_GET['id']) {
 			break; 
 		case 'manage':
 			$pageBase = '../../../';
-			if(!Library::checkPermission($person, "dashboardLevelPackCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			if(!Library::checkPermission($person, "dashboardLevelPackCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			
+			$friendsString = Library::getFriendsQueryString($accountID);
+				
+			$filters = [
+				"levelID IN (".$mapPackLevels.")",
+				"(
+					unlisted != 1 OR
+					(unlisted = 1 AND (levels.extID IN (".$friendsString.")))
+				)"
+			];
+			
+			$queryJoin = "INNER JOIN users ON levels.userID = users.userID";
+			
+			$levelsText = '';
+			foreach($mapPackLevelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+			
+			$order = 'CASE
+				'.$levelsText.'
+			END';
+			$orderSorting = 'ASC';
+			
+			$mapPackLevelsElements = '';
+			
+			$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, 0);
+			
+			foreach($levels['levels'] AS &$level) {
+				$userMetadata = Dashboard::getUserMetadata($level);
+				
+				$mapPackLevelsElements .= '<div class="option" value="'.$level['levelID'].'" dashboard-select-multiple-option>
+						<i class="fa-solid fa-gamepad"></i>
+						<text>'.sprintf(Dashboard::string("levelTitlePlain"), htmlspecialchars($level['levelName']), htmlspecialchars($level['userName'])).'</text>
+						<img loading="lazy" src="'.$userMetadata['mainIcon'].'">
+						
+						<button type="button" class="eyeButton" style="margin-left: auto;">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>';
+			}
+			
+			$barColor = Library::convertRGBToHEX($mapPack['rgbcolors']);
+			$textColor = $mapPack['colors2'] ? Library::convertRGBToHEX($mapPack['colors2']) : $textColor;
+			
+			$additionalData = [
+				'MAPPACK_ID' => $mapPackID,
+				'MAPPACK_NAME' => $mapPack['MAPPACK_TITLE'],
+				
+				'MAPPACK_STARS' => $mapPack['stars'],
+				'MAPPACK_COINS' => $mapPack['coins'],
+				'MAPPACK_DIFFICULTY' => $mapPack['difficulty'],
+				'MAPPACK_DIFFICULTY_NAME' => Library::getMapPackDifficultyName($mapPack),
+				
+				'MAPPACK_TEXT_COLOR' => $textColor,
+				'MAPPACK_BAR_COLOR' => $barColor,
+				
+				'MAPPACK_LEVELS' => $mapPackLevels,
+				'MAPPACK_LEVELS_OPTIONS' => $mapPackLevelsElements
+			];
+			
 			$mapPack['MAPPACK_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/mappack', $additionalData);
 			break;
 		default:

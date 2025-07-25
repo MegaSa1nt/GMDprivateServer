@@ -113,8 +113,8 @@ $language['errorFailedToWriteLevel'] = 'An error has occured while trying to sav
 $language['errorCronTooFast'] = 'Please wait a few minutes before running Cron again!';
 
 $language['errorPlayerNotFound'] = 'Player wasn\'t found!';
-$language['errorBadLevelName'] = 'Please choose another name!';
-$language['errorBadLevelDesc'] = 'Please choose another description!';
+$language['errorBadName'] = 'Please choose another name!';
+$language['errorBadDesc'] = 'Please choose another description!';
 
 $language['errorAccountsAutomod'] = 'You may not create accounts for now!';
 $language['errorUsernameTooShort'] = 'This username is too short!';
@@ -126,7 +126,12 @@ $language['errorEmailInUse'] = 'There is an account using this email!';
 
 $language['errorGauntletNotFound'] = 'Gauntlet wasn\'t found!';
 $language['errorGauntletWrongLevelsCount'] = 'Gauntlet can have only 5 levels!';
-$language['errorGauntletWrongLevels'] = 'You specified non-existing levels!';
+$language['errorMultipleLevelsNotFound'] = 'You specified non-existing levels!';
+
+$language['errorFailedToGetGMD'] = 'An error occured while trying to get level data!';
+
+$language['errorMapPackNotFound'] = 'Map Pack wasn\'t found!';
+$language['errorMapPackNoLevels'] = 'You didn\'t specify any levels!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -158,6 +163,8 @@ $language['successReuploadFromServer'] = 'You successfully reuploaded a level to
 $language['successRanCron'] = 'You successfully executed Cron!';
 
 $language['successCreatedAccount'] = 'You successfully created an account!';
+
+$language['successDownloadNow'] = 'Download will start in a few seconds...';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -402,8 +409,8 @@ $language['publicLevel'] = 'Public level';
 $language['privateLevel'] = 'Private level';
 $language['unlistedLevel'] = 'Unlisted level';
 $language['onlyForFriends'] = 'Only for friends';
-$language['levelDifficulty'] = 'Level difficulty';
-$language['chooseLevelDifficulty'] = 'Choose level difficulty...';
+$language['difficulty'] = 'Difficulty';
+$language['chooseDifficulty'] = 'Choose difficulty...';
 $language['silverCoins'] = 'Silver coins';
 $language['silverCoinsDesc'] = 'Should coins on a level be silver';
 $language['updatesLock'] = 'Lock updates';
@@ -420,4 +427,10 @@ $language['invalidPasswordHint'] = 'Your password contains symbols, that you can
 $language['public'] = 'Public';
 $language['private'] = 'Private';
 $language['unlisted'] = 'Unlisted';
+
+$language['downloadLevel'] = 'Download level';
+
+$language['mapPackName'] = 'Map Pack name';
+$language['textColor'] = 'Text color';
+$language['barColor'] = 'Bar color';
 ?>

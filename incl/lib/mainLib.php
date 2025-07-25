@@ -612,6 +612,8 @@ class Library {
 	}
 	
 	public static function convertIPForSearching($IP, $isSearch = false) {
+		if(strpos($IP, ":") !== false) return $IP;
+		
 		$IP = explode('.', $IP);
 		return $IP[0].'.'.$IP[1].'.'.$IP[2].($isSearch ? '' : '.0');
 	}
@@ -843,7 +845,7 @@ class Library {
 							SELECT * FROM users
 							WHERE ".$queryText."
 							stars + moons <= :stars
-							ORDER BY stars + moons DESC
+							ORDER BY stars + moons DESC, userName ASC
 							LIMIT ".$count."
 						)
 						UNION
@@ -851,7 +853,7 @@ class Library {
 							SELECT * FROM users
 							WHERE ".$queryText."
 							stars + moons >= :stars
-							ORDER BY stars + moons ASC
+							ORDER BY stars + moons ASC, userName ASC
 							LIMIT ".$count."
 						)
 					) as leaderboards
@@ -3726,10 +3728,17 @@ class Library {
 	public static function getMapPackDifficultyImage($mapPack) {
 		require __DIR__."/../../config/discord.php";
 		
-		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-easy', '7' => 'demon-medium', '8' => 'demon-hard', '9' => 'demon-insane', '10' => 'demon-extreme'];
+		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-hard', '7' => 'demon-easy', '8' => 'demon-medium', '9' => 'demon-insane', '10' => 'demon-extreme'];
 		$diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'na';
 		
 		return $difficultiesURL.'stars/'.$diffIcon.'.png';
+	}
+	
+	public static function getMapPackDifficultyName($mapPack) {
+		$diffArray = ['-1' => 'N/A', '0' => 'Auto', '1' => 'Easy', '2' => 'Normal', '3' => 'Hard', '4' => 'Harder', '5' => 'Insane', '6' => 'Hard Demon', '7' => 'Easy Demon', '8' => 'Medium Demon', '9' => 'Insane Demon', '10' => 'Extreme Demon'];
+		$diffName = $diffArray[(string)$mapPack['difficulty']] ?: 'N/A';
+		
+		return $diffName;
 	}
 	
 	public static function getMapPackByID($mapPackID) {
@@ -3785,6 +3794,17 @@ class Library {
 		$changeGauntlet->execute([':level1' => $level1, ':level2' => $level2, ':level3' => $level3, ':level4' => $level4, ':level5' => $level5, ':gauntletID' => $gauntletID]);
 		
 		self::logModeratorAction($person, ModeratorAction::GauntletChange, $gauntletID, $level1, $level2, $level3, $level4, $level5);
+		
+		return true;
+	}
+	
+	public static function changeMapPack($person, $mapPackID, $mapPackName, $stars, $coins, $difficulty, $textColor, $barColor, $levels) {
+		require __DIR__."/connection.php";
+		
+		$changeGauntlet = $db->prepare("UPDATE mappacks SET name = :mapPackName, stars = :stars, coins = :coins, difficulty = :difficulty, rgbcolors = :barColor, colors2 = :textColor, levels = :levels WHERE ID = :mapPackID");
+		$changeGauntlet->execute([':mapPackName' => $mapPackName, ':stars' => $stars, ':coins' => $coins, ':difficulty' => $difficulty, ':textColor' => $textColor, ':barColor' => $barColor, ':levels' => $levels, ':mapPackID' => $mapPackID]);
+		
+		self::logModeratorAction($person, ModeratorAction::MapPackChange, $mapPackID, $mapPackName, $stars.','.$coins, $difficulty, $textColor, $barColor, $levels);
 		
 		return true;
 	}
@@ -5299,6 +5319,26 @@ class Library {
 		}
 		
 		return ['success' => true, 'accountID' => $requestArray[0], 'userID' => $requestArray[1], 'gjp2' => $gjp2];
+	}
+	
+	public static function convertHEXToRBG($hexString) {
+		$hexString = preg_replace("/[^0-9A-Fa-f]/", '', $hexString);
+		$rgbArray = [];
+		
+		if(strlen($hexString) != 6) return false;
+		
+		$colorVal = hexdec($hexString);
+		$rgbArray[0] = 0xFF & ($colorVal >> 0x10);
+		$rgbArray[1] = 0xFF & ($colorVal >> 0x8);
+		$rgbArray[2] = 0xFF & $colorVal;
+		
+		return implode(',', $rgbArray); 
+	}
+	
+	public static function convertRGBToHEX($rgbString) {
+		$rgbArray = explode(',', $rgbString);
+		
+		return sprintf("#%02x%02x%02x", $rgbArray[0], $rgbArray[1], $rgbArray[2]);
 	}
 	
 	/*

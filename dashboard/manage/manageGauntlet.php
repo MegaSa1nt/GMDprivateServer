@@ -29,7 +29,7 @@ if(Library::checkPermission($person, "dashboardGauntletCreate") && isset($_POST[
 	
 	$levelsArray = Library::getLevels($filters, '', '', '', 0);
 	
-	if($levelsArray['count'] != 5) exit(Dashboard::renderToast("xmark", Dashboard::string("errorGauntletWrongLevels"), "error"));
+	if($levelsArray['count'] != 5) exit(Dashboard::renderToast("xmark", Dashboard::string("errorMultipleLevelsNotFound"), "error"));
 	
 	Library::changeGauntlet($person, $gauntletID, $newLevelsArray[0], $newLevelsArray[1], $newLevelsArray[2], $newLevelsArray[3], $newLevelsArray[4]);
 	

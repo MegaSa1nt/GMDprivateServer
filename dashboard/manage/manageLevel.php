@@ -19,13 +19,13 @@ if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['l
 	$newLevelAuthor = Escape::latin($_POST['levelAuthor']); // In case of unregistered user, which will have non-numeric ID
 	if(!$newLevelName || !$newLevelAuthor) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
-	if(Security::checkFilterViolation($person, $newLevelName, 3)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadLevelName"), "error"));
+	if(Security::checkFilterViolation($person, $newLevelName, 3)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadName"), "error"));
 	
 	$newLevelAuthorArray = Library::getUserByAccountID($newLevelAuthor);
 	if(!$newLevelAuthorArray) exit(Dashboard::renderToast("xmark", Dashboard::string("errorPlayerNotFound"), "error"));
 	
 	$newLevelDesc = Library::escapeDescriptionCrash(Escape::text($_POST['levelDesc'], 300));
-	if(Security::checkFilterViolation($person, $newLevelDesc, 3)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadLevelDesc"), "error"));
+	if(Security::checkFilterViolation($person, $newLevelDesc, 3)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadDesc"), "error"));
 	
 	$newStars = Security::limitValue(0, abs(Escape::number($_POST['stars']) ?: 0), 10);
 	$newDifficultyName = Escape::latin($_POST['difficulty']) ?: 'na';

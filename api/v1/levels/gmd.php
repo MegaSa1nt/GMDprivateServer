@@ -25,7 +25,7 @@ if(!$levelID) {
 
 // Check if the level even exists or if the player can even see it
 $level = Library::getLevelByID($levelID);
-if(!$level || !Library::canAccountPlayLevel($person, $levelID)) {
+if(!$level || !Library::canAccountPlayLevel($person, $level)) {
     http_response_code(404);
     exit(json_encode(['success' => false, 'cause' => 'Level not found!']));
 }

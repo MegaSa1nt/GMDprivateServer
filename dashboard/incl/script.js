@@ -225,9 +225,9 @@ function showToastOutOfPage(toastBody) {
 	return true;
 }
 
-async function showToast(toastText, toastStyle) {
+async function showToast(toastIcon, toastText, toastStyle) {
 	Toastify({
-		text: toastText,
+		text: toastIcon + toastText,
 		duration: 2000,
 		position: "center",
 		escapeMarkup: false,
@@ -489,7 +489,7 @@ async function updatePage() {
 		});
 		
 		const selectValue = selectValueInput.getAttribute("value");
-		if(selectValue != null) element.querySelector("[dashboard-select-option][value='" + selectValue + "']").click();
+		if(selectValue != null) element.querySelector("[dashboard-select-option][value='" + selectValue + "']")?.click();
 		
 		selectInput.oninput = async (e) => {
 			const searchValue = e.target.value.trim();
@@ -673,7 +673,7 @@ async function updatePage() {
 				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
 				fileInputElement.value = null;
 				
-				showToast(xIcon + couldntReadFileText, "error");
+				showToast(errorIcon, couldntReadFileText, "error");
 				
 				return;
 			}
@@ -682,7 +682,7 @@ async function updatePage() {
 				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
 				fileInputElement.value = null;
 				
-				showToast(xIcon + (fileInputType == "song" ? maxSongSizeText : maxSFXSizeText), "error");
+				showToast(errorIcon, (fileInputType == "song" ? maxSongSizeText : maxSFXSizeText), "error");
 				
 				return;
 			}
@@ -694,7 +694,7 @@ async function updatePage() {
 				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
 				fileInputElement.value = null;
 				
-				showToast(xIcon + notAnAudioText, "error");
+				showToast(errorIcon, notAnAudioText, "error");
 				
 				return;
 			}
@@ -838,6 +838,21 @@ async function updatePage() {
 			
 			element.onclick = () => removeElementFromList(searchValue);
 		});
+	});
+	
+	const runningTextElements = document.querySelectorAll("[dashboard-running-text]");
+	runningTextElements.forEach(async (element) => {
+		const elementWidth = element.scrollWidth - 300;
+		const animationDuration = elementWidth >= 30 ? elementWidth / 10 : 3;
+		
+		element.style = `--text-width: -${elementWidth}px; animation-duration: ${animationDuration}s;`;
+	});
+	
+	const inputColorElements = document.querySelectorAll("input[type='color']");
+	inputColorElements.forEach(async (element) => {
+		element.style = `--href-shadow-color: ${element.value}61`;
+		
+		element.oninput = (event) => element.style = `--href-shadow-color: ${event.target.value}61`;
 	});
 }
 
@@ -1122,6 +1137,9 @@ async function resetSettings() {
 				searchLists[searchID].push(element.getAttribute("value"));
 			});
 		})
+		
+		const selectColorCheck = settingsFormElement.querySelectorAll("input[type='color']");
+		selectColorCheck.forEach((element) => element.style = `--href-shadow-color: ${element.value}61`);
 	});
 	
 	const saveSettingsButtonsDiv = document.querySelector("[dashboard-change-buttons]");
@@ -1188,7 +1206,7 @@ async function handleSongUpload(form) {
 		if(typeof convertedSongFile == 'string') {
 			showLoaderProgressBar(false);
 			
-			return showToast(xIcon + convertedSongFile, "error");
+			return showToast(errorIcon, convertedSongFile, "error");
 		}
 		
 		formData.set("songFile", new File([convertedSongFile], "song.ogg"));
@@ -1271,7 +1289,7 @@ async function handleSFXUpload(form) {
 		if(typeof convertedSFXFile == 'string') {
 			showLoaderProgressBar(false);
 			
-			return showToast(xIcon + convertedSFXFile, "error");
+			return showToast(errorIcon, convertedSFXFile, "error");
 		}
 		
 		formData.set("sfxFile", new File([convertedSFXFile], "sfx.ogg"));
@@ -1314,3 +1332,37 @@ function checkFormSettingsChange(element) {
 	else checkChangeButtons.classList.remove("show");
 }
 
+async function downloadLevel(levelID) {
+	dashboardLoader.classList.remove("hide");
+	
+	const request = await fetch("manage/downloadGMD?levelID=" + levelID).catch((e) => {
+		console.error(e);
+		
+		dashboardLoader.classList.add("hide");
+	});
+	const result = await request.text();
+		
+	try {
+		const resultJSON = JSON.parse(result);
+		
+		fakeA = document.createElement("a");
+		fakeA.href = "data:text/xml;base64," + resultJSON.level.gmd;
+		fakeA.download = resultJSON.level.name + ".gmd";
+		fakeA.setAttribute("target", "_blank");
+		
+		fakeA.click();
+		
+		showToast(successIcon, downloadNowText, "success");
+		
+		dashboardLoader.classList.add("hide");
+	} catch(e) {
+		console.error(e);
+		
+		const toastBody = new DOMParser().parseFromString(result, "text/html");
+		const toastElement = toastBody.getElementById("toast");
+		
+		showToastOutOfPage(toastElement);
+		
+		dashboardLoader.classList.add("hide");
+	}
+}
