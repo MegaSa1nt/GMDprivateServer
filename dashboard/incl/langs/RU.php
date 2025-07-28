@@ -48,6 +48,10 @@ $language['uploadSFXTitle'] = 'Загрузить звуковой эффект'
 $language['reuploadLevelTitle'] = 'Перенести уровень';
 $language['runCron'] = 'Выполнить Крон';
 
+$language['moderatorTools'] = 'Инструменты модератора';
+$language['addMapPackTitle'] = 'Добавить Мап-Пак';
+$language['addGauntletTitle'] = 'Добавить Гаунтлет';
+
 $language['clans'] = 'Кланы';
 $language['clansListTitle'] = 'Список кланов';
 
@@ -126,9 +130,16 @@ $language['errorEmailInUse'] = 'Аккаунт, использующий эту 
 
 $language['errorGauntletNotFound'] = 'Гаунтлет не найден!';
 $language['errorGauntletWrongLevelsCount'] = 'В Гаунтлете может быть только 5 уровней!';
-$language['errorGauntletWrongLevels'] = 'Вы указали несуществующие уровни!';
+$language['errorMultipleLevelsNotFound'] = 'Вы указали несуществующие уровни!';
 
 $language['errorFailedToGetGMD'] = 'Произошла ошибка при получении данных уровня!';
+
+$language['errorMapPackNotFound'] = 'Мап-Пак не найден!';
+$language['errorMapPackNoLevels'] = 'Вы не указали ни одного уровня!';
+
+$language['errorListNotFound'] = 'Список уровней не найден!';
+
+$language['errorGauntletAlreadyExists'] = 'Этот Гаунтлет уже существует!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -162,6 +173,9 @@ $language['successRanCron'] = 'Вы успешно выполнили Крон!'
 $language['successCreatedAccount'] = 'Вы успешно создали аккаунт!';
 
 $language['successDownloadNow'] = 'Загрузка начнётся через пару секунд...';
+
+$language['successAddedMapPack'] = 'Вы успешно добавили Мап-Пак!';
+$language['successAddedGauntlet'] = 'Вы успешно добавили Гаунтлет!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
@@ -430,4 +444,20 @@ $language['downloadLevel'] = 'Скачать уровень';
 $language['mapPackName'] = 'Название Мап-Пака';
 $language['textColor'] = 'Цвет текста';
 $language['barColor'] = 'Цвет полоски';
+
+$language['listName'] = 'Название списка уровней';
+$language['listAuthor'] = 'Автор списка уровней';
+$language['listDesc'] = 'Описание списка уровней';
+$language['listRateType'] = 'Тип оценки списка уровней';
+$language['chooseListRateType'] = 'Выберите тип оценки списка уровней...';
+$language['listPrivacy'] = 'Приватность списка уровней';
+$language['chooseListPrivacy'] = 'Выберите приватность списка уровней...';
+$language['publicList'] = 'Открытый список уровней';
+$language['privateList'] = 'Приватный список уровней';
+$language['unlistedList'] = 'Скрытый список уровней';
+$language['updatesLockListDesc'] = 'Если включить эту настройку, автор списка уровней больше не сможет обновить его';
+$language['commentingLockListDesc'] = 'Если включить эту настройку, игроки больше не смогут написать комментарий к списку уровней';
+
+$language['gauntletType'] = 'Тип Гаунтлета';
+$language['chooseGauntletType'] = 'Выберите тип Гаунтлета...';
 ?>

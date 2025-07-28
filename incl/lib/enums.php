@@ -172,7 +172,7 @@ class Action { // Last action ID is 70
 	const LevelDescriptionChange = 21;
 }
 
-class ModeratorAction { // Last action ID is 47
+class ModeratorAction { // Last action ID is 49
 	const LevelRate = 1;
 	const LevelDailySet = 5;
 	const LevelDeletion = 6;
@@ -185,6 +185,7 @@ class ModeratorAction { // Last action ID is 47
 	const LevelChangeSong = 16;
 	const LevelLockUpdating = 29;
 	const LevelLockCommenting = 38;
+	const LevelSuggestRemove = 40;
 	const LevelSuggest = 41;
 	const LevelEventSet = 44;
 	const LevelScoreDelete = 45;
@@ -193,14 +194,13 @@ class ModeratorAction { // Last action ID is 47
 	const PersonUnban = 46;
 	const PersonBanChange = 47;
 	
+	const GauntletCreate = 18;
 	const GauntletChange = 22;
 
+	const MapPackCreate = 17;
 	const MapPackChange = 21;
 	
 	// To be done with dashboard
-	const LevelSuggestRemove = 40;
-	const MapPackCreate = 17;
-	const GauntletCreate = 18;
 	const SongChange = 19;
 	const ModeratorPromote = 20;
 	const QuestChange = 23;
@@ -219,6 +219,8 @@ class ModeratorAction { // Last action ID is 47
 	const ListRename = 36;
 	const ListDescriptionChange = 37;
 	const ListLockCommenting = 39;
+	const ListLockUpdating = 48;
+	const ListLevelsChange = 49;
 	
 	// Unused
 	const LevelFeature = 2;

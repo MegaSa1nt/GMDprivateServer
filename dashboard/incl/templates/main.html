@@ -208,6 +208,26 @@
 						</button>
 					</div>
 				</div>
+				
+				<div class="dropdown" id="modToolsDropdown" dashboard-show="%PERMISSION_dashboardModTools%">
+					<button title="%TEXT_moderatorTools%" type="button" dashboard-dropdown="modToolsDropdown">
+						<i class="fa-solid fa-wrench"></i>
+						<text>%TEXT_moderatorTools%</text>
+						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
+					</button>
+					
+					<div class="dropdown-items">
+						<button title="%TEXT_addMapPackTitle%" type="button" href="upload/mappack" dashboard-show="%PERMISSION_dashboardLevelPackCreate%">
+							<i class="fa-solid fa-folder-open"></i>
+							<text>%TEXT_addMapPackTitle%</text>
+						</button>
+						
+						<button title="%TEXT_addGauntletTitle%" type="button" href="upload/gauntlet" dashboard-show="%PERMISSION_dashboardGauntletCreate%">
+							<i class="fa-solid fa-globe"></i>
+							<text>%TEXT_addGauntletTitle%</text>
+						</button>
+					</div>
+				</div>
 			</div>
 			
 			<div class="navbar-buttons up">

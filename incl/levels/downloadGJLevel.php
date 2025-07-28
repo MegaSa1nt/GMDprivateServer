@@ -46,7 +46,7 @@ if($gameVersion > 18) {
 }
 $response = "1:".$level["levelID"].":2:".Escape::translit($level["levelName"]).":3:".$levelDesc.":4:".$levelString.":5:".$level["levelVersion"].":6:".$level["userID"].":8:".$level["difficultyDenominator"].":9:".$level["starDifficulty"].":10:".$level["downloads"].":11:1:12:".$level["audioTrack"].":13:".$level["gameVersion"].":14:".$level["likes"].":16:".$level["dislikes"].":17:".$level["starDemon"].":43:".$level["starDemonDiff"].":25:".$level["starAuto"].":18:".$level["starStars"].":19:".$level["starFeatured"].":42:".$level["starEpic"].":45:".$level["objects"].":15:".$level["levelLength"].":30:".$level["original"].":31:".$level['twoPlayer'].":28:".$uploadDate.(isset($updateDate) ? ":29:".$updateDate : '').":35:".$level["songID"].":36:".$level["extraString"].":37:".$level["coins"].":38:".$level["starCoins"].":39:".$level["requestedStars"].":46:".$level["wt"].":47:".$level["wt2"].":48:".$level["settingsString"].":40:".$level["isLDM"].":27:".$xorPass.":52:".$level["songIDs"].":53:".$level["sfxIDs"].":57:".$level['ts'];
 
-if(isset($feaID)) $response .= ":41:".$feaID;
+if($feaID) $response .= ":41:".$feaID;
 if($extras) $response .= ":26:".$level["levelInfo"];
 
 $response .= "#".Security::generateFirstHash($levelString);
@@ -54,7 +54,7 @@ $response .= "#".Security::generateFirstHash($levelString);
 $someString = $level["userID"].",".$level["starStars"].",".$level["starDemon"].",".$level["levelID"].",".$level["starCoins"].",".$level["starFeatured"].",".$pass.",".$feaID;
 $response .= "#".Security::generateSecondHash($someString);
 
-if(isset($feaID)) $response .= "#".Library::getUserString($level);
+if($feaID) $response .= "#".Library::getUserString($level);
 
 exit($response);
 ?>

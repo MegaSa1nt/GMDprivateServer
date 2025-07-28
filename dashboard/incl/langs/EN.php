@@ -48,6 +48,10 @@ $language['uploadSFXTitle'] = 'Add a SFX';
 $language['reuploadLevelTitle'] = 'Reupload a level';
 $language['runCron'] = 'Run Cron';
 
+$language['moderatorTools'] = 'Moderator tools';
+$language['addMapPackTitle'] = 'Add Map Pack';
+$language['addGauntletTitle'] = 'Add Gauntlet';
+
 $language['clans'] = 'Clans';
 $language['clansListTitle'] = 'Clans list';
 
@@ -133,6 +137,10 @@ $language['errorFailedToGetGMD'] = 'An error occured while trying to get level d
 $language['errorMapPackNotFound'] = 'Map Pack wasn\'t found!';
 $language['errorMapPackNoLevels'] = 'You didn\'t specify any levels!';
 
+$language['errorListNotFound'] = 'List wasn\'t found!';
+
+$language['errorGauntletAlreadyExists'] = 'This Gauntlet already exists!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
 
@@ -165,6 +173,9 @@ $language['successRanCron'] = 'You successfully executed Cron!';
 $language['successCreatedAccount'] = 'You successfully created an account!';
 
 $language['successDownloadNow'] = 'Download will start in a few seconds...';
+
+$language['successAddedMapPack'] = 'You successfullty added a Map Pack!';
+$language['successAddedGauntlet'] = 'You successfullty added a Gauntlet!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -433,4 +444,20 @@ $language['downloadLevel'] = 'Download level';
 $language['mapPackName'] = 'Map Pack name';
 $language['textColor'] = 'Text color';
 $language['barColor'] = 'Bar color';
+
+$language['listName'] = 'List name';
+$language['listAuthor'] = 'List author';
+$language['listDesc'] = 'List description';
+$language['listRateType'] = 'List rate type';
+$language['chooseListRateType'] = 'Choose list rate type...';
+$language['listPrivacy'] = 'List privacy';
+$language['chooseListPrivacy'] = 'Choose list privacy...';
+$language['publicList'] = 'Public list';
+$language['privateList'] = 'Private list';
+$language['unlistedList'] = 'Unlisted list';
+$language['updatesLockListDesc'] = 'If you enable this setting, list author won\'t be able to update this list anymore';
+$language['commentingLockListDesc'] = 'If you enable this setting, players wouldn\'t be able to comment on this list anymore';
+
+$language['gauntletType'] = 'Gauntlet type';
+$language['chooseGauntletType'] = 'Choose Gauntlet type...';
 ?>

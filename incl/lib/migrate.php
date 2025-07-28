@@ -611,6 +611,12 @@ if(!$installed) {
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageClans` INT NOT NULL DEFAULT '0' AFTER `dashboardManageLevels`");
 	$db->query("ALTER TABLE `accounts` CHANGE `auth` `auth` VARCHAR(64) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `accounts` CHANGE `mail` `mail` VARCHAR(64) NOT NULL DEFAULT ''");
+	$check = $db->query("SHOW COLUMNS FROM `lists` LIKE 'updateLocked'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `lists` ADD `updateLocked` INT NOT NULL DEFAULT '0' AFTER `unlisted`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandSetLevels'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandSetLevels` INT NOT NULL DEFAULT '0' AFTER `commandLockUpdating`");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

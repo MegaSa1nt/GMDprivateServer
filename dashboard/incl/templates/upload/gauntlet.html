@@ -1,0 +1,37 @@
+<form class="box" name="addGauntletForm">
+	<div class="settingDescription">
+		<h2>
+			<i class="fa-solid fa-globe"></i>
+			%TEXT_gauntletType%
+		</h2>
+		
+		<div class="select" dashboard-select="gauntletID">
+			<input type="hidden" name="gauntletID" dashboard-select-value required>
+			<input type="text" placeholder="%TEXT_chooseGauntletType%" dashboard-select-input>
+				
+			<i class="fa-solid fa-caret-right" dashboard-caret></i>
+				
+			<div class="options" dashboard-select-options>%ADD_GAUNTLET_TYPES%</div>
+		</div>
+	</div>
+	
+	<div class="settingDescription">
+		<h2>
+			<i class="fa-solid fa-gamepad"></i>
+			%TEXT_levels%
+		</h2>
+			
+		<div class="select" dashboard-select-search-multiple="levelSearch">
+			<input type="hidden" name="levels" dashboard-select-value value />
+			<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getLevels" />
+			
+			<i class="fa-solid fa-caret-right" dashboard-caret></i>
+			
+			<div class="options" dashboard-select-options></div>
+		</div>
+		
+		<div class="select multiple" dashboard-select-multiple-list="levelSearch"></div>
+	</div>
+		
+	<button class="button" type="button" onclick="%ADD_GAUNTLET_BUTTON_ONCLICK%">%TEXT_addGauntletTitle%</button>
+</form>

@@ -3387,7 +3387,7 @@ class Library {
 		
 		if($listID != 0) {
 			$list = self::getListByID($listID);
-			if(!$list || $list['accountID'] != $accountID) return false;
+			if(!$list || $list['accountID'] != $accountID || $list['updateLocked']) return false;
 			
 			$updateList = $db->prepare('UPDATE lists SET listDesc = :listDesc, listVersion = listVersion + 1, listlevels = :listlevels, starDifficulty = :difficulty, original = :original, unlisted = :unlisted, updateDate = :timestamp WHERE listID = :listID');
 			$updateList->execute([':listID' => $listID, ':listDesc' => $listDetails['listDesc'], ':listlevels' => $listDetails['listLevels'], ':difficulty' => $listDetails['difficulty'], ':original' => $listDetails['original'], ':unlisted' => $listDetails['unlisted'], ':timestamp' => time()]);
@@ -3642,6 +3642,7 @@ class Library {
 		$diffParams = [];
 		$filters = !$removeDefaultFilter ? ["unlisted = 0"] : [];
 		
+		$type = Escape::number($query["type"]) ?: 0;
 		$str = Escape::text(urldecode($query["str"])) ?: '';
 		$diff = Escape::multiple_ids(urldecode($query["diff"])) ?: '-';
 
@@ -3696,6 +3697,15 @@ class Library {
 		return $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 	}
 	
+	public static function getListDifficultyName($list) {
+		require __DIR__."/../../config/discord.php";
+		
+		$diffArray = ['-1' => 'N/A', '0' => 'Auto', '1' => 'Easy', '2' => 'Normal', '3' => 'Hard', '4' => 'Harder', '5' => 'Insane', '6' => 'Easy Demon', '7' => 'Medium Demon', '8' => 'Hard Demon', '9' => 'Insane Demon', '10' => 'Extreme Demon'];
+		$diffName = $diffArray[(string)$list['starDifficulty']] ?: 'N/A';
+		
+		return $diffName;
+	}
+	
 	public static function getListStatsCount($person, $listID) {
 		require __DIR__."/connection.php";
 		require_once __DIR__."/exploitPatch.php";
@@ -3728,15 +3738,15 @@ class Library {
 	public static function getMapPackDifficultyImage($mapPack) {
 		require __DIR__."/../../config/discord.php";
 		
-		$diffArray = ['-1' => 'na', '0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-hard', '7' => 'demon-easy', '8' => 'demon-medium', '9' => 'demon-insane', '10' => 'demon-extreme'];
-		$diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'na';
+		$diffArray = ['0' => 'auto', '1' => 'easy', '2' => 'normal', '3' => 'hard', '4' => 'harder', '5' => 'insane', '6' => 'demon-hard', '7' => 'demon-easy', '8' => 'demon-medium', '9' => 'demon-insane', '10' => 'demon-extreme'];
+		$diffIcon = $diffArray[(string)$mapPack['difficulty']] ?: 'auto';
 		
 		return $difficultiesURL.'stars/'.$diffIcon.'.png';
 	}
 	
 	public static function getMapPackDifficultyName($mapPack) {
-		$diffArray = ['-1' => 'N/A', '0' => 'Auto', '1' => 'Easy', '2' => 'Normal', '3' => 'Hard', '4' => 'Harder', '5' => 'Insane', '6' => 'Hard Demon', '7' => 'Easy Demon', '8' => 'Medium Demon', '9' => 'Insane Demon', '10' => 'Extreme Demon'];
-		$diffName = $diffArray[(string)$mapPack['difficulty']] ?: 'N/A';
+		$diffArray = ['0' => 'Auto', '1' => 'Easy', '2' => 'Normal', '3' => 'Hard', '4' => 'Harder', '5' => 'Insane', '6' => 'Hard Demon', '7' => 'Easy Demon', '8' => 'Medium Demon', '9' => 'Insane Demon', '10' => 'Extreme Demon'];
+		$diffName = $diffArray[(string)$mapPack['difficulty']] ?: 'Auto';
 		
 		return $diffName;
 	}
@@ -3776,7 +3786,7 @@ class Library {
 	}
 	
 	public static function getGauntletNames() {
-		$gauntlets = ["Unknown", "Fire", "Ice", "Poison", "Shadow", "Lava", "Bonus", "Chaos", "Demon", "Time", "Crystal", "Magic", "Spike", "Monster", "Doom", "Death", 'Forest', 'Rune', 'Force', 'Spooky', 'Dragon', 'Water', 'Haunted', 'Acid', 'Witch', 'Power', 'Potion', 'Snake', 'Toxic', 'Halloween', 'Treasure', 'Ghost', 'Spider', 'Gem', 'Inferno', 'Portal', 'Strange', 'Fantasy', 'Christmas', 'Surprise', 'Mystery', 'Cursed', 'Cyborg', 'Castle', 'Grave', 'Temple', 'World', 'Galaxy', 'Universe', 'Discord', 'Split', 'NCS I', 'NCS II', 'Space', 'Cosmos'];
+		$gauntlets = ["Fire", "Ice", "Poison", "Shadow", "Lava", "Bonus", "Chaos", "Demon", "Time", "Crystal", "Magic", "Spike", "Monster", "Doom", "Death", 'Forest', 'Rune', 'Force', 'Spooky', 'Dragon', 'Water', 'Haunted', 'Acid', 'Witch', 'Power', 'Potion', 'Snake', 'Toxic', 'Halloween', 'Treasure', 'Ghost', 'Spider', 'Gem', 'Inferno', 'Portal', 'Strange', 'Fantasy', 'Christmas', 'Surprise', 'Mystery', 'Cursed', 'Cyborg', 'Castle', 'Grave', 'Temple', 'World', 'Galaxy', 'Universe', 'Discord', 'Split', 'NCS I', 'NCS II', 'Space', 'Cosmos'];
 		
 		return $gauntlets;
 	}
@@ -3784,7 +3794,7 @@ class Library {
 	public static function getGauntletName($gauntletID) {
 		$gauntlets = self::getGauntletNames();
 		
-		return $gauntlets[$gauntletID] ?: $gauntlets[0];
+		return $gauntlets[$gauntletID - 1] ?: "Unknown";
 	}
 	
 	public static function changeGauntlet($person, $gauntletID, $level1, $level2, $level3, $level4, $level5) {
@@ -3801,12 +3811,61 @@ class Library {
 	public static function changeMapPack($person, $mapPackID, $mapPackName, $stars, $coins, $difficulty, $textColor, $barColor, $levels) {
 		require __DIR__."/connection.php";
 		
-		$changeGauntlet = $db->prepare("UPDATE mappacks SET name = :mapPackName, stars = :stars, coins = :coins, difficulty = :difficulty, rgbcolors = :barColor, colors2 = :textColor, levels = :levels WHERE ID = :mapPackID");
-		$changeGauntlet->execute([':mapPackName' => $mapPackName, ':stars' => $stars, ':coins' => $coins, ':difficulty' => $difficulty, ':textColor' => $textColor, ':barColor' => $barColor, ':levels' => $levels, ':mapPackID' => $mapPackID]);
+		$changeMapPack = $db->prepare("UPDATE mappacks SET name = :mapPackName, stars = :stars, coins = :coins, difficulty = :difficulty, rgbcolors = :barColor, colors2 = :textColor, levels = :levels WHERE ID = :mapPackID");
+		$changeMapPack->execute([':mapPackName' => $mapPackName, ':stars' => $stars, ':coins' => $coins, ':difficulty' => $difficulty, ':textColor' => $textColor, ':barColor' => $barColor, ':levels' => $levels, ':mapPackID' => $mapPackID]);
 		
 		self::logModeratorAction($person, ModeratorAction::MapPackChange, $mapPackID, $mapPackName, $stars.','.$coins, $difficulty, $textColor, $barColor, $levels);
 		
 		return true;
+	}
+	
+	public static function lockUpdatingList($listID, $person, $lockUpdating) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$lockLevel = $db->prepare("UPDATE lists SET updateLocked = :updateLocked WHERE listID = :listID");
+		$lockLevel->execute([':updateLocked' => $lockUpdating, ':listID' => $listID]);
+		
+		self::logModeratorAction($person, ModeratorAction::ListLockUpdating, $lockUpdating, '', $listID);
+		
+		return true;
+	}
+	
+	public static function changeListLevels($listID, $person, $listLevels) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$lockLevel = $db->prepare("UPDATE lists SET listlevels = :listLevels WHERE listID = :listID");
+		$lockLevel->execute([':listLevels' => $listLevels, ':listID' => $listID]);
+		
+		self::logModeratorAction($person, ModeratorAction::ListLevelsChange, $listLevels, $listID);
+		
+		return true;
+	}
+	
+	public static function addMapPack($person, $mapPackName, $stars, $coins, $difficulty, $textColor, $barColor, $levels) {
+		require __DIR__."/connection.php";
+		
+		$addMapPack = $db->prepare("INSERT INTO mappacks (name, levels, stars, coins, difficulty, rgbcolors, colors2, timestamp) VALUES (:mapPackName, :levels, :stars, :coins, :difficulty, :barColor, :textColor, :timestamp)");
+		$addMapPack->execute([':mapPackName' => $mapPackName, ':stars' => $stars, ':coins' => $coins, ':difficulty' => $difficulty, ':textColor' => $textColor, ':barColor' => $barColor, ':levels' => $levels, ':timestamp' => time()]);
+		$mapPackID = $db->lastInsertId();
+		
+		self::logModeratorAction($person, ModeratorAction::MapPackCreate, $mapPackID, $mapPackName, $stars.','.$coins, $difficulty, $textColor, $barColor, $levels);
+		
+		return $mapPackID;
+	}
+	
+	public static function addGauntlet($person, $gauntletID, $level1, $level2, $level3, $level4, $level5) {
+		require __DIR__."/connection.php";
+		
+		$changeGauntlet = $db->prepare("INSERT INTO gauntlets (ID, level1, level2, level3, level4, level5, timestamp) VALUES (:gauntletID, :level1, :level2, :level3, :level4, :level5, :timestamp)");
+		$changeGauntlet->execute([':gauntletID' => $gauntletID, ':level1' => $level1, ':level2' => $level2, ':level3' => $level3, ':level4' => $level4, ':level5' => $level5, ':timestamp' => time()]);
+		
+		self::logModeratorAction($person, ModeratorAction::GauntletCreate, $gauntletID, $level1, $level2, $level3, $level4, $level5);
+		
+		return $gauntletID;
 	}
 	
 	/*

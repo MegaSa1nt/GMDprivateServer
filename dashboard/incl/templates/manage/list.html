@@ -1,0 +1,222 @@
+<form class="wideBox" name="listSettingsForm" dashboard-change-form>
+	<input type="hidden" name="listID" value="%LIST_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-pen-to-square"></i>
+					%TEXT_listName%
+				</h2>
+				
+				<input class="inputStyle" type="text" name="listName" value="%LIST_NAME%" autocomplete="gdps-dashboard-listName" dashboard-change-default placeholder="The List Name" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user"></i>
+					%TEXT_listAuthor%
+				</h2>
+				
+				<div class="select" dashboard-select-search="userSearch">
+					<input type="hidden" name="listAuthor" dashboard-select-value value="%LIST_AUTHOR_ID%" dashboard-change-default="%LIST_AUTHOR_ID%" />
+					<input type="text" placeholder="%TEXT_searchText%" value="%LIST_AUTHOR_NAME%" dashboard-change-default="%LIST_AUTHOR_NAME%" dashboard-select-input="manage/getUsers" />
+					
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+					<div class="options" dashboard-select-options></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-comment-dots"></i>
+				%TEXT_listDesc%
+			</h2>
+				
+			<input class="inputStyle" type="text" name="listDesc" value="%LIST_DESC%" autocomplete="gdps-dashboard-listDesc" dashboard-change-default placeholder="Cool description about this list, good good..." dashboard-not-required />
+		</div>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-gem"></i>
+					%TEXT_diamonds%
+				</h2>
+				
+				<input class="inputStyle" type="number" name="diamonds" value="%LIST_STARS%" autocomplete="gdps-dashboard-listStars" dashboard-change-default placeholder="25" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-face-smile"></i>
+					%TEXT_difficulty%
+				</h2>
+				
+				<div class="select" dashboard-select="difficulty">
+					<input type="hidden" name="difficulty" value="%DIFFICULTY%" dashboard-change-default="%DIFFICULTY%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseDifficulty%" value="%DIFFICULTY_NAME%" dashboard-change-default="%DIFFICULTY_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="-1" dashboard-select-option="N/A">
+							<text>N/A</text>
+						</div>
+						
+						<div class="option" value="0" dashboard-select-option="Auto">
+							<text>Auto</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="Easy">
+							<text>Easy</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="Normal">
+							<text>Normal</text>
+						</div>
+						
+						<div class="option" value="3" dashboard-select-option="Hard">
+							<text>Hard</text>
+						</div>
+						
+						<div class="option" value="4" dashboard-select-option="Harder">
+							<text>Harder</text>
+						</div>
+						
+						<div class="option" value="5" dashboard-select-option="Insane">
+							<text>Insane</text>
+						</div>
+						
+						<div class="option" value="6" dashboard-select-option="Easy Demon">
+							<text>Easy Demon</text>
+						</div>
+						
+						<div class="option" value="7" dashboard-select-option="Medium Demon">
+							<text>Medium Demon</text>
+						</div>
+						
+						<div class="option" value="8" dashboard-select-option="Hard Demon">
+							<text>Hard Demon</text>
+						</div>
+						
+						<div class="option" value="9" dashboard-select-option="Insane Demon">
+							<text>Insane Demon</text>
+						</div>
+						
+						<div class="option" value="10" dashboard-select-option="Extreme Demon">
+							<text>Extreme Demon</text>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-fire"></i>
+					%TEXT_listRateType%
+				</h2>
+				
+				<div class="select" dashboard-select="listRateType">
+					<input type="hidden" name="listRateType" value="%LIST_RATE_TYPE%" dashboard-change-default="%LIST_RATE_TYPE%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseListRateType%" value="%LIST_RATE_TYPE_NAME%" dashboard-change-default="%LIST_RATE_TYPE_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_noRating%">
+							<text>%TEXT_noRating%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="Featured">
+							<text>Featured</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-eye"></i>
+				%TEXT_listPrivacy%
+			</h2>
+			
+			<div class="select" dashboard-select="listPrivacy">
+				<input type="hidden" name="listPrivacy" value="%LIST_PRIVACY%" dashboard-change-default="%LIST_PRIVACY%" dashboard-select-value required>
+				<input type="text" placeholder="%TEXT_chooseListPrivacy%" value="%LIST_PRIVACY_NAME%" dashboard-change-default="%LIST_PRIVACY_NAME%" dashboard-select-input>
+				
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+				<div class="options" dashboard-select-options>
+					<div class="option" value="0" dashboard-select-option="%TEXT_publicList%">
+						<i class="fa-solid fa-eye"></i>
+						<text>%TEXT_publicList%</text>
+					</div>
+					
+					<div class="option" value="1" dashboard-select-option="%TEXT_privateList%">
+						<i class="fa-solid fa-lock"></i>
+						<text>%TEXT_privateList%</text>
+					
+						<span class="infoIcon" title="%TEXT_onlyForFriends%">
+							<i class="fa-solid fa-circle-info"></i>
+						</span>
+					</div>
+					
+					<div class="option" value="2" dashboard-select-option="%TEXT_unlistedList%">
+						<i class="fa-solid fa-eye-slash"></i>
+						<text>%TEXT_unlistedList%</text>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-gamepad"></i>
+				%TEXT_levels%
+			</h2>
+				
+			<div class="select" dashboard-select-search-multiple="levelSearch">
+				<input type="hidden" name="levels" dashboard-select-value value="%LIST_LEVELS%" dashboard-change-default="%LIST_LEVELS%" />
+				<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getLevels" dashboard-not-required />
+				
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+				
+				<div class="options" dashboard-select-options></div>
+			</div>
+			
+			<div class="select multiple" dashboard-select-multiple-list="levelSearch">%LIST_LEVELS_OPTIONS%</div>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-lock"></i>
+					%TEXT_updatesLock%
+				</h2>
+				<h3>%TEXT_updatesLockListDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="updatesLock" value="%UPDATES_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%UPDATES_LOCK_REMOVE_CHECK%"></input>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comment"></i>
+					%TEXT_commentingLock%
+				</h2>
+				<h3>%TEXT_commentingLockListDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="commentingLock" value="%COMMENTING_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%COMMENTING_LOCK_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageList', 'listSettingsForm')">%TEXT_applySettings%</button>
+	</div>
+</form>

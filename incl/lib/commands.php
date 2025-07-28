@@ -652,6 +652,22 @@ class Commands {
 				
 				return "You ".Library::textColor("successfully", Color::Green)." changed description of ".Library::textColor($list['listName'], Color::SkyBlue)." to:".PHP_EOL
 					.Library::textColor($newListDesc, Color::Yellow);
+			case '!lockUpdating':
+			case '!unlockUpdating':
+			case '!lu':
+			case '!unlu':
+				if(!Library::checkPermission($person, 'commandLockUpdating')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+			
+				$lockUpdatingArray = [
+					'!lockUpdating' => 1, '!lu' => 1,
+					'!unlockUpdating' => 0, '!unlu' => 0
+				];
+				$lockUpdating = $lockUpdatingArray[$command];
+				if($list['updateLocked'] == $lockUpdating) return Library::textColor($list['listName'], Color::SkyBlue)." ".Library::textColor("is already", Color::Green)." ".(!$lockUpdating ? 'un' : '')."locked!";
+				
+				Library::lockUpdatingList($listID, $person, $lockUpdating);
+				
+				return "You ".Library::textColor("successfully", Color::Green)." ".(!$lockUpdating ? 'un' : '')."locked ".Library::textColor($list['listName'], Color::SkyBlue)."!";
 			case '!lockComments':
 			case '!unlockComments':
 			case '!lc':
@@ -696,6 +712,29 @@ class Commands {
 				if(!$sendList) return "You ".Library::textColor("already suggested", Color::Green)." ".Library::textColor($list['listName'], Color::SkyBlue)."!";
 				
 				return "You ".Library::textColor("successfully", Color::Green)." sent ".Library::textColor($list['listName'], Color::SkyBlue).' as '.Library::textColor($sendList, Color::Yellow).', '.$reward .' diamond'.($reward > 1 ? 's!' : '!');
+			case '!setLevels':
+			case '!levels':
+			case '!lvls':
+			case '!lvl':
+				if(!Library::checkPermission($person, 'commandSetLevels')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+				
+				unset($commentSplit[0]);
+				$listLevels = implode(",", $commentSplit);
+				
+				if(!$listLevels || $listLevels != Escape::multiple_ids($listLevels)) {
+					return Library::textColor("Incorrect usage!", Color::Red).PHP_EOL
+						."!setLevels ".Library::textColor("*level IDs*", Color::Orange).PHP_EOL
+						."Example: ".Library::textColor("!setLevels 38 107 753 647", Color::LightYellow);
+				}
+				
+				if($listLevels == $list['listlevels']) return Library::textColor($list['listName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." these levels!";
+				
+				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to change levels of ".Library::textColor($list['listName'], Color::SkyBlue)."?".PHP_EOL
+					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+				
+				Library::changeListLevels($listID, $person, $listLevels);
+				
+				return "You ".Library::textColor("successfully", Color::Green)." changed levels of ".Library::textColor($list['listName'], Color::SkyBlue)."!";
 		}
 		
 		return "Command ".Library::textColor($command, Color::SkyBlue)." was ".Library::textColor("not found", Color::Red).".";

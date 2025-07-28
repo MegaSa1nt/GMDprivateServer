@@ -22,7 +22,7 @@ if(Library::checkPermission($person, "dashboardLevelPackCreate") && isset($_POST
 	
 	$newStars = Security::limitValue(0, abs(Escape::number($_POST['stars']) ?: 0), 10);
 	$newCoins = Security::limitValue(0, abs(Escape::number($_POST['coins']) ?: 0), 2);
-	$newDifficulty = Security::limitValue(-1, Escape::number($_POST['difficulty']), 10);
+	$newDifficulty = Security::limitValue(0, abs(Escape::number($_POST['difficulty']) ?: 0), 10);
 	
 	$newTextColor = Library::convertHEXToRBG(Escape::latin_no_spaces($_POST['mapPackTextColor']) ?: '000000') ?: '0,0,0';
 	$newBarColor = Library::convertHEXToRBG(Escape::latin_no_spaces($_POST['mapPackBarColor']) ?: '000000') ?: '0,0,0';

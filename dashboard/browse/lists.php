@@ -46,6 +46,9 @@ if($_GET['id']) {
 
 	$list['LIST_LEVELS'] = $listStatsCount['levels'];
 	$list['LIST_COMMENTS'] = $listStatsCount['comments'];
+		
+	$listLevels = Escape::multiple_ids($list['listlevels']);
+	$listLevelsArray = explode(',', $listLevels);
 	
 	$pageBase = '../../';
 	$list['LIST_ADDITIONAL_PAGE'] = '';
@@ -143,7 +146,89 @@ if($_GET['id']) {
 		case 'manage':
 			$pageBase = '../../../';
 			
-			if(!Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			if(!Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			
+			$listRateTypes = [Dashboard::string('noRating'), 'Featured'];
+			$listPrivacyNames = [Dashboard::string('publicList'), Dashboard::string('privateList'), Dashboard::string('unlistedList')];
+			
+			$listAuthor = Library::getUserByAccountID($list['accountID']);
+			
+			$listRateType = $list['starFeatured'] ? 1 : 0;
+			$listRateTypeName = $listRateTypes[$listRateType];
+			
+			$difficulty = $list['starDifficulty'];
+			$difficultyName = Library::getListDifficultyName($list);
+			
+			$listPrivacy = $list['unlisted'];
+			$listPrivacyName = $listPrivacyNames[$listPrivacy];
+			
+			$friendsString = Library::getFriendsQueryString($accountID);
+				
+			$filters = [
+				"levelID IN (".$listLevels.")",
+				"(
+					unlisted != 1 OR
+					(unlisted = 1 AND (levels.extID IN (".$friendsString.")))
+				)"
+			];
+			
+			$queryJoin = "INNER JOIN users ON levels.userID = users.userID";
+			
+			$levelsText = '';
+			foreach($listLevelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+			
+			$order = 'CASE
+				'.$levelsText.'
+			END';
+			$orderSorting = 'ASC';
+			
+			$listLevelsElements = '';
+			
+			$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, 0);
+			
+			foreach($levels['levels'] AS &$level) {
+				$userMetadata = Dashboard::getUserMetadata($level);
+				
+				$listLevelsElements .= '<div class="option" value="'.$level['levelID'].'" dashboard-select-multiple-option>
+						<i class="fa-solid fa-gamepad"></i>
+						<text>'.sprintf(Dashboard::string("levelTitlePlain"), htmlspecialchars($level['levelName']), htmlspecialchars($level['userName'])).'</text>
+						<img loading="lazy" src="'.$userMetadata['mainIcon'].'">
+						
+						<button type="button" class="eyeButton" style="margin-left: auto;">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>';
+			}
+			
+			$additionalData = [
+				'LIST_ID' => $list['listID'],
+				
+				'LIST_NAME' => htmlspecialchars($list['listName']),
+				'LIST_DESC' => htmlspecialchars(Escape::url_base64_decode($list['listDesc'])),
+				
+				'LIST_AUTHOR_ID' => $list['accountID'],
+				'LIST_AUTHOR_NAME' => htmlspecialchars($listAuthor['userName']),
+				
+				'LIST_STARS' => $list['starStars'],
+				'LIST_RATE_TYPE' => $listRateType,
+				'LIST_RATE_TYPE_NAME' => $listRateTypeName,
+				
+				'LIST_PRIVACY' => $listPrivacy,
+				'LIST_PRIVACY_NAME' => $listPrivacyName,
+				
+				'LIST_LEVELS' => $listLevels,
+				'LIST_LEVELS_OPTIONS' => $listLevelsElements,
+				
+				'DIFFICULTY' => $difficulty,
+				'DIFFICULTY_NAME' => $difficultyName,
+				
+				'UPDATES_LOCK_VALUE' => $list["updateLocked"] ? 1 : 0,
+				'UPDATES_LOCK_REMOVE_CHECK' => !$list["updateLocked"] ? 'checked' : '',
+				
+				'COMMENTING_LOCK_VALUE' => $list["commentLocked"] ? 1 : 0,
+				'COMMENTING_LOCK_REMOVE_CHECK' => !$list["commentLocked"] ? 'checked' : '',
+			];
+			
 			$list['LIST_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/list', $additionalData);
 			break;
 		default:

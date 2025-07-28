@@ -1,0 +1,130 @@
+<form class="box" name="addMapPackForm">
+	<div class="settingDescription">
+		<h2>
+			<i class="fa-solid fa-pen-to-square"></i>
+			%TEXT_mapPackName%
+		</h2>
+		
+		<input class="inputStyle" type="text" name="mapPackName" autocomplete="gdps-dashboard-mapPackName" placeholder="The Map Pack Name" />
+	</div>
+	
+	<div class="horisontal">
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-star"></i>
+				%TEXT_stars%
+			</h2>
+			
+			<input class="inputStyle" type="number" min="0" max="10" name="stars" autocomplete="gdps-dashboard-mapPackStars" placeholder="10" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-coins"></i>
+				%TEXT_coins%
+			</h2>
+			
+			<input class="inputStyle" type="number" min="0" max="2" name="coins" autocomplete="gdps-dashboard-mapPackCoins" placeholder="2" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-face-smile"></i>
+				%TEXT_difficulty%
+			</h2>
+			
+			<div class="select" dashboard-select="difficulty">
+				<input type="hidden" name="difficulty" dashboard-select-value required>
+				<input type="text" placeholder="%TEXT_chooseDifficulty%" dashboard-select-input>
+					
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+				<div class="options" dashboard-select-options>
+					<div class="option" value="0" dashboard-select-option="Auto">
+						<text>Auto</text>
+					</div>
+					
+					<div class="option" value="1" dashboard-select-option="Easy">
+						<text>Easy</text>
+					</div>
+					
+					<div class="option" value="2" dashboard-select-option="Normal">
+						<text>Normal</text>
+					</div>
+					
+					<div class="option" value="3" dashboard-select-option="Hard">
+						<text>Hard</text>
+					</div>
+					
+					<div class="option" value="4" dashboard-select-option="Harder">
+						<text>Harder</text>
+					</div>
+					
+					<div class="option" value="5" dashboard-select-option="Insane">
+						<text>Insane</text>
+					</div>
+					
+					<div class="option" value="7" dashboard-select-option="Easy Demon">
+						<text>Easy Demon</text>
+					</div>
+					
+					<div class="option" value="8" dashboard-select-option="Medium Demon">
+						<text>Medium Demon</text>
+					</div>
+					
+					<div class="option" value="6" dashboard-select-option="Hard Demon">
+						<text>Hard Demon</text>
+					</div>
+					
+					<div class="option" value="9" dashboard-select-option="Insane Demon">
+						<text>Insane Demon</text>
+					</div>
+					
+					<div class="option" value="10" dashboard-select-option="Extreme Demon">
+						<text>Extreme Demon</text>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="horisontal">
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-font"></i>
+				%TEXT_textColor%
+			</h2>
+			
+			<input class="inputColor" type="color" name="mapPackTextColor" autocomplete="gdps-dashboard-mapPackTextColor" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-bars-progress"></i>
+				%TEXT_barColor%
+			</h2>
+			
+			<input class="inputColor" type="color" name="mapPackBarColor" autocomplete="gdps-dashboard-mapPackBarColor" />
+		</div>
+	</div>
+		
+	<div class="settingDescription">
+		<h2>
+			<i class="fa-solid fa-gamepad"></i>
+			%TEXT_levels%
+		</h2>
+			
+		<div class="select" dashboard-select-search-multiple="levelSearch">
+			<input type="hidden" name="levels" dashboard-select-value value="" />
+			<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getLevels" dashboard-not-required />
+			
+			<i class="fa-solid fa-caret-right" dashboard-caret></i>
+			
+			<div class="options" dashboard-select-options></div>
+		</div>
+		
+		<div class="select multiple" dashboard-select-multiple-list="levelSearch"></div>
+	</div>
+		
+	<button class="button" type="button" onclick="%ADD_MAPPACK_BUTTON_ONCLICK%">%TEXT_addMapPackTitle%</button>
+</form>

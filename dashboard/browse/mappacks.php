@@ -168,7 +168,7 @@ $mapPacks = Library::getMapPacks($pageOffset);
 foreach($mapPacks['mapPacks'] AS &$mapPack) $page .= Dashboard::renderMapPackCard($mapPack, $person);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-$pageCount = floor(($mapPack['count'] - 1) / 10) + 1;
+$pageCount = floor(($mapPacks['count'] - 1) / 10) + 1;
 
 $dataArray = [
 	'ADDITIONAL_PAGE' => $page,

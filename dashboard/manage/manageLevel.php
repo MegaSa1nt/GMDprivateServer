@@ -24,7 +24,7 @@ if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['l
 	$newLevelAuthorArray = Library::getUserByAccountID($newLevelAuthor);
 	if(!$newLevelAuthorArray) exit(Dashboard::renderToast("xmark", Dashboard::string("errorPlayerNotFound"), "error"));
 	
-	$newLevelDesc = Library::escapeDescriptionCrash(Escape::text($_POST['levelDesc'], 300));
+	$newLevelDesc = Library::escapeDescriptionCrash(Escape::text(trim($_POST['levelDesc']), 300));
 	if(Security::checkFilterViolation($person, $newLevelDesc, 3)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadDesc"), "error"));
 	
 	$newStars = Security::limitValue(0, abs(Escape::number($_POST['stars']) ?: 0), 10);

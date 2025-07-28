@@ -20,6 +20,7 @@ $orderEnabled = $isIDSearch = false;
 $limit = 10;
 
 $gameVersion = abs(Escape::number($_POST["gameVersion"]) ?: 18);
+$gauntlet = isset($_POST['gauntlet']) ? abs(Escape::number($_POST['gauntlet']) ?: 0) : false;
 
 $pageOffset = is_numeric($_POST["page"]) ? abs(Escape::number($_POST["page"]) * 10) : 0;
 
@@ -112,7 +113,7 @@ switch($type) {
 				(unlisted = 1 AND (extID IN (".$friendsString.")))
 			)";
 			
-		$noLimit = true;
+		$limit = false;
 		break;
 	case 11: // Awarded
 		$filters[] = "NOT starStars = 0";
@@ -165,7 +166,7 @@ switch($type) {
 				(unlisted = 1 AND (extID IN (".$friendsString.")))
 			)"];
 			
-		$limit = true;
+		$limit = false;
 		break;
 	case 27: // Sent levels
 		$queryJoin = "JOIN (SELECT suggestLevelId AS levelID, MAX(suggest.timestamp) AS timestamp FROM suggest GROUP BY levelID) suggest ON levels.levelID = suggest.levelID";
@@ -188,7 +189,7 @@ foreach($levels['levels'] as &$level) {
 	if($gameVersion < 20) $level['levelDesc'] = Escape::gd($level['levelDesc']);
 	else $level['levelDesc'] = Escape::url_base64_encode($level['levelDesc']);
 
-	if(isset($gauntlet)) $echoString .= "44:1:";
+	if($gauntlet) $echoString .= "44:".$gauntlet.":";
 	$echoString .= "1:".$level["levelID"].":2:".Escape::translit($level["levelName"]).":5:".$level["levelVersion"].":6:".$level["userID"].":8:".$level["difficultyDenominator"].":9:".$level["starDifficulty"].":10:".$level["downloads"].":12:".$level["audioTrack"].":13:".$level["gameVersion"].":14:".$level["likes"].":16:".$level["dislikes"].":17:".$level["starDemon"].":43:".$level["starDemonDiff"].":25:".$level["starAuto"].":18:".$level["starStars"].":19:".$level["starFeatured"].":42:".$level["starEpic"].":45:".$level["objects"].":3:".$level["levelDesc"].":15:".$level["levelLength"].":28:".Library::makeTime($level['uploadDate']).($level['updateDate'] ? ":29:".Library::makeTime($level['updateDate']) : "").":30:".$level["original"].":31:".$level['twoPlayer'].":37:".$level["coins"].":38:".$level["starCoins"].":39:".$level["requestedStars"].":46:".$level["wt"].":47:".$level["wt2"].":40:".$level["isLDM"].":35:".$level["songID"]."|";
 
 	if($level["songID"] != 0) {
@@ -204,6 +205,7 @@ if($showUnknownLevel && !$levels['count'] && $isIDSearch) {
 	
 	$levelsStatsArray[] = ["levelID" => $levelID, "stars" => 0, 'coins' => 0];
 	
+	if($gauntlet) $echoString .= "44:".$gauntlet.":";
 	$echoString = "1:".$levelID.":2:Unknown level:5:0:6:0:8:0:9:0:10:-1:12:1:13:".$gameVersion.":14:0:16:0:17:0:43:0:25:0:18:0:19:0:42:0:45:0:3:VGhpcyBsZXZlbCB3YXMgZGVsZXRlZCwgbmV2ZXIgZXhpc3RlZCBvciB5b3UgaGF2ZSBubyBhY2Nlc3MgdG8gaXQu:15:0:28:NA:30:0:31:0:37:0:38:0:39:0:46:0:47:0:40:0:35:0|";
 	$userString = '0:-:0|';
 }
