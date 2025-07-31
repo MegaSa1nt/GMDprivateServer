@@ -11,7 +11,7 @@ if(!$person["success"]) exit(CommonError::InvalidRequest);
 $userID = $person['userID'];
 
 $levelID = Escape::number($_POST['levelID']);
-$levelDesc = Library::escapeDescriptionCrash(Escape::text(Escape::url_base64_decode($_POST['levelDesc'])));
+$levelDesc = Library::escapeDescriptionCrash(Escape::text(Escape::url_base64_decode($_POST['levelDesc']), 500));
 
 $level = Library::getLevelByID($levelID);
 if(!$level || $level['userID'] != $userID || Security::checkFilterViolation($person, $levelDesc, 3) || Automod::isLevelsDisabled(0)) exit(CommonError::InvalidRequest);

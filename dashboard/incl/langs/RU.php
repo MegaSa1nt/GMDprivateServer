@@ -141,6 +141,8 @@ $language['errorListNotFound'] = 'Список уровней не найден!
 
 $language['errorGauntletAlreadyExists'] = 'Этот Гаунтлет уже существует!';
 
+$language['errorAccountNotFound'] = 'Аккаунт не был найден!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
 
@@ -460,4 +462,17 @@ $language['commentingLockListDesc'] = 'Если включить эту наст
 
 $language['gauntletType'] = 'Тип Гаунтлета';
 $language['chooseGauntletType'] = 'Выберите тип Гаунтлета...';
+
+$language['messagesPrivacyTitle'] = 'Приватность сообщений';
+$language['messagesPrivacyDesc'] = 'Кто может написать в личные сообщения?';
+$language['friendRequestsTitle'] = 'Заявки в друзья';
+$language['friendRequestsDesc'] = 'Кто может отправить заявку в друзья?';
+$language['commentHistoryTitle'] = 'Приватность истории комментариев';
+$language['commentHistoryDesc'] = 'Кто может посмотреть историю комментариев?';
+$language['youTubeChannel'] = 'Канал на YouTube';
+$language['twitterAccount'] = 'Аккаунт в X';
+$language['twitchChannel'] = 'Канал на Twitch';
+$language['timezone'] = 'Часовой пояс';
+$language['chooseTimezone'] = 'Выберите часовой пояс...';
+$language['none'] = 'Никто';
 ?>

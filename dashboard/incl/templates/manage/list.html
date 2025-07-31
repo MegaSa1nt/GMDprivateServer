@@ -137,36 +137,47 @@
 			</div>
 		</div>
 		
-		<div class="settingDescription">
-			<h2>
-				<i class="fa-solid fa-eye"></i>
-				%TEXT_listPrivacy%
-			</h2>
-			
-			<div class="select" dashboard-select="listPrivacy">
-				<input type="hidden" name="listPrivacy" value="%LIST_PRIVACY%" dashboard-change-default="%LIST_PRIVACY%" dashboard-select-value required>
-				<input type="text" placeholder="%TEXT_chooseListPrivacy%" value="%LIST_PRIVACY_NAME%" dashboard-change-default="%LIST_PRIVACY_NAME%" dashboard-select-input>
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-check"></i>
+					%TEXT_countForReward%
+				</h2>
 				
-				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+				<input class="inputStyle" type="number" name="countForReward" value="%LIST_LEVELS_COUNT%" autocomplete="gdps-dashboard-listCountForReward" dashboard-not-required dashboard-change-default placeholder="5" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-eye"></i>
+					%TEXT_listPrivacy%
 					
-				<div class="options" dashboard-select-options>
-					<div class="option" value="0" dashboard-select-option="%TEXT_publicList%">
-						<i class="fa-solid fa-eye"></i>
-						<text>%TEXT_publicList%</text>
-					</div>
+					<span class="infoIcon" title="%TEXT_onlyForFriends%" dashboard-select-type="listPrivacy" value="1">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<div class="select" dashboard-select="listPrivacy">
+					<input type="hidden" name="listPrivacy" value="%LIST_PRIVACY%" dashboard-change-default="%LIST_PRIVACY%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseListPrivacy%" value="%LIST_PRIVACY_NAME%" dashboard-change-default="%LIST_PRIVACY_NAME%" dashboard-select-input>
 					
-					<div class="option" value="1" dashboard-select-option="%TEXT_privateList%">
-						<i class="fa-solid fa-lock"></i>
-						<text>%TEXT_privateList%</text>
-					
-						<span class="infoIcon" title="%TEXT_onlyForFriends%">
-							<i class="fa-solid fa-circle-info"></i>
-						</span>
-					</div>
-					
-					<div class="option" value="2" dashboard-select-option="%TEXT_unlistedList%">
-						<i class="fa-solid fa-eye-slash"></i>
-						<text>%TEXT_unlistedList%</text>
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_publicList%">
+							<i class="fa-solid fa-eye"></i>
+							<text>%TEXT_publicList%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="%TEXT_privateList%">
+							<i class="fa-solid fa-lock"></i>
+							<text>%TEXT_privateList%</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="%TEXT_unlistedList%">
+							<i class="fa-solid fa-eye-slash"></i>
+							<text>%TEXT_unlistedList%</text>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -1,0 +1,122 @@
+<form class="wideBox" name="accountSettingsForm" dashboard-change-form>
+	<input type="hidden" name="accountID" value="%ACCOUNT_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-message"></i>
+					%TEXT_messagesPrivacyTitle%
+				</h2>
+				<h3>%TEXT_messagesPrivacyDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="messagesPrivacy" value="%MESSAGES_PRIVACY_VALUE%" dashboard-change-default="%MESSAGES_PRIVACY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_none%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_friends%">
+					<i class="fa-solid fa-user-group"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_all%">
+					<i class="fa-solid fa-people-group"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user-plus"></i>
+					%TEXT_friendRequestsTitle%
+				</h2>
+				<h3>%TEXT_friendRequestsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="friendRequests" value="%FRIEND_REQUESTS_VALUE%" dashboard-change-default="%FRIEND_REQUESTS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_none%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_all%">
+					<i class="fa-solid fa-people-group"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comments"></i>
+					%TEXT_commentHistoryTitle%
+				</h2>
+				<h3>%TEXT_commentHistoryDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="commentHistory" value="%COMMENT_HISTORY_VALUE%" dashboard-change-default="%COMMENT_HISTORY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_none%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_friends%">
+					<i class="fa-solid fa-user-group"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_all%">
+					<i class="fa-solid fa-people-group"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-brands fa-youtube"></i>
+				%TEXT_youTubeChannel%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="youtube" value="%YOUTUBE_CHANNEL%" autocomplete="gdps-dashboard-youtube" dashboard-change-default dashboard-not-required placeholder="UCz_yk8mDSAnxJq0ar66L4sw" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-brands fa-x-twitter"></i>
+				%TEXT_twitterAccount%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="twitter" value="%TWITTER_ACCOUNT%" autocomplete="gdps-dashboard-twitter" dashboard-change-default dashboard-not-required placeholder="RobTopGames" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-brands fa-twitch"></i>
+				%TEXT_twitchChannel%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="twitch" value="%TWITCH_CHANNEL%" autocomplete="gdps-dashboard-twitch" dashboard-change-default dashboard-not-required placeholder="robtopgames" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-clock"></i>
+				%TEXT_timezone%
+			</h2>
+			
+			<div class="select" dashboard-select="timezone">
+				<input type="hidden" name="timezone" value="%TIMEZONE_VALUE%" dashboard-change-default="%TIMEZONE_VALUE%" dashboard-select-value required>
+				<input type="text" placeholder="%TEXT_chooseTimezone%" value="%TIMEZONE_NAME%" dashboard-change-default="%TIMEZONE_NAME%" dashboard-select-input>
+					
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+					
+				<div class="options" dashboard-select-options>%TIMEZONE_ELEMENTS%</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageAccount', 'accountSettingsForm')">%TEXT_applySettings%</button>
+	</div>
+</form>

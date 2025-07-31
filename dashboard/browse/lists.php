@@ -216,6 +216,8 @@ if($_GET['id']) {
 				'LIST_PRIVACY' => $listPrivacy,
 				'LIST_PRIVACY_NAME' => $listPrivacyName,
 				
+				'LIST_LEVELS_COUNT' => $list['countForReward'],
+				
 				'LIST_LEVELS' => $listLevels,
 				'LIST_LEVELS_OPTIONS' => $listLevelsElements,
 				

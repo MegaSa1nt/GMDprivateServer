@@ -1825,7 +1825,8 @@ span.background {
 	background: #86868624 !important;
 }
 
-.option.hide {
+.option.hide,
+.infoIcon.hide {
 	display: none;
 }
 
@@ -2700,4 +2701,70 @@ progress::-webkit-progress-value {
 	100% {
 		text-indent: var(--text-width);
 	}
+}
+
+a {
+	color: white;
+	
+	text-decoration: none;
+}
+
+.toggleExtra {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	cursor: pointer;
+	
+	padding: 0px;
+	
+	background-color: var(--href-shadow-color);
+	box-shadow: 0px 0px 20px var(--href-shadow-color);
+	
+	border-radius: 500px;
+	padding: 10px;
+	
+	height: max-content;
+	
+	transition: 0.2s;
+}
+
+.toggleExtra::after {
+	content: '';
+	position: absolute;
+	
+	width: 40px;
+	
+	background-color: var(--href-color);
+	box-shadow: 0px 0px 20px var(--href-shadow-color);
+	border: 1px solid #86868634;
+	
+	border-radius: 500px;
+	
+	aspect-ratio: 1 / 1;
+	
+	transition: 0.2s;
+	transform: translateX(calc((100% - 2.5px) * var(--toggle-value)));
+	
+	z-index: -1;
+}
+
+.toggleExtraOption {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	outline: none;
+	padding: 5px;
+	
+	font-size: 20px;
+	
+	width: 40px;
+	height: 40px;
+	
+	transition: 0.2s;
+}
+
+.toggleExtraOption.checked {
+	color: black;
 }

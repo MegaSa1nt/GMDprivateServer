@@ -196,6 +196,42 @@ switch($parameters[1]) {
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/sfxs', $additionalData);
 		$pageBase = "../../";
 		break;
+	case 'settings':
+		$timezones = Dashboard::getTimezones();
+		$timezoneNames = [];
+		$timezoneElements = '';
+		
+		foreach($timezones AS $timezone => $offset) {
+			$offsetPrefix = $offset < 0 ? '-' : '+';
+			$offsetDormatted = gmdate('H:i', abs($offset));
+
+			$prettyOffset = "UTC".$offsetPrefix.$offsetDormatted;
+			$timezoneNames[$timezone] = $timezone.' ('.$prettyOffset.')';
+
+			$timezoneElements .= '<div class="option" value="'.$timezone.'" dashboard-select-option="'.$timezone.' ('.$prettyOffset.')">
+					<text>'.$timezone.' ('.$prettyOffset.')</text>
+				</div>';
+		}
+		
+		$additionalData = [
+			'ACCOUNT_ID' => $account['accountID'],
+			
+			'MESSAGES_PRIVACY_VALUE' => $account['mS'],
+			'FRIEND_REQUESTS_VALUE' => $account['frS'],
+			'COMMENT_HISTORY_VALUE' => $account['cS'],
+			
+			'YOUTUBE_CHANNEL' => htmlspecialchars($account['youtubeurl']),
+			'TWITTER_ACCOUNT' => htmlspecialchars($account['twitter']),
+			'TWITCH_CHANNEL' => htmlspecialchars($account['twitch']),
+			
+			'TIMEZONE_VALUE' => htmlspecialchars($account['timezone']),
+			'TIMEZONE_NAME' => htmlspecialchars($timezoneNames[$account['timezone']]),
+			'TIMEZONE_ELEMENTS' => $timezoneElements
+		];
+		
+		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/account', $additionalData);
+		$pageBase = "../../";
+		break;
 	case '': // User posts
 		$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 		$sortMode = $mode ? "acccomments.likes - acccomments.dislikes" : "acccomments.timestamp";
@@ -257,6 +293,15 @@ $user['PROFILE_ROLE'] = htmlspecialchars($userMetadata["userAppearance"]['roleNa
 $user['PROFILE_HAS_RANK'] = $userRank > 0 ? 'true' : 'false';
 $user['PROFILE_IS_TOP_100'] = $userRank <= 100 ? 'true' : 'false';
 $user['PROFILE_RANK'] = $userRank;
+
+$user['PROFILE_HAS_YOUTUBE_CHANNEL'] = !empty($account['youtubeurl']) ? 'true' : 'false';
+$user['PROFILE_HAS_TWITTER_ACCOUNT'] = !empty($account['twitter']) ? 'true' : 'false';
+$user['PROFILE_HAS_TWITCH_CHANNEL'] = !empty($account['twitch']) ? 'true' : 'false';
+$user['PROFILE_HAS_DISCORD_ACCOUNT'] = !empty($account['discordID']) && !$account['discordLinkReq'] ? 'true' : 'false';
+$user['PROFILE_YOUTUBE_CHANNEL'] = htmlspecialchars($account['youtubeurl']);
+$user['PROFILE_TWITTER_ACCOUNT'] = htmlspecialchars($account['twitter']);
+$user['PROFILE_TWITCH_CHANNEL'] = htmlspecialchars($account['twitch']);
+$user['PROFILE_DISCORD_ACCOUNT'] = !$account['discordLinkReq'] ? htmlspecialchars($account['discordID']) : '';
 
 $user['PROFILE_MAIN_ICON_URL'] = $iconKit['main'];
 $user['PROFILE_ICON_CUBE'] = $iconKit['cube'];

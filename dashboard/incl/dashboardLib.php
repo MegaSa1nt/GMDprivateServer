@@ -358,6 +358,32 @@ class Dashboard {
 		return $json;
 	}
 	
+	public static function getTimezones() {
+		static $regions = array(
+			DateTimeZone::AFRICA,
+			DateTimeZone::AMERICA,
+			DateTimeZone::ANTARCTICA,
+			DateTimeZone::ASIA,
+			DateTimeZone::ATLANTIC,
+			DateTimeZone::AUSTRALIA,
+			DateTimeZone::EUROPE,
+			DateTimeZone::INDIAN,
+			DateTimeZone::PACIFIC,
+		);
+
+		$timezones = $timezoneOffsets = $timezoneList = [];
+		foreach($regions AS &$region) $timezones = array_merge($timezones, DateTimeZone::listIdentifiers($region));
+
+		foreach($timezones AS &$timezone) {
+			$tz = new DateTimeZone($timezone);
+			$timezoneOffsets[$timezone] = $tz->getOffset(new DateTime);
+		}
+
+		asort($timezoneOffsets);
+		
+		return $timezoneOffsets;
+	}
+	
 	/*
 		Render pages
 	*/

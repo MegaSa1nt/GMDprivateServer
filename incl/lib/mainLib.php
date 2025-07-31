@@ -357,18 +357,17 @@ class Library {
 		return $commentID;
 	}
 	
-	public static function updateAccountSettings($person, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch) {
+	public static function updateAccountSettings($person, $accountID, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch) {
 		require __DIR__."/connection.php";
 		
 		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
 		
-		$accountID = $person['accountID'];
-		
 		$updateAccountSettings = $db->prepare("UPDATE accounts SET mS = :messagesState, frS = :friendRequestsState, cS = :commentsState, youtubeurl = :socialsYouTube, twitter = :socialsTwitter, twitch = :socialsTwitch WHERE accountID = :accountID");
 		$updateAccountSettings->execute([':accountID' => $accountID, ':messagesState' => $messagesState, ':friendRequestsState' => $friendRequestsState, ':commentsState' => $commentsState, ':socialsYouTube' => $socialsYouTube, ':socialsTwitter' => $socialsTwitter, ':socialsTwitch' => $socialsTwitch]);
 		
-		self::logAction($person, Action::ProfileSettingsChange, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch);
-		
+		if($person['accountID'] == $accountID) self::logAction($person, Action::ProfileSettingsChange, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch);
+		else self::logModeratorAction($person, ModeratorAction::ProfileSettingsChange, $accountID, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch);
+			
 		return true;
 	}
 	
@@ -1679,6 +1678,15 @@ class Library {
 		$friendsArray[] = $accountID;
 		
 		return "'".implode("','", $friendsArray)."'";
+	}
+	
+	public static function updateAccountTimezone($accountID, $timezone) {
+		require __DIR__."/connection.php";
+		
+		$updateTimezone = $db->prepare("UPDATE accounts SET timezone = :timezone WHERE accountID = :accountID");
+		$updateTimezone->execute([':accountID' => $accountID, ':timezone' => $timezone]);
+		
+		return true;
 	}
 	
 	/*

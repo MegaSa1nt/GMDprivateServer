@@ -141,6 +141,8 @@ $language['errorListNotFound'] = 'List wasn\'t found!';
 
 $language['errorGauntletAlreadyExists'] = 'This Gauntlet already exists!';
 
+$language['errorAccountNotFound'] = 'Account wasn\'t found!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
 
@@ -460,4 +462,17 @@ $language['commentingLockListDesc'] = 'If you enable this setting, players would
 
 $language['gauntletType'] = 'Gauntlet type';
 $language['chooseGauntletType'] = 'Choose Gauntlet type...';
+
+$language['messagesPrivacyTitle'] = 'Messages privacy';
+$language['messagesPrivacyDesc'] = 'Who is able to send messages?';
+$language['friendRequestsTitle'] = 'Friend requests';
+$language['friendRequestsDesc'] = 'Who is able to send friend requests?';
+$language['commentHistoryTitle'] = 'Comment history privacy';
+$language['commentHistoryDesc'] = 'Who is able to see comment history?';
+$language['youTubeChannel'] = 'YouTube channel';
+$language['twitterAccount'] = 'X account';
+$language['twitchChannel'] = 'Twitch channel';
+$language['timezone'] = 'Timezone';
+$language['chooseTimezone'] = 'Choose timezone...';
+$language['none'] = 'None';
 ?>

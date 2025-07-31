@@ -50,6 +50,9 @@ if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['l
 	
 	if($levelsArray['count'] != count($newLevelsArray)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorMultipleLevelsNotFound"), "error"));
 	
+	$newLevelsCount = Security::limitValue(0, abs(Escape::number($_POST['countForReward']) ?: 0), count($newLevelsArray));
+	if(!$newLevelsCount || !$newDiamonds) $newLevelsCount = $newDiamonds ? count($newLevelsArray) : 0;
+	
 	$newUpdatesLock = isset($_POST['updatesLock']) ? 1 : 0;
 	$newCommentingLock = isset($_POST['commentingLock']) ? 1 : 0;
 	
@@ -59,8 +62,9 @@ if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['l
 	
 	if($list['starStars'] != $newDiamonds ||
 		$list['starDifficulty'] != $newDifficulty ||
-		$list['starFeatured'] != $newListRateType
-	) Library::rateList($listID, $person, $newDiamonds, $newDifficulty, $newListRateType, $levelsCount);
+		$list['starFeatured'] != $newListRateType ||
+		$list['countForReward'] != $newLevelsCount
+	) Library::rateList($listID, $person, $newDiamonds, $newDifficulty, $newListRateType, $newLevelsCount);
 	
 	if($list['unlisted'] != $newListPrivacy) Library::changeListPrivacy($listID, $person, $newListPrivacy);
 	

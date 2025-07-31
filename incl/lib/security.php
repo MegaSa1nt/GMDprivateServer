@@ -46,7 +46,7 @@ class Security {
 			}
 		}
 		
-		if($account["isActive"] == "0") return ["success" => false, "error" => LoginError::AccountIsNotActivated, "accountID" => (string)$accountID, "IP" => $IP];
+		if(!$account["isActive"]) return ["success" => false, "error" => LoginError::AccountIsNotActivated, "accountID" => (string)$accountID, "IP" => $IP];
 		
 		$userID = Library::getUserID($accountID);
 		
@@ -73,6 +73,17 @@ class Security {
 			
 			Library::logAction($logPerson, Action::GJPSessionGrant);
 		}
+		
+		if(!$account['timezone']) {
+			$IPInfo = file_get_contents('http://ip-api.com/json/'.$IP);
+			$IPInfoJSON = json_decode($IPInfo, true);
+			
+			$account['timezone'] = $IPInfoJSON && $IPInfoJSON['timezone'] ? Escape::text($IPInfoJSON['timezone']) : 'America/Danmarkshavn'; // UTC +0 fallback
+			
+ 			Library::updateAccountTimezone($accountID, $account['timezone']);
+		}
+		
+		date_default_timezone_set($account['timezone']);
 		
 		return ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => (string)$userName, "IP" => $IP];
 	}

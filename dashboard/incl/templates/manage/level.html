@@ -313,6 +313,10 @@
 				<h2>
 					<i class="fa-solid fa-eye"></i>
 					%TEXT_levelPrivacy%
+					
+					<span class="infoIcon hide" title="%TEXT_onlyForFriends%" dashboard-select-type="levelPrivacy" value="1">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
 				</h2>
 				
 				<div class="select" dashboard-select="levelPrivacy">
@@ -330,10 +334,6 @@
 						<div class="option" value="1" dashboard-select-option="%TEXT_privateLevel%">
 							<i class="fa-solid fa-lock"></i>
 							<text>%TEXT_privateLevel%</text>
-						
-							<span class="infoIcon" title="%TEXT_onlyForFriends%">
-								<i class="fa-solid fa-circle-info"></i>
-							</span>
 						</div>
 						
 						<div class="option" value="2" dashboard-select-option="%TEXT_unlistedLevel%">

@@ -13,11 +13,11 @@ window.addEventListener('load', () => {
 	
 	dashboardBody.classList.add("hide");
 	
+	window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
+	
 	loadAudioPlayer();
 	updatePage();
 	updateNavbar();
-	
-	window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
 	
 	window.addEventListener("popstate", (event) => getPage(event.target.location.href, true));
 	window.addEventListener("wheel", () => document.querySelector("[dashboard-context-menu].show")?.classList.remove("show"));
@@ -155,8 +155,10 @@ async function updateNavbar() {
 	navbarButtons.forEach(navbarButton => {
 		const href = navbarButton.getAttribute("href");
 		const dropdown = navbarButton.getAttribute("dashboard-dropdown");
+		
+		const pageHref = decodeURIComponent(window.location.href).substr(window.baseURL.href.length);
 
-		if(href != null && ((decodeURIComponent(window.location.href).endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) navbarButton.classList.add("current");
+		if(href != null && ((href.length && href == pageHref) || (!href.length && dashboardBase.getAttribute("href") == './'))) navbarButton.classList.add("current");
 		
 		if(dropdown != null) {
 			const navbarDropdown = document.querySelector("#" + dropdown + " .dropdown-items");
@@ -280,6 +282,28 @@ async function updatePage() {
 					openNewTab.click();
 					break;
 			}
+		});
+		
+		element.addEventListener("mousedown", async (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			
+			return false;
+		});
+	});
+	
+	const hrefNewTabElements = document.querySelectorAll('[dashboard-href-new-tab]');
+	hrefNewTabElements.forEach(async (element) => {
+		const href = element.getAttribute("dashboard-href-new-tab");
+		
+		element.addEventListener("mouseup", async (event) => {
+			if(event.button == 2) return false;
+			
+			const openNewTab = document.createElement("a");
+			
+			openNewTab.href = href;
+			openNewTab.target = "_blank";
+			openNewTab.click();
 		});
 		
 		element.addEventListener("mousedown", async (event) => {
@@ -511,7 +535,7 @@ async function updatePage() {
 				return;
 			}
 			
-			const searchValueSplit = "(" + searchValue.replaceAll(" ", ")(?=.*") + ")";
+			const searchValueSplit = "(" + escapeRegex(searchValue).replaceAll(" ", ")(?=.*") + ")";
 			const searchValueRegex = new RegExp(searchValueSplit, 'gi');
 			
 			selectOptions.forEach(async (selectOption) => {
@@ -854,6 +878,31 @@ async function updatePage() {
 		
 		element.oninput = (event) => element.style = `--href-shadow-color: ${event.target.value}61`;
 	});
+	
+	const extraToggleElements = document.querySelectorAll("[dashboard-extra-toggle]");
+	extraToggleElements.forEach(async (element) => {
+		const inputElement = element.querySelector("input");
+		
+		const buttonElements = element.querySelectorAll("button");
+		var i = -1;
+		buttonElements.forEach(async (buttonElement) => {
+			i++;
+			const buttonValue = buttonElement.getAttribute("value");
+			const buttonIndex = i;
+			
+			buttonElement.onclick = () => {
+				buttonElements.forEach(async (removeButtonStyle) => removeButtonStyle.classList.remove("checked"));
+				buttonElement.classList.add("checked");
+				
+				inputElement.value = buttonValue;
+				element.style = `--toggle-value: ${buttonIndex};`;
+				
+				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+			}
+		});
+		
+		if(inputElement.value.length) element.querySelector(`button[value="${inputElement.value}"]`).click();
+	});
 }
 
 function timeConverter(timestamp, textStyle = "short") {
@@ -1107,7 +1156,6 @@ async function resetSettings() {
 		var defaultValue = element.getAttribute("dashboard-change-default");
 		if(!defaultValue.length) defaultValue = element.getAttribute("value");
 		
-		
 		if(inputType != "checkbox" || inputType == 'checkbox' && ((defaultValue == false && element.checked) || (defaultValue == true && !element.checked))) element.click();
 		element.value = defaultValue;
 		
@@ -1120,30 +1168,39 @@ async function resetSettings() {
 			if(selectElement != null) selectElement.click();
 		}
 		
-		const selectMultipleCheck = settingsFormElement.querySelectorAll("[dashboard-select-multiple-list]");
-		selectMultipleCheck.forEach((element) => {
-			const searchID = element.getAttribute("dashboard-select-multiple-list");
-			
-			const selectBadElements = element.querySelectorAll(".option:not([dashboard-select-multiple-option])");
-			selectBadElements.forEach((element) => element.remove());
-			
-			const selectElements = element.querySelectorAll(".option");
-			
-			searchLists[searchID] = [];
-			
-			selectElements.forEach((element) => {
-				element.style = "";
-				
-				searchLists[searchID].push(element.getAttribute("value"));
-			});
-		})
-		
-		const selectColorCheck = settingsFormElement.querySelectorAll("input[type='color']");
-		selectColorCheck.forEach((element) => element.style = `--href-shadow-color: ${element.value}61`);
 	});
+	
+	const selectMultipleCheck = settingsFormElement.querySelectorAll("[dashboard-select-multiple-list]");
+	selectMultipleCheck.forEach((element) => {
+		const searchID = element.getAttribute("dashboard-select-multiple-list");
+		
+		const selectBadElements = element.querySelectorAll(".option:not([dashboard-select-multiple-option])");
+		selectBadElements.forEach((element) => element.remove());
+		
+		const selectElements = element.querySelectorAll(".option");
+		
+		searchLists[searchID] = [];
+		
+		selectElements.forEach((element) => {
+			element.style = "";
+			
+			searchLists[searchID].push(element.getAttribute("value"));
+		});
+	})
+	
+	const selectColorCheck = settingsFormElement.querySelectorAll("input[type='color']");
+	selectColorCheck.forEach((element) => element.style = `--href-shadow-color: ${element.value}61`);
 	
 	const saveSettingsButtonsDiv = document.querySelector("[dashboard-change-buttons]");
 	if(saveSettingsButtonsDiv != null) saveSettingsButtonsDiv.classList.remove("show");
+	
+	const extraToggleCheck = settingsFormElement.querySelectorAll("[dashboard-extra-toggle]:has(input[dashboard-change-default])");
+	extraToggleCheck.forEach((element) => {
+		const inputElement = element.querySelector("input[dashboard-change-default]");
+		inputElement.value = inputElement.getAttribute("dashboard-change-default");
+		
+		element.querySelector(`button[value="${inputElement.value}"]`).click();
+	});
 }
 
 async function addEmojiToInput(emojiName) {
@@ -1365,4 +1422,8 @@ async function downloadLevel(levelID) {
 		
 		dashboardLoader.classList.add("hide");
 	}
+}
+
+function escapeRegex(string) { // https://stackoverflow.com/a/3561711
+	return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 }
