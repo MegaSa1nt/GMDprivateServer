@@ -71,7 +71,7 @@ foreach($gauntletNames AS $index => $gauntletName) {
 $dataArray = [
 	'ADD_GAUNTLET_TYPES' => $gauntletElements,
 	
-	'ADD_GAUNTLET_BUTTON_ONCLICK' => "postPage('upload/gauntlet', 'addGauntletForm')"
+	'ADD_GAUNTLET_BUTTON_ONCLICK' => "postPage('upload/gauntlet', 'addGauntletForm', 'box')"
 ];
 
 exit(Dashboard::renderPage("upload/gauntlet", Dashboard::string("addGauntletTitle"), "../", $dataArray));

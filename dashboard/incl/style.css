@@ -240,8 +240,108 @@ body.hide nav button .navbar-hide {
 	padding: 190px 45px 50px 50px;
 }
 
+.dashboard-page.hide {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.dashboard-page.skeleton {
+	position: absolute;
+	box-sizing: border-box;
+	
+	width: calc(100vw - 340px);
+	height: 100vh;
+	
+	padding: 50px;
+	
+	overflow: hidden;
+	
+	top: 0px;
+	left: 0px;
+	
+	pointer-events: none;
+	
+	z-index: 5;
+}
+
+.dashboard-page.skeleton:has(.wideBox) {
+	align-items: flex-start;
+	padding: 190px 50px 50px 50px;
+}
+
+.dashboard-page.skeleton .head {
+	gap: 10px;
+}
+
+.dashboard-page.skeleton .head span {
+	height: 22px;
+	width: 250px;
+	
+	background: linear-gradient(90deg, #86868614 0%, #86868624 50%, #86868614 100%);
+	border: 1px solid #86868624;
+	background-size: 50%;
+	
+	padding: 10px 15px;
+	border-radius: 50px;
+}
+
+.dashboard-page.skeleton .head span.description {
+	height: 12px;
+	width: 150px;
+}
+
+.dashboard-page.skeleton .box {
+	min-width: 35%;
+	min-height: 40%;
+	
+	background: linear-gradient(90deg, #86868614 0%, #86868624 50%, #86868614 100%);
+	background-size: 50%;
+}
+
+.dashboard-page.skeleton .contentDiv {
+	min-height: 235px;
+	
+	background: linear-gradient(90deg, #86868614 0%, #86868624 50%, #86868614 100%);
+	background-size: 50%;
+}
+
+.dashboard-page.skeleton .commentsDiv .contentDiv {
+	min-height: 140px;
+	
+	background: linear-gradient(90deg, #86868614 0%, #86868624 50%, #86868614 100%);
+	background-size: 50%;
+}
+
+.dashboard-page.skeleton .levelStats .levelStat {
+	min-height: 65px;
+	
+	background-color: transparent !important;
+	background: linear-gradient(90deg, #86868614 0%, #86868624 50%, #86868614 100%);
+	background-size: 50%;
+}
+
+.skeletonAnimation {
+	animation: skeleton-animation;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+@keyframes skeleton-animation {
+	0% {
+		background-position: 0%;
+	}
+	100% {
+		background-position: 100%;
+	}
+}
+
 body.hide .dashboard-page {
 	margin-left: 111px;
+}
+
+body.hide .dashboard-page.skeleton {
+	width: calc(100vw - 111px);
 }
 
 .box {

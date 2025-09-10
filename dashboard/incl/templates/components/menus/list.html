@@ -6,7 +6,7 @@
 	
 	<hr dashboard-show="%MENU_SHOW_NAME%">
 	
-	<button class="contextMenuButton" title="%TEXT_viewList%" type="button" href="browse/lists/%MENU_ID%">
+	<button class="contextMenuButton" title="%TEXT_viewList%" type="button" href="browse/lists/%MENU_ID%" dashboard-loader-type="settings">
 		<i class="fa-solid fa-eye"></i>
 		<text>%TEXT_viewList%</text>
 	</button>
@@ -18,19 +18,19 @@
 	
 	<hr>
 	
-	<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/lists/%MENU_ID%/comments">
+	<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/lists/%MENU_ID%/comments" dashboard-loader-type="settings">
 		<i class="fa-solid fa-comment"></i>
 		<text>%TEXT_viewComments%</text>
 	</button>
 	
 	<hr dashboard-show="%MENU_SHOW_MANAGE_HR%">
 	
-	<button class="contextMenuButton" title="%TEXT_manageList%" type="button" href="browse/lists/%MENU_ID%/manage" dashboard-show="%MENU_CAN_MANAGE%">
+	<button class="contextMenuButton" title="%TEXT_manageList%" type="button" href="browse/lists/%MENU_ID%/manage" dashboard-loader-type="settings" dashboard-show="%MENU_CAN_MANAGE%">
 		<i class="fa-solid fa-pencil"></i>
 		<text>%TEXT_manageList%</text>
 	</button>
 	
-	<button class="contextMenuButton" title="%TEXT_deleteList%" type="button" href="browse/lists/%MENU_ID%/delete" dashboard-show="%MENU_CAN_DELETE%" style="--button-color: #ff9999;">
+	<button class="contextMenuButton" title="%TEXT_deleteList%" type="button" href="browse/lists/%MENU_ID%/delete" dashboard-loader-type="settings" dashboard-show="%MENU_CAN_DELETE%" style="--button-color: #ff9999;">
 		<i class="fa-solid fa-trash"></i>
 		<text>%TEXT_deleteList%</text>
 	</button>

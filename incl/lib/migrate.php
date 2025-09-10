@@ -377,7 +377,9 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageAutomod'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageAutomod` INT NOT NULL DEFAULT '0' AFTER `dashboardManageLevels`");
-	$db->query("ALTER TABLE `actions` CHANGE `value3` `value3` VARCHAR(255) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `actions` CHANGE `value` `value` VARCHAR(2048) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `actions` CHANGE `value2` `value2` VARCHAR(2048) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `actions` CHANGE `value3` `value3` VARCHAR(2048) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `actions` CHANGE `value4` `value4` VARCHAR(255) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `actions` CHANGE `value5` `value5` VARCHAR(255) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `actions` CHANGE `value6` `value6` VARCHAR(255) NOT NULL DEFAULT ''");
@@ -536,9 +538,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `lists` LIKE 'rateDate'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `lists` ADD `rateDate` INT NOT NULL DEFAULT '0' AFTER `updateDate`");
-	$check = $db->query("SHOW COLUMNS FROM `comments` LIKE 'creatorRating'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `comments` ADD `creatorRating` INT NOT NULL DEFAULT '0' AFTER `isSpam`");
 	$check = $db->query("SELECT count(*) FROM `accounts` WHERE auth = 'none'");
 		$exist = $check->fetchColumn();
 		if($exist) $db->query("UPDATE accounts SET auth = '' WHERE auth = 'none'");
@@ -557,17 +556,22 @@ if(!$installed) {
 			$db->query("ALTER TABLE `accounts` ADD `registerIP` VARCHAR(255) NOT NULL DEFAULT '' AFTER `registerDate`");
 			
 			// Filling IPs from actions table
-			$getIPs = $db->prepare("SELECT account, IP FROM actions WHERE type = 1");
+			$getIPs = $db->prepare("SELECT account, IP FROM actions WHERE type = 1 ORDER BY account ASC");
 			$getIPs->execute();
 			$getIPs = $getIPs->fetchAll();
 			
 			foreach($getIPs AS &$account) {
 				$fillIP = $db->prepare("UPDATE accounts SET registerIP = :registerIP WHERE accountID = :accountID");
 				$fillIP->execute([':registerIP' => $account['IP'], ':accountID' => $account['account']]);
+				
+				$fillActionsIP = $db->prepare("UPDATE actions_downloads SET accountID = :accountID WHERE ip = INET6_ATON(:IP) AND accountID = ''");
+				$fillActionsIP->execute([':IP' => $account['IP'], ':accountID' => $account['account']]);
+				$fillActionsIP = $db->prepare("UPDATE actions_likes SET accountID = :accountID WHERE ip = INET6_ATON(:IP) AND accountID = ''");
+				$fillActionsIP->execute([':IP' => $account['IP'], ':accountID' => $account['account']]);
 			}
 			
 			// Fill IPs of accounts before using newer version of my core
-			$getAccounts = $db->prepare("SELECT accountID FROM accounts WHERE registerIP = ''");
+			$getAccounts = $db->prepare("SELECT accountID FROM accounts WHERE registerIP = '' ORDER BY accountID ASC");
 			$getAccounts->execute();
 			$getAccounts = $getAccounts->fetchAll();
 			if($getAccounts) {
@@ -578,8 +582,27 @@ if(!$installed) {
 					
 					$fillIP = $db->prepare("UPDATE accounts SET registerIP = :registerIP WHERE accountID = :accountID");
 					$fillIP->execute([':registerIP' => $getIP, ':accountID' => $account['accountID']]);
+					
+					$fillActionsIP = $db->prepare("UPDATE actions_downloads SET accountID = :accountID WHERE ip = INET6_ATON(:IP) AND accountID = ''");
+					$fillActionsIP->execute([':IP' => $getIP, ':accountID' => $account['accountID']]);
+					$fillActionsIP = $db->prepare("UPDATE actions_likes SET accountID = :accountID WHERE ip = INET6_ATON(:IP) AND accountID = ''");
+					$fillActionsIP->execute([':IP' => $getIP, ':accountID' => $account['accountID']]);
 				}
 			}
+		}
+	
+	$check = $db->query("SHOW COLUMNS FROM `comments` LIKE 'creatorRating'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) {
+			$db->query("ALTER TABLE `comments` ADD `creatorRating` INT NOT NULL DEFAULT '0' AFTER `isSpam`");
+			$db->query("UPDATE comments JOIN (
+					SELECT commentID, IF(actions_likes.isLike = 1, 1, -1) AS creatorRating FROM actions_likes
+					INNER JOIN comments ON actions_likes.type = 2 AND actions_likes.itemID = comments.commentID
+					INNER JOIN levels ON comments.levelID = levels.levelID
+					INNER JOIN users ON levels.extID = users.extID GROUP BY commentID
+				) creatorRatings
+				SET comments.creatorRating = creatorRatings.creatorRating
+				WHERE comments.commentID = creatorRatings.commentID");
 		}
 	
 	$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'mailExpires'");
@@ -609,18 +632,41 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageClans'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageClans` INT NOT NULL DEFAULT '0' AFTER `dashboardManageLevels`");
-	$db->query("ALTER TABLE `accounts` CHANGE `auth` `auth` VARCHAR(64) NOT NULL DEFAULT ''");
-	$db->query("ALTER TABLE `accounts` CHANGE `mail` `mail` VARCHAR(64) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `accounts` CHANGE `auth` `auth` VARCHAR(66) NOT NULL DEFAULT ''");
+	$db->query("ALTER TABLE `accounts` CHANGE `mail` `mail` VARCHAR(66) NOT NULL DEFAULT ''");
 	$check = $db->query("SHOW COLUMNS FROM `lists` LIKE 'updateLocked'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `lists` ADD `updateLocked` INT NOT NULL DEFAULT '0' AFTER `unlisted`");
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandSetLevels'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandSetLevels` INT NOT NULL DEFAULT '0' AFTER `commandLockUpdating`");
+	$check = $db->query("SHOW COLUMNS FROM `levels` LIKE 'hasMagicString'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `levels` ADD `hasMagicString` INT NOT NULL DEFAULT '0' AFTER `levelInfo`");
+	$check = $db->query("SHOW COLUMNS FROM `actions_downloads` LIKE 'uploadDate'");
+		$exist = $check->fetchAll();
+		if(!empty($exist)) $db->query("ALTER TABLE `actions_downloads` ADD `timestamp` INT NOT NULL DEFAULT '0' AFTER `uploadDate`;
+			UPDATE `actions_downloads` SET timestamp = UNIX_TIMESTAMP(uploadDate);
+			ALTER TABLE `actions_downloads` DROP `uploadDate`;
+			
+			ALTER TABLE `actions_downloads` ADD `IP_temp` varchar(255) NOT NULL DEFAULT '' AFTER `ip`;
+			UPDATE `actions_downloads` SET IP_temp = INET6_NTOA(ip);
+			ALTER TABLE `actions_downloads` DROP `ip`;
+			ALTER TABLE `actions_downloads` CHANGE `IP_temp` `IP` varchar(255) NOT NULL DEFAULT '';");
+	$check = $db->query("SHOW COLUMNS FROM `actions_likes` LIKE 'uploadDate'");
+		$exist = $check->fetchAll();
+		if(!empty($exist)) $db->query("ALTER TABLE `actions_likes` ADD `timestamp` INT NOT NULL DEFAULT '0' AFTER `uploadDate`;
+			UPDATE `actions_likes` SET timestamp = UNIX_TIMESTAMP(uploadDate);
+			ALTER TABLE `actions_likes` DROP `uploadDate`;
+			
+			ALTER TABLE `actions_likes` ADD `IP_temp` varchar(255) NOT NULL DEFAULT '' AFTER `ip`;
+			UPDATE `actions_likes` SET IP_temp = INET6_NTOA(ip);
+			ALTER TABLE `actions_likes` DROP `ip`;
+			ALTER TABLE `actions_likes` CHANGE `IP_temp` `IP` varchar(255) NOT NULL DEFAULT '';");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];
-	$lines = array_slice($lines, 1 + 2);
+	$lines = array_slice($lines, 3);
 	$lines = array_merge(array($first_line, "\n"), $lines);
 	$file = fopen(__DIR__.'/../../config/dashboard.php', 'w');
 	if($file) {

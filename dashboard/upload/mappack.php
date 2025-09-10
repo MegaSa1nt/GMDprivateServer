@@ -58,7 +58,7 @@ if(isset($_POST['mapPackName']) && isset($_POST['levels'])) {
 }
 
 $dataArray = [
-	'ADD_MAPPACK_BUTTON_ONCLICK' => "postPage('upload/mappack', 'addMapPackForm')"
+	'ADD_MAPPACK_BUTTON_ONCLICK' => "postPage('upload/mappack', 'addMapPackForm', 'box')"
 ];
 
 exit(Dashboard::renderPage("upload/mappack", Dashboard::string("addMapPackTitle"), "../", $dataArray));

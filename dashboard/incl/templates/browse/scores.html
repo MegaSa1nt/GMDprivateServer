@@ -1,19 +1,19 @@
 <div class="horisontal" dashboard-page-buttons>
 	<div class="horisontal" dashboard-show="%SCORE_ENABLE_FILTERS%">
 		<div class="modeButtons">
-			<button type="button" title="%TEXT_friends%" onclick="getPage('@page=REMOVE_QUERY&type=REMOVE_QUERY')"><i class="fa-solid fa-user-group"></i></button>
-			<button type="button" title="%TEXT_all%" onclick="getPage('@page=REMOVE_QUERY&type=1')"><i class="fa-solid fa-globe"></i></button>
-			<button type="button" title="%TEXT_forWeek%" onclick="getPage('@page=REMOVE_QUERY&type=2')"><i class="fa-solid fa-calendar-week"></i></button>
+			<button type="button" title="%TEXT_friends%" onclick="getPage('@page=REMOVE_QUERY&type=REMOVE_QUERY', 'settings')"><i class="fa-solid fa-user-group"></i></button>
+			<button type="button" title="%TEXT_all%" onclick="getPage('@page=REMOVE_QUERY&type=1', 'settings')"><i class="fa-solid fa-globe"></i></button>
+			<button type="button" title="%TEXT_forWeek%" onclick="getPage('@page=REMOVE_QUERY&type=2', 'settings')"><i class="fa-solid fa-calendar-week"></i></button>
 		</div>
 		
 		<div class="modeButtons" dashboard-show="%SCORE_IS_PLATFORMER%">
-			<button type="button" title="%TEXT_sortByTime%" onclick="getPage('@page=REMOVE_QUERY&mode=REMOVE_QUERY')"><i class="fa-solid fa-clock"></i></button>
-			<button type="button" title="%TEXT_sortByPoints%" onclick="getPage('@page=REMOVE_QUERY&mode=1')"><i class="fa-solid fa-circle-dot"></i></button>
+			<button type="button" title="%TEXT_sortByTime%" onclick="getPage('@page=REMOVE_QUERY&mode=REMOVE_QUERY', 'settings')"><i class="fa-solid fa-clock"></i></button>
+			<button type="button" title="%TEXT_sortByPoints%" onclick="getPage('@page=REMOVE_QUERY&mode=1', 'settings')"><i class="fa-solid fa-circle-dot"></i></button>
 		</div>
 		
 		<div class="modeButtons">
-			<button dashboard-show="%SCORE_IS_DAILY%" type="button" title="%TEXT_normalScores%" onclick="getPage('@page=REMOVE_QUERY&isDaily=REMOVE_QUERY')"><i class="fa-solid fa-gamepad"></i></button>
-			<button dashboard-hide="%SCORE_IS_DAILY%" type="button" title="%TEXT_dailyScores%" onclick="getPage('@page=REMOVE_QUERY&isDaily=1')"><i class="fa-solid fa-sun"></i></button>
+			<button dashboard-show="%SCORE_IS_DAILY%" type="button" title="%TEXT_normalScores%" onclick="getPage('@page=REMOVE_QUERY&isDaily=REMOVE_QUERY', 'settings')"><i class="fa-solid fa-gamepad"></i></button>
+			<button dashboard-hide="%SCORE_IS_DAILY%" type="button" title="%TEXT_dailyScores%" onclick="getPage('@page=REMOVE_QUERY&isDaily=1', 'settings')"><i class="fa-solid fa-sun"></i></button>
 		</div>
 	</div>
 	

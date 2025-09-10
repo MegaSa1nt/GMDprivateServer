@@ -64,10 +64,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$clan['CLAN_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/clanposts', $additionalData);
@@ -111,10 +111,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$clan['CLAN_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/accounts', $additionalData);

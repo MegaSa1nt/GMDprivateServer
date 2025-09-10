@@ -743,37 +743,27 @@ class Security {
         return $string;
     }
 	
-	public static function validateLevel($levelString, $version) { // Was made by 0x1DEA: https://github.com/Cvolton/GMDprivateServer/pull/1002
+	public static function validateLevel($levelString, $levelVersion) { // Was made by 0x1DEA: https://github.com/Cvolton/GMDprivateServer/pull/1002
 		require __DIR__.'/../../config/security.php';
-		require_once __DIR__.'/exploitPatch.php';
 		
 		try {
-			$data = $levelString;
-
-			// Decode (strict mode) if falsy then
-			$decoded = Escape::url_base64_decode($levelString);
-			if($decoded !== false) $data = $decoded;
-
-			// Check for zlib magic
-			$magic = bin2hex(substr($data, 0, 3));
-			if($magic === '1f8b08' || substr($magic, 0, 2) === '78') {
-				$data = zlib_decode($data, $maxUncompressedLevelSize);
-				if(!$data) return false;
-			}
+			$data = self::decodeLevelString($levelString);
 			
-			if(!$enableACEExploitCheck || strlen($data) > $maxUncompressedLevelSize) return false;			
+			if(!$data || strlen($data) > $maxUncompressedLevelSize) return false;			
+			
+			if(!$enableACEExploitCheck) return true;
 			
 			// Check if result invalid (any character outside ascii range). Better heuristic for detecting junk?
 			if(preg_match('/[^\x20-\x7e]/', $data)) return false;
 			
-			$objs = explode(';', $data);
+			$levelObjects = explode(';', $data);
 			// Skip level header
-			for($i = 1; $i < count($objs); $i++) {
-				$obj = self::mapGDString($objs[$i], ',');
+			for($i = 1; $i < count($levelObjects); $i++) {
+				$levelObject = self::mapGDString($levelObjects[$i], ',');
 				// Clamp groups based on version
-				if(array_key_exists(80, $obj)) {
-					$id = (int)$obj[80];
-					if($id > ($version > 21 ? 9999 : 1099) || $id < 0) return false;
+				if(array_key_exists(80, $levelObject)) {
+					$triggerGroupID = $levelObject[80];
+					if(!is_numeric($triggerGroupID) || $triggerGroupID > ($levelVersion > 21 ? 9999 : 1099) || $triggerGroupID < 0) return false;
 				}
 			}
 		} catch (Exception $e) {
@@ -781,6 +771,78 @@ class Security {
 		}
 
 		return true;
+	}
+	
+	public static function decodeLevelString($levelString) {
+		require __DIR__.'/../../config/security.php';
+		require_once __DIR__.'/exploitPatch.php';
+		
+		if(substr($levelString, 0, 2) == 'kS') return $levelString;
+		
+		$decoded = Escape::url_base64_decode($levelString);
+		if($decoded !== false) $levelString = $decoded;
+		
+		$magic = bin2hex(substr($levelString, 0, 3));
+		if($magic == '1f8b08' || substr($magic, 0, 2) == '78') {
+			$levelString = zlib_decode($levelString, $maxUncompressedLevelSize);
+			if(!$levelString) return false;
+		}
+		
+		return $levelString;
+	}
+	
+	public static function encodeLevelString($levelString) {
+		require_once __DIR__.'/exploitPatch.php';
+		
+		$levelString = self::decodeLevelString($levelString);
+		if(!$levelString) return false;
+		
+		return Escape::url_base64_encode(gzencode($levelString));
+	}
+	
+	public static function insertMagicString($levelString, $gdpsURL, $levelID, $accountID) {
+		require __DIR__.'/../../config/security.php';
+		require_once __DIR__.'/exploitPatch.php';
+		require_once __DIR__.'/XOR.php';
+		
+		$magicString = '';
+		
+		$levelString = self::decodeLevelString($levelString);
+		if(!$levelString) return $levelString;
+		
+		$gdpsURLParsed = parse_url($gdpsURL);
+		$gdpsHost = $gdpsURLParsed["host"];
+		
+		$magicString .= XORCipher::cipher($gdpsHost, 24157);
+		$magicString .= '|'.XORCipher::cipher($levelID, 24157);
+		$magicString .= '|'.XORCipher::cipher($accountID, 24157);
+		$magicString = Escape::url_base64_encode(Escape::url_base64_encode($magicString));
+		
+		$objectPlacement = rand(-2140000000, -2147483647);
+		$objectString = ';1,914,3,'.$objectPlacement.',128,0.001,129,0.001,31,'.$magicString;
+		
+		$levelObjects = explode(';', $levelString);
+		$levelMagicStringObject = rand(1, count($levelObjects) - 1);
+		
+		$levelObjects[$levelMagicStringObject] .= $objectString;
+		
+		$levelString = implode(";", $levelObjects);
+		
+		return self::encodeLevelString($levelString);
+	}
+	
+	public static function decodeMagicString($magicString) {
+		require_once __DIR__.'/exploitPatch.php';
+		require_once __DIR__.'/XOR.php';
+		
+		$magicString = Escape::url_base64_decode(Escape::url_base64_decode($magicString));
+		$magicStringArray = explode("|", $magicString);
+		
+		return [
+			'serverURL' => XORCipher::cipher($magicStringArray[0], 24157),
+			'levelID' => XORCipher::cipher($magicStringArray[1], 24157),
+			'accountID' => XORCipher::cipher($magicStringArray[2], 24157)
+		];
 	}
 }
 ?>

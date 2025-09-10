@@ -54,10 +54,10 @@ switch($parameters[1]) {
 				'IS_FIRST_PAGE' => 'true',
 				'IS_LAST_PAGE' => 'true',
 				
-				'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-				'PREVIOUS_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-				'NEXT_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-				'LAST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')"
+				'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+				'PREVIOUS_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+				'NEXT_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+				'LAST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')"
 			];
 			
 			$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/comments', $additionalData);
@@ -84,10 +84,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/comments', $additionalData);
@@ -124,10 +124,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/scores', $additionalData);
@@ -158,10 +158,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/songs', $additionalData);
@@ -187,10 +187,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/sfxs', $additionalData);
@@ -259,10 +259,10 @@ switch($parameters[1]) {
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
 			
-			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY')",
-			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."')",
-			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."')",
-			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."')"
+			'FIRST_PAGE_BUTTON' => "getPage('@page=REMOVE_QUERY', 'settings')",
+			'PREVIOUS_PAGE_BUTTON' => "getPage('@".(($pageNumber - 1) > 1 ? "page=".($pageNumber - 1) : 'page=REMOVE_QUERY')."', 'settings')",
+			'NEXT_PAGE_BUTTON' => "getPage('@page=".($pageNumber + 1)."', 'settings')",
+			'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'settings')"
 		];
 		
 		$user['PROFILE_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/posts', $additionalData);

@@ -7,7 +7,7 @@ require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
+if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(Library::checkPermission($person, "dashboardLevelPackCreate") && isset($_POST['mapPackID']) && isset($_POST['levels'])) {
 	$mapPackID = Escape::number($_POST['mapPackID']);
@@ -46,7 +46,7 @@ if(Library::checkPermission($person, "dashboardLevelPackCreate") && isset($_POST
 	
 	Library::changeMapPack($person, $mapPackID, $newMapPackName, $newStars, $newCoins, $newDifficulty, $newTextColor, $newBarColor, $newLevels);
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@', "settings"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

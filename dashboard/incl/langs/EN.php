@@ -247,7 +247,7 @@ $language['languageDesc'] = 'Dashboard has many languages, choose one you know m
 
 $language['notInClan'] = 'Not in clan';
 
-$language['songTitle'] = '<text class="big">%1$s</text> — <text class="big">%2$s</text>'; // %1$s — song author, %2$s — song title
+$language['songTitle'] = '<text class="big">%1$s</text> — <text class="big">%2$s</text>'; // %1$s — song artist, %2$s — song title
 $language['songID'] = 'Song ID';
 $language['usageCount'] = 'Usage';
 $language['favouritesCount'] = 'Favourites';
@@ -406,7 +406,7 @@ $language['registeredPlayer'] = 'Registered player';
 $language['unregisteredPlayer'] = 'Unregistered player';
 
 $language['levelName'] = 'Level name';
-$language['levelAuthor'] = 'Level author';
+$language['levelAuthor'] = 'Level creator';
 $language['levelDesc'] = 'Level description';
 $language['levelRateType'] = 'Level rate type';
 $language['chooseRateType'] = 'Choose level rate type...';
@@ -427,7 +427,7 @@ $language['chooseDifficulty'] = 'Choose difficulty...';
 $language['silverCoins'] = 'Silver coins';
 $language['silverCoinsDesc'] = 'Should coins on a level be silver';
 $language['updatesLock'] = 'Lock updates';
-$language['updatesLockDesc'] = 'If you enable this setting, level author won\'t be able to update this level anymore';
+$language['updatesLockDesc'] = 'If you enable this setting, level creator won\'t be able to update this level anymore';
 $language['commentingLock'] = 'Lock commenting';
 $language['commentingLockDesc'] = 'If you enable this setting, players wouldn\'t be able to comment on this level anymore';
 $language['passwordRemoveHint'] = 'Set 0 or nothing, if you want to remove password';
@@ -448,7 +448,7 @@ $language['textColor'] = 'Text color';
 $language['barColor'] = 'Bar color';
 
 $language['listName'] = 'List name';
-$language['listAuthor'] = 'List author';
+$language['listAuthor'] = 'List creator';
 $language['listDesc'] = 'List description';
 $language['listRateType'] = 'List rate type';
 $language['chooseListRateType'] = 'Choose list rate type...';
@@ -457,7 +457,7 @@ $language['chooseListPrivacy'] = 'Choose list privacy...';
 $language['publicList'] = 'Public list';
 $language['privateList'] = 'Private list';
 $language['unlistedList'] = 'Unlisted list';
-$language['updatesLockListDesc'] = 'If you enable this setting, list author won\'t be able to update this list anymore';
+$language['updatesLockListDesc'] = 'If you enable this setting, list creator won\'t be able to update this list anymore';
 $language['commentingLockListDesc'] = 'If you enable this setting, players wouldn\'t be able to comment on this list anymore';
 
 $language['gauntletType'] = 'Gauntlet type';
@@ -475,4 +475,9 @@ $language['twitchChannel'] = 'Twitch channel';
 $language['timezone'] = 'Timezone';
 $language['chooseTimezone'] = 'Choose timezone...';
 $language['none'] = 'None';
+
+$language['creatorRatingLevel'] = 'Level creator rating';
+$language['creatorRatingList'] = 'List creator rating';
+$language['creatorRatingLike'] = 'Creator liked';
+$language['creatorRatingDislike'] = 'Creator disliked';
 ?>

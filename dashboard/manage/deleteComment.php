@@ -7,7 +7,7 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
+if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(isset($_POST['commentID'])) {
 	$commentID = Escape::number($_POST['commentID']);
@@ -16,7 +16,7 @@ if(isset($_POST['commentID'])) {
 	$deleteComment = Library::deleteComment($person, $commentID);
 	if(!$deleteComment) exit(Dashboard::renderToast("xmark", Dashboard::string("errorCantDeleteComment"), "error"));
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successDeletedComment"), "success", '@'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successDeletedComment"), "success", '@', "settings"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

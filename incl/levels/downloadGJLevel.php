@@ -38,12 +38,19 @@ $levelString = file_exists(__DIR__."/../../data/levels/".$levelID) ? file_get_co
 
 $pass = $xorPass = $level['password'];
 if($gameVersion > 18) {
-	if(substr($levelString, 0, 3) == 'kS1') $levelString = Escape::url_base64_encode(gzcompress($levelString));
+	if(substr($levelString, 0, 2) == 'kS') $levelString = Escape::url_base64_encode(gzencode($levelString));
 	if($gameVersion > 19) {
 		if($pass != 0) $xorPass = Escape::url_base64_encode(XORCipher::cipher($pass, 26364));
 		$levelDesc = Escape::url_base64_encode($levelDesc);
 	}
 }
+
+if(!$level['hasMagicString']) {
+	$levelString = Security::insertMagicString($levelString, Library::getServerURL(), $levelID, $level['extID']);
+	$writeData = file_put_contents(__DIR__."/../../data/levels/".$levelID, $levelString);
+	if($writeData) Library::setLevelMagicString($levelID, true);
+}
+
 $response = "1:".$level["levelID"].":2:".Escape::translit($level["levelName"]).":3:".$levelDesc.":4:".$levelString.":5:".$level["levelVersion"].":6:".$level["userID"].":8:".$level["difficultyDenominator"].":9:".$level["starDifficulty"].":10:".$level["downloads"].":11:1:12:".$level["audioTrack"].":13:".$level["gameVersion"].":14:".$level["likes"].":16:".$level["dislikes"].":17:".$level["starDemon"].":43:".$level["starDemonDiff"].":25:".$level["starAuto"].":18:".$level["starStars"].":19:".$level["starFeatured"].":42:".$level["starEpic"].":45:".$level["objects"].":15:".$level["levelLength"].":30:".$level["original"].":31:".$level['twoPlayer'].":28:".$uploadDate.(isset($updateDate) ? ":29:".$updateDate : '').":35:".$level["songID"].":36:".$level["extraString"].":37:".$level["coins"].":38:".$level["starCoins"].":39:".$level["requestedStars"].":46:".$level["wt"].":47:".$level["wt2"].":48:".$level["settingsString"].":40:".$level["isLDM"].":27:".$xorPass.":52:".$level["songIDs"].":53:".$level["sfxIDs"].":57:".$level['ts'];
 
 if($feaID) $response .= ":41:".$feaID;

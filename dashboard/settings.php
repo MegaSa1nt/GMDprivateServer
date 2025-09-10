@@ -25,7 +25,7 @@ $dataArray = [
 	
 	'SHOW_CLAN' => $accountClan ? 'true' : 'false',
 	
-	'DASHBOARD_SETTINGS_BUTTON_ONCLICK' => "postPage('settings', 'dashboardSettingsForm')"
+	'DASHBOARD_SETTINGS_BUTTON_ONCLICK' => "postPage('settings', 'dashboardSettingsForm', 'list')"
 ];
 
 exit(Dashboard::renderPage("settings", Dashboard::string("dashboardSettingsTitle"), ".", $dataArray));

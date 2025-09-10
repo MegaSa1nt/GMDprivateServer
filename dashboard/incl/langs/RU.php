@@ -247,7 +247,7 @@ $language['languageDesc'] = 'Панель имеет кучу языков, вы
 
 $language['notInClan'] = 'Не в клане';
 
-$language['songTitle'] = '<text class="big">%1$s</text> — <text class="big">%2$s</text>'; // %1$s — song author, %2$s — song title
+$language['songTitle'] = '<text class="big">%1$s</text> — <text class="big">%2$s</text>'; // %1$s — song artist, %2$s — song title
 $language['songID'] = 'ID песни';
 $language['usageCount'] = 'Кол-во использований';
 $language['favouritesCount'] = 'Кол-во лайкнувших';
@@ -475,4 +475,9 @@ $language['twitchChannel'] = 'Канал на Twitch';
 $language['timezone'] = 'Часовой пояс';
 $language['chooseTimezone'] = 'Выберите часовой пояс...';
 $language['none'] = 'Никто';
+
+$language['creatorRatingLevel'] = 'Оценка автора уровня';
+$language['creatorRatingList'] = 'Оценка автора списка уровней';
+$language['creatorRatingLike'] = 'Автор оценил';
+$language['creatorRatingDislike'] = 'Автор не оценил';
 ?>

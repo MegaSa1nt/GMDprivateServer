@@ -7,7 +7,7 @@ require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
+if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['levelID']) && isset($_POST['levelName']) && isset($_POST['levelAuthor'])) {
 	$levelID = Escape::number($_POST['levelID']);
@@ -67,7 +67,7 @@ if(Library::checkPermission($person, "dashboardManageLevels") && isset($_POST['l
 	if($level['updateLocked'] != $newUpdatesLock) Library::lockUpdatingLevel($levelID, $person, $newUpdatesLock);
 	if($level['commentLocked'] != $newCommentingLock) Library::lockCommentingOnLevel($levelID, $person, $newCommentingLock);
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@', "settings"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

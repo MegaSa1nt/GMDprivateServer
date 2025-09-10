@@ -1,7 +1,7 @@
 <div class="horisontal" dashboard-page-buttons>
 	<div class="modeButtons">
-		<button type="button" title="%TEXT_sortByLikes%" onclick="getPage('@page=REMOVE_QUERY&mode=1')"><i class="fa-solid fa-thumbs-up"></i></button>
-		<button type="button" title="%TEXT_sortByTime%" onclick="getPage('@page=REMOVE_QUERY&mode=REMOVE_QUERY')"><i class="fa-solid fa-clock"></i></button>
+		<button type="button" title="%TEXT_sortByLikes%" onclick="getPage('@page=REMOVE_QUERY&mode=1', 'settings')"><i class="fa-solid fa-thumbs-up"></i></button>
+		<button type="button" title="%TEXT_sortByTime%" onclick="getPage('@page=REMOVE_QUERY&mode=REMOVE_QUERY', 'settings')"><i class="fa-solid fa-clock"></i></button>
 	</div>
 	
 	<div class="pageDiv">
@@ -40,7 +40,7 @@
 		</div>
 	</div>
 	
-	<button dashboard-submit class="button bordered" type="button"onclick="postPage('manage/uploadClanPost', 'uploadClanPostForm')"><i class="fa-solid fa-paper-plane"></i></button>
+	<button dashboard-submit class="button bordered" type="button"onclick="postPage('manage/uploadClanPost', 'uploadClanPostForm', 'settings')"><i class="fa-solid fa-paper-plane"></i></button>
 </form>
 
 <div class="nothingOnPageDiv" dashboard-show="%CLAN_NO_POSTS%">

@@ -24,7 +24,7 @@ if(isset($_POST['userName']) && isset($_POST['password'])) {
 }
 
 $dataArray = [
-	'LOGIN_BUTTON_ONCLICK' => "postPage('account/login', 'loginForm')",
+	'LOGIN_BUTTON_ONCLICK' => "postPage('account/login', 'loginForm', 'box')",
 	'LOGIN_HTTP_REFERER' => htmlspecialchars(Escape::text($_SERVER['HTTP_REFERER'])) ?: "./"
 ];
 

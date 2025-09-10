@@ -41,17 +41,17 @@
 				</div>
 				
 				<div class="mainUsername">
-					<h1 class="username" style="%ACCOUNT_COLOR%" dashboard-show="%IS_LOGGED_IN%" href="profile/%USERNAME%" title="%PROFILE_TITLE%">%USERNAME%</h1>
+					<h1 class="username" style="%ACCOUNT_COLOR%" dashboard-show="%IS_LOGGED_IN%" href="profile/%USERNAME%" dashboard-loader-type="settings" title="%PROFILE_TITLE%">%USERNAME%</h1>
 					<h1 dashboard-hide="%IS_LOGGED_IN%">%TEXT_loginToAccountTitle%</h1>
 					
-					<h2 style="%CLAN_COLOR%" dashboard-show="%SHOW_CLAN%" href="clan/%CLAN_NAME%" title="%CLAN_TITLE%">%CLAN_NAME%</h2>
+					<h2 style="%CLAN_COLOR%" dashboard-show="%SHOW_CLAN%" href="clan/%CLAN_NAME%" dashboard-loader-type="settings" title="%CLAN_TITLE%">%CLAN_NAME%</h2>
 				</div>
 			</div>
 			
-			<button dashboard-show="%IS_LOGGED_IN%" class="button settingsButton" type="button" href="profile/%USERNAME%/settings">
+			<button dashboard-show="%IS_LOGGED_IN%" class="button settingsButton" type="button" href="profile/%USERNAME%/settings" dashboard-loader-type="settings">
 				<i class='fa-solid fa-gear'></i>
 			</button>
-			<button dashboard-hide="%IS_LOGGED_IN%" class="button settingsButton" type="button" href="account/login">
+			<button dashboard-hide="%IS_LOGGED_IN%" class="button settingsButton" type="button" href="account/login" dashboard-loader-type="box">
 				<i class='fa-solid fa-sign-in'></i>
 			</button>
 		</div>
@@ -60,7 +60,7 @@
 
 <div class="saveSettingsButtons" dashboard-change-buttons>
 	<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
-	<button type="button" class="button" onclick="postPage('manage/applySettings', 'settingsForm')">%TEXT_applySettings%</button>
+	<button type="button" class="button" onclick="postPage('manage/applySettings', 'settingsForm', 'list')">%TEXT_applySettings%</button>
 </div>
 
 <script id="pageScript">

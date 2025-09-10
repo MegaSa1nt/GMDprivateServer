@@ -75,7 +75,7 @@ class CommentsError {
 	const NothingFound = "-2";
 }
 
-class Action { // Last action ID is 70
+class Action { // Last action ID is 71
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -166,6 +166,8 @@ class Action { // Last action ID is 70
 	
 	const ReuploadLevelToGDPS = 69;
 	const ReuploadLevelFromGDPS = 70;
+	
+	const LevelsRecommendationsGenerate = 71;
 	
 	// Unused
 	const LevelReport = 20;

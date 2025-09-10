@@ -45,13 +45,13 @@ if(isset($_POST['userName']) && isset($_POST['password']) && isset($_POST['repea
 		}
 	}
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successCreatedAccount"), "success", 'account/login'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successCreatedAccount"), "success", 'account/login', "box"));
 }
 
 $dataArray = [
 	'REGISTER_EMAIL_ENABLED' => $mailEnabled ? 'true' : 'false',
 	
-	'REGISTER_BUTTON_ONCLICK' => "postPage('account/register', 'registerForm')"
+	'REGISTER_BUTTON_ONCLICK' => "postPage('account/register', 'registerForm', 'box')"
 ];
 
 exit(Dashboard::renderPage("account/register", Dashboard::string("registerAccountTitle"), "../", $dataArray));

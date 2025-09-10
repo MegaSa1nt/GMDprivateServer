@@ -7,7 +7,7 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
+if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(isset($_POST['comment'])) {
 	$comment = Escape::text($_POST['comment']);
@@ -29,7 +29,7 @@ if(isset($_POST['comment'])) {
 	
 	Library::uploadAccountComment($person, $comment);
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successUploadedPost"), "success", '@mode=0&page=REMOVE_QUERY'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successUploadedPost"), "success", '@mode=REMOVE_QUERY&page=REMOVE_QUERY', "settings"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

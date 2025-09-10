@@ -9,7 +9,7 @@ if(isset($_POST['lang'])) {
 	$_COOKIE['lang'] = $lang;
 	setcookie("lang", $lang, 2147483647, "/");
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", "@", "list"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

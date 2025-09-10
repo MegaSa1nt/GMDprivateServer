@@ -6,7 +6,7 @@
 	
 	<hr dashboard-show="%MENU_SHOW_NAME%">
 	
-	<button class="contextMenuButton" title="%TEXT_viewLevel%" type="button" href="browse/levels/%MENU_ID%">
+	<button class="contextMenuButton" title="%TEXT_viewLevel%" type="button" href="browse/levels/%MENU_ID%" dashboard-loader-type="settings">
 		<i class="fa-solid fa-eye"></i>
 		<text>%TEXT_viewLevel%</text>
 	</button>
@@ -23,34 +23,34 @@
 	
 	<hr>
 	
-	<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/levels/%MENU_ID%/comments">
+	<button class="contextMenuButton" title="%TEXT_viewComments%" type="button" href="browse/levels/%MENU_ID%/comments" dashboard-loader-type="settings">
 		<i class="fa-solid fa-comment"></i>
 		<text>%TEXT_viewComments%</text>
 	</button>
 	
-	<button class="contextMenuButton" title="%TEXT_viewLeaderboards%" type="button" href="browse/levels/%MENU_ID%/scores">
+	<button class="contextMenuButton" title="%TEXT_viewLeaderboards%" type="button" href="browse/levels/%MENU_ID%/scores" dashboard-loader-type="settings">
 		<i class="fa-solid fa-chart-simple"></i>
 		<text>%TEXT_viewLeaderboards%</text>
 	</button>
 	
-	<button class="contextMenuButton" title="%TEXT_viewSongs%" type="button" href="browse/levels/%MENU_ID%/songs">
+	<button class="contextMenuButton" title="%TEXT_viewSongs%" type="button" href="browse/levels/%MENU_ID%/songs" dashboard-loader-type="settings">
 		<i class="fa-solid fa-music"></i>
 		<text>%TEXT_viewSongs%</text>
 	</button>
 	
-	<button class="contextMenuButton" title="%TEXT_viewSFXs%" type="button" href="browse/levels/%MENU_ID%/sfxs">
+	<button class="contextMenuButton" title="%TEXT_viewSFXs%" type="button" href="browse/levels/%MENU_ID%/sfxs" dashboard-loader-type="settings">
 		<i class="fa-solid fa-drum"></i>
 		<text>%TEXT_viewSFXs%</text>
 	</button>
 	
 	<hr dashboard-show="%MENU_SHOW_MANAGE_HR%">
 	
-	<button class="contextMenuButton" title="%TEXT_manageLevel%" type="button" href="browse/levels/%MENU_ID%/manage" dashboard-show="%MENU_CAN_MANAGE%">
+	<button class="contextMenuButton" title="%TEXT_manageLevel%" type="button" href="browse/levels/%MENU_ID%/manage" dashboard-loader-type="settings" dashboard-show="%MENU_CAN_MANAGE%">
 		<i class="fa-solid fa-pencil"></i>
 		<text>%TEXT_manageLevel%</text>
 	</button>
 	
-	<button class="contextMenuButton" title="%TEXT_deleteLevel%" type="button" href="browse/levels/%MENU_ID%/delete" dashboard-show="%MENU_CAN_DELETE%" style="--button-color: #ff9999;">
+	<button class="contextMenuButton" title="%TEXT_deleteLevel%" type="button" href="browse/levels/%MENU_ID%/delete" dashboard-loader-type="settings" dashboard-show="%MENU_CAN_DELETE%" style="--button-color: #ff9999;">
 		<i class="fa-solid fa-trash"></i>
 		<text>%TEXT_deleteLevel%</text>
 	</button>

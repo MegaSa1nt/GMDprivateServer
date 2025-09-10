@@ -28,13 +28,24 @@
 		
 		<div class="stats small">
 			<div class="commentStat" title="ID">
-				<i class="fa-solid fa-comment"></i> 
+				<i class="fa-solid fa-comment"></i>
 				<text dashboard-copy>%commentID%</text>
 			</div>
 			
 			<div class="horisontal">
 				<div class="commentStat" dashboard-show="%COMMENT_SHOW_LEVEL%">
 					%COMMENT_LEVEL_TEXT%
+				</div>
+				
+				<div class="commentStat" dashboard-show="%COMMENT_IS_CREATOR%">
+					<i class="fa-solid fa-user"></i>
+					<text>%COMMENT_CREATOR_TEXT%</text>
+				</div>
+				
+				<div class="commentStat" dashboard-show="%COMMENT_SHOW_RATING%" title="%COMMENT_RATING_TITLE%">
+					<i class="fa-solid fa-thumbs-up" dashboard-show="%COMMENT_RATING_IS_LIKE%"></i>
+					<i class="fa-solid fa-thumbs-down" dashboard-hide="%COMMENT_RATING_IS_LIKE%"></i>
+					<text>%COMMENT_RATING_TEXT%</text>
 				</div>
 
 				<div class="commentStat" title="%TEXT_uploadDate%">

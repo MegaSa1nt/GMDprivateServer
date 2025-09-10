@@ -487,8 +487,8 @@ class Dashboard {
 		return $page;
 	}
 	
-	public static function renderToast($icon, $text, $state, $location = '') {
-		return "<div id='toast' state='".$state."' location='".$location."'><i class='fa-solid fa-".$icon."'></i>".$text."</div>";
+	public static function renderToast($icon, $text, $state, $location = '', $loaderType = 'loader') {
+		return "<div id='toast' state='".$state."' location='".$location."' loader='".$loaderType."'><i class='fa-solid fa-".$icon."'></i>".$text."</div>";
 	}
 	
 	public static function renderTemplate($template, $dataArray) {
@@ -700,16 +700,27 @@ class Dashboard {
 		
 		$contextMenuData = [];
 		$isPersonThemselves = $person['userID'] == $comment['userID'];
+		$isCreatorThemselves = $person['accountID'] == $comment['creatorAccountID'];
 		
 		$user = Library::getUserByID($comment['userID']);
 		$userName = $user ? $user['userName'] : 'Undefined';
 		
 		$userMetadata = self::getUserMetadata($user);
 		
+		if(!$comment['itemID']) $comment['itemID'] = $comment['levelID'];
+		
 		if($showLevel) {
 			$comment['COMMENT_LEVEL_TEXT'] = $comment['itemID'] >= 0 ? self::getLevelString($person, $comment['creatorAccountID'], $comment['itemID'], $comment['itemName']) : self::getListString($person, $comment['creatorAccountID'], $comment['itemID'] * -1, $comment['itemName']);
-		}
-		$comment['COMMENT_SHOW_LEVEL'] = $showLevel ? 'true' : 'false';
+			$comment['COMMENT_SHOW_LEVEL'] = 'true';
+		} else $comment['COMMENT_SHOW_LEVEL'] = 'false';
+		
+		$comment['COMMENT_SHOW_RATING'] = $comment['creatorRating'] ? 'true' : 'false';
+		$comment['COMMENT_RATING_TITLE'] = $comment['itemID'] >= 0 ? self::string("creatorRatingLevel") : self::string("creatorRatingList");
+		$comment['COMMENT_RATING_IS_LIKE'] = $comment['creatorRating'] == '1' ? 'true' : 'false';
+		$comment['COMMENT_RATING_TEXT'] = $comment['creatorRating'] == '1' ? self::string("creatorRatingLike") : self::string("creatorRatingDislike");
+		
+		$comment['COMMENT_IS_CREATOR'] = $isCreatorThemselves && !$comment['creatorRating'] ? 'true' : 'false';
+		$comment['COMMENT_CREATOR_TEXT'] = $comment['itemID'] >= 0 ? self::string("levelAuthor") : self::string("listAuthor");
 		
 		$comment['COMMENT_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
 		$comment['COMMENT_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($comment['comment']))) ?: "<i>".self::string('emptyComment')."</i>";

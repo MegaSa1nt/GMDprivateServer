@@ -55,21 +55,9 @@
 		</script>
 	</head>
 	<body id="dashboard-body">
-		<div id="dashboard-loader" class="dashboard-loader">
-			<i class="fa-solid fa-circle-notch fa-spin"></i>
-		</div>
-		
-		<div id="dashboard-loader-progress" class="dashboard-loader hide">
-			<i class="fa-solid fa-circle-notch fa-spin"></i>
-			<h1></h1>
-			<progress min="0" max="100" value="30" />
-		</div>
-		
-		<span class="background"></span>
-	
 		<nav>
 			<div class="navbar-buttons down">
-				<button title="%TEXT_home%" type="button" href="">
+				<button title="%TEXT_home%" type="button" href="" dashboard-loader-type="loader">
 					<i class="fa-solid fa-house"></i>
 					<text>%TEXT_home%</text>
 				</button>
@@ -82,37 +70,37 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_changeUsernameTitle%" type="button" href="account/changeUsername">
+						<button title="%TEXT_changeUsernameTitle%" type="button" href="account/changeUsername" dashboard-loader-type="box">
 							<i class="fa-solid fa-circle-user"></i>
 							<text>%TEXT_changeUsernameTitle%</text>
 						</button>
 						
-						<button title="%TEXT_changePasswordTitle%" type="button" href="account/changePassword">
+						<button title="%TEXT_changePasswordTitle%" type="button" href="account/changePassword" dashboard-loader-type="box">
 							<i class="fa-solid fa-key"></i>
 							<text>%TEXT_changePasswordTitle%</text>
 						</button>
 						
-						<button title="%TEXT_yourLevelsTitle%" type="button" href="account/levels">
+						<button title="%TEXT_yourLevelsTitle%" type="button" href="account/levels" dashboard-loader-type="list">
 							<i class="fa-solid fa-gamepad"></i>
 							<text>%TEXT_yourLevelsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_yourListsTitle%" type="button" href="account/lists">
+						<button title="%TEXT_yourListsTitle%" type="button" href="account/lists" dashboard-loader-type="list">
 							<i class="fa-solid fa-list"></i>
 							<text>%TEXT_yourListsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_yourSongsTitle%" type="button" href="account/songs">
+						<button title="%TEXT_yourSongsTitle%" type="button" href="account/songs" dashboard-loader-type="list">
 							<i class="fa-solid fa-music"></i>
 							<text>%TEXT_yourSongsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_favouriteSongsTitle%" type="button" href="account/favouriteSongs">
+						<button title="%TEXT_favouriteSongsTitle%" type="button" href="account/favouriteSongs" dashboard-loader-type="list">
 							<i class="fa-solid fa-heart"></i>
 							<text>%TEXT_favouriteSongsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_yourSFXsTitle%" type="button" href="account/sfxs">
+						<button title="%TEXT_yourSFXsTitle%" type="button" href="account/sfxs" dashboard-loader-type="list">
 							<i class="fa-solid fa-drum"></i>
 							<text>%TEXT_yourSFXsTitle%</text>
 						</button>
@@ -127,37 +115,37 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_accountsTitle%" type="button" href="browse/accounts">
+						<button title="%TEXT_accountsTitle%" type="button" href="browse/accounts" dashboard-loader-type="list">
 							<i class="fa-solid fa-user"></i>
 							<text>%TEXT_accountsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_levelsTitle%" type="button" href="browse/levels">
+						<button title="%TEXT_levelsTitle%" type="button" href="browse/levels" dashboard-loader-type="list">
 							<i class="fa-solid fa-gamepad"></i>
 							<text>%TEXT_levelsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_listsTitle%" type="button" href="browse/lists">
+						<button title="%TEXT_listsTitle%" type="button" href="browse/lists" dashboard-loader-type="list">
 							<i class="fa-solid fa-list"></i>
 							<text>%TEXT_listsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_mapPacksTitle%" type="button" href="browse/mappacks">
+						<button title="%TEXT_mapPacksTitle%" type="button" href="browse/mappacks" dashboard-loader-type="list">
 							<i class="fa-solid fa-folder-open"></i>
 							<text>%TEXT_mapPacksTitle%</text>
 						</button>
 						
-						<button title="%TEXT_gauntletsTitle%" type="button" href="browse/gauntlets">
+						<button title="%TEXT_gauntletsTitle%" type="button" href="browse/gauntlets" dashboard-loader-type="list">
 							<i class="fa-solid fa-globe"></i>
 							<text>%TEXT_gauntletsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_songsTitle%" type="button" href="browse/songs">
+						<button title="%TEXT_songsTitle%" type="button" href="browse/songs" dashboard-loader-type="list">
 							<i class="fa-solid fa-music"></i>
 							<text>%TEXT_songsTitle%</text>
 						</button>
 						
-						<button title="%TEXT_sfxsTitle%" type="button" href="browse/sfxs">
+						<button title="%TEXT_sfxsTitle%" type="button" href="browse/sfxs" dashboard-loader-type="list">
 							<i class="fa-solid fa-drum"></i>
 							<text>%TEXT_sfxsTitle%</text>
 						</button>
@@ -172,7 +160,7 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_clansListTitle%" type="button" href="browse/clans">
+						<button title="%TEXT_clansListTitle%" type="button" href="browse/clans" dashboard-loader-type="list">
 							<i class="fa-solid fa-list"></i>
 							<text>%TEXT_clansListTitle%</text>
 						</button>
@@ -187,17 +175,17 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_uploadSongTitle%" type="button" href="upload/song" dashboard-show="%UPLOAD_SONG_PAGE_ENABLED%">
+						<button title="%TEXT_uploadSongTitle%" type="button" href="upload/song" dashboard-loader-type="box" dashboard-show="%UPLOAD_SONG_PAGE_ENABLED%">
 							<i class="fa-solid fa-music"></i>
 							<text>%TEXT_uploadSongTitle%</text>
 						</button>
 						
-						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx" dashboard-show="%UPLOAD_SFX_PAGE_ENABLED%">
+						<button title="%TEXT_uploadSFXTitle%" type="button" href="upload/sfx" dashboard-loader-type="box" dashboard-show="%UPLOAD_SFX_PAGE_ENABLED%">
 							<i class="fa-solid fa-drum"></i>
 							<text>%TEXT_uploadSFXTitle%</text>
 						</button>
 						
-						<button title="%TEXT_reuploadLevelTitle%" type="button" href="upload/level" dashboard-show="%REUPLOAD_LEVEL_PAGE_ENABLED%">
+						<button title="%TEXT_reuploadLevelTitle%" type="button" href="upload/level" dashboard-loader-type="box" dashboard-show="%REUPLOAD_LEVEL_PAGE_ENABLED%">
 							<i class="fa-solid fa-gamepad"></i>
 							<text>%TEXT_reuploadLevelTitle%</text>
 						</button>
@@ -217,12 +205,12 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_addMapPackTitle%" type="button" href="upload/mappack" dashboard-show="%PERMISSION_dashboardLevelPackCreate%">
+						<button title="%TEXT_addMapPackTitle%" type="button" href="upload/mappack" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardLevelPackCreate%">
 							<i class="fa-solid fa-folder-open"></i>
 							<text>%TEXT_addMapPackTitle%</text>
 						</button>
 						
-						<button title="%TEXT_addGauntletTitle%" type="button" href="upload/gauntlet" dashboard-show="%PERMISSION_dashboardGauntletCreate%">
+						<button title="%TEXT_addGauntletTitle%" type="button" href="upload/gauntlet" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardGauntletCreate%">
 							<i class="fa-solid fa-globe"></i>
 							<text>%TEXT_addGauntletTitle%</text>
 						</button>
@@ -244,17 +232,17 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_settings%" type="button" href="settings">
+						<button title="%TEXT_settings%" type="button" href="settings" dashboard-loader-type="list">
 							<i class="fa-solid fa-gear"></i>
 							<text>%TEXT_settings%</text>
 						</button>
 						
-						<button title="%TEXT_loginToAccountTitle%" type="button" href="account/login">
+						<button title="%TEXT_loginToAccountTitle%" type="button" href="account/login" dashboard-loader-type="box">
 							<i class="fa-solid fa-sign-in"></i>
 							<text>%TEXT_loginToAccountTitle%</text>
 						</button>
 						
-						<button title="%TEXT_registerAccountTitle%" type="button" href="account/register">
+						<button title="%TEXT_registerAccountTitle%" type="button" href="account/register" dashboard-loader-type="box">
 							<i class="fa-solid fa-user-plus"></i>
 							<text>%TEXT_registerAccountTitle%</text>
 						</button>
@@ -269,17 +257,17 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_yourProfileTitle%" type="button" href="profile/%USERNAME%">
+						<button title="%TEXT_yourProfileTitle%" type="button" href="profile/%USERNAME%" dashboard-loader-type="settings">
 							<i class="fa-solid fa-user"></i>
 							<text>%TEXT_yourProfileTitle%</text>
 						</button>
 						
-						<button title="%TEXT_yourClan%" type="button" href="clan/%CLAN_NAME%" dashboard-show="%IS_IN_CLAN%">
+						<button title="%TEXT_yourClan%" type="button" href="clan/%CLAN_NAME%" dashboard-loader-type="settings" dashboard-show="%IS_IN_CLAN%">
 							<i class="fa-solid fa-shield-halved"></i>
 							<text>%CLAN_NAME%</text>
 						</button>
 						
-						<button title="%TEXT_settings%" type="button" href="settings">
+						<button title="%TEXT_settings%" type="button" href="settings" dashboard-loader-type="list">
 							<i class="fa-solid fa-gear"></i>
 							<text>%TEXT_settings%</text>
 						</button>
@@ -293,13 +281,83 @@
 			</div>
 		</nav>
 		
-		<div id="dashboard-page" class="dashboard-page">
+		<div class="dashboard-loader" id="dashboard-loader" dashboard-loader>
+			<i class="fa-solid fa-circle-notch fa-spin"></i>
+		</div>
+		
+		<div class="dashboard-loader hide" id="dashboard-loader-progress" dashboard-loader>
+			<i class="fa-solid fa-circle-notch fa-spin"></i>
+			<h1></h1>
+			<progress min="0" max="100" value="30" />
+		</div>
+		
+		<span class="background"></span>
+		
+		<div class="dashboard-page" id="dashboard-page" dashboard-loader>
 			<div class="head">
 				<h1 class="title">%GDPS_NAME%</h1>
 				<p class="description">%PAGE_TITLE%</p>
 			</div>
 			
 			%PAGE%
+		</div>
+		
+		<div class="dashboard-page skeleton hide" id="dashboard-loader-box" dashboard-loader>
+			<div class="head">
+				<span class="title skeletonAnimation"></span>
+				<span class="description skeletonAnimation"></span>
+			</div>
+			
+			<div class="box skeletonAnimation"></div>
+		</div>
+		
+		<div class="dashboard-page skeleton hide" id="dashboard-loader-list" dashboard-loader>
+			<div class="head">
+				<span class="title skeletonAnimation"></span>
+				<span class="description skeletonAnimation"></span>
+			</div>
+			
+			<div class="wideBox">
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="contentDiv skeletonAnimation"></div>
+			</div>
+		</div>
+		
+		<div class="dashboard-page skeleton hide" id="dashboard-loader-settings" dashboard-loader>
+			<div class="head">
+				<span class="title skeletonAnimation"></span>
+				<span class="description skeletonAnimation"></span>
+			</div>
+			
+			<div class="wideBox levelPage">
+				<div class="contentDiv skeletonAnimation"></div>
+				<div class="horisontal">
+					<div class="levelStats">
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+					</div>
+					<div class="commentsDiv">
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		<div class="audioPlayer" id="audioPlayer">

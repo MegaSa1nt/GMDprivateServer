@@ -82,7 +82,7 @@ $dataArray = [
 	'REUPLOAD_LEVEL_TO_TEXT' => htmlspecialchars(sprintf(Dashboard::string("reuploadLevelToServer"), $gdps)),
 	'REUPLOAD_LEVEL_FROM_TEXT' => htmlspecialchars(sprintf(Dashboard::string("reuploadLevelFromServer"), $gdps)),
 	
-	'REUPLOAD_LEVEL_BUTTON_ONCLICK' => "postPage('upload/level', 'reuploadLevelForm')"
+	'REUPLOAD_LEVEL_BUTTON_ONCLICK' => "postPage('upload/level', 'reuploadLevelForm', 'box')"
 ];
 
 exit(Dashboard::renderPage("upload/level", Dashboard::string("reuploadLevelTitle"), "../", $dataArray));

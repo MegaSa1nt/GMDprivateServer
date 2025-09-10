@@ -3,6 +3,7 @@ if(typeof localStorage.player_volume == "undefined") localStorage.player_volume 
 var dashboardLoader, dashboardBody, dashboardBase, dashboardBackground;
 var intervals = [];
 var searchLists = [];
+var pageLoaders = {};
 var updateFilters = true;
 
 window.addEventListener('load', () => {
@@ -19,20 +20,29 @@ window.addEventListener('load', () => {
 	updatePage();
 	updateNavbar();
 	
-	window.addEventListener("popstate", (event) => getPage(event.target.location.href, true));
+	window.addEventListener("popstate", (event) => {
+		const newHref = decodeURIComponent(event.target.location.href).substr(baseURL.href.length);
+		
+		return getPage(newHref, false);
+	});
 	window.addEventListener("wheel", () => document.querySelector("[dashboard-context-menu].show")?.classList.remove("show"));
 	
 	setTimeout(() => dashboardLoader.classList.add("hide"), 200);
 });
 
-async function getPage(href, skipCheck = false) {
-	if(!skipCheck && ((window.location.href.endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) return false;
+async function getPage(href, loaderType = 'loader') {
+	if(loaderType && ((window.location.href.endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) return false;
 	
-	dashboardLoader.classList.remove("hide");
+	var pageLoaderType = loaderType;
+	
+	if(loaderType) pageLoaders[href] = loaderType;
+	else pageLoaderType = pageLoaders[href];
+	
+	activateLoaderOfType(pageLoaderType);
 	
 	switch(true) {
 		case href == '@':
-			skipCheck = true;
+			pageLoaderType = false;
 			href = window.location.href;
 			break;
 		case href.startsWith('@'):
@@ -56,19 +66,24 @@ async function getPage(href, skipCheck = false) {
 	const pageRequest = await fetch(href);
 	const response = await pageRequest.text();
 	
-	const updatePageDetails = await changePage(response, href, skipCheck);
+	const updatePageDetails = await changePage(response, href, loaderType);
 	
-	if(updatePageDetails) dashboardLoader.classList.add("hide");
+	if(updatePageDetails) activateLoaderOfType(false);
 	
 	return true;
 }
 
-async function postPage(href, form, showLoadingCircle = true) {
+async function postPage(href, form, loaderType = 'loader') {
 	return new Promise(async (r) => {
 		const formData = await getForm(form);
 		if(!formData) return r(false);
 
-		if(showLoadingCircle) dashboardLoader.classList.remove("hide");
+		var pageLoaderType = loaderType;
+	
+		if(loaderType) pageLoaders[href] = loaderType;
+		else pageLoaderType = pageLoaders[href];
+		
+		activateLoaderOfType(pageLoaderType);
 		
 		switch(true) {
 			case href == '@':
@@ -91,15 +106,15 @@ async function postPage(href, form, showLoadingCircle = true) {
 		
 		href = pageRequest.url;
 		
-		const updatePageDetails = await changePage(response, href);
+		const updatePageDetails = await changePage(response, href, pageLoaderType);
 		
-		if(updatePageDetails && showLoadingCircle) dashboardLoader.classList.add("hide");
+		if(updatePageDetails && showLoadingCircle) activateLoaderOfType(false); // false = disable loader
 		
 		r(true);
 	});
 }
 
-function changePage(response, href, skipCheck = false) {
+function changePage(response, href, loaderType = false) {
 	return new Promise(r => {
 		newPageBody = new DOMParser().parseFromString(response, "text/html");
 	
@@ -119,8 +134,9 @@ function changePage(response, href, skipCheck = false) {
 			
 			return r(true);
 		}
-
-		if(!skipCheck) history.pushState(null, null, href);
+		
+		if(!href.length) href = baseURL.pathname;
+		if(loaderType) history.pushState(null, null, href);
 		
 		const newPageScript = newPageBody.querySelector("#pageScript");
 		
@@ -145,7 +161,7 @@ function changePage(response, href, skipCheck = false) {
 		
 		window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
 		
-		r(true);
+		return r(true);
 	});
 }
 
@@ -156,7 +172,7 @@ async function updateNavbar() {
 		const href = navbarButton.getAttribute("href");
 		const dropdown = navbarButton.getAttribute("dashboard-dropdown");
 		
-		const pageHref = decodeURIComponent(window.location.href).substr(window.baseURL.href.length);
+		const pageHref = decodeURIComponent(window.location.href).substr(baseURL.href.length);
 
 		if(href != null && ((href.length && href == pageHref) || (!href.length && dashboardBase.getAttribute("href") == './'))) navbarButton.classList.add("current");
 		
@@ -220,7 +236,8 @@ function showToastOutOfPage(toastBody) {
 	
 	const toastLocation = toastBody.getAttribute("location");
 	if(toastLocation.length) {
-		getPage(toastLocation);
+		const toastLoaderType = toastBody.getAttribute("loader");
+		getPage(toastLocation, toastLoaderType);
 		return false;
 	}
 	
@@ -273,13 +290,16 @@ async function updatePage() {
 			
 			switch(event.button) {
 				case 0:
-					getPage(href);
+					const hrefLoaderType = element.getAttribute("dashboard-loader-type") ?? 'loader';
+					getPage(href, hrefLoaderType);
+					
 					break;
 				case 1:
 					const openNewTab = document.createElement("a");
 					openNewTab.href = href;
 					openNewTab.target = "_blank";
 					openNewTab.click();
+					
 					break;
 			}
 		});
@@ -1101,7 +1121,7 @@ async function searchSomething(url, search) {
 	return searchResult;
 }
 
-async function applyFilters(modalID) {
+async function applyFilters(modalID, loaderType = 'list') {
 	const formElement = document.querySelector(`form[dashboard-modal="${modalID}"]`);
 	const formInputs = formElement.querySelectorAll("input"); // FormData(formElement) is bugged and skips inputs for no reason
 	
@@ -1130,7 +1150,7 @@ async function applyFilters(modalID) {
 	}
 	
 	updateFilters = true;
-	await getPage(window.location.pathname + "?" + new URLSearchParams(realForm).toString());
+	await getPage(window.location.pathname + "?" + new URLSearchParams(realForm).toString(), loaderType);
 }
 
 function escapeHTML(text) {
@@ -1390,12 +1410,12 @@ function checkFormSettingsChange(element) {
 }
 
 async function downloadLevel(levelID) {
-	dashboardLoader.classList.remove("hide");
+	activateLoaderOfType('loader');
 	
 	const request = await fetch("manage/downloadGMD?levelID=" + levelID).catch((e) => {
 		console.error(e);
 		
-		dashboardLoader.classList.add("hide");
+		activateLoaderOfType(false);
 	});
 	const result = await request.text();
 		
@@ -1411,7 +1431,7 @@ async function downloadLevel(levelID) {
 		
 		showToast(successIcon, downloadNowText, "success");
 		
-		dashboardLoader.classList.add("hide");
+		activateLoaderOfType(false);
 	} catch(e) {
 		console.error(e);
 		
@@ -1420,10 +1440,25 @@ async function downloadLevel(levelID) {
 		
 		showToastOutOfPage(toastElement);
 		
-		dashboardLoader.classList.add("hide");
+		activateLoaderOfType(false);
 	}
 }
 
 function escapeRegex(string) { // https://stackoverflow.com/a/3561711
 	return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function activateLoaderOfType(loaderType) {
+	for(const element of document.querySelectorAll("[dashboard-loader]")) element.classList.add("hide");
+	for(const element of document.querySelectorAll("[dashboard-modal]")) element.classList.remove("show");
+	
+	dashboardBody.classList.add("hide");
+	
+	if(!loaderType || !loaderType.length) {
+		document.getElementById("dashboard-page").classList.remove("hide");
+		return;
+	}
+	
+	if(loaderType == 'loader') dashboardLoader.classList.remove("hide");
+	else document.getElementById(`dashboard-loader-${loaderType}`).classList.remove("hide");
 }

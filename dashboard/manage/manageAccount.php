@@ -7,7 +7,7 @@ require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login"));
+if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(isset($_POST['accountID'])) {
 	$accountID = Escape::number($_POST['accountID']);
@@ -40,7 +40,7 @@ if(isset($_POST['accountID'])) {
 	
 	if($account['timezone'] != $newTimezone) Library::updateAccountTimezone($accountID, $newTimezone);
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@'));
+	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@', "settings"));
 }
 
 exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

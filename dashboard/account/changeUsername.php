@@ -23,10 +23,10 @@ if(isset($_POST['userName']) && isset($_POST['password'])) {
 	
 	setcookie('auth', '', 2147483647, '/');
 	
-	exit(Dashboard::renderToast("check", Dashboard::string("successChangedUsername"), "success", "account/login"));
+	exit(Dashboard::renderToast("check", Dashboard::string("successChangedUsername"), "success", "account/login", "box"));
 }
 
-$dataArray = ['CHANGE_USERNAME_BUTTON_ONCLICK' => "postPage('account/changeUsername', 'changeUsernameForm')"];
+$dataArray = ['CHANGE_USERNAME_BUTTON_ONCLICK' => "postPage('account/changeUsername', 'changeUsernameForm', 'box')"];
 
 exit(Dashboard::renderPage("account/changeUsername", Dashboard::string("changeUsernameTitle"), "../", $dataArray));
 ?>

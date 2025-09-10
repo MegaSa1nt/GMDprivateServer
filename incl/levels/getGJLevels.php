@@ -91,11 +91,26 @@ switch($type) {
 		$filters[] = "NOT starEpic = 0";
 		$order = "starFeatured DESC, rateDate DESC, uploadDate";
 		break;
-	case 7: // Magic
-        $filters[] = "objects > 9999"; // L
+	case 7: // Magic (recommendations)
+		$levelIDs = Library::generateLevelsRecommendations($person);
+		
+		$levelsArray = explode(',', $levelIDs);
+		$levelsText = '';
+		
+		$str = implode(',', $levelsArray);
+		
+		foreach($levelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+		
+		$order = 'CASE
+			'.$levelsText.'
+		END';
+		$orderSorting = 'ASC';
+		
+		$filters[] = "levelID IN (".$str.")";
 		break;
 	case 10: // Map Packs
 	case 19: // Unknown, but same as Map Packs (on real GD type 10 has star rated filter and 19 doesn't)
+	case 26: // Cvolton's 2.1 lists
 		$levelsArray = explode(',', $str);
 		$levelsText = '';
 		
