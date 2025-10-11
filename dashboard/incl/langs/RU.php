@@ -51,6 +51,9 @@ $language['runCron'] = 'Выполнить Крон';
 $language['moderatorTools'] = 'Инструменты модератора';
 $language['addMapPackTitle'] = 'Добавить Мап-Пак';
 $language['addGauntletTitle'] = 'Добавить Гаунтлет';
+$language['unlistedLevelsTitle'] = 'Скрытые уровни';
+$language['unlistedListsTitle'] = 'Скрытые списки уровней';
+$language['manageRolesTitle'] = 'Управление ролями';
 
 $language['clans'] = 'Кланы';
 $language['clansListTitle'] = 'Список кланов';
@@ -141,7 +144,9 @@ $language['errorListNotFound'] = 'Список уровней не найден!
 
 $language['errorGauntletAlreadyExists'] = 'Этот Гаунтлет уже существует!';
 
-$language['errorAccountNotFound'] = 'Аккаунт не был найден!';
+$language['errorAccountNotFound'] = 'Аккаунт не найден!';
+
+$language['errorRoleNotFound'] = 'Роль не найдена!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -178,6 +183,8 @@ $language['successDownloadNow'] = 'Загрузка начнётся через 
 
 $language['successAddedMapPack'] = 'Вы успешно добавили Мап-Пак!';
 $language['successAddedGauntlet'] = 'Вы успешно добавили Гаунтлет!';
+
+$language['successCreatedRole'] = 'Вы успешно создали роль!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
@@ -480,4 +487,91 @@ $language['creatorRatingLevel'] = 'Оценка автора уровня';
 $language['creatorRatingList'] = 'Оценка автора списка уровней';
 $language['creatorRatingLike'] = 'Автор оценил';
 $language['creatorRatingDislike'] = 'Автор не оценил';
+
+$language['createRole'] = 'Создать роль';
+$language['roleAppearance'] = 'Внешний вид роли';
+$language['roleName'] = 'Название роли';
+$language['roleCommentsCaption'] = 'Подпись роли в комментариях';
+$language['roleCommentsCaptionHint'] = 'Подпись роли появится перед временем публикации комментария';
+$language['roleColor'] = 'Цвет роли';
+$language['rolePriority'] = 'Приоритет роли';
+$language['rolePriorityHint'] = 'Чем выше приоритет, тем выше роль в списке';
+$language['modBadge'] = 'Бейдж модератора';
+$language['chooseModBadge'] = 'Выберите бейдж модератора...';
+$language['elderModeratorRole'] = 'Старший модератор';
+$language['moderatorRole'] = 'Модератор';
+$language['leaderboardModeratorRole'] = 'Модератор лидербордов';
+$language['rolePermissions'] = 'Права роли';
+$language['roleIsDefaultTitle'] = 'Стандартная роль';
+$language['roleIsDefaultDesc'] = 'Эта роль будет у каждого игрока';
+$language['permissionGameSuggestLevelTitle'] = 'Предложить уровень';
+$language['permissionGameSuggestLevelDesc'] = 'Позволяет игроку предлагать оценки уровням и спискам уровней';
+$language['permissionGameRateLevelTitle'] = 'Оценить уровень';
+$language['permissionGameRateLevelDesc'] = 'Позволяет игроку оценивать уровни и списки уровней на звёзды';
+$language['permissionGameSetDifficultyTitle'] = 'Установить сложность';
+$language['permissionGameSetDifficultyDesc'] = 'Позволяет игроку менять сложность уровней и списков уровней';
+$language['permissionGameSetFeaturedTitle'] = 'Поставить уровню Featured';
+$language['permissionGameSetFeaturedDesc'] = 'Позволяет игроку поставить или убрать Featured с уровней и списков уровней';
+$language['permissionGameSetEpicTitle'] = 'Поставить уровню Epic';
+$language['permissionGameSetEpicDesc'] = 'Позволяет игроку поставить или убрать Epic, Legendary и Mythic с уровней';
+$language['permissionGameDeleteLevelTitle'] = 'Удалить уровень';
+$language['permissionGameDeleteLevelDesc'] = 'Позволяет игроку удалять уровни и списки уровней';
+$language['permissionGameMoveLevelTitle'] = 'Переместить уровень';
+$language['permissionGameMoveLevelDesc'] = 'Позволяет игроку переместить уровень на другой аккаунт';
+$language['permissionGameRenameLevelTitle'] = 'Переименовать уровень';
+$language['permissionGameRenameLevelDesc'] = 'Позволяет игроку переименовывать уровни и списки уровней';
+$language['permissionGameSetPasswordTitle'] = 'Поставить пароль уровню';
+$language['permissionGameSetPasswordDesc'] = 'Позволяет игроку поставить или убрать пароль на уровни';
+$language['permissionGameSetDescriptionTitle'] = 'Поставить описание уровню';
+$language['permissionGameSetDescriptionDesc'] = 'Позволяет игроку поставить описание уровням и спискам уровней';
+$language['permissionGameSetLevelPrivacyTitle'] = 'Указать приватность уровня';
+$language['permissionGameSetLevelPrivacyDesc'] = 'Позволяет игроку поменять приватность уровней и списков уровней';
+$language['permissionGameShareCreatorPointsTitle'] = 'Поделиться Creator Point\'ами';
+$language['permissionGameShareCreatorPointsDesc'] = 'Позволяет игроку поделиться Creator Point\'ами уровней';
+$language['permissionGameSetLevelSongTitle'] = 'Поставить песню';
+$language['permissionGameSetLevelSongDesc'] = 'Позволяет игроку поставить или убрать песню на уровнях';
+$language['permissionGameLockLevelCommentsTitle'] = 'Заблокировать комментирование';
+$language['permissionGameLockLevelCommentsDesc'] = 'Позволяет игроку блокировать и разблокировать комментарование уровней и списков уровней';
+$language['permissionGameLockLevelUpdatingTitle'] = 'Заблокировать обновление уровня';
+$language['permissionGameLockLevelUpdatingDesc'] = 'Позволяет игроку блокировать и разблокировать обновление уровней';
+$language['permissionGameSetListLevelsTitle'] = 'Указать уровни в списке уровней';
+$language['permissionGameSetListLevelsDesc'] = 'Позволяет игроку указывать свои уровни в списках уровней';
+$language['permissionGameDeleteCommentsTitle'] = 'Удалить комментарий';
+$language['permissionGameDeleteCommentsDesc'] = 'Позволяет игроку удалять комментарии с уровней и списков уровней';
+$language['permissionGameVerifyCoinsTitle'] = 'Верифицировать монетки';
+$language['permissionGameVerifyCoinsDesc'] = 'Позволяет игроку верифицировать и убирать верификацию монеток на уровне';
+$language['permissionGameSetDailyTitle'] = 'Указать уровень, как ежедневный';
+$language['permissionGameSetDailyDesc'] = 'Позволяет игроку добавлять уровни в список ежедневных уровней';
+$language['permissionGameSetWeeklyTitle'] = 'Указать уровень, как еженедельный';
+$language['permissionGameSetWeeklyDesc'] = 'Позволяет игроку добавлять уровни в список еженедельных уровней';
+$language['permissionGameSetEventTitle'] = 'Указать уровень, как уровень мероприятия';
+$language['permissionGameSetEventDesc'] = 'Позволяет игроку указывать уровни, как уровни мероприятия';
+$language['permissionDashboardModeratorToolsTitle'] = 'Доступ к инструментам модератора';
+$language['permissionDashboardModeratorToolsDesc'] = 'Позволяет игроку получить доступ к инструментам модератора, таким, как бан аккаунтов, скрытые уровни, и так далее';
+$language['permissionDashboardDeleteLeaderboardsTitle'] = 'Удалить рекорд из лидерборда';
+$language['permissionDashboardDeleteLeaderboardsDesc'] = 'Позволяет игроку удалять рекорды с уровней';
+$language['permissionDashboardManageMapPacksTitle'] = 'Управлять Мап-Паками';
+$language['permissionDashboardManageMapPacksDesc'] = 'Позволяет игроку создавать, настраивать и удалять Мап-Паки';
+$language['permissionDashboardManageGauntletsTitle'] = 'Управлять Гаунтлетами';
+$language['permissionDashboardManageGauntletsDesc'] = 'Позволяет игроку создавать, настраивать и удалять Гаунтлеты';
+$language['permissionDashboardManageSongsTitle'] = 'Управлять песнями и звуковыми эффектами';
+$language['permissionDashboardManageSongsDesc'] = 'Позволяет игроку включать, отключать, настраивать и удалять песни и звуковые эффекты';
+$language['permissionDashboardManageAccountsTitle'] = 'Управлять аккаунтами';
+$language['permissionDashboardManageAccountsDesc'] = 'Позволяет игроку менять настройки аккаунта и менять ему никнейм и пароль';
+$language['permissionDashboardManageLevelsTitle'] = 'Управлять уровнями';
+$language['permissionDashboardManageLevelsDesc'] = 'Позволяет игроку настраивать уровни';
+$language['permissionDashboardManageClansTitle'] = 'Управлять кланами';
+$language['permissionDashboardManageClansDesc'] = 'Позволяет игроку настраивать и удалять кланы';
+$language['permissionDashboardManageAutomodTitle'] = 'Управлять Автомодом';
+$language['permissionDashboardManageAutomodDesc'] = 'Позволяет игроку настраивать Автомод и смотреть историю действий игроков';
+$language['permissionDashboardManageRolesTitle'] = 'Управлять ролями';
+$language['permissionDashboardManageRolesDesc'] = 'Позволяет игроку создавать, настраивать и удалять роли';
+$language['permissionDashboardManageVaultCodesTitle'] = 'Управлять кодами Wraith';
+$language['permissionDashboardManageVaultCodesDesc'] = 'Позволяет игроку создавать, настраивать и удалять коды Wraith';
+$language['permissionDashboardSetAccountRolesTitle'] = 'Добавлять роли на аккаунт';
+$language['permissionDashboardSetAccountRolesDesc'] = 'Позволяет игроку добавлять и убирать роли аккаунтам';
+$language['disallow'] = 'Запретить';
+$language['inherit'] = 'Наследовать';
+$language['allow'] = 'Разрешить';
+$language['chooseRole'] = 'Выберите роль!';
 ?>

@@ -361,6 +361,7 @@ class Security {
 	
 	public static function hashUDID($userID, $udid, $userName = "Undefined") {
 		require __DIR__."/connection.php";
+		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/ip.php";
 		
 		$IP = IP::getIP();
@@ -378,8 +379,14 @@ class Security {
 			$registerUDID = $db->prepare("UPDATE udids SET userID = :userID WHERE ID = :unregisteredID");
 			$registerUDID->execute([':userID' => $userID, ':unregisteredID' => $unregisteredID]);
 		} else {
-			$updateUser = $db->prepare("UPDATE users SET extID = :unregisteredID WHERE userID = :userID AND isRegistered = 0");
-			$updateUser->execute([':userID' => $userID, ':unregisteredID' => "u".$unregisteredID]);
+			$unregisteredUser = Library::getUserByID($userID);
+			
+			if(!$unregisteredUser['isRegistered']) {
+				$updateUser = $db->prepare("UPDATE users SET extID = :unregisteredID WHERE userID = :userID");
+				$updateUser->execute([':userID' => $userID, ':unregisteredID' => "u".$unregisteredID]);
+				$updateLevels = $db->prepare("UPDATE levels SET extID = :unregisteredID WHERE userID = :userID");
+				$updateLevels->execute([':userID' => $userID, ':unregisteredID' => "u".$unregisteredID]);
+			}
 		}
 		
 		return ['unregisteredID' => $unregisteredID, 'userID' => $userID];

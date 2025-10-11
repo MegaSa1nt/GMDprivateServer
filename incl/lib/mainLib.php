@@ -1395,40 +1395,39 @@ class Library {
 	
 	public static function getPermissions() {
 		return [
-			'commandRate',
-			'commandFeature',
-			'commandEpic',
-			'commandVerifycoins',
-			'commandDaily',
-			'commandWeekly',
-			'commandEvent',
-			'commandSuggest',
-			'commandDelete',
-			'commandSetacc',
-			'commandRename',
-			'commandPass',
-			'commandDescription',
-			'commandPublic',
-			'commandSharecp',
-			'commandSong',
-			'commandLockComments',
-			'commandLockUpdating',
-			'actionRateDemon',
-			'actionRateStars',
-			'actionRateDifficulty',
-			'actionSuggestRating',
-			'actionDeleteComment',
-			'dashboardGauntletCreate',
-			'dashboardModTools',
-			'dashboardLevelPackCreate',
-			'dashboardManageSongs',
-			'dashboardAddMod',
-			'dashboardManageAccounts',
+			'gameSuggestLevel',
+			'gameRateLevel',
+			'gameSetDifficulty',
+			'gameSetFeatured',
+			'gameSetEpic',
+			'gameDeleteLevel',
+			'gameMoveLevel',
+			'gameRenameLevel',
+			'gameSetPassword',
+			'gameSetDescription',
+			'gameSetLevelPrivacy',
+			'gameShareCreatorPoints',
+			'gameSetLevelSong',
+			'gameLockLevelComments',
+			'gameLockLevelUpdating',
+			'gameSetListLevels',
+			'gameDeleteComments',
+			'gameVerifyCoins',
+			'gameSetDaily',
+			'gameSetWeekly',
+			'gameSetEvent',
+			'dashboardModeratorTools',
 			'dashboardDeleteLeaderboards',
+			'dashboardManageMapPacks',
+			'dashboardManageGauntlets',
+			'dashboardManageSongs',
+			'dashboardManageAccounts',
 			'dashboardManageLevels',
 			'dashboardManageClans',
 			'dashboardManageAutomod',
-			'dashboardVaultCodesManage'
+			'dashboardManageRoles',
+			'dashboardManageVaultCodes',
+			'dashboardSetAccountRoles'
 		];
 	}
 	
@@ -1689,6 +1688,84 @@ class Library {
 		return true;
 	}
 	
+	public static function getRoles($maxPriority = false) {
+		require __DIR__."/connection.php";
+		
+		$getRoles = $db->prepare("SELECT * FROM roles ".($maxPriority !== false ? "WHERE priority < ".$maxPriority : '')." ORDER BY priority DESC");
+		$getRoles->execute();
+		$getRoles = $getRoles->fetchAll();
+		
+		return $getRoles;
+	}
+	
+	public static function getRoleByID($roleID) {
+		require __DIR__."/connection.php";
+		
+		$role = $db->prepare("SELECT * FROM roles WHERE roleID = :roleID");
+		$role->execute([':roleID' => $roleID]);
+		$role = $role->fetch();
+		
+		return $role;
+	}
+	
+	public static function getPersonRolePriority($person) {
+		if(isset($GLOBALS['core_cache']['personRolePriority'][$person['accountID']])) return $GLOBALS['core_cache']['personRolePriority'][$person['accountID']];
+		
+		$isAdmin = self::isAccountAdministrator($person['accountID']);
+		if($isAdmin) {
+			$GLOBALS['core_cache']['personRolePriority'][$person['accountID']] = 2147483647;
+			return 2147483647;
+		}
+		
+		$roles = self::getPersonRoles($person);
+		if(!$roles) {
+			$GLOBALS['core_cache']['personRolePriority'][$person['accountID']] = 0;
+			return 0;
+		}
+		
+		$GLOBALS['core_cache']['personRolePriority'][$person['accountID']] = $roles[0]["priority"];
+		return $roles[0]["priority"];
+	}
+	
+	public static function changeRole($person, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault, $rolePermissions) {
+		require __DIR__."/connection.php";
+		
+		if($roleID) {
+			$permissionsArray = [];
+			$permissionsString = '';
+			
+			$role = self::getRoleByID($roleID);
+			if(!$role) return false;
+			
+			foreach($rolePermissions AS $permissionName => $permissionValue) {
+				$permissionsArray[] = $permissionName." = ".$permissionValue;
+			}
+			$permissionsString = implode(", ", $permissionsArray);
+			
+			$changeRole = $db->prepare("UPDATE roles SET roleName = :roleName, commentsExtraText = :roleCommentsCaption, commentColor = :roleColor, priority = :rolePriority, modBadgeLevel = :roleModBadge, isDefault = :roleIsDefault, ".$permissionsString." WHERE roleID = :roleID");
+			$changeRole->execute([':roleName' => $roleName, ':roleCommentsCaption' => $roleCommentsCaption, ':roleColor' => $roleColor, ':rolePriority' => $rolePriority, ':roleModBadge' => $roleModBadge, ':roleIsDefault' => $roleIsDefault, ':roleID' => $roleID]);
+			
+			self::logModeratorAction($person, ModeratorAction::RoleChange, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault);
+		} else {
+			$permissionsNamesArray = $permissionsValuesArray = [];
+			$permissionsString = '';
+			
+			foreach($rolePermissions AS $permissionName => $permissionValue) {
+				$permissionsNamesArray[] = $permissionName;
+				$permissionsValuesArray[] = $permissionValue;
+			}
+			$permissionsString = "(roleName, commentsExtraText, commentColor, priority, modBadgeLevel, isDefault, ".implode(",", $permissionsNamesArray).") VALUES (:roleName, :roleCommentsCaption, :roleColor, :rolePriority, :roleModBadge, :roleIsDefault, ".implode(",", $permissionsValuesArray).")";
+			
+			$createRole = $db->prepare("INSERT INTO roles ".$permissionsString);
+			$createRole->execute([':roleName' => $roleName, ':roleCommentsCaption' => $roleCommentsCaption, ':roleColor' => $roleColor, ':rolePriority' => $rolePriority, ':roleModBadge' => $roleModBadge, ':roleIsDefault' => $roleIsDefault]);
+			$roleID = $db->lastInsertId();
+			
+			self::logModeratorAction($person, ModeratorAction::RoleCreate, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault);
+		}
+		
+		return $roleID;
+	}
+	
 	/*
 		Levels-related functions
 	*/
@@ -1917,7 +1994,7 @@ class Library {
 	public static function getCommentsOfLevel($levelID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
 		
-		$comments = $db->prepare("SELECT *, levels.userID AS creatorUserID, levels.extID AS creatorAccountID FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0 ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
+		$comments = $db->prepare("SELECT *, levels.userID AS creatorUserID FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0 ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':levelID' => $levelID]);
 		$comments = $comments->fetchAll();
 		
@@ -2329,7 +2406,7 @@ class Library {
 		$getComment = $db->prepare("SELECT * FROM comments WHERE commentID = :commentID");
 		$getComment->execute([':commentID' => $commentID]);
 		$getComment = $getComment->fetch();
-		if(!$getComment || ($getComment['userID'] != $userID && !self::checkPermission($person, 'actionDeleteComment'))) return false;
+		if(!$getComment || ($getComment['userID'] != $userID && !self::checkPermission($person, 'gameDeleteComments'))) return false;
 		
 		$user = self::getUserByID($getComment['userID']);
 		
@@ -3300,7 +3377,7 @@ class Library {
 		foreach($downloadedLevels AS &$downloadedLevel) {
 			$levelCreators[$downloadedLevel['accountID']] += 2;
 			
-			$levelsScores[$downloadedLevel['levelID']] += 5 + ($downloadedLevel['accountID'] == $accountID ? 5 : 0);
+			$levelsScores[$downloadedLevel['levelID']] += 2 + ($downloadedLevel['accountID'] == $accountID ? 2 : 0);
 		}
 		
 		$commentedLevels = $db->prepare("SELECT comments.levelID AS levelID, levels.extID AS accountID FROM comments INNER JOIN levels ON levels.levelID = comments.levelID WHERE comments.userID = :userID AND levels.userID != :userID AND IF(levels.updateDate = 0, levels.uploadDate, levels.updateDate) >= :monthAgo AND levels.unlisted = 0 AND levels.isDeleted = 0 ORDER BY comments.timestamp DESC LIMIT 500");
@@ -3310,7 +3387,7 @@ class Library {
 		foreach($commentedLevels AS &$commentedLevel) {
 			$levelCreators[$commentedLevel['accountID']]++;
 			
-			$levelsScores[$commentedLevel['levelID']] += 2.5;
+			$levelsScores[$commentedLevel['levelID']] += 1;
 		}
 		
 		arsort($levelCreators);
@@ -3431,11 +3508,6 @@ class Library {
 		$listsCount = $db->prepare("SELECT count(*) FROM lists WHERE (".implode(" ) AND ( ", $filters).")");
 		$listsCount->execute();
 		$listsCount = $listsCount->fetchColumn();
-		
-		foreach($lists AS $listKey => $list) {
-			$addDownload = self::addDownloadToList($person, $list['listID']);
-			if($addDownload) $lists[$listKey]['downloads']++;
-		}
 		
 		return ["lists" => $lists, "count" => $listsCount];
 	}

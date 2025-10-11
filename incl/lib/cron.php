@@ -54,18 +54,17 @@ class Cron {
 		$demons = $levelStats['demons'];
 		$moons = $levelStats['moons']; 
 		
-		$getCheaters = $db->prepare("SELECT userID FROM users WHERE stars > :stars OR demons > :demons OR userCoins > :coins OR moons > :moons OR stars < 0 OR demons < 0 OR coins < 0 OR userCoins < 0 OR diamonds < 0 OR moons < 0");
+		$getCheaters = $db->prepare("SELECT stars, moons, demons, userCoins, extID, userID, IP FROM users WHERE stars > :stars OR demons > :demons OR userCoins > :coins OR moons > :moons OR stars < 0 OR demons < 0 OR coins < 0 OR userCoins < 0 OR diamonds < 0 OR moons < 0");
 		$getCheaters->execute([':stars' => $stars, ':demons' => $demons, ':coins' => $coins, ':moons' => $moons]);
 		$getCheaters = $getCheaters->fetchAll();
 		
 		foreach($getCheaters AS &$ban) {
-			$getUser = Library::getUserByID($ban['userID']);
-			$maxText = 'MAX: ⭐'.$stars.' • 🌙'.$moons.' • 👿'.$demons.' • 🪙'.$coins.' | USER: ⭐'.$getUser['stars'].' • 🌙'.$getUser['moons'].' • 👿'.$getUser['demons'].' • 🪙'.$getUser['userCoins'];
+			$maxText = 'MAX: ⭐'.$stars.' • 🌙'.$moons.' • 👿'.$demons.' • 🪙'.$coins.' | USER: ⭐'.$ban['stars'].' • 🌙'.$ban['moons'].' • 👿'.$ban['demons'].' • 🪙'.$ban['userCoins'];
 		
 			$banPerson = [
-				'accountID' => $getUser['extID'],
+				'accountID' => $ban['extID'],
 				'userID' => $ban['userID'],
-				'IP' => $getUser['IP'],
+				'IP' => $ban['IP'],
 			];
 			
 			Library::banPerson(0, $banPerson, "You're too good at gaining stats.", Ban::Leaderboards, Person::UserID, 2147483647, $maxText);

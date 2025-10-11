@@ -530,10 +530,10 @@ class Dashboard {
 		if($showContextMenu) {
 			$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
 			
-			$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+			$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 			$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
 			$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
-			$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+			$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 			
 			$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 			
@@ -560,7 +560,7 @@ class Dashboard {
 		$levelnameData['LEVELNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = !$levelID ? 'dashboard-remove="href title"' : '';
 		
 		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 		
@@ -586,7 +586,7 @@ class Dashboard {
 		$listnameData['LISTNAME_ATTRIBUTES'] = $contextMenuData['MENU_NAME_ATTRIBUTES'] = !$listID ? 'dashboard-remove="href title"' : '';
 		
 		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 		
@@ -684,7 +684,7 @@ class Dashboard {
 		$contextMenuData['MENU_ID'] = $level['levelID'];
 		
 		$contextMenuData['MENU_CAN_MANAGE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 		
@@ -700,7 +700,7 @@ class Dashboard {
 		
 		$contextMenuData = [];
 		$isPersonThemselves = $person['userID'] == $comment['userID'];
-		$isCreatorThemselves = $person['accountID'] == $comment['creatorAccountID'];
+		$isCreatorThemselves = $person['userID'] == $comment['creatorUserID'] || $person['accountID'] == $comment['creatorAccountID'];
 		
 		$user = Library::getUserByID($comment['userID']);
 		$userName = $user ? $user['userName'] : 'Undefined';
@@ -730,8 +730,8 @@ class Dashboard {
 		$contextMenuData['MENU_ID'] = $comment['commentID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
-		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteComments")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 		
@@ -759,8 +759,8 @@ class Dashboard {
 		$contextMenuData['MENU_ID'] = $accountPost['commentID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
-		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "actionDeleteComment")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteComments")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 		
@@ -793,7 +793,7 @@ class Dashboard {
 		
 		$score['SCORE_IS_PLATFORMER'] = $levelIsPlatformer ? 'true' : 'false';
 		
-		$score['SCORE_CAN_SEE_HIDDEN'] = ($person['accountID'] == $user['accountID'] || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$score['SCORE_CAN_SEE_HIDDEN'] = ($person['accountID'] == $user['accountID'] || Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		if($score['SCORE_CAN_SEE_HIDDEN'] == 'false') {
 			$score['clicks'] = 'Smartest one here? :trollface:';
 			if(!$levelIsPlatformer) $score['time'] = 'No time for ya!!!';
@@ -806,7 +806,7 @@ class Dashboard {
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
 		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardDeleteLeaderboards")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_CONTEXT'] = ($contextMenuData['MENU_CAN_DELETE'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 		
@@ -847,7 +847,7 @@ class Dashboard {
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
 		$contextMenuData['MENU_CAN_CHANGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$song['SONG_CONTEXT_MENU'] = self::renderTemplate('components/menus/song', $contextMenuData);
 		
@@ -880,14 +880,14 @@ class Dashboard {
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
 		$contextMenuData['MENU_CAN_CHANGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageSongs")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$sfx['SFX_CONTEXT_MENU'] = self::renderTemplate('components/menus/sfx', $contextMenuData);
 		
 		return self::renderTemplate('components/sfx', $sfx);
 	}
 	
-	public static function renderListCard($list, $person) {
+	public static function renderListCard($list, $person, $showPrivacy = true) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -907,12 +907,33 @@ class Dashboard {
 		$list['LIST_LIKES'] = abs($list['likes'] - $list['dislikes']);
 		$list['LIST_IS_DISLIKED'] = $list['dislikes'] > $list['likes'] ? 'true' : 'false';
 		
+		$list['LIST_SHOW_PRIVACY'] = 'false';
+		$list['LIST_PRIVACY_ICON'] = $list['LEVEL_PRIVACY_TEXT'] = '';
+		if($showPrivacy) {
+			$list['LIST_SHOW_PRIVACY'] = 'true';
+			
+			switch($list['unlisted']) {
+				case 0:
+					$list['LIST_PRIVACY_ICON'] = 'eye';
+					$list['LIST_PRIVACY_TEXT'] = self::string("public");
+					break;
+				case 1:
+					$list['LIST_PRIVACY_ICON'] = 'lock';
+					$list['LIST_PRIVACY_TEXT'] = self::string("onlyForFriends");
+					break;
+				default:
+					$list['LIST_PRIVACY_ICON'] = 'eye-slash';
+					$list['LIST_PRIVACY_TEXT'] = self::string("unlisted");
+					break;
+			}
+		}
+		
 		$contextMenuData['MENU_SHOW_NAME'] = 'false';
 		
 		$contextMenuData['MENU_ID'] = $list['listID'];
 		
 		$contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 		
@@ -940,7 +961,7 @@ class Dashboard {
 		
 		$contextMenuData['MENU_ID'] = $mapPack['ID'];
 		
-		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardLevelPackCreate") ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardManageMapPacks") ? 'true' : 'false';
 		
 		$mapPack['MAPPACK_CONTEXT_MENU'] = self::renderTemplate('components/menus/mappack', $contextMenuData);
 		
@@ -958,7 +979,7 @@ class Dashboard {
 		
 		$contextMenuData['MENU_ID'] = $gauntlet['ID'];
 		
-		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardGauntletCreate") ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardManageGauntlets") ? 'true' : 'false';
 		
 		$gauntlet['GAUNTLET_CONTEXT_MENU'] = self::renderTemplate('components/menus/gauntlet', $contextMenuData);
 		
@@ -1023,10 +1044,10 @@ class Dashboard {
 		
 		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
 		
-		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		$contextMenuData['MENU_CAN_OPEN_SETTINGS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageAccounts")) ? 'true' : 'false';
 		$contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
-		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+		$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 		
 		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 		

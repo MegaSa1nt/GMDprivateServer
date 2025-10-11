@@ -197,7 +197,7 @@
 					</div>
 				</div>
 				
-				<div class="dropdown" id="modToolsDropdown" dashboard-show="%PERMISSION_dashboardModTools%">
+				<div class="dropdown" id="modToolsDropdown" dashboard-show="%PERMISSION_dashboardModeratorTools%">
 					<button title="%TEXT_moderatorTools%" type="button" dashboard-dropdown="modToolsDropdown">
 						<i class="fa-solid fa-wrench"></i>
 						<text>%TEXT_moderatorTools%</text>
@@ -205,14 +205,29 @@
 					</button>
 					
 					<div class="dropdown-items">
-						<button title="%TEXT_addMapPackTitle%" type="button" href="upload/mappack" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardLevelPackCreate%">
+						<button title="%TEXT_addMapPackTitle%" type="button" href="upload/mappack" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardManageMapPacks%">
 							<i class="fa-solid fa-folder-open"></i>
 							<text>%TEXT_addMapPackTitle%</text>
 						</button>
 						
-						<button title="%TEXT_addGauntletTitle%" type="button" href="upload/gauntlet" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardGauntletCreate%">
+						<button title="%TEXT_addGauntletTitle%" type="button" href="upload/gauntlet" dashboard-loader-type="box" dashboard-show="%PERMISSION_dashboardManageGauntlets%">
 							<i class="fa-solid fa-globe"></i>
 							<text>%TEXT_addGauntletTitle%</text>
+						</button>
+						
+						<button title="%TEXT_unlistedLevelsTitle%" type="button" href="mod/levels" dashboard-loader-type="list">
+							<i class="fa-solid fa-gamepad"></i>
+							<text>%TEXT_unlistedLevelsTitle%</text>
+						</button>
+						
+						<button title="%TEXT_unlistedListsTitle%" type="button" href="mod/lists" dashboard-loader-type="list">
+							<i class="fa-solid fa-list"></i>
+							<text>%TEXT_unlistedListsTitle%</text>
+						</button>
+						
+						<button title="%TEXT_manageRolesTitle%" type="button" href="mod/roles" dashboard-loader-type="manage" dashboard-show="%PERMISSION_dashboardManageRoles%">
+							<i class="fa-solid fa-id-badge"></i>
+							<text>%TEXT_manageRolesTitle%</text>
 						</button>
 					</div>
 				</div>
@@ -338,6 +353,42 @@
 				<div class="contentDiv skeletonAnimation"></div>
 				<div class="horisontal">
 					<div class="levelStats">
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+					</div>
+					<div class="commentsDiv">
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+						<div class="contentDiv skeletonAnimation"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="dashboard-page skeleton hide" id="dashboard-loader-manage" dashboard-loader>
+			<div class="head">
+				<span class="title skeletonAnimation"></span>
+				<span class="description skeletonAnimation"></span>
+			</div>
+			
+			<div class="wideBox levelPage">
+				<div class="horisontal">
+					<div class="levelStats">
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
+						<div class="levelStat skeletonAnimation"></div>
 						<div class="levelStat skeletonAnimation"></div>
 						<div class="levelStat skeletonAnimation"></div>
 						<div class="levelStat skeletonAnimation"></div>

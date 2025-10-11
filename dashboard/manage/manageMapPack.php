@@ -9,7 +9,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
-if(Library::checkPermission($person, "dashboardLevelPackCreate") && isset($_POST['mapPackID']) && isset($_POST['levels'])) {
+if(Library::checkPermission($person, "dashboardManageMapPacks") && isset($_POST['mapPackID']) && isset($_POST['levels'])) {
 	$mapPackID = Escape::number($_POST['mapPackID']);
 	
 	$mapPack = Library::getMapPackByID($mapPackID);

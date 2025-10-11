@@ -31,7 +31,7 @@ $userRank = Library::getUserRank($user['stars'], $user['moons'], $user['userName
 
 $canSeeCommentHistory = Library::canSeeCommentsHistory($person, $user['userID']);
 
-$canSeeBans = ($accountID == $account['accountID'] || Library::checkPermission($person, "dashboardModTools"));
+$canSeeBans = ($accountID == $account['accountID'] || Library::checkPermission($person, "dashboardModeratorTools"));
 $canOpenSettings = ($accountID == $account['accountID'] || Library::checkPermission($person, "dashboardManageAccounts"));
 
 $additionalPage = '';
@@ -328,7 +328,7 @@ $user['PROFILE_CAN_SEE_COMMENT_HISTORY'] = $contextMenuData['MENU_CAN_SEE_COMMEN
 $user['PROFILE_CAN_SEE_BANS'] = $contextMenuData['MENU_CAN_SEE_BANS'] = $canSeeBans ? 'true' : 'false';
 $user['PROFILE_CAN_OPEN_SETTINGS'] = $contextMenuData['MENU_CAN_OPEN_SETTINGS'] = $canOpenSettings ? 'true' : 'false';
 $contextMenuData['MENU_CAN_BLOCK'] = ($person['accountID'] != 0 && !$isPersonThemselves) ? 'true' : 'false';
-$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModTools")) ? 'true' : 'false';
+$contextMenuData['MENU_CAN_BAN'] = (!$isPersonThemselves && Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';
 
 $contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
 

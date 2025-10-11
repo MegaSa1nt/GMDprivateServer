@@ -18,7 +18,7 @@ $level = Library::getLevelByID($levelID);
 if(!$level) exit(CommonError::InvalidRequest);
 
 switch(true) {
-	case Library::checkPermission($person, 'actionRateStars'):
+	case Library::checkPermission($person, 'gameRateLevel'):
 		$featured = $level['starEpic'] + ($level['starFeatured'] ? 1 : 0);
 		
 		Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating($ratingNumber, ($stars == 1), ($stars == 10)), $stars, ($level['coins'] > 0 ? 1 : 0), $featured);

@@ -16,11 +16,11 @@ $level = Library::getLevelByID($levelID);
 if(!$level) exit(CommonError::InvalidRequest);
 
 switch(true) {
-	case Library::checkPermission($person, 'actionRateStars'):		
+	case Library::checkPermission($person, 'gameRateLevel'):		
 		Library::rateLevel($levelID, $person, $stars, $stars, ($level['coins'] > 0 ? 1 : 0), $feature);
 		
 		exit(CommonError::Success);
-	case Library::checkPermission($person, 'actionSuggestRating'):
+	case Library::checkPermission($person, 'gameSuggestLevel'):
 		if($level['starStars']) exit(CommonError::InvalidRequest);
 		
 		Library::sendLevel($levelID, $person, $stars, $stars, $feature);

@@ -36,7 +36,7 @@ if($_GET['id']) {
 	$contextMenuData['MENU_ID'] = $list['listID'];
 	
 	$list['LIST_CAN_MANAGE'] = $contextMenuData['MENU_CAN_MANAGE'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-	$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+	$contextMenuData['MENU_CAN_DELETE'] = ($isPersonThemselves || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 	
 	$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 	
@@ -250,7 +250,7 @@ $filters = $getFilters['filters'];
 
 $lists = Library::getLists($person, $filters, $order, $pageOffset);
 
-foreach($lists['lists'] AS &$list) $page .= Dashboard::renderListCard($list, $person);
+foreach($lists['lists'] AS &$list) $page .= Dashboard::renderListCard($list, $person, false);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 $pageCount = floor(($lists['count'] - 1) / 10) + 1;

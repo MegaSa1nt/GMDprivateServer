@@ -39,7 +39,7 @@ if($_GET['id']) {
 	$contextMenuData['MENU_ID'] = $level['levelID'];
 	
 	$contextMenuData['MENU_CAN_MANAGE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "dashboardManageLevels")) ? 'true' : 'false';
-	$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "commandDelete")) ? 'true' : 'false';
+	$contextMenuData['MENU_CAN_DELETE'] = ($person['accountID'] == $level['extID'] || Library::checkPermission($person, "gameDeleteLevel")) ? 'true' : 'false';
 	
 	$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_MANAGE'] == 'true' || $contextMenuData['MENU_CAN_DELETE'] == 'true') ? 'true' : 'false';
 	
@@ -90,7 +90,7 @@ if($_GET['id']) {
 	$level['LEVEL_COMMENTS'] = $levelStatsCount['comments'];
 	$level['LEVEL_SCORES'] = $levelStatsCount['scores'];
 	
-	$level['LEVEL_CAN_SEE_PASSWORD'] = (Library::checkPermission($person, "dashboardModTools") && strlen($level['password']) > 1) ? 'true' : 'false';
+	$level['LEVEL_CAN_SEE_PASSWORD'] = (Library::checkPermission($person, "dashboardModeratorTools") && strlen($level['password']) > 1) ? 'true' : 'false';
 	$level['LEVEL_PASSWORD'] = $level['LEVEL_CAN_SEE_PASSWORD'] == 'true' ? substr($level['password'], 1) : 'No password for you :)';
 	
 	$level['LEVEL_CAN_MANAGE'] = Library::checkPermission($person, "dashboardManageLevels") ? 'true' : 'false';

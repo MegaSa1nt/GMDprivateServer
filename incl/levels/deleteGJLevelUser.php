@@ -12,7 +12,7 @@ $userID = $person['userID'];
 $levelID = Escape::number($_POST['levelID']);
 
 $level = Library::getLevelByID($levelID);
-if(!$level || ($level['userID'] != $userID && !Library::checkPermission($person, 'commandDelete'))) exit(CommonError::InvalidRequest);
+if(!$level || ($level['userID'] != $userID && !Library::checkPermission($person, 'gameDeleteLevel'))) exit(CommonError::InvalidRequest);
 
 $deleteLevel = Library::deleteLevel($levelID, $person);
 if(!$deleteLevel) exit(CommonError::InvalidRequest);

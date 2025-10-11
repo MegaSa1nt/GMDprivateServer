@@ -27,7 +27,7 @@ $ratingArray = [7, 8, 6, 9, 10];
 $ratingNumber = $ratingArray[$demon - 1] ?? 6;
 
 // Check for rate demon permission
-if(!Library::checkPermission($person, "actionRateDemon")) {
+if(!Library::checkPermission($person, "gameSetDifficulty")) {
     http_response_code(403);
     exit(json_encode(['success' => false, 'cause' => 'You do not have the necessary permission to change the demon difficulty of a level!']));
 }

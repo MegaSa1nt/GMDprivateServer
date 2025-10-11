@@ -17,6 +17,7 @@ if($_GET['id']) {
 	$mapPackID = Escape::number($parameters[0]);
 	
 	$mapPack = Library::getMapPackByID($mapPackID);
+	if(!$mapPack) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorMapPackNotFound"), '../../'));
 	
 	$mapPackColor = str_replace(',', ' ', $mapPack['rgbcolors']);
 	
@@ -29,7 +30,7 @@ if($_GET['id']) {
 	
 	$contextMenuData['MENU_ID'] = $mapPack['ID'];
 	
-	$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardLevelPackCreate") ? 'true' : 'false';
+	$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardManageMapPacks") ? 'true' : 'false';
 	
 	$mapPack['MAPPACK_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/mappack', $contextMenuData);
 		
@@ -91,7 +92,7 @@ if($_GET['id']) {
 			break; 
 		case 'manage':
 			$pageBase = '../../../';
-			if(!Library::checkPermission($person, "dashboardLevelPackCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			if(!Library::checkPermission($person, "dashboardManageMapPacks")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), $pageBase));
 			
 			$friendsString = Library::getFriendsQueryString($accountID);
 				

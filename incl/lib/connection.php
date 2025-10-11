@@ -31,8 +31,8 @@ if(empty($db)) {
 		
 		if(!$installed) require __DIR__."/migrate.php";
 	} catch (PDOException $e) {
-		echo "<h1>Connection to MySQL failed!</h1>";
-		echo "Error: ".$e->getMessage();
+		exit("<h1>Connection to MySQL or migration failed!</h1><br>
+			<p><b>Error:</b> ".$e->getMessage()."</p>");
 	}
 }
 ?>

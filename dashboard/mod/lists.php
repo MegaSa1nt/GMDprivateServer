@@ -6,10 +6,12 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("yourListsTitle"), Dashboard::string("errorLoginRequired")));
+if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("unlistedListsTitle"), Dashboard::string("errorLoginRequired")));
+
+if(!Library::checkPermission($person, "dashboardModeratorTools")) exit(Dashboard::renderErrorPage(Dashboard::string("unlistedListsTitle"), Dashboard::string("errorNoPermission"), '../'));
+
 $accountID = $person['accountID'];
 
-// Search lists
 $order = "uploadDate";
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
@@ -17,7 +19,14 @@ $page = '';
 $getFilters = Library::getListSearchFilters($_GET, true, true);
 $filters = $getFilters['filters'];
 
-$filters[] = "lists.accountID = '".$accountID."'";
+$friendsString = Library::getFriendsQueryString($accountID);
+
+$filters[] = "lists.unlisted != 0";
+if(!$unlistedLevelsForAdmins || !Library::isAccountAdministrator($accountID)) {
+	$friendsString = Library::getFriendsQueryString($accountID);
+	
+	$filters[] = "lists.unlisted != 1 OR (lists.unlisted = 1 AND (lists.accountID IN (".$friendsString.")))";
+}
 
 $lists = Library::getLists($person, $filters, $order, $pageOffset);
 
@@ -44,5 +53,5 @@ $dataArray = [
 
 $fullPage = Dashboard::renderTemplate("browse/lists", $dataArray);
 
-exit(Dashboard::renderPage("general/wide", Dashboard::string("yourListsTitle"), "../", $fullPage));
+exit(Dashboard::renderPage("general/wide", Dashboard::string("unlistedListsTitle"), "../", $fullPage));
 ?>

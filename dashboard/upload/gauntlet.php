@@ -10,7 +10,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("addGauntletTitle"), Dashboard::string("errorLoginRequired")));
 
-if(!Library::checkPermission($person, "dashboardGauntletCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("addGauntletTitle"), Dashboard::string("errorNoPermission"), '../'));
+if(!Library::checkPermission($person, "dashboardManageGauntlets")) exit(Dashboard::renderErrorPage(Dashboard::string("addGauntletTitle"), Dashboard::string("errorNoPermission"), '../'));
 
 $gauntletNames = Library::getGauntletNames();
 

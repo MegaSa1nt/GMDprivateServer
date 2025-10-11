@@ -1,0 +1,910 @@
+<form class="wideBox" name="manageRolesForm" dashboard-change-form>
+	<input type="hidden" name="roleID" value="%ROLE_ID%" />
+	
+	<div class="contentDiv vertical">
+		<h1>
+			<i class="fa-solid fa-eye"></i>
+			%TEXT_roleAppearance%
+		</h1>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-pen-to-square"></i>
+					%TEXT_roleName%
+				</h2>
+				
+				<input class="inputStyle" type="text" name="roleName" value="%ROLE_NAME%" autocomplete="gdps-dashboard-roleName" dashboard-change-default placeholder="Elder Moderator" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comment-dots"></i>
+					%TEXT_roleCommentsCaption%
+					
+					<span class="infoIcon titleToRight" title="%TEXT_roleCommentsCaptionHint%">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<input class="inputStyle" type="text" name="roleCommentsExtraText" dashboard-not-required value="%ROLE_COMMENTS_EXTRA_TEXT%" autocomplete="gdps-dashboard-roleCommentsExtraText" dashboard-change-default placeholder="Elder Mod" />
+			</div>
+		</div>
+		
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-palette"></i>
+					%TEXT_roleColor%
+				</h2>
+				
+				<input class="inputColor" type="color" name="roleColor" value="%ROLE_COLOR%" autocomplete="gdps-dashboard-roleColor" dashboard-change-default />
+			</div>
+		</div>
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trophy"></i>
+					%TEXT_rolePriority%
+					
+					<span class="infoIcon" title="%TEXT_rolePriorityHint%">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<input class="inputStyle" type="number" name="rolePriority" value="%ROLE_PRIORITY%" autocomplete="gdps-dashboard-rolePriority" dashboard-change-default placeholder="100" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-medal"></i>
+					%TEXT_modBadge%
+				</h2>
+				
+				<div class="select" dashboard-select="modBadgeLevel">
+					<input type="hidden" name="modBadgeLevel" value="%ROLE_MOD_BADGE_LEVEL%" dashboard-change-default="%ROLE_MOD_BADGE_LEVEL%" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseModBadge%" value="%ROLE_MOD_BADGE_NAME%" dashboard-change-default="%ROLE_MOD_BADGE_NAME%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="2" dashboard-select-option="%TEXT_elderModeratorRole%">
+							<img src="incl/icons/badge_2.png"></img>
+							<text>%TEXT_elderModeratorRole%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="%TEXT_moderatorRole%">
+							<img src="incl/icons/badge_1.png"></img>
+							<text>%TEXT_moderatorRole%</text>
+						</div>
+						
+						<div class="option" value="3" dashboard-select-option="%TEXT_leaderboardModeratorRole%">
+							<img src="incl/icons/badge_3.png"></img>
+							<text>%TEXT_leaderboardModeratorRole%</text>
+						</div>
+						
+						<div class="option" value="0" dashboard-select-option="%TEXT_none%">
+							<text>%TEXT_none%</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user"></i>
+					%TEXT_roleIsDefaultTitle%
+				</h2>
+				<h3>%TEXT_roleIsDefaultDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="roleIsDefault" value="%ROLE_IS_DEFAULT_VALUE%" dashboard-change-default checked dashboard-remove="%ROLE_IS_DEFAULT_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<h1>
+			<i class="fa-solid fa-gavel"></i>
+			%TEXT_rolePermissions%
+		</h1>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-regular fa-star"></i>
+					%TEXT_permissionGameSuggestLevelTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSuggestLevelDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSuggestLevel" value="%ROLE_PERMISSION_GAME_SUGGEST_LEVEL_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SUGGEST_LEVEL_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-star"></i>
+					%TEXT_permissionGameRateLevelTitle%
+				</h2>
+				<h3>%TEXT_permissionGameRateLevelDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameRateLevel" value="%ROLE_PERMISSION_GAME_RATE_LEVEL_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_RATE_LEVEL_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-face-smile"></i>
+					%TEXT_permissionGameSetDifficultyTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetDifficultyDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetDifficulty" value="%ROLE_PERMISSION_GAME_SET_DIFFICULTY_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_DIFFICULTY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-regular fa-circle"></i>
+					%TEXT_permissionGameSetFeaturedTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetFeaturedDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetFeatured" value="%ROLE_PERMISSION_GAME_SET_FEATURED_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_FEATURED_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-fire"></i>
+					%TEXT_permissionGameSetEpicTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetEpicDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetEpic" value="%ROLE_PERMISSION_GAME_SET_EPIC_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_EPIC_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash-can"></i>
+					%TEXT_permissionGameDeleteLevelTitle%
+				</h2>
+				<h3>%TEXT_permissionGameDeleteLevelDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameDeleteLevel" value="%ROLE_PERMISSION_GAME_DELETE_LEVEL_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_DELETE_LEVEL_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-arrow-right"></i>
+					%TEXT_permissionGameMoveLevelTitle%
+				</h2>
+				<h3>%TEXT_permissionGameMoveLevelDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameMoveLevel" value="%ROLE_PERMISSION_GAME_MOVE_LEVEL_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_MOVE_LEVEL_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-pen-to-square"></i>
+					%TEXT_permissionGameRenameLevelTitle%
+				</h2>
+				<h3>%TEXT_permissionGameRenameLevelDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameRenameLevel" value="%ROLE_PERMISSION_GAME_RENAME_LEVEL_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_RENAME_LEVEL_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-key"></i>
+					%TEXT_permissionGameSetPasswordTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetPasswordDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetPassword" value="%ROLE_PERMISSION_GAME_SET_PASSWORD_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_PASSWORD_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comment-dots"></i>
+					%TEXT_permissionGameSetDescriptionTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetDescriptionDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetDescription" value="%ROLE_PERMISSION_GAME_SET_DESCRIPTION_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_DESCRIPTION_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-eye"></i>
+					%TEXT_permissionGameSetLevelPrivacyTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetLevelPrivacyDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetLevelPrivacy" value="%ROLE_PERMISSION_GAME_SET_LEVEL_PRIVACY_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_LEVEL_PRIVACY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-screwdriver-wrench"></i>
+					%TEXT_permissionGameShareCreatorPointsTitle%
+				</h2>
+				<h3>%TEXT_permissionGameShareCreatorPointsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameShareCreatorPoints" value="%ROLE_PERMISSION_GAME_SHARE_CREATOR_POINTS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SHARE_CREATOR_POINTS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-music"></i>
+					%TEXT_permissionGameSetLevelSongTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetLevelSongDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetLevelSong" value="%ROLE_PERMISSION_GAME_SET_LEVEL_SONG_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_LEVEL_SONG_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-lock"></i>
+					%TEXT_permissionGameLockLevelCommentsTitle%
+				</h2>
+				<h3>%TEXT_permissionGameLockLevelCommentsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameLockLevelComments" value="%ROLE_PERMISSION_GAME_LOCK_LEVEL_COMMENTS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_LOCK_LEVEL_COMMENTS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user-lock"></i>
+					%TEXT_permissionGameLockLevelUpdatingTitle%
+				</h2>
+				<h3>%TEXT_permissionGameLockLevelUpdatingDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameLockLevelUpdating" value="%ROLE_PERMISSION_GAME_LOCK_LEVEL_UPDATING_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_LOCK_LEVEL_UPDATING_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-list"></i>
+					%TEXT_permissionGameSetListLevelsTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetListLevelsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetListLevels" value="%ROLE_PERMISSION_GAME_SET_LIST_LEVELS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_LIST_LEVELS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-comment-slash"></i>
+					%TEXT_permissionGameDeleteCommentsTitle%
+				</h2>
+				<h3>%TEXT_permissionGameDeleteCommentsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameDeleteComments" value="%ROLE_PERMISSION_GAME_DELETE_COMMENTS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_DELETE_COMMENTS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-coins"></i>
+					%TEXT_permissionGameVerifyCoinsTitle%
+				</h2>
+				<h3>%TEXT_permissionGameVerifyCoinsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameVerifyCoins" value="%ROLE_PERMISSION_GAME_VERIFY_COINS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_VERIFY_COINS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-regular fa-calendar"></i>
+					%TEXT_permissionGameSetDailyTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetDailyDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetDaily" value="%ROLE_PERMISSION_GAME_SET_DAILY_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_DAILY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-calendar"></i>
+					%TEXT_permissionGameSetWeeklyTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetWeeklyDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetWeekly" value="%ROLE_PERMISSION_GAME_SET_WEEKLY_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_WEEKLY_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-cake-candles"></i>
+					%TEXT_permissionGameSetEventTitle%
+				</h2>
+				<h3>%TEXT_permissionGameSetEventDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="gameSetEvent" value="%ROLE_PERMISSION_GAME_SET_EVENT_VALUE%" dashboard-change-default="%ROLE_PERMISSION_GAME_SET_EVENT_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-gauge"></i>
+					%TEXT_permissionDashboardModeratorToolsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardModeratorToolsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardModeratorTools" value="%ROLE_PERMISSION_DASHBOARD_MODERATOR_TOOLS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MODERATOR_TOOLS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-chart-simple"></i>
+					%TEXT_permissionDashboardDeleteLeaderboardsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardDeleteLeaderboardsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardDeleteLeaderboards" value="%ROLE_PERMISSION_DASHBOARD_DELETE_LEADERBOARDS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_DELETE_LEADERBOARDS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-folder-open"></i>
+					%TEXT_permissionDashboardManageMapPacksTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageMapPacksDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageMapPacks" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_MAPPACKS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_MAPPACKS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-globe"></i>
+					%TEXT_permissionDashboardManageGauntletsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageGauntletsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageGauntlets" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_GAUNTLETS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_GAUNTLETS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-drum"></i>
+					%TEXT_permissionDashboardManageSongsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageSongsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageSongs" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_SONGS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_SONGS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-user"></i>
+					%TEXT_permissionDashboardManageAccountsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageAccountsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageAccounts" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_ACCOUNTS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_ACCOUNTS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-gamepad"></i>
+					%TEXT_permissionDashboardManageLevelsTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageLevelsDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageLevels" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_LEVELS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_LEVELS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-shield-halved"></i>
+					%TEXT_permissionDashboardManageClansTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageClansDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageClans" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_CLANS_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_CLANS_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-robot"></i>
+					%TEXT_permissionDashboardManageAutomodTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageAutomodDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageAutomod" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_AUTOMOD_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_AUTOMOD_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-gavel"></i>
+					%TEXT_permissionDashboardManageRolesTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageRolesDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageRoles" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_ROLES_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_ROLES_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-award"></i>
+					%TEXT_permissionDashboardManageVaultCodesTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardManageVaultCodesDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardManageVaultCodes" value="%ROLE_PERMISSION_DASHBOARD_MANAGE_VAULT_CODES_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_MANAGE_VAULT_CODES_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-id-badge"></i>
+					%TEXT_permissionDashboardSetAccountRolesTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardSetAccountRolesDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardSetAccountRoles" value="%ROLE_PERMISSION_DASHBOARD_SET_ACCOUNT_ROLES_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_SET_ACCOUNT_ROLES_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageRole', 'manageRolesForm', 'manage')">%TEXT_applySettings%</button>
+	</div>
+</form>

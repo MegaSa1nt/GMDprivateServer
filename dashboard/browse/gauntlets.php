@@ -8,7 +8,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 $accountID = $person['accountID'];
 
-// List page
+// Gauntlet page
 if($_GET['id']) {
 	$contextMenuData = [];
 	
@@ -17,13 +17,14 @@ if($_GET['id']) {
 	$gauntletID = Escape::number($parameters[0]);
 	
 	$gauntlet = Library::getGauntletByID($gauntletID);
+	if(!$gauntlet) exit(Dashboard::renderErrorPage(Dashboard::string("gauntletsTitle"), Dashboard::string("errorGauntletNotFound"), '../../'));
 	
 	$gauntlet['GAUNTLET_TITLE'] = Library::getGauntletName($gauntlet['ID']).' Gauntlet';
 	$gauntlet['GAUNTLET_DIFFICULTY_IMAGE'] = Library::getGauntletImage($gauntlet['ID']);
 	
 	$contextMenuData['MENU_ID'] = $gauntlet['ID'];
 	
-	$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardGauntletCreate") ? 'true' : 'false';
+	$contextMenuData['MENU_CAN_MANAGE'] = Library::checkPermission($person, "dashboardManageGauntlets") ? 'true' : 'false';
 	
 	$gauntlet['GAUNTLET_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/gauntlet', $contextMenuData);
 	
@@ -83,7 +84,7 @@ if($_GET['id']) {
 			break; 
 		case 'manage':
 			$pageBase = '../../../';
-			if(!Library::checkPermission($person, "dashboardGauntletCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("gauntletsTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			if(!Library::checkPermission($person, "dashboardManageGauntlets")) exit(Dashboard::renderErrorPage(Dashboard::string("gauntletsTitle"), Dashboard::string("errorNoPermission"), $pageBase));
 			
 			$friendsString = Library::getFriendsQueryString($accountID);
 				
@@ -139,7 +140,7 @@ if($_GET['id']) {
 	exit(Dashboard::renderPage("browse/gauntlet", $gauntlet['GAUNTLET_TITLE'], $pageBase, $gauntlet));
 }
 
-// Search lists
+// Search Gauntlets
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
 

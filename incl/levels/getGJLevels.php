@@ -172,6 +172,8 @@ switch($type) {
 			break;
 		}
 		
+		Library::addDownloadToList($person, $list['listID']);
+		
 		$listLevels = $list['listlevels'];
 		
 		$friendsString = Library::getFriendsQueryString($accountID);

@@ -174,7 +174,7 @@ class Action { // Last action ID is 71
 	const LevelDescriptionChange = 21;
 }
 
-class ModeratorAction { // Last action ID is 50
+class ModeratorAction { // Last action ID is 53
 	const LevelRate = 1;
 	const LevelDailySet = 5;
 	const LevelDeletion = 6;
@@ -225,6 +225,10 @@ class ModeratorAction { // Last action ID is 50
 	const ListLevelsChange = 49;
 	
 	const ProfileSettingsChange = 50;
+	
+	const RoleCreate = 51;
+	const RoleChange = 52;
+	const RoleDelete = 53;
 	
 	// Unused
 	const LevelFeature = 2;

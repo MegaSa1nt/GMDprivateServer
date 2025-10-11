@@ -1287,6 +1287,7 @@ i[onclick],
 .nothingOnPageDiv .nothing-icon {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	
 	font-size: 150px;
 }
@@ -2485,7 +2486,7 @@ body:has(.modalPage.show) span.background {
 	justify-content: space-between;
 }
 
-[dashboard-context-menu] hr {
+hr {
 	width: 100%;
 	
 	border: none;

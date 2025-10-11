@@ -10,7 +10,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("addMapPackTitle"), Dashboard::string("errorLoginRequired")));
 
-if(!Library::checkPermission($person, "dashboardLevelPackCreate")) exit(Dashboard::renderErrorPage(Dashboard::string("addMapPackTitle"), Dashboard::string("errorNoPermission"), '../'));
+if(!Library::checkPermission($person, "dashboardManageMapPacks")) exit(Dashboard::renderErrorPage(Dashboard::string("addMapPackTitle"), Dashboard::string("errorNoPermission"), '../'));
 
 if(isset($_POST['mapPackName']) && isset($_POST['levels'])) {
 	$mapPackName = trim(Escape::text($_POST['mapPackName'], 25));

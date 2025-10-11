@@ -9,7 +9,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
-if(Library::checkPermission($person, "dashboardGauntletCreate") && isset($_POST['gauntletID']) && isset($_POST['levels'])) {
+if(Library::checkPermission($person, "dashboardManageGauntlets") && isset($_POST['gauntletID']) && isset($_POST['levels'])) {
 	$gauntletID = Escape::number($_POST['gauntletID']);
 	
 	$gauntlet = Library::getGauntletByID($gauntletID);

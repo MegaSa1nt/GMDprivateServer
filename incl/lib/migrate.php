@@ -205,15 +205,6 @@ if(!$installed) {
 			
 			Cron::updateClansRanks($cronPerson, false);
 		}
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardLevelPackCreate'");
-    	$exist = $check->fetchAll();
-    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardAddMod'");
-    	$exist = $check->fetchAll();
-    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardAddMod INT NOT NULL DEFAULT '0' AFTER dashboardLevelPackCreate");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageSongs'");
-    	$exist = $check->fetchAll();
-    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardAddMod");
 	$check = $db->query("SHOW COLUMNS FROM `songs` LIKE 'reuploadID'");
     	$exist = $check->fetchAll();
     	if(empty($exist)) $db->query("ALTER TABLE songs ADD reuploadID INT NOT NULL DEFAULT '0' AFTER reuploadTime");
@@ -247,9 +238,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'mail'");
    		$exist = $check->fetchAll();
    		if(empty($exist)) $db->query("ALTER TABLE accounts ADD mail varchar(255) NOT NULL DEFAULT '' AFTER auth");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardGauntletCreate'");
-   		$exist = $check->fetchAll();
-   		if(empty($exist)) $db->query("ALTER TABLE `roles` CHANGE `toolPackcreate` `dashboardGauntletCreate` INT(11) NOT NULL DEFAULT '0'");
 	$check = $db->query("SHOW COLUMNS FROM `dailyfeatures` LIKE 'webhookSent'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE dailyfeatures ADD webhookSent INT NOT NULL DEFAULT '0' AFTER type");
@@ -277,20 +265,10 @@ if(!$installed) {
 					'IP' => $ban['IP'],
 				];
 				
-				switch(true) {
-					case $ban['isBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Leaderboards, Person::UserID, 2147483647);
-						break;
-					case $ban['isCreatorBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Creators, Person::UserID, 2147483647);
-						break;
-					case $ban['isUploadBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::UploadingLevels, Person::UserID, 2147483647);
-						break;
-					case $ban['isCommentBanned'] > 0:
-						Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Commenting, Person::UserID, 2147483647);
-						break;
-				}
+				if($ban['isBanned'] > 0) Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Leaderboards, Person::UserID, 2147483647);
+				if($creatorBanned && $ban['isCreatorBanned'] > 0) Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Creators, Person::UserID, 2147483647);
+				if($uploadBanned && $ban['isUploadBanned'] > 0) Library::banPerson(0, $banPerson, $ban['banReason'], Ban::UploadingLevels, Person::UserID, 2147483647);
+				if($commentBanned && $ban['isCommentBanned'] > 0) Library::banPerson(0, $banPerson, $ban['banReason'], Ban::Commenting, Person::UserID, 2147483647);
 			}
 			$db->query('ALTER TABLE `users` DROP `isBanned`');
 			if(!empty($creatorBanned)) $db->query('ALTER TABLE `users` DROP `isCreatorBanned`');
@@ -302,25 +280,25 @@ if(!$installed) {
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandRenameOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandRenameAll` `commandRename` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandRenameAll` `gameRenameLevel` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandPassOwn'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandPassOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandPassAll` `commandPass` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandPassAll` `gameSetPassword` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandDescriptionOwn'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandDescriptionOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandDescriptionAll` `commandDescription` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandDescriptionAll` `gameSetDescription` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandPublicOwn'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandPublicOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandPublicAll` `commandPublic` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandPublicAll` `gameSetLevelPrivacy` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandUnlistOwn'");
 		$exist = $check->fetchAll();
@@ -332,23 +310,20 @@ if(!$installed) {
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandSharecpOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandSharecpAll` `commandSharecp` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandSharecpAll` `gameShareCreatorPoints` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandSongOwn'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandSongOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandSongAll` `commandSong` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandSongAll` `gameSetLevelSong` INT NOT NULL DEFAULT '0'");
 		}
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandLockCommentsOwn'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
 			$db->query("ALTER TABLE `roles` DROP `commandLockCommentsOwn`");
-			$db->query("ALTER TABLE `roles` CHANGE `commandLockCommentsAll` `commandLockComments` INT NOT NULL DEFAULT '0'");
+			$db->query("ALTER TABLE `roles` CHANGE `commandLockCommentsAll` `gameLockLevelComments` INT NOT NULL DEFAULT '0'");
 		}
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandLockComments'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandLockComments` INT NOT NULL DEFAULT '0' AFTER `commandSong`");
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'profilecommandDiscord'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) $db->query("ALTER TABLE `roles` DROP `profilecommandDiscord`");
@@ -364,9 +339,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `lists` LIKE 'commentLocked'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `lists` ADD `commentLocked` INT NOT NULL DEFAULT '0' AFTER `unlisted`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandLockUpdating'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandLockUpdating` INT NOT NULL DEFAULT '0' AFTER `commandLockComments`");
 	$check = $db->query("SHOW COLUMNS FROM `sfxs` LIKE 'token'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `sfxs` ADD `token` varchar(255) NOT NULL DEFAULT '' AFTER `reuploadTime`");
@@ -383,12 +355,6 @@ if(!$installed) {
 	$db->query("ALTER TABLE `actions` CHANGE `value4` `value4` VARCHAR(255) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `actions` CHANGE `value5` `value5` VARCHAR(255) NOT NULL DEFAULT ''");
 	$db->query("ALTER TABLE `actions` CHANGE `value6` `value6` VARCHAR(255) NOT NULL DEFAULT ''");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardVaultCodesManage'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardVaultCodesManage` INT NOT NULL DEFAULT '0' AFTER `dashboardManageAutomod`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandEvent'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandEvent` INT NOT NULL DEFAULT '0' AFTER `commandWeekly`");
 	$check = $db->query("SHOW COLUMNS FROM `events` LIKE 'reward'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) {
@@ -499,9 +465,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandUnepic'");
 		$exist = $check->fetchAll();
 		if(!empty($exist)) $db->query("ALTER TABLE `roles` DROP `commandUnepic`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandSuggest'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandSuggest` INT NOT NULL DEFAULT '0' AFTER `commandEvent`");
 	$check = $db->query("SHOW COLUMNS FROM `modactions` LIKE 'IP'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `modactions` ADD `IP` VARCHAR(255) NOT NULL DEFAULT '' AFTER `value7`");
@@ -556,12 +519,12 @@ if(!$installed) {
 			$db->query("ALTER TABLE `accounts` ADD `registerIP` VARCHAR(255) NOT NULL DEFAULT '' AFTER `registerDate`");
 			
 			// Filling IPs from actions table
-			$getIPs = $db->prepare("SELECT account, IP FROM actions WHERE type = 1 ORDER BY account ASC");
+			$getIPs = $db->prepare("SELECT IF(IP != '', account, value) AS account, IF(IP != '', IP, value2) AS IP FROM actions WHERE IF(IP != '', 1, type = 16) GROUP BY ip ORDER BY timestamp ASC, account ASC");
 			$getIPs->execute();
 			$getIPs = $getIPs->fetchAll();
 			
 			foreach($getIPs AS &$account) {
-				$fillIP = $db->prepare("UPDATE accounts SET registerIP = :registerIP WHERE accountID = :accountID");
+				$fillIP = $db->prepare("UPDATE accounts SET registerIP = :registerIP WHERE accountID = :accountID AND registerIP != ''");
 				$fillIP->execute([':registerIP' => $account['IP'], ':accountID' => $account['account']]);
 				
 				$fillActionsIP = $db->prepare("UPDATE actions_downloads SET accountID = :accountID WHERE ip = INET6_ATON(:IP) AND accountID = ''");
@@ -570,13 +533,13 @@ if(!$installed) {
 				$fillActionsIP->execute([':IP' => $account['IP'], ':accountID' => $account['account']]);
 			}
 			
-			// Fill IPs of accounts before using newer version of my core
+			// Fill IPs of accounts created before using newer version of my core
 			$getAccounts = $db->prepare("SELECT accountID FROM accounts WHERE registerIP = '' ORDER BY accountID ASC");
 			$getAccounts->execute();
 			$getAccounts = $getAccounts->fetchAll();
 			if($getAccounts) {
 				foreach($getAccounts AS &$account) {
-					$getIP = $db->prepare("SELECT IP FROM users WHERE extID = :accountID");
+					$getIP = $db->prepare("SELECT IP FROM users WHERE extID = :accountID ORDER BY isRegistered DESC, extID ASC");
 					$getIP->execute([':accountID' => $account['accountID']]);
 					$getIP = $getIP->fetchColumn();
 					
@@ -596,10 +559,10 @@ if(!$installed) {
 		if(empty($exist)) {
 			$db->query("ALTER TABLE `comments` ADD `creatorRating` INT NOT NULL DEFAULT '0' AFTER `isSpam`");
 			$db->query("UPDATE comments JOIN (
-					SELECT commentID, IF(actions_likes.isLike = 1, 1, -1) AS creatorRating FROM actions_likes
-					INNER JOIN comments ON actions_likes.type = 2 AND actions_likes.itemID = comments.commentID
+					SELECT commentID, IF(actions_likes.isLike = 1, 1, -1) AS creatorRating FROM comments
 					INNER JOIN levels ON comments.levelID = levels.levelID
-					INNER JOIN users ON levels.extID = users.extID GROUP BY commentID
+					INNER JOIN users ON levels.extID = users.extID
+					INNER JOIN actions_likes ON actions_likes.type = 2 AND actions_likes.itemID = comments.commentID AND (levels.extID = actions_likes.accountID OR users.IP = actions_likes.IP)
 				) creatorRatings
 				SET comments.creatorRating = creatorRatings.creatorRating
 				WHERE comments.commentID = creatorRatings.commentID");
@@ -637,9 +600,6 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `lists` LIKE 'updateLocked'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `lists` ADD `updateLocked` INT NOT NULL DEFAULT '0' AFTER `unlisted`");
-	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'commandSetLevels'");
-		$exist = $check->fetchAll();
-		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `commandSetLevels` INT NOT NULL DEFAULT '0' AFTER `commandLockUpdating`");
 	$check = $db->query("SHOW COLUMNS FROM `levels` LIKE 'hasMagicString'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `levels` ADD `hasMagicString` INT NOT NULL DEFAULT '0' AFTER `levelInfo`");
@@ -663,6 +623,70 @@ if(!$installed) {
 			UPDATE `actions_likes` SET IP_temp = INET6_NTOA(ip);
 			ALTER TABLE `actions_likes` DROP `ip`;
 			ALTER TABLE `actions_likes` CHANGE `IP_temp` `IP` varchar(255) NOT NULL DEFAULT '';");
+	$check = $db->query('SHOW COLUMNS FROM roles WHERE Field NOT IN ("roleID", "priority", "roleName", "commentsExtraText", "isDefault", "commentColor", "modBadgeLevel")');
+		$exist = $check->fetchAll();
+		
+		$columnsToChange = [
+			'commandRate' => 'gameRateLevel',
+			'commandFeature' => 'gameSetFeatured',
+			'commandEpic' => 'gameSetEpic',
+			'commandVerifycoins' => 'gameVerifyCoins',
+			'commandDaily' => 'gameSetDaily',
+			'commandWeekly' => 'gameSetWeekly',
+			'commandEvent' => 'gameSetEvent',
+			'commandSuggest' => 'gameSuggestLevel',
+			'commandDelete' => 'gameDeleteLevel',
+			'commandSetacc' => 'gameMoveLevel',
+			'commandRename' => 'gameRenameLevel',
+			'commandPass' => 'gameSetPassword',
+			'commandDescription' => 'gameSetDescription',
+			'commandPublic' => 'gameSetLevelPrivacy',
+			'commandSharecp' => 'gameShareCreatorPoints',
+			'commandSong' => 'gameSetLevelSong',
+			'commandLockComments' => 'gameLockLevelComments',
+			'commandLockUpdating' => 'gameLockLevelUpdating',
+			'commandSetLevels' => 'gameSetListLevels',
+			'actionRateDifficulty' => 'gameSetDifficulty',
+			'dashboardGauntletCreate' => 'dashboardManageGauntlets',
+			'dashboardModTools' => 'dashboardModeratorTools',
+			'dashboardLevelPackCreate' => 'dashboardManageMapPacks',
+			'dashboardAddMod' => 'dashboardSetAccountRoles',
+			'dashboardVaultCodesManage' => 'dashboardManageVaultCodes',
+		];
+		$columnsToDelete = ['actionRateDemon', 'actionRateStars', 'actionSuggestRating', 'actionDeleteComment'];
+		
+		foreach($exist AS &$permission) {
+			$permissionName = $permission['Field'];
+			
+			if(isset($columnsToChange[$permissionName])) {
+				$checkColumn = $db->query("SHOW COLUMNS FROM `roles` LIKE '".$columnsToChange[$permissionName]."'");
+				$columnExist = $checkColumn->fetchAll();
+				
+				if(!$columnExist) $db->query("ALTER TABLE roles CHANGE `".$permissionName."` `".$columnsToChange[$permissionName]."` TINYINT(1) NOT NULL DEFAULT '0'");
+			}
+			elseif(in_array($permissionName, $columnsToDelete)) $db->query("ALTER TABLE `roles` DROP `".$permissionName."`");
+		}
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageMapPacks'");
+    	$exist = $check->fetchAll();
+    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardManageMapPacks INT NOT NULL DEFAULT '0' AFTER dashboardModeratorTools");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardSetAccountRoles'");
+    	$exist = $check->fetchAll();
+    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardSetAccountRoles INT NOT NULL DEFAULT '0' AFTER dashboardManageMapPacks");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageSongs'");
+    	$exist = $check->fetchAll();
+    	if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardManageSongs INT NOT NULL DEFAULT '0' AFTER dashboardSetAccountRoles");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameLockLevelComments'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameLockLevelComments` INT NOT NULL DEFAULT '0' AFTER `gameSetLevelSong`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameLockLevelUpdating'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameLockLevelUpdating` INT NOT NULL DEFAULT '0' AFTER `gameLockLevelComments`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardManageVaultCodes'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardManageVaultCodes` INT NOT NULL DEFAULT '0' AFTER `dashboardManageAutomod`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameSetListLevels'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameSetListLevels` INT NOT NULL DEFAULT '0' AFTER `gameLockLevelUpdating`");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

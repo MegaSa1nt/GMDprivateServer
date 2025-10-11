@@ -51,6 +51,9 @@ $language['runCron'] = 'Run Cron';
 $language['moderatorTools'] = 'Moderator tools';
 $language['addMapPackTitle'] = 'Add Map Pack';
 $language['addGauntletTitle'] = 'Add Gauntlet';
+$language['unlistedLevelsTitle'] = 'Unlisted levels';
+$language['unlistedListsTitle'] = 'Unlisted lists';
+$language['manageRolesTitle'] = 'Manage roles';
 
 $language['clans'] = 'Clans';
 $language['clansListTitle'] = 'Clans list';
@@ -143,6 +146,8 @@ $language['errorGauntletAlreadyExists'] = 'This Gauntlet already exists!';
 
 $language['errorAccountNotFound'] = 'Account wasn\'t found!';
 
+$language['errorRoleNotFound'] = 'Role wasn\'t found!';
+
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
 
@@ -178,6 +183,8 @@ $language['successDownloadNow'] = 'Download will start in a few seconds...';
 
 $language['successAddedMapPack'] = 'You successfullty added a Map Pack!';
 $language['successAddedGauntlet'] = 'You successfullty added a Gauntlet!';
+
+$language['successCreatedRole'] = 'You successfullty created a role!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -480,4 +487,91 @@ $language['creatorRatingLevel'] = 'Level creator rating';
 $language['creatorRatingList'] = 'List creator rating';
 $language['creatorRatingLike'] = 'Creator liked';
 $language['creatorRatingDislike'] = 'Creator disliked';
+
+$language['createRole'] = 'Create a role';
+$language['roleAppearance'] = 'Role appearance';
+$language['roleName'] = 'Role name';
+$language['roleCommentsCaption'] = 'Role comments caption';
+$language['roleCommentsCaptionHint'] = 'Role caption will appear in comments before comment upload date';
+$language['roleColor'] = 'Role color';
+$language['rolePriority'] = 'Role priority';
+$language['rolePriorityHint'] = 'The higher this value, the higher role is in the list';
+$language['modBadge'] = 'Moderator badge';
+$language['chooseModBadge'] = 'Choose moderator badge...';
+$language['elderModeratorRole'] = 'Elder Moderator';
+$language['moderatorRole'] = 'Moderator';
+$language['leaderboardModeratorRole'] = 'Leaderboard Moderator';
+$language['rolePermissions'] = 'Role permissions';
+$language['roleIsDefaultTitle'] = 'Default role';
+$language['roleIsDefaultDesc'] = 'Every user will have this role';
+$language['permissionGameSuggestLevelTitle'] = 'Suggest levels';
+$language['permissionGameSuggestLevelDesc'] = 'Allows user to suggest ratings for levels and lists';
+$language['permissionGameRateLevelTitle'] = 'Rate levels';
+$language['permissionGameRateLevelDesc'] = 'Allows user to set stars for levels and lists';
+$language['permissionGameSetDifficultyTitle'] = 'Set difficulty';
+$language['permissionGameSetDifficultyDesc'] = 'Allows user to set difficulty of levels and lists';
+$language['permissionGameSetFeaturedTitle'] = 'Set level as Featured';
+$language['permissionGameSetFeaturedDesc'] = 'Allows user to set levels and lists as Featured';
+$language['permissionGameSetEpicTitle'] = 'Set level as Epic';
+$language['permissionGameSetEpicDesc'] = 'Allows user to set levels as Epic, Legendary or Mythic';
+$language['permissionGameDeleteLevelTitle'] = 'Delete levels';
+$language['permissionGameDeleteLevelDesc'] = 'Allows user to delete levels and lists';
+$language['permissionGameMoveLevelTitle'] = 'Move levels';
+$language['permissionGameMoveLevelDesc'] = 'Allows user to move levels and lists to a different account';
+$language['permissionGameRenameLevelTitle'] = 'Rename levels';
+$language['permissionGameRenameLevelDesc'] = 'Allows user to rename levels and lists';
+$language['permissionGameSetPasswordTitle'] = 'Set password of a level';
+$language['permissionGameSetPasswordDesc'] = 'Allows user to set and remove password of levels';
+$language['permissionGameSetDescriptionTitle'] = 'Set description of a level';
+$language['permissionGameSetDescriptionDesc'] = 'Allows user to set description of levels and lists';
+$language['permissionGameSetLevelPrivacyTitle'] = 'Set level privacy';
+$language['permissionGameSetLevelPrivacyDesc'] = 'Allows user to set view privacy of levels and lists';
+$language['permissionGameShareCreatorPointsTitle'] = 'Share Creator Points of a level';
+$language['permissionGameShareCreatorPointsDesc'] = 'Allows user to share Creator Points of levels';
+$language['permissionGameSetLevelSongTitle'] = 'Set song of a level';
+$language['permissionGameSetLevelSongDesc'] = 'Allows user to set or remove song of levels';
+$language['permissionGameLockLevelCommentsTitle'] = 'Lock commenting a level';
+$language['permissionGameLockLevelCommentsDesc'] = 'Allows user to lock or unlock commenting of levels';
+$language['permissionGameLockLevelUpdatingTitle'] = 'Lock updating a level';
+$language['permissionGameLockLevelUpdatingDesc'] = 'Allows user to lock or unlock updating levels';
+$language['permissionGameSetListLevelsTitle'] = 'Set levels of a list';
+$language['permissionGameSetListLevelsDesc'] = 'Allows user to set levels on lists';
+$language['permissionGameDeleteCommentsTitle'] = 'Delete comments';
+$language['permissionGameDeleteCommentsDesc'] = 'Allows user to delete any comments on levels and lists';
+$language['permissionGameVerifyCoinsTitle'] = 'Verify coins of a level';
+$language['permissionGameVerifyCoinsDesc'] = 'Allows user to verify or unverify coins on levels';
+$language['permissionGameSetDailyTitle'] = 'Set level as Daily level';
+$language['permissionGameSetDailyDesc'] = 'Allows user to set levels as Daily levels';
+$language['permissionGameSetWeeklyTitle'] = 'Set level as Weekly level';
+$language['permissionGameSetWeeklyDesc'] = 'Allows user to set levels as Weekly levels';
+$language['permissionGameSetEventTitle'] = 'Set level as Event level';
+$language['permissionGameSetEventDesc'] = 'Allows user to set levels as Event levels';
+$language['permissionDashboardModeratorToolsTitle'] = 'Access moderator tools';
+$language['permissionDashboardModeratorToolsDesc'] = 'Allows user to access moderator tools, such as banning tool, unlisted levels, etc';
+$language['permissionDashboardDeleteLeaderboardsTitle'] = 'Delete leaderboard scores';
+$language['permissionDashboardDeleteLeaderboardsDesc'] = 'Allows user to delete leaderboard scores on levels';
+$language['permissionDashboardManageMapPacksTitle'] = 'Manage Map Packs';
+$language['permissionDashboardManageMapPacksDesc'] = 'Allows user to create, manage and delete Map Packs';
+$language['permissionDashboardManageGauntletsTitle'] = 'Manage Gauntlets';
+$language['permissionDashboardManageGauntletsDesc'] = 'Allows user to create, manage and delete Gauntlets';
+$language['permissionDashboardManageSongsTitle'] = 'Manage songs and SFXs';
+$language['permissionDashboardManageSongsDesc'] = 'Allows user to activate, deactivate, manage and delete songs and SFXs';
+$language['permissionDashboardManageAccountsTitle'] = 'Manage accounts';
+$language['permissionDashboardManageAccountsDesc'] = 'Allows user to manage settings of accounts and change its username and password';
+$language['permissionDashboardManageLevelsTitle'] = 'Manage levels';
+$language['permissionDashboardManageLevelsDesc'] = 'Allows user to manage settings of levels';
+$language['permissionDashboardManageClansTitle'] = 'Manage clans';
+$language['permissionDashboardManageClansDesc'] = 'Allows user to manage and delete clans';
+$language['permissionDashboardManageAutomodTitle'] = 'Manage Automod';
+$language['permissionDashboardManageAutomodDesc'] = 'Allows user to manage Automod and view user actions history';
+$language['permissionDashboardManageRolesTitle'] = 'Manage roles';
+$language['permissionDashboardManageRolesDesc'] = 'Allows user to create, manage and delete roles';
+$language['permissionDashboardManageVaultCodesTitle'] = 'Manage Wraith codes';
+$language['permissionDashboardManageVaultCodesDesc'] = 'Allows user to create, manage and delete Wraith codes';
+$language['permissionDashboardSetAccountRolesTitle'] = 'Set roles for an account';
+$language['permissionDashboardSetAccountRolesDesc'] = 'Allows user to set and remove roles of accounts';
+$language['disallow'] = 'Disallow';
+$language['inherit'] = 'Inherit';
+$language['allow'] = 'Allow';
+$language['chooseRole'] = 'Choose a role!';
 ?>
