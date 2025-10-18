@@ -108,7 +108,7 @@ async function postPage(href, form, loaderType = 'loader') {
 		
 		const updatePageDetails = await changePage(response, href, pageLoaderType);
 		
-		if(updatePageDetails && showLoadingCircle) activateLoaderOfType(false); // false = disable loader
+		if(updatePageDetails && pageLoaderType) activateLoaderOfType(false); // false = disable loader
 		
 		r(true);
 	});
@@ -118,6 +118,7 @@ function changePage(response, href, loaderType = false) {
 	return new Promise(r => {
 		newPageBody = new DOMParser().parseFromString(response, "text/html");
 	
+		const oldPage = document.getElementById("dashboard-page");
 		const newPage = newPageBody.getElementById("dashboard-page");
 		
 		if(newPage == null) {
@@ -140,7 +141,8 @@ function changePage(response, href, loaderType = false) {
 		
 		const newPageScript = newPageBody.querySelector("#pageScript");
 		
-		document.getElementById("dashboard-page").replaceWith(newPage);
+		oldPage.replaceWith(newPage);
+		dashboardBody.scroll(0, 0);
 		document.querySelector("base").replaceWith(newPageBody.querySelector("base"));
 		document.querySelector("title").replaceWith(newPageBody.querySelector("title"));
 		document.querySelector("nav").replaceWith(newPageBody.querySelector("nav"));
@@ -189,7 +191,8 @@ function toggleDropdown(dropdown) {
 	const previousDropdown = document.querySelector(".dropdown.show");
 	if(previousDropdown != null && previousDropdown.id != dropdown) previousDropdown.classList.remove("show");
 	
-	document.getElementById(dropdown).classList.toggle("show");
+	const newDropdown = document.getElementById(dropdown);
+	if(newDropdown != null) newDropdown.classList.toggle("show");
 }
 
 function showToastOutOfPage(toastBody) {
@@ -389,17 +392,6 @@ async function updatePage() {
 	
 	const checkChangeForm = document.querySelector("[dashboard-change-form]");
 	if(checkChangeForm != null) checkChangeForm.oninput = async () => checkFormSettingsChange(checkChangeForm);
-	
-	const pageButtonsElement = document.querySelector("[dashboard-page-buttons]");
-	const pageButtonsDiv = document.querySelector("[dashboard-page-div]");
-	
-	if(pageButtonsElement != null && pageButtonsDiv != null) {
-		const pagePseudoElement = document.createElement("span");
-		
-		pagePseudoElement.style['min-height'] = pageButtonsElement.offsetHeight;
-		pagePseudoElement.style['max-height'] = pageButtonsElement.offsetHeight;
-		pageButtonsDiv.appendChild(pagePseudoElement);
-	}
 	
 	const favouriteButtonsElements = document.querySelectorAll("[dashboard-favourite]");
 	favouriteButtonsElements.forEach(async (element) => {
@@ -992,7 +984,7 @@ function timeConverter(timestamp, textStyle = "short") {
 }
 
 function copyElementContent(textToCopy, relativeLink = false) {
-	if(relativeLink) textToCopy = baseURL.href + textToCopy;
+	if(relativeLink && !textToCopy.startsWith("http://") && !textToCopy.startsWith("https://")) textToCopy = baseURL.href + textToCopy;
 	
 	navigator.clipboard.writeText(textToCopy);
 	
@@ -1453,6 +1445,7 @@ function activateLoaderOfType(loaderType) {
 	for(const element of document.querySelectorAll("[dashboard-modal]")) element.classList.remove("show");
 	
 	dashboardBody.classList.add("hide");
+	toggleDropdown(null);
 	
 	if(!loaderType || !loaderType.length) {
 		document.getElementById("dashboard-page").classList.remove("hide");

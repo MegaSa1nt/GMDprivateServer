@@ -58,13 +58,14 @@ h3 {
 }
 
 body {
+	display: flex;
+	flex-wrap: wrap;
+	
 	margin: 0px;
 	
 	width: 100vw;
 	height: 100vh;
 	background: #131313;
-	
-	display: flex;
 	
 	overflow-x: hidden;
 }
@@ -78,8 +79,8 @@ button {
 nav {
 	padding: 20px;
 
-	max-height: calc(100vh - 40px);
-	min-height: calc(100vh - 40px);
+	max-height: 100vh;
+	min-height: 100vh;
 
 	display: flex;
 	justify-content: space-between;
@@ -91,8 +92,8 @@ nav {
 	
 	z-index: 5;
 	
-	min-width: 300px;
-	max-width: 300px;
+	min-width: 340px;
+	max-width: 340px;
 	
 	position: fixed;
 	
@@ -100,6 +101,8 @@ nav {
 	
 	overflow-y: scroll;
 	gap: 10px;
+	
+	box-sizing: border-box;
 }
 
 .navbar-buttons {
@@ -196,8 +199,8 @@ nav button .navbar-hide {
 }
 
 body.hide nav {
-	min-width: 71px;
-	max-width: 71px;
+	min-width: 111px;
+	max-width: 111px;
 }
 
 body.hide nav button {
@@ -218,6 +221,9 @@ body.hide nav button .navbar-hide {
 
 .dashboard-page {
 	width: 100%;
+	
+	min-height: 100vh;
+	box-sizing: border-box;
 	
 	margin-left: 340px;
 	
@@ -246,7 +252,7 @@ body.hide nav button .navbar-hide {
 }
 
 .dashboard-page.skeleton {
-	position: absolute;
+	position: fixed;
 	box-sizing: border-box;
 	
 	width: calc(100vw - 340px);
@@ -262,6 +268,17 @@ body.hide nav button .navbar-hide {
 	pointer-events: none;
 	
 	z-index: 5;
+}
+
+body:has(.dashboard-page.skeleton:not(.hide)),
+body:has(.dashboard-loader:not(.hide)) {
+	max-height: 0px !important;
+	overflow-y: hidden;
+}
+
+body:has(.dashboard-page.skeleton:not(.hide)) footer,
+body:has(.dashboard-loader:not(.hide)) footer {
+	display: none;
 }
 
 .dashboard-page.skeleton:has(.wideBox) {
@@ -342,6 +359,55 @@ body.hide .dashboard-page {
 
 body.hide .dashboard-page.skeleton {
 	width: calc(100vw - 111px);
+}
+
+footer {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	
+	width: 100%;
+	
+	padding: 20px;
+	box-sizing: border-box;
+	
+	background-color: #00000025;
+	border-top: solid 1px #FFFFFF20;
+	
+	margin-left: 340px;
+	
+	transition: 0.2s;
+}
+
+body.hide footer {
+	margin-left: 111px;
+}
+
+footer h2 {
+	font-size: 26px;
+}
+
+footer h4 {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	
+	color: #c0c0c0;
+	font-weight: 400;
+	
+	font-size: 21.5px;
+}
+
+footer h4 img {
+	border-radius: 5px;
+	
+	max-width: 27px;
+	max-height: 27px;
+}
+
+footer h4 span {
+	display: flex;
+	gap: 5px;
 }
 
 .box {
@@ -429,7 +495,7 @@ body.hide .dashboard-page.skeleton {
 	width: 100vw;
 	height: 100vh;
 	
-	position: absolute;
+	position: fixed;
 	
 	z-index: 10;
 	
@@ -687,7 +753,7 @@ nav::-webkit-scrollbar,
 	opacity: 0.07;
 	
 	display: grid;
-	position: absolute;
+	position: fixed;
 	
 	place-items: center;
 	
@@ -800,7 +866,8 @@ span.username {
 	gap: 7px;
 }
 
-[href] {
+[href],
+[dashboard-href-new-tab] {
 	cursor: pointer;
 }
 
@@ -842,12 +909,20 @@ h1.username[href],
 	gap: 10px;
 }
 
+.vertical.small {
+	width: max-content;
+}
+
 .horisontal {
 	display: flex;
 	
 	width: 100%;
 	
 	gap: 10px;
+}
+
+.horisontal.small {
+	width: max-content;
 }
 
 .contentDiv .difficultyImage {
@@ -959,7 +1034,7 @@ h1.username[href],
 
 	position: fixed;
 	bottom: 50px;
-	right: 50px;
+	right: 45px;
 	
 	padding: 10px;
 
@@ -2868,4 +2943,24 @@ a {
 
 .toggleExtraOption.checked {
 	color: black;
+}
+
+.footerText {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.maintenanceDiv {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	
+	width: 100%;
+	height: 100%;
+}
+
+.maintenanceDiv .nothingOnPageDiv {
+	width: max-content;
 }

@@ -17,7 +17,7 @@ $songs = Library::getFavouriteSongs($person, $pageOffset, 10);
 foreach($songs['songs'] AS &$song) $page .= Dashboard::renderSongCard($song, $person, true);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-$pageCount = floor($songs['count'] / 10) + 1;
+$pageCount = floor(($songs['count'] - 1) / 10) + 1;
 
 $dataArray = [
 	'ADDITIONAL_PAGE' => $page,

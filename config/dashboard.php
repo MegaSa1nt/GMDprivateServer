@@ -4,6 +4,8 @@ $installed = true; // Like i said, it changed!
 /*
 	Main dashboard settings
 	
+	$maintenanceMode — Doesn't let people without bypass permission access GDPS
+	
 	$gdps — GDPS name, shows in title and various dashboard and Discord webhooks
 	
 	$accentColor — main color of your GDPS, will affect dashboard's accent color
@@ -48,6 +50,8 @@ $installed = true; // Like i said, it changed!
 		%2$s — clan tag
 		%1$s [%2$s] -> USERNAME [TAG], for example: Sa1ntSosetHui [GCS]
 */
+$maintenanceMode = true;
+
 $gdps = "GDPS";
 
 $accentColor = "#93D7FF";
@@ -72,30 +76,22 @@ $preenableSFXs = true;
 $clansTagPosition = '%1$s [%2$s]';
 
 /*
-	Download links
+	Footer socials and download links
 	
 	$downloadLinks[] = ['download name', 'download link'];
 */
 //$downloadLinks[] = ['Windows', 'download/'.$gdps.'.zip'];
 //$downloadLinks[] = ['Android', 'download/'.$gdps.'.apk'];
-// $downloadLinks[] = ['Mac OS', 'download/'.$gdps.'.dmg'];
-// $downloadLinks[] = ['iOS', 'download/'.$gdps.'.ipa'];
-
-/*
-	Footer social links
-	
-	$footer[] = ['title', 'link to social', 'icon url'];
-*/
-
-// $footer[] = ['', '', ''];
+//$downloadLinks[] = ['Mac OS', 'download/'.$gdps.'.dmg'];
+//$downloadLinks[] = ['iOS', 'download/'.$gdps.'.ipa'];
 
 /*
 	Third-party resources
 	
 	$thirdParty[] = ['icon url', 'username', 'social media link', 'what person did'];
 */
-$thirdParty[] = ['https://yt3.googleusercontent.com/EZ149IVvU5JX2Fi6yH7R95NQmKdNsea_gggEvJXA0MIZQ397E_WHLLNCgBjL45npnMZNUkpq=s88-c-k-c0x00ffffff-no-rj', 'RobTop', 'https://store.steampowered.com/app/322170/Geometry_Dash/', 'For Geometry Dash'];
-$thirdParty[] = ['https://avatars.githubusercontent.com/u/5721187', 'Cvolton', 'https://github.com/Cvolton', 'For GDPS code'];
+$thirdParty[] = ['incl/icons/robtop.jpg', 'RobTop', 'https://store.steampowered.com/app/322170/Geometry_Dash/', 'Creator of Geometry Dash'];
+$thirdParty[] = ['incl/icons/cvolton.png', 'Cvolton', 'https://github.com/Cvolton', 'Creator of original GDPS core'];
 
 /*
 	Custom music and SFX libraries
@@ -104,7 +100,7 @@ $thirdParty[] = ['https://avatars.githubusercontent.com/u/5721187', 'Cvolton', '
 	Library types:
 		0 — only SFX library
 		1 — only music library
-		1 — both
+		2 — both
 */
 $customLibrary[] = [1, 'Geometry Dash', 'https://geometrydashfiles.b-cdn.net', 2]; 
 $customLibrary[] = [2, 'GDPSFH', 'https://sfx.fhgdps.com', 0]; 
@@ -149,7 +145,7 @@ $disallowReuploadingNotUserLevels = true;
 	Turnstile-protected APIs are currently not supported, sorry
 */
 $useCobalt = true;
-$cobaltAPI = 'https://cobalt.gcs.icu';
+$cobaltAPI = 'https://cobalt.gcs.skin';
 
 /*
 	Geometry Dash icons renderer Server
@@ -158,7 +154,7 @@ $cobaltAPI = 'https://cobalt.gcs.icu';
 	
 	$iconsRendererServer — what server to use
 	
-	If gdicon.oat.zone doesn't work for you for some reason, you can use icons.gcs.icu
+	If gdicon.oat.zone doesn't work for you for some reason, you can use icons.gcs.skin
 */
 $iconsRendererServer = 'https://gdicon.oat.zone';
 

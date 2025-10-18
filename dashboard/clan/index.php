@@ -87,7 +87,7 @@ switch($parameters[1]) {
 		$pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 		$page = '';
 
-		$accounts = Library::getAccounts($filters, $order, $orderSorting, $pageOffset, false);
+		$accounts = Library::getAccounts($filters, $order, $orderSorting, '', $pageOffset, false);
 
 		foreach($accounts['accounts'] AS &$account) {
 			if($account['accountID'] == $clan['clanOwner']) {

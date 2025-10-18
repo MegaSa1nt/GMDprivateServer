@@ -44,7 +44,7 @@ if(isset($_POST['sfxTitle']) && $_FILES && $_FILES['sfxFile']['error'] == UPLOAD
 	$sfxTime = Library::lastSFXTime();
 	Library::updateLibraries('', '', $sfxTime, 0);
 	
-	$filters = ['ID = '.$uploadSFX['sfxID']];
+	$filters = ['ID = '.$uploadSFX['sfxID'], "sfxs.isDisabled = 0"];
 	
 	$sfxs = Library::getSFXs($filters, '', '', '', 0, 1);
 	$sfx = $sfxs['sfxs'][0];

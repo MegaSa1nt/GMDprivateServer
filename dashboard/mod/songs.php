@@ -6,23 +6,28 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("yourSongsTitle"), Dashboard::string("errorLoginRequired")));
+if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("disabledSongsTitle"), Dashboard::string("errorLoginRequired")));
+
+if(!Library::checkPermission($person, "dashboardModeratorTools")) exit(Dashboard::renderErrorPage(Dashboard::string("disabledSongsTitle"), Dashboard::string("errorNoPermission"), '../'));
+
 $accountID = $person['accountID'];
 
 $favouriteSongs = [];
+if($person['success']) {
+	$favouriteSongsArray = Library::getFavouriteSongs($person, 0, false);
 
-$favouriteSongsArray = Library::getFavouriteSongs($person, 0, false);
-foreach($favouriteSongsArray['songs'] AS &$favouriteSong) $favouriteSongs[] = $favouriteSong["songID"];
+	foreach($favouriteSongsArray['songs'] AS &$favouriteSong) $favouriteSongs[] = $favouriteSong["songID"];
+}
 
 $order = "reuploadTime";
 $orderSorting = "DESC";
-$filters = ["songs.reuploadID = '".$accountID."'", "songs.isDisabled = 0"];
+$filters = ["songs.reuploadID > 0", "isDisabled != 0"];
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
 
 $songs = Library::getSongs($filters, $order, $orderSorting, '', $pageOffset, 10);
 
-foreach($songs['songs'] AS &$song) $page .= Dashboard::renderSongCard($song, $person, $favouriteSongs);
+foreach($songs['songs'] AS &$song) $page .= Dashboard::renderSongCard($song, $person, $favouriteSongs, false);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 $pageCount = floor(($songs['count'] - 1) / 10) + 1;
@@ -43,5 +48,5 @@ $dataArray = [
 
 $fullPage = Dashboard::renderTemplate("browse/songs", $dataArray);
 
-exit(Dashboard::renderPage("general/wide", Dashboard::string("yourSongsTitle"), "../", $fullPage));
+exit(Dashboard::renderPage("general/wide", Dashboard::string("disabledSongsTitle"), "../", $fullPage));
 ?>

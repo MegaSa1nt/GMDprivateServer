@@ -7,13 +7,14 @@ $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
 
-$order = "registerDate";
-$orderSorting = "DESC";
+$order = "accounts.userName";
+$orderSorting = "ASC";
 $filters = ["accounts.isActive != 0"];
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
+$queryJoin = "INNER JOIN roleassign ON (accounts.accountID = roleassign.person AND roleassign.personType = 0) OR (users.userID = roleassign.person AND roleassign.personType = 1)";
 
-$accounts = Library::getAccounts($filters, $order, $orderSorting, '', $pageOffset, false);
+$accounts = Library::getAccounts($filters, $order, $orderSorting, $queryJoin, $pageOffset, false);
 
 foreach($accounts['accounts'] AS &$account) $page .= Dashboard::renderUserCard($account, $person);
 
@@ -36,5 +37,5 @@ $dataArray = [
 
 $fullPage = Dashboard::renderTemplate("browse/accounts", $dataArray);
 
-exit(Dashboard::renderPage("general/wide", Dashboard::string("accountsTitle"), "../", $fullPage));
+exit(Dashboard::renderPage("general/wide", Dashboard::string("moderatorsTitle"), "../", $fullPage));
 ?>

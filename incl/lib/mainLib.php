@@ -1427,6 +1427,7 @@ class Library {
 			'dashboardManageAutomod',
 			'dashboardManageRoles',
 			'dashboardManageVaultCodes',
+			'dashboardBypassMaintenance',
 			'dashboardSetAccountRoles'
 		];
 	}
@@ -1658,14 +1659,14 @@ class Library {
 		return $GLOBALS['core_cache']['profileStatsCount'][$userID];
 	}
 	
-	public static function getAccounts($filters, $order, $orderSorting, $pageOffset, $noLimit = false) {
+	public static function getAccounts($filters, $order, $orderSorting, $queryJoin, $pageOffset, $noLimit = false) {
 		require __DIR__."/connection.php";
 
-		$accounts = $db->prepare("SELECT * FROM users INNER JOIN accounts ON users.extID = accounts.accountID WHERE (".implode(") AND (", $filters).") ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".(!$noLimit ? "LIMIT 10 OFFSET ".$pageOffset : ''));
+		$accounts = $db->prepare("SELECT * FROM users INNER JOIN accounts ON users.extID = accounts.accountID ".$queryJoin." WHERE (".implode(") AND (", $filters).") GROUP BY accountID ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".(!$noLimit ? "LIMIT 10 OFFSET ".$pageOffset : ''));
 		$accounts->execute();
 		$accounts = $accounts->fetchAll();
 		
-		$accountsCount = $db->prepare("SELECT count(*) FROM users INNER JOIN accounts ON users.extID = accounts.accountID WHERE (".implode(" ) AND ( ", $filters).")");
+		$accountsCount = $db->prepare("SELECT count(*) FROM (SELECT 1 FROM users INNER JOIN accounts ON users.extID = accounts.accountID ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).") GROUP BY accounts.accountID) accountsCount");
 		$accountsCount->execute();
 		$accountsCount = $accountsCount->fetchColumn();
 		
@@ -4681,11 +4682,11 @@ class Library {
 	public static function getSongs($filters, $order, $orderSorting, $queryJoin, $pageOffset, $limit = false) {
 		require __DIR__."/connection.php";
 		
-		$songs = $db->prepare("SELECT * FROM songs ".$queryJoin." WHERE (".implode(") AND (", $filters).") AND isDisabled = 0 ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
+		$songs = $db->prepare("SELECT * FROM songs ".$queryJoin." WHERE (".implode(") AND (", $filters).") ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
 		$songs->execute();
 		$songs = $songs->fetchAll();
 		
-		$songsCount = $db->prepare("SELECT count(*) FROM songs ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).") AND isDisabled = 0");
+		$songsCount = $db->prepare("SELECT count(*) FROM songs ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).")");
 		$songsCount->execute();
 		$songsCount = $songsCount->fetchColumn();
 		
@@ -4811,7 +4812,7 @@ class Library {
 		$accountID = $person['accountID'];
 		
 		$song = self::getSongByID($songID);
-		if(!$song || !$song['isLocalSong']) return false;
+		if(!$song || !$song['isLocalSong'] || $song['isDisabled']) return false;
 		
 		$favouritedSong = $db->prepare("SELECT count(*) FROM favsongs WHERE songID = :songID AND accountID = :accountID");
 		$favouritedSong->execute([':songID' => $songID, ':accountID' => $accountID]);
@@ -4839,7 +4840,7 @@ class Library {
 		require __DIR__."/connection.php";
 		require __DIR__."/../../config/dashboard.php";
 		
-		$sfxs = $db->prepare("SELECT *, 1 AS isLocalSFX FROM sfxs ".$queryJoin." WHERE (".implode(") AND (", $filters).") AND isDisabled = 0 ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
+		$sfxs = $db->prepare("SELECT *, 1 AS isLocalSFX FROM sfxs ".$queryJoin." WHERE (".implode(") AND (", $filters).") ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
 		$sfxs->execute();
 		$sfxs = $sfxs->fetchAll();
 		
@@ -4851,7 +4852,7 @@ class Library {
 			$sfx['ID'] = self::getLibraryOriginalID($sfx['ID'] + 8000000, 'sfx', $serverIDs[null]);
 		}
 		
-		$sfxsCount = $db->prepare("SELECT count(*) FROM sfxs ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).") AND isDisabled = 0");
+		$sfxsCount = $db->prepare("SELECT count(*) FROM sfxs ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).")");
 		$sfxsCount->execute();
 		$sfxsCount = $sfxsCount->fetchColumn();
 		

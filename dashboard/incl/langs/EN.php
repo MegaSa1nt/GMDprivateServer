@@ -6,6 +6,8 @@
 */
 
 /* General strings */
+$language['footer'] = '%1$s, %2$s'; // GDPS, 20xx
+
 $language['account'] = 'Account';
 $language['userName'] = 'Username';
 $language['password'] = 'Password';
@@ -41,6 +43,8 @@ $language['mapPacksTitle'] = 'Map Packs';
 $language['gauntletsTitle'] = 'Gauntlets';
 $language['songsTitle'] = 'Songs';
 $language['sfxsTitle'] = 'SFXs';
+$language['clansListTitle'] = 'Clans';
+$language['moderatorsTitle'] = 'Moderators';
 
 $language['upload'] = 'Uploads';
 $language['uploadSongTitle'] = 'Add a song';
@@ -53,16 +57,24 @@ $language['addMapPackTitle'] = 'Add Map Pack';
 $language['addGauntletTitle'] = 'Add Gauntlet';
 $language['unlistedLevelsTitle'] = 'Unlisted levels';
 $language['unlistedListsTitle'] = 'Unlisted lists';
+$language['suggestedLevelsTitle'] = 'Suggested levels';
+$language['disabledSongsTitle'] = 'Unlisted songs';
+$language['disabledSFXsTitle'] = 'Unlisted SFXs';
 $language['manageRolesTitle'] = 'Manage roles';
 
 $language['clans'] = 'Clans';
-$language['clansListTitle'] = 'Clans list';
 
 $language['messengerTitle'] = 'Messenger';
 $language['loginToAccountTitle'] = 'Login to account';
 $language['yourProfileTitle'] = 'Your profile';
 $language['logoutFromAccountTitle'] = 'Logout';
 $language['registerAccountTitle'] = 'Register account';
+
+$language['linksTitle'] = 'Links';
+$language['creditsTitle'] = 'Credits';
+
+$language['maintenanceModeTitle'] = 'In maintenance';
+$language['maintenanceModeDesc'] = '%1$s is currently in maintenance, please try again later!';
 
 /* Error strings */
 $language['errorTitle'] = 'An error has occured';
@@ -568,6 +580,8 @@ $language['permissionDashboardManageRolesTitle'] = 'Manage roles';
 $language['permissionDashboardManageRolesDesc'] = 'Allows user to create, manage and delete roles';
 $language['permissionDashboardManageVaultCodesTitle'] = 'Manage Wraith codes';
 $language['permissionDashboardManageVaultCodesDesc'] = 'Allows user to create, manage and delete Wraith codes';
+$language['permissionDashboardBypassMaintenanceTitle'] = 'Bypass maintenance mode';
+$language['permissionDashboardBypassMaintenanceDesc'] = 'Allows user to access GDPS under maintenance mode';
 $language['permissionDashboardSetAccountRolesTitle'] = 'Set roles for an account';
 $language['permissionDashboardSetAccountRolesDesc'] = 'Allows user to set and remove roles of accounts';
 $language['disallow'] = 'Disallow';

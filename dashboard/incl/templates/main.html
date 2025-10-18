@@ -149,20 +149,15 @@
 							<i class="fa-solid fa-drum"></i>
 							<text>%TEXT_sfxsTitle%</text>
 						</button>
-					</div>
-				</div>
-				
-				<div class="dropdown" id="clansDropdown" dashboard-show="%CLANS_ENABLED%">
-					<button title="%TEXT_clans%" type="button" dashboard-dropdown="clansDropdown">
-						<i class="fa-solid fa-shield-halved"></i>
-						<text>%TEXT_clans%</text>
-						<i class="fa-solid fa-caret-right navbar-hide" dashboard-dropdown-caret></i>
-					</button>
-					
-					<div class="dropdown-items">
-						<button title="%TEXT_clansListTitle%" type="button" href="browse/clans" dashboard-loader-type="list">
-							<i class="fa-solid fa-list"></i>
+						
+						<button title="%TEXT_clansListTitle%" type="button" href="browse/clans" dashboard-loader-type="list" dashboard-show="%CLANS_ENABLED%">
+							<i class="fa-solid fa-shield-halved"></i>
 							<text>%TEXT_clansListTitle%</text>
+						</button>
+						
+						<button title="%TEXT_moderatorsTitle%" type="button" href="mod/accounts" dashboard-loader-type="list">
+							<i class="fa-solid fa-user-shield"></i>
+							<text>%TEXT_moderatorsTitle%</text>
 						</button>
 					</div>
 				</div>
@@ -223,6 +218,21 @@
 						<button title="%TEXT_unlistedListsTitle%" type="button" href="mod/lists" dashboard-loader-type="list">
 							<i class="fa-solid fa-list"></i>
 							<text>%TEXT_unlistedListsTitle%</text>
+						</button>
+						
+						<button title="%TEXT_suggestedLevelsTitle%" type="button" href="mod/suggestedLevels" dashboard-loader-type="list">
+							<i class="fa-solid fa-user"></i>
+							<text>%TEXT_suggestedLevelsTitle%</text>
+						</button>
+						
+						<button title="%TEXT_disabledSongsTitle%" type="button" href="mod/songs" dashboard-loader-type="list">
+							<i class="fa-solid fa-music"></i>
+							<text>%TEXT_disabledSongsTitle%</text>
+						</button>
+						
+						<button title="%TEXT_disabledSFXsTitle%" type="button" href="mod/sfxs" dashboard-loader-type="list">
+							<i class="fa-solid fa-drum"></i>
+							<text>%TEXT_disabledSFXsTitle%</text>
 						</button>
 						
 						<button title="%TEXT_manageRolesTitle%" type="button" href="mod/roles" dashboard-loader-type="manage" dashboard-show="%PERMISSION_dashboardManageRoles%">
@@ -437,7 +447,33 @@
 			</button>
 		</div>
 		
-		<footer>%FOOTER%</footer>
+		<footer>
+			<div class="horisontal">
+				<div class="vertical small" dashboard-show="%SHOW_GDPS_LINKS%">
+					<h2>
+						<i class="fa-solid fa-chain"></i>
+						%TEXT_linksTitle%
+					</h2>
+					
+					<div class="footerText">
+						%GDPS_LINKS%
+					</div>
+				</div>
+				
+				<div class="vertical small" dashboard-show="%SHOW_CREDITS_LINKS%">
+					<h2>
+						<i class="fa-solid fa-handshake-simple"></i>
+						%TEXT_creditsTitle%
+					</h2>
+					
+					<div class="footerText">
+						%CREDITS_LINKS%
+					</div>
+				</div>
+			</div>
+			
+			<h4>%FOOTER_TEXT%</h4>
+		</footer>
 		
 		<div class="circles">
 			<div class="circle" style='--position-delay: -1s'></div>

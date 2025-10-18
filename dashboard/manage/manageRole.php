@@ -60,6 +60,7 @@ if(Library::checkPermission($person, "dashboardManageRoles") && isset($_POST['ro
 	$newDashboardManageAutomod = Security::limitValue(0, abs(Escape::number($_POST['dashboardManageAutomod']) ?: 0), 2);
 	$newDashboardManageRoles = Security::limitValue(0, abs(Escape::number($_POST['dashboardManageRoles']) ?: 0), 2);
 	$newDashboardManageVaultCodes = Security::limitValue(0, abs(Escape::number($_POST['dashboardManageVaultCodes']) ?: 0), 2);
+	$newDashboardBypassMaintenance = Security::limitValue(0, abs(Escape::number($_POST['dashboardBypassMaintenance']) ?: 0), 2);
 	$newDashboardSetAccountRoles = Security::limitValue(0, abs(Escape::number($_POST['dashboardSetAccountRoles']) ?: 0), 2);
 	
 	$rolePermissions = [
@@ -95,6 +96,7 @@ if(Library::checkPermission($person, "dashboardManageRoles") && isset($_POST['ro
 		'dashboardManageAutomod' => $newDashboardManageAutomod,
 		'dashboardManageRoles' => $newDashboardManageRoles,
 		'dashboardManageVaultCodes' => $newDashboardManageVaultCodes,
+		'dashboardBypassMaintenance' => $newDashboardBypassMaintenance,
 		'dashboardSetAccountRoles' => $newDashboardSetAccountRoles
 	];
 	

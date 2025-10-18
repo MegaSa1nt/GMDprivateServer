@@ -32,7 +32,7 @@ $levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 foreach($levels['levels'] AS &$level) $page .= Dashboard::renderLevelCard($level, $person);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-$pageCount = floor($levels['count'] / 10) + 1;
+$pageCount = floor(($levels['count'] - 1) / 10) + 1;
 
 $dataArray = [
 	'ADDITIONAL_PAGE' => $page,

@@ -141,14 +141,14 @@ switch($parameters[1]) {
 
 		$order = "reuploadTime";
 		$orderSorting = "DESC";
-		$filters = ["songs.reuploadID = '".$user['extID']."'"];
+		$filters = ["songs.reuploadID = '".$user['extID']."'", "songs.isDisabled = 0"];
 
 		$songs = Library::getSongs($filters, $order, $orderSorting, '', $pageOffset, 10);
 
 		foreach($songs['songs'] AS &$song) $additionalPage .= Dashboard::renderSongCard($song, $person, $favouriteSongs);
 
 		$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-		$pageCount = floor($songs['count'] / 10) + 1;
+		$pageCount = floor(($songs['count'] - 1) / 10) + 1;
 
 		$additionalData = [
 			'ADDITIONAL_PAGE' => $additionalPage,
@@ -170,14 +170,14 @@ switch($parameters[1]) {
 	case 'sfxs':
 		$order = "reuploadTime";
 		$orderSorting = "DESC";
-		$filters = ["sfxs.reuploadID = '".$user['extID']."'"];
+		$filters = ["sfxs.reuploadID = '".$user['extID']."'", "sfxs.isDisabled = 0"];
 
 		$sfxs = Library::getSFXs($filters, $order, $orderSorting, '', $pageOffset, 10);
 
 		foreach($sfxs['sfxs'] AS &$sfx) $additionalPage .= Dashboard::renderSFXCard($sfx, $person);
 
 		$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-		$pageCount = floor($sfxs['count'] / 10) + 1;
+		$pageCount = floor(($sfxs['count'] - 1) / 10) + 1;
 
 		$additionalData = [
 			'ADDITIONAL_PAGE' => $additionalPage,

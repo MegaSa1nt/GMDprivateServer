@@ -6,24 +6,27 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
+if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("disabledSFXsTitle"), Dashboard::string("errorLoginRequired")));
 
-$order = "registerDate";
+if(!Library::checkPermission($person, "dashboardModeratorTools")) exit(Dashboard::renderErrorPage(Dashboard::string("disabledSFXsTitle"), Dashboard::string("errorNoPermission"), '../'));
+
+$order = "reuploadTime";
 $orderSorting = "DESC";
-$filters = ["accounts.isActive != 0"];
+$filters = ["sfxs.reuploadID > 0", "sfxs.isDisabled != 0"];
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
 
-$accounts = Library::getAccounts($filters, $order, $orderSorting, '', $pageOffset, false);
+$sfxs = Library::getSFXs($filters, $order, $orderSorting, '', $pageOffset, 10);
 
-foreach($accounts['accounts'] AS &$account) $page .= Dashboard::renderUserCard($account, $person);
+foreach($sfxs['sfxs'] AS &$sfx) $page .= Dashboard::renderSFXCard($sfx, $person);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-$pageCount = floor(($accounts['count'] - 1) / 10) + 1;
+$pageCount = floor(($sfxs['count'] - 1) / 10) + 1;
 
 $dataArray = [
 	'ADDITIONAL_PAGE' => $page,
-	'USER_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
-	'USER_NO_USERS' => empty($page) ? 'true' : 'false',
+	'SFX_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
+	'SFX_NO_SFXS' => empty($page) ? 'true' : 'false',
 	
 	'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 	'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
@@ -34,7 +37,7 @@ $dataArray = [
 	'LAST_PAGE_BUTTON' => "getPage('@page=".$pageCount."', 'list')"
 ];
 
-$fullPage = Dashboard::renderTemplate("browse/accounts", $dataArray);
+$fullPage = Dashboard::renderTemplate("browse/sfxs", $dataArray);
 
-exit(Dashboard::renderPage("general/wide", Dashboard::string("accountsTitle"), "../", $fullPage));
+exit(Dashboard::renderPage("general/wide", Dashboard::string("disabledSFXsTitle"), "../", $fullPage));
 ?>

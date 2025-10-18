@@ -9,6 +9,7 @@ class Security {
 	}
 	
 	public function loginToAccountWithID($accountID, $key, $type) {
+		require __DIR__."/../../config/dashboard.php";
 		require __DIR__."/../../config/security.php";
 		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/enums.php";
@@ -18,7 +19,11 @@ class Security {
 		$skipValidating = false;
 		
 		$account = Library::getAccountByID($accountID);
-		if(!$account) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+		if(!$account) {
+			if($maintenanceMode) exit(CommonError::InvalidRequest);
+			
+			return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+		}
 		
 		if($sessionGrants) {
 			$searchIP = Library::convertIPForSearching($IP, true);
@@ -38,15 +43,27 @@ class Security {
 		if(!$skipValidating) {
 			switch($type) {
 				case 1:
-					if(!password_verify($key, $account["password"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					if(!password_verify($key, $account["password"])) {
+						if($maintenanceMode) exit(CommonError::InvalidRequest);
+						
+						return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					}
 					break;
 				case 2:
-					if(!password_verify($key, $account["gjp2"])) return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					if(!password_verify($key, $account["gjp2"])) {
+						if($maintenanceMode) exit(CommonError::InvalidRequest);
+						
+						return ["success" => false, "error" => LoginError::WrongCredentials, "accountID" => (string)$accountID, "IP" => $IP];
+					}
 					break;
 			}
 		}
 		
-		if(!$account["isActive"]) return ["success" => false, "error" => LoginError::AccountIsNotActivated, "accountID" => (string)$accountID, "IP" => $IP];
+		if(!$account["isActive"]) {
+			if($maintenanceMode) exit(CommonError::InvalidRequest);
+			
+			return ["success" => false, "error" => LoginError::AccountIsNotActivated, "accountID" => (string)$accountID, "IP" => $IP];
+		}
 		
 		$userID = Library::getUserID($accountID);
 		
@@ -84,6 +101,8 @@ class Security {
 		}
 		
 		date_default_timezone_set($account['timezone']);
+		
+		if($maintenanceMode && !Library::checkPermission(["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => (string)$userName, "IP" => $IP], "dashboardBypassMaintenance")) exit(CommonError::InvalidRequest);
 		
 		return ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => (string)$userName, "IP" => $IP];
 	}

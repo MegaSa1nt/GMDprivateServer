@@ -18,6 +18,7 @@ class Dashboard {
 	public static function loginDashboardUser() {
 		global $dbPath;
 		require __DIR__."/../".$dbPath."incl/lib/connection.php";
+		require __DIR__."/../".$dbPath."config/dashboard.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -30,7 +31,10 @@ class Dashboard {
 		$auth = Escape::latin($_COOKIE['auth']);
 		
 		if(empty($auth) || $auth == 'none') {
+			if($maintenanceMode) exit(Dashboard::renderMaintenancePage());
+			
 			$GLOBALS['core_cache']['dashboard']['person'] = ["success" => false, "accountID" => "0", "IP" => $IP];
+			
 			return ["success" => false, "accountID" => "0", "IP" => $IP];
 		}
 		
@@ -38,6 +42,8 @@ class Dashboard {
 		$checkAuth->execute([':auth' => $auth]);
 		$checkAuth = $checkAuth->fetch();
 		if(empty($checkAuth)) {
+			if($maintenanceMode) exit(Dashboard::renderMaintenancePage());
+			
 			$logPerson = [
 				'accountID' => "0",
 				'userID' => "0",
@@ -59,6 +65,8 @@ class Dashboard {
 		$userName = $checkAuth['userName'];
 		
 		if(Security::isTooManyAttempts()) {
+			if($maintenanceMode) exit(Dashboard::renderMaintenancePage());
+			
 			$logPerson = [
 				'accountID' => (string)$accountID,
 				'userID' => (string)$userID,
@@ -76,6 +84,8 @@ class Dashboard {
 		}
 		
 		$GLOBALS['core_cache']['dashboard']['person'] = ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => $userName, "IP" => $IP];
+		
+		if($maintenanceMode && !Library::checkPermission($GLOBALS['core_cache']['dashboard']['person'], "dashboardBypassMaintenance")) exit(Dashboard::renderMaintenancePage());
 		
 		return ["success" => true, "accountID" => (string)$accountID, "userID" => (string)$userID, "userName" => $userName, "IP" => $IP];
 	}
@@ -391,13 +401,14 @@ class Dashboard {
 	public static function renderPage($template, $pageTitle, $pageBase, $dataArray) {
 		global $dbPath;
 		require __DIR__."/../".$dbPath."config/dashboard.php";
+		require __DIR__."/../".$dbPath."config/discord.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
 		if(!is_array($dataArray)) $dataArray = ['PAGE' => $dataArray];
 		
 		$isInClan = false;
-		$clanName = '';
+		$clanName = $gdpsLinks = '';
 		
 		$person = self::loginDashboardUser();
 		$userID = $person['userID'];
@@ -415,6 +426,45 @@ class Dashboard {
 		$templatePage = self::renderTemplate($template, $dataArray);
 		
 		$iconKit = self::getUserIconKit($userID);
+		
+		if(!empty($downloadLinks)) {
+			foreach($downloadLinks AS &$downloadLink) {
+				$downloadName = htmlspecialchars($downloadLink[0]);
+				$downloadURL = $downloadLink[1];
+				
+				$gdpsLinks .= '<h4 dashboard-context-div>
+					<span dashboard-href-new-tab="'.$downloadURL.'">'.$downloadName.'</span>
+					
+					<div class="contextMenuDiv" dashboard-context-menu>
+						<button class="contextMenuButton" title="%TEXT_copyLink%" type="button" onclick="copyElementContent(\''.$downloadURL.'\', true)">
+							<i class="fa-solid fa-chain"></i>
+							<text>%TEXT_copyLink%</text>
+						</button>
+					</div>
+				</h4>';
+			}
+		}
+		
+		if(!empty($thirdParty)) {
+			foreach($thirdParty AS &$creditsArray) {
+				$creditIcon = $creditsArray[0];
+				$creditName = htmlspecialchars($creditsArray[1]);
+				$creditURL = $creditsArray[2];
+				$creditTitle = htmlspecialchars($creditsArray[3]);
+				
+				$creditsLinks .= '<h4 dashboard-context-div>
+					<img loading="lazy" src="'.$creditIcon.'"></img>
+					<span class="titleToLeft" dashboard-href-new-tab="'.$creditURL.'" title="'.$creditTitle.'">'.$creditName.'</span>
+					
+					<div class="contextMenuDiv" dashboard-context-menu>
+						<button class="contextMenuButton" title="%TEXT_copyLink%" type="button" onclick="copyElementContent(\''.$creditURL.'\', true)">
+							<i class="fa-solid fa-chain"></i>
+							<text>%TEXT_copyLink%</text>
+						</button>
+					</div>
+				</h4>';
+			}
+		}
 		
 		$mainPageData = [
 			'PAGE' => $templatePage,
@@ -450,10 +500,18 @@ class Dashboard {
 			'IS_LOGGED_IN' => $person['success'] ? 'true' : 'false',
 			'USERNAME' => $person['success'] ? htmlspecialchars($person['userName']) : '',
 			'PROFILE_ICON' => $person['success'] ? $iconKit['main'] : '',
+			
+			'CLANS_ENABLED' => $clansEnabled ? 'true' : 'false',
 			'IS_IN_CLAN' => $isInClan ? 'true' : 'false',
 			'CLAN_NAME' => htmlspecialchars($clanName),
 			
-			'FOOTER' => ""
+			'DIFFICULTIES_URL' => $difficultiesURL,
+			
+			'GDPS_LINKS' => $gdpsLinks,
+			'SHOW_GDPS_LINKS' => !empty($gdpsLinks) ? 'true' : 'false',
+			'CREDITS_LINKS' => $creditsLinks,
+			'SHOW_CREDITS_LINKS' => !empty($creditsLinks) ? 'true' : 'false',
+			'FOOTER_TEXT' => sprintf(self::string("footer"), $gdps, date('Y', time()))
 		];
 		
 		$personPermissions = Library::getPersonPermissions($person);
@@ -466,6 +524,50 @@ class Dashboard {
 		foreach($languageCredits['languages'] AS $string => $value) $mainPageData['LANGUAGE_'.$string] = $value;
 		
 		$page = self::renderTemplate('main', $mainPageData);
+		
+		return $page;
+	}
+	
+	public static function renderMaintenancePage() {
+		global $dbPath;
+		require __DIR__."/../".$dbPath."config/dashboard.php";
+		require __DIR__."/../".$dbPath."config/discord.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
+		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
+		
+		if(!file_exists(__DIR__."/templates/general/maintenance.html")) return false;
+
+		$mainPageData = [
+			
+			'PAGE_TITLE' => self::string("maintenanceModeTitle"),
+			'GDPS_NAME' => $gdps,
+			'PAGE_BASE' => $pageBase,
+			
+			'DASHBOARD_FAVICON' => $dashboardFavicon,
+			'DASHBOARD_ACCENT_COLOR' => $accentColor,
+			'DATABASE_PATH' => $dbPath,
+			
+			'STYLE_TIMESTAMP' => filemtime(__DIR__."/style.css"),
+			'SCRIPT_TIMESTAMP' => filemtime(__DIR__."/script.js"),
+			
+			'MAX_SONG_SIZE' => $songSize,
+			'MAX_SFX_SIZE' => $sfxSize,
+			
+			'MAX_SONG_SIZE_TEXT' => sprintf(self::string("errorMaxFileSize"), $songSize),
+			'MAX_SFX_SIZE_TEXT' => sprintf(self::string("errorMaxFileSize"), $sfxSize),
+			
+			'FAILED_TO_LOAD_TEXT' => "<i class='fa-solid fa-xmark'></i>".self::string("errorFailedToLoadPage"),
+			'COPIED_TEXT' => "<i class='fa-solid fa-copy'></i>".self::string("successCopiedText"),
+			
+			'LANGUAGE' => Escape::latin_no_spaces($_COOKIE['lang'], 2) ?: "EN",
+			
+			'MAINTENANCE_DESCRIPTION' => sprintf(self::string("maintenanceModeDesc"), $gdps)
+		];
+		
+		$allStrings = self::allStrings();
+		foreach($allStrings AS $string => $value) $mainPageData['TEXT_'.$string] = $value;
+		
+		$page = self::renderTemplate('general/maintenance', $mainPageData);
 		
 		return $page;
 	}
@@ -815,7 +917,7 @@ class Dashboard {
 		return self::renderTemplate('components/score', $score);
 	}
 	
-	public static function renderSongCard($song, $person, $favouriteSongs) {
+	public static function renderSongCard($song, $person, $favouriteSongs, $canUseButtons = true) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
@@ -839,9 +941,11 @@ class Dashboard {
 		$song['SONG_SIZE'] = sprintf(self::string("songSizeTemplate"), $song['size'] ?: 0);
 		
 		$song['SONG_LEVELS_COUNT'] = $song['levelsCount'] ?: 0;
-		$song['SONG_FAVORITES_COUNT'] = $song['favoritesCount'] ?: 0;
+		$song['SONG_FAVORITES_COUNT'] = $song['favouritesCount'] ?: 0;
 		
 		$song['SONG_IS_FAVOURITE'] = (is_array($favouriteSongs) && in_array($song['ID'], $favouriteSongs)) || (!is_array($favouriteSongs) && $favouriteSongs) ? 'true' : 'false';
+		
+		$song['SONG_CAN_USE_BUTTONS'] = $canUseButtons ? 'true' : 'false';
 		
 		$contextMenuData['MENU_ID'] = $song['ID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);

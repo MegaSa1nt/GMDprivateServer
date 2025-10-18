@@ -37,20 +37,29 @@
 				<text dashboard-date="%reuploadTime%"></text>
 			</text>
 		
-			<button class="button" type="button" title="%TEXT_usageCount%" href="browse/levels?customSong=1&song=%ID%" dashboard-loader-type="list">
+			<button class="button" type="button" title="%TEXT_usageCount%" href="browse/levels?customSong=1&song=%ID%" dashboard-loader-type="list" dashboard-show="%SONG_CAN_USE_BUTTONS%">
 				<text class="levelStat">
 					<i class="fa-solid fa-gamepad"></i>
 					%SONG_LEVELS_COUNT%
 				</text>
 			</button>
+			<text class="levelStat" dashboard-hide="%SONG_CAN_USE_BUTTONS%">
+				<i class="fa-solid fa-gamepad"></i>
+				%SONG_LEVELS_COUNT%
+			</text>
 			
-			<button class="button titleToRight" type="button" title="%TEXT_favouritesCount%" dashboard-favourite="%ID%">
+			<button class="button titleToRight" type="button" title="%TEXT_favouritesCount%" dashboard-favourite="%ID%" dashboard-show="%SONG_CAN_USE_BUTTONS%">
 				<text class="levelStat">
 					<i class="fa-solid fa-heart" dashboard-show="%SONG_IS_FAVOURITE%"></i>
 					<i class="fa-regular fa-heart" dashboard-hide="%SONG_IS_FAVOURITE%"></i>
 					<span>%SONG_FAVORITES_COUNT%</span>
 				</text>
 			</button>
+			<text class="levelStat" dashboard-hide="%SONG_CAN_USE_BUTTONS%">
+				<i class="fa-solid fa-heart" dashboard-show="%SONG_IS_FAVOURITE%"></i>
+				<i class="fa-regular fa-heart" dashboard-hide="%SONG_IS_FAVOURITE%"></i>
+				<span>%SONG_FAVORITES_COUNT%</span>
+			</text>
 		</div>
 	</div>
 	

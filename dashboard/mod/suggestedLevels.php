@@ -6,8 +6,11 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
-if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("yourLevelsTitle"), Dashboard::string("errorLoginRequired")));
-$userID = $person['userID'];
+if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("suggestedLevelsTitle"), Dashboard::string("errorLoginRequired")));
+
+if(!Library::checkPermission($person, "dashboardModeratorTools")) exit(Dashboard::renderErrorPage(Dashboard::string("suggestedLevelsTitle"), Dashboard::string("errorNoPermission"), '../'));
+
+$accountID = $person['accountID'];
 
 $order = "uploadDate";
 $orderSorting = "DESC";
@@ -17,9 +20,15 @@ $page = '';
 $getFilters = Library::getLevelSearchFilters($_GET, 22, true, true);
 $filters = $getFilters['filters'];
 
-$filters[] = "levels.userID = '".$userID."'";
+$filters[] = "levels.unlisted = 0";
+if(!$unlistedLevelsForAdmins || !Library::isAccountAdministrator($accountID)) {
+	$friendsString = Library::getFriendsQueryString($accountID);
+	
+	$filters[] = "levels.unlisted != 1 OR (levels.unlisted = 1 AND (levels.extID IN (".$friendsString.")))";
+}
+$queryJoin = 'INNER JOIN suggest ON levels.levelID = suggest.suggestLevelId';
 
-$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
+$levels = Library::getLevels($filters, $order, $orderSorting, $queryJoin, $pageOffset);
 
 foreach($levels['levels'] AS &$level) $page .= Dashboard::renderLevelCard($level, $person);
 
@@ -44,5 +53,5 @@ $dataArray = [
 
 $fullPage = Dashboard::renderTemplate("browse/levels", $dataArray);
 
-exit(Dashboard::renderPage("general/wide", Dashboard::string("yourLevelsTitle"), "../", $fullPage));
+exit(Dashboard::renderPage("general/wide", Dashboard::string("suggestedLevelsTitle"), "../", $fullPage));
 ?>

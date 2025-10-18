@@ -9,7 +9,7 @@ if(isset($_GET['search'])) {
 	$search = trim(Escape::text($_GET['search']));
 	if(empty($search)) exit(json_encode([]));
 	
-	$filters = ['name LIKE "%'.$search.'%" OR authorName LIKE "%'.$search.'%" OR ID LIKE "'.$search.'"', "reuploadID > 0"];
+	$filters = ['name LIKE "%'.$search.'%" OR authorName LIKE "%'.$search.'%" OR ID LIKE "'.$search.'"', "reuploadID > 0", "songs.isDisabled = 0"];
 	
 	$songsArray = Library::getSongs($filters, false, '', '', 0, 5);
 	if(!$songsArray['songs']) exit(json_encode([]));

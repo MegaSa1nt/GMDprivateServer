@@ -221,7 +221,7 @@ if($_GET['id']) {
 					foreach($favouriteSongsArray['songs'] AS &$favouriteSong) $favouriteSongs[] = $favouriteSong["songID"];
 				}
 				
-				$filters = ["songs.ID IN (".Escape::multiple_ids($level['LEVEL_SONG_IDS']).")"];
+				$filters = ["songs.ID IN (".Escape::multiple_ids($level['LEVEL_SONG_IDS']).")", "songs.isDisabled = 0"];
 				$additionalPage = '';
 
 				$songs = Library::getSongs($filters, '', '', '', $pageOffset, 10);
@@ -229,7 +229,7 @@ if($_GET['id']) {
 				foreach($songs['songs'] AS &$song) $additionalPage .= Dashboard::renderSongCard($song, $person, $favouriteSongs);
 
 				$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-				$pageCount = floor($songs['count'] / 10) + 1;
+				$pageCount = floor(($songs['count'] - 1) / 10) + 1;
 
 				$additionalData = [
 					'ADDITIONAL_PAGE' => $additionalPage,
@@ -274,7 +274,7 @@ if($_GET['id']) {
 				foreach($sfxs['sfxs'] AS &$sfx) $additionalPage .= Dashboard::renderSFXCard($sfx, $person);
 
 				$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-				$pageCount = floor($sfxs['count'] / 10) + 1;
+				$pageCount = floor(($sfxs['count'] - 1) / 10) + 1;
 
 				$additionalData = [
 					'ADDITIONAL_PAGE' => $additionalPage,

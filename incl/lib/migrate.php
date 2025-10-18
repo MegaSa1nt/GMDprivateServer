@@ -687,6 +687,9 @@ if(!$installed) {
 	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameSetListLevels'");
 		$exist = $check->fetchAll();
 		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameSetListLevels` INT NOT NULL DEFAULT '0' AFTER `gameLockLevelUpdating`");
+	$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardBypassMaintenance'");
+		$exist = $check->fetchAll();
+		if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `dashboardBypassMaintenance` INT NOT NULL DEFAULT '0' AFTER `dashboardManageVaultCodes`");
 	
 	$lines = file(__DIR__.'/../../config/dashboard.php');
 	$first_line = $lines[2];

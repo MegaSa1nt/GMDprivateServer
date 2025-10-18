@@ -9,7 +9,7 @@ $person = Dashboard::loginDashboardUser();
 
 $order = "reuploadTime";
 $orderSorting = "DESC";
-$filters = ["sfxs.reuploadID > 0"];
+$filters = ["sfxs.reuploadID > 0", "sfxs.isDisabled = 0"];
 $pageOffset = is_numeric($_GET["page"]) ? abs(Escape::number($_GET["page"]) - 1) * 10 : 0;
 $page = '';
 
@@ -18,7 +18,7 @@ $sfxs = Library::getSFXs($filters, $order, $orderSorting, '', $pageOffset, 10);
 foreach($sfxs['sfxs'] AS &$sfx) $page .= Dashboard::renderSFXCard($sfx, $person);
 
 $pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
-$pageCount = floor($sfxs['count'] / 10) + 1;
+$pageCount = floor(($sfxs['count'] - 1) / 10) + 1;
 
 $dataArray = [
 	'ADDITIONAL_PAGE' => $page,

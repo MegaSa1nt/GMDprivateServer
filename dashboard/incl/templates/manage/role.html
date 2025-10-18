@@ -881,6 +881,30 @@
 		<div class="languageDiv">
 			<div class="settingDescription">
 				<h2>
+					<i class="fa-solid fa-triangle-exclamation"></i>
+					%TEXT_permissionDashboardBypassMaintenanceTitle%
+				</h2>
+				<h3>%TEXT_permissionDashboardBypassMaintenanceDesc%</h3>
+			</div>
+			
+			<div class="toggleExtra" dashboard-extra-toggle>
+				<input type="hidden" name="dashboardBypassMaintenance" value="%ROLE_PERMISSION_DASHBOARD_BYPASS_MAINTENANCE_VALUE%" dashboard-change-default="%ROLE_PERMISSION_DASHBOARD_BYPASS_MAINTENANCE_VALUE%" />
+				
+				<button type="button" class="toggleExtraOption" value="2" title="%TEXT_disallow%">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="0" title="%TEXT_inherit%">
+					<i class="fa-solid fa-slash fa-flip-horizontal"></i>
+				</button>
+				<button type="button" class="toggleExtraOption" value="1" title="%TEXT_allow%">
+					<i class="fa-solid fa-check"></i>
+				</button>
+			</div>
+		</div>
+		
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
 					<i class="fa-solid fa-id-badge"></i>
 					%TEXT_permissionDashboardSetAccountRolesTitle%
 				</h2>

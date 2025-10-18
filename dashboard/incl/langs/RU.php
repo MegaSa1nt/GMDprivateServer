@@ -6,6 +6,8 @@
 */
 
 /* General strings */
+$language['footer'] = '%1$s, %2$s'; // GDPS, 20xx
+
 $language['account'] = 'Аккаунт';
 $language['userName'] = 'Никнейм';
 $language['password'] = 'Пароль';
@@ -41,6 +43,8 @@ $language['mapPacksTitle'] = 'Мап-Паки';
 $language['gauntletsTitle'] = 'Гаунтлеты';
 $language['songsTitle'] = 'Песни';
 $language['sfxsTitle'] = 'Звуковые эффекты';
+$language['clansListTitle'] = 'Кланы';
+$language['moderatorsTitle'] = 'Модераторы';
 
 $language['upload'] = 'Загрузка';
 $language['uploadSongTitle'] = 'Загрузить песню';
@@ -53,16 +57,24 @@ $language['addMapPackTitle'] = 'Добавить Мап-Пак';
 $language['addGauntletTitle'] = 'Добавить Гаунтлет';
 $language['unlistedLevelsTitle'] = 'Скрытые уровни';
 $language['unlistedListsTitle'] = 'Скрытые списки уровней';
+$language['suggestedLevelsTitle'] = 'Предложенные уровни';
+$language['disabledSongsTitle'] = 'Скрытые песни';
+$language['disabledSFXsTitle'] = 'Скрытые звуковые эффекты';
 $language['manageRolesTitle'] = 'Управление ролями';
 
 $language['clans'] = 'Кланы';
-$language['clansListTitle'] = 'Список кланов';
 
 $language['messengerTitle'] = 'Мессенджер';
 $language['loginToAccountTitle'] = 'Войти в аккаунт';
 $language['yourProfileTitle'] = 'Ваш профиль';
 $language['logoutFromAccountTitle'] = 'Выйти из аккаунта';
 $language['registerAccountTitle'] = 'Зарегистрировать аккаунт';
+
+$language['linksTitle'] = 'Ссылки';
+$language['creditsTitle'] = 'Упоминания';
+
+$language['maintenanceModeTitle'] = 'Технические работы';
+$language['maintenanceModeDesc'] = 'На %1$s сейчас проходят технические работы, подождите немного!';
 
 /* Error strings */
 $language['errorTitle'] = 'Произошла ошибка';
@@ -531,7 +543,7 @@ $language['permissionGameShareCreatorPointsDesc'] = 'Позволяет игро
 $language['permissionGameSetLevelSongTitle'] = 'Поставить песню';
 $language['permissionGameSetLevelSongDesc'] = 'Позволяет игроку поставить или убрать песню на уровнях';
 $language['permissionGameLockLevelCommentsTitle'] = 'Заблокировать комментирование';
-$language['permissionGameLockLevelCommentsDesc'] = 'Позволяет игроку блокировать и разблокировать комментарование уровней и списков уровней';
+$language['permissionGameLockLevelCommentsDesc'] = 'Позволяет игроку блокировать и разблокировать комментирование уровней и списков уровней';
 $language['permissionGameLockLevelUpdatingTitle'] = 'Заблокировать обновление уровня';
 $language['permissionGameLockLevelUpdatingDesc'] = 'Позволяет игроку блокировать и разблокировать обновление уровней';
 $language['permissionGameSetListLevelsTitle'] = 'Указать уровни в списке уровней';
@@ -568,6 +580,8 @@ $language['permissionDashboardManageRolesTitle'] = 'Управлять роля�
 $language['permissionDashboardManageRolesDesc'] = 'Позволяет игроку создавать, настраивать и удалять роли';
 $language['permissionDashboardManageVaultCodesTitle'] = 'Управлять кодами Wraith';
 $language['permissionDashboardManageVaultCodesDesc'] = 'Позволяет игроку создавать, настраивать и удалять коды Wraith';
+$language['permissionDashboardBypassMaintenanceTitle'] = 'Обойти режим технических работ';
+$language['permissionDashboardBypassMaintenanceDesc'] = 'Позволяет игроку пользоваться сервером во время технических работ';
 $language['permissionDashboardSetAccountRolesTitle'] = 'Добавлять роли на аккаунт';
 $language['permissionDashboardSetAccountRolesDesc'] = 'Позволяет игроку добавлять и убирать роли аккаунтам';
 $language['disallow'] = 'Запретить';
