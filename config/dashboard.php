@@ -50,7 +50,7 @@ $installed = true; // Like i said, it changed!
 		%2$s — clan tag
 		%1$s [%2$s] -> USERNAME [TAG], for example: Sa1ntSosetHui [GCS]
 */
-$maintenanceMode = true;
+$maintenanceMode = false;
 
 $gdps = "GDPS";
 
@@ -91,7 +91,7 @@ $clansTagPosition = '%1$s [%2$s]';
 	$thirdParty[] = ['icon url', 'username', 'social media link', 'what person did'];
 */
 $thirdParty[] = ['incl/icons/robtop.jpg', 'RobTop', 'https://store.steampowered.com/app/322170/Geometry_Dash/', 'Creator of Geometry Dash'];
-$thirdParty[] = ['incl/icons/cvolton.png', 'Cvolton', 'https://github.com/Cvolton', 'Creator of original GDPS core'];
+$thirdParty[] = ['incl/icons/cvolton.png', 'Cvolton', 'https://github.com/Cvolton', 'Creator of the original GDPS core'];
 
 /*
 	Custom music and SFX libraries
