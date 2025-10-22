@@ -57,14 +57,14 @@ class IP {
 		if(isset($_SERVER['HTTP_CF_CONNECTING_IP']) && self::isCloudFlareIP($_SERVER['REMOTE_ADDR'])) return $_SERVER['HTTP_CF_CONNECTING_IP'];
 		
 		/*
+			141412.xyz support
+		*/
+		if(isset($_SERVER['HTTP_X_REAL_IP']) && $_SERVER['REMOTE_ADDR'] == "10.0.1.10") return $_SERVER['HTTP_X_REAL_IP'];
+			
+		/*
 			Localhost reverse proxy (mostly 7m.pl)
 		*/
 		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && self::ipv4inrange($_SERVER['REMOTE_ADDR'], '127.0.0.0/8')) return $_SERVER['HTTP_X_FORWARDED_FOR'];
-		
-		/*
-			141412.xyz support
-		*/
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['REMOTE_ADDR'] == "10.0.1.10") return explode(",", $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
 		
 		/*
 			Direct access to server

@@ -1146,6 +1146,16 @@ class Dashboard {
 		
 		$user['USER_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		
+		$user['USER_SHOW_REGISTER_DATE'] = 'true';
+		$user['USER_SHOW_RANK'] = 'false';
+		$user['USER_IS_LEADER'] = 'false';
+		if(isset($user["USER_RANK"])) {
+			$user['USER_SHOW_REGISTER_DATE'] = 'false';
+			$user['USER_SHOW_RANK'] = 'true';
+			
+			$user['USER_IS_LEADER'] = $user['USER_RANK'] < 4 ? 'true' : 'false';
+		}
+		
 		$contextMenuData['MENU_CAN_SEE_COMMENT_HISTORY'] = $canSeeCommentHistory ? 'true' : 'false';
 		
 		$contextMenuData['MENU_CAN_SEE_BANS'] = ($isPersonThemselves || Library::checkPermission($person, "dashboardModeratorTools")) ? 'true' : 'false';

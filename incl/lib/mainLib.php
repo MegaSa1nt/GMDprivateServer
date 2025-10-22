@@ -507,7 +507,7 @@ class Library {
 		
 		switch($personType) {
 			case Person::AccountID:
-				$person = $person['accountID'];
+				if(is_array($person)) $person = $person['accountID'];
 				
 				if($banType == Ban::Account) {
 					$removeAuth = $db->prepare('UPDATE accounts SET auth = "" WHERE accountID = :accountID');
@@ -516,11 +516,11 @@ class Library {
 				
 				break;
 			case Person::UserID:
-				$person = $person['userID'];
+				if(is_array($person)) $person = $person['userID'];
 				
 				break;
 			case Person::IP:
-				$person = self::convertIPForSearching($person['IP']);
+				if(is_array($person)) $person = self::convertIPForSearching($person['IP']);
 				
 				if($banType == Ban::Account) {
 					$banIP = $db->prepare("INSERT INTO bannedips (IP) VALUES (:IP)");
@@ -859,7 +859,7 @@ class Library {
 					ORDER BY leaderboards.stars + leaderboards.moons DESC, leaderboards.userName ASC");
 				$leaderboard->execute([':stars' => $user['stars'] + $user['moons']]);
 				
-				$rank = max(0, self::getUserRank($user['stars'], $user['moons'], $userName) - $count);
+				$rank = max(0, self::getUserRank($user['stars'], $user['moons'], $userName, true) - $count);
 				
 				break;
 			case 'friends':
@@ -880,14 +880,14 @@ class Library {
 		
 		$leaderboard = $leaderboard->fetchAll();
 		
-		return ["rank" => $rank, "leaderboard" => $leaderboard];
+		return ["rank" => $rank, "leaderboard" => $leaderboard, "count" => count($leaderboard)];
 	}
 	
-	public static function getUserRank($stars, $moons, $userName) {
+	public static function getUserRank($stars, $moons, $userName, $ignoreMinStars = false) {
 		require __DIR__."/../../config/misc.php";
 		require __DIR__."/connection.php";
 		
-		if($stars + $moons < $leaderboardMinStars) return 0;
+		if(!$ignoreMinStars && $stars + $moons < $leaderboardMinStars) return 0;
 		
 		$queryText = self::getBannedPeopleQuery(Ban::Leaderboards, true);
 		

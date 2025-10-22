@@ -1,5 +1,5 @@
 <div class="contentDiv" dashboard-context-div>
-	<div class="horisontal">
+	<div class="horisontal spaceBetween">
 		<div class="levelTitle">
 			<h2 class="horisontal">
 				%USER_CARD%
@@ -9,6 +9,12 @@
 				</span>
 			</h2>
 		</div>
+		
+		<h1 dashboard-score="%USER_RANK%" dashboard-show="%USER_SHOW_RANK%">
+			<i dashboard-show="%USER_IS_LEADER%" class="fa-solid fa-trophy"></i>
+			<i dashboard-hide="%USER_IS_LEADER%" class="fa-solid fa-hashtag"></i>
+			%USER_RANK%
+		</h1>
 	</div>
 	
 	<div class="horisontal stats">
@@ -25,7 +31,7 @@
 		</div>
 		
 		<div class="levelStats card">
-			<text class="levelStat" title="%TEXT_registerDate%">
+			<text class="levelStat" title="%TEXT_registerDate%" dashboard-show="%USER_SHOW_REGISTER_DATE%">
 				<i class="fa-solid fa-calendar"></i>
 				<text dashboard-date="%registerDate%"></text>
 			</text>

@@ -1,5 +1,5 @@
 <?php
-$installed = true; // Like i said, it changed!
+$installed = true;
 
 /*
 	Main dashboard settings

@@ -16,7 +16,7 @@ if(isset($_POST['userName']) && isset($_POST['password'])) {
 	$lastLocation = htmlspecialchars(Escape::text($_POST['lastLocation']));
 	if(mb_strpos($lastLocation, 'account/register') !== false || mb_strpos($lastLocation, 'account/login') !== false) $lastLocation = './';
 	
-	setcookie('auth', $person['auth'], 2147483647, '/');
+	setcookie('auth', $person['auth'], 2147483647, '/', '', true, true);
 
 	Library::logAction($person, Action::SuccessfulLogin);
 	

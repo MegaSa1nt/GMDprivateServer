@@ -1,0 +1,173 @@
+<div class="box">
+	<form name="banUserForm" autocomplete="gdps-dashboard">
+		<div class="horisontal">
+			<div class="inputDiv">
+				<h2>
+					<i class="fa-regular fa-user"></i>
+					%TEXT_personType%
+					
+					<span class="infoIcon hide" title="%TEXT_personTypeAccountDesc%" dashboard-select-type="personType" value="0">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+					<span class="infoIcon hide" title="%TEXT_personTypeIPDesc%" dashboard-select-type="personType" value="2">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<div class="select" dashboard-select="personType">
+					<input type="hidden" name="personType" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_choosePersonType%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_account%">
+							<i class="fa-solid fa-user"></i>
+							<text>%TEXT_account%</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="IP">
+							<i class="fa-solid fa-server"></i>
+							<text>IP</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="inputDiv">
+				<h2>
+					<i class="fa-solid fa-gavel"></i>
+					%TEXT_banType%
+					
+					<span class="infoIcon hide" title="%TEXT_banTypePlayersLeaderboardDesc%" dashboard-select-type="banType" value="0">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+					<span class="infoIcon hide" title="%TEXT_banTypeCreatorsLeaderboardDesc%" dashboard-select-type="banType" value="1">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+					<span class="infoIcon hide" title="%TEXT_banTypeUploadingLevelsDesc%" dashboard-select-type="banType" value="2">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+					<span class="infoIcon hide" title="%TEXT_banTypeCommentingDesc%" dashboard-select-type="banType" value="3">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+					<span class="infoIcon hide" title="%TEXT_banTypeUsingAccountDesc%" dashboard-select-type="banType" value="4">
+						<i class="fa-solid fa-circle-info"></i>
+					</span>
+				</h2>
+				
+				<div class="select" dashboard-select="banType">
+					<input type="hidden" name="banType" dashboard-select-value required>
+					<input type="text" placeholder="%TEXT_chooseBanType%" dashboard-select-input>
+						
+					<i class="fa-solid fa-caret-right" dashboard-caret></i>
+						
+					<div class="options" dashboard-select-options>
+						<div class="option" value="0" dashboard-select-option="%TEXT_playersLeaderboard%">
+							<i class="fa-solid fa-chart-simple"></i>
+							<text>%TEXT_playersLeaderboard%</text>
+						</div>
+						
+						<div class="option" value="1" dashboard-select-option="%TEXT_creatorsLeaderboard%">
+							<i class="fa-solid fa-screwdriver-wrench"></i>
+							<text>%TEXT_creatorsLeaderboard%</text>
+						</div>
+						
+						<div class="option" value="2" dashboard-select-option="%TEXT_uploadingLevels%">
+							<i class="fa-solid fa-gamepad"></i>
+							<text>%TEXT_uploadingLevels%</text>
+						</div>
+						
+						<div class="option" value="3" dashboard-select-option="%TEXT_commenting%">
+							<i class="fa-solid fa-comment"></i>
+							<text>%TEXT_commenting%</text>
+						</div>
+						
+						<div class="option" value="4" dashboard-select-option="%TEXT_usingAccount%">
+							<i class="fa-solid fa-user"></i>
+							<text>%TEXT_usingAccount%</text>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="inputDiv hide" dashboard-select-type="personType" value="0">
+			<h2>
+				<i class="fa-solid fa-user"></i>
+				%TEXT_user%
+			</h2>
+			
+			<div class="select" dashboard-select-search="userSearch">
+				<input type="hidden" name="person" dashboard-select-value />
+				<input type="text" placeholder="%TEXT_searchText%" dashboard-select-input="manage/getUsers" />
+				
+				<i class="fa-solid fa-caret-right" dashboard-caret></i>
+				
+				<div class="options" dashboard-select-options></div>
+			</div>
+		</div>
+		
+		<div class="inputDiv hide" dashboard-select-type="personType" value="2">
+			<h2>
+				<i class="fa-solid fa-server"></i>
+				IP
+			</h2>
+			
+			<input class="inputStyle" type="text" name="person" autocomplete="gdps-dashboard-ban-IP" placeholder="127.0.0.1" />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-comment"></i>
+				%TEXT_banReason%
+				
+				<span class="infoIcon" title="%TEXT_banReasonDesc%">
+					<i class="fa-solid fa-circle-info"></i>
+				</span>
+			</h2>
+			
+			<input class="inputStyle" type="text" name="banReason" autocomplete="gdps-dashboard-banReason" placeholder="No cheats allowed" />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-comment-medical"></i>
+				%TEXT_modBanReason%
+				
+				<span class="infoIcon" title="%TEXT_modBanReasonDesc%">
+					<i class="fa-solid fa-circle-info"></i>
+				</span>
+			</h2>
+			
+			<input class="inputStyle" type="text" name="modBanReason" autocomplete="gdps-dashboard-modBanReason" placeholder="This user used cheats on..." dashboard-not-required />
+		</div>
+		
+		<div class="inputDiv">
+			<h2>
+				<i class="fa-solid fa-clock"></i>
+				%TEXT_expiryTime%
+				
+				<span class="infoIcon" title="%TEXT_expiryTimeDesc%">
+					<i class="fa-solid fa-circle-info"></i>
+				</span>
+			</h2>
+			
+			<input class="inputStyle" type="datetime-local" name="expiryTime" min="%BAN_MINIMUM_EXPIRATION_TIME%" autocomplete="gdps-dashboard-expiryTime" dashboard-not-required />
+		</div>
+				
+		<div class="languageDiv hide" dashboard-toggle dashboard-select-type="personType" value="0">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-server"></i>
+					%TEXT_alsoBanIP%
+				</h2>
+				<h3>%TEXT_alsoBanIPDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="alsoBanIP" dashboard-change-default></input>
+		</div>
+		
+		<button class="button" type="button" onclick="postPage('mod/ban', 'banUserForm', 'box')">%TEXT_banUserTitle%</button>
+	</form>
+</div>

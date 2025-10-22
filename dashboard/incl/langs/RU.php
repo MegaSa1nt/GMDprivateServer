@@ -37,6 +37,7 @@ $language['yourSFXsTitle'] = 'Ваши звуковые эффекты';
 
 $language['browse'] = 'Просмотр';
 $language['accountsTitle'] = 'Аккаунты'; // "Accounts" as page title
+$language['leaderboardsTitle'] = 'Топ игроков';
 $language['levelsTitle'] = 'Уровни'; // "Levels" as page title
 $language['listsTitle'] = 'Списки уровней';
 $language['mapPacksTitle'] = 'Мап-Паки';
@@ -53,6 +54,7 @@ $language['reuploadLevelTitle'] = 'Перенести уровень';
 $language['runCron'] = 'Выполнить Крон';
 
 $language['moderatorTools'] = 'Инструменты модератора';
+$language['banUserTitle'] = 'Забанить игрока';
 $language['addMapPackTitle'] = 'Добавить Мап-Пак';
 $language['addGauntletTitle'] = 'Добавить Гаунтлет';
 $language['unlistedLevelsTitle'] = 'Скрытые уровни';
@@ -152,13 +154,13 @@ $language['errorFailedToGetGMD'] = 'Произошла ошибка при по�
 $language['errorMapPackNotFound'] = 'Мап-Пак не найден!';
 $language['errorMapPackNoLevels'] = 'Вы не указали ни одного уровня!';
 
-$language['errorListNotFound'] = 'Список уровней не найден!';
-
 $language['errorGauntletAlreadyExists'] = 'Этот Гаунтлет уже существует!';
-
 $language['errorAccountNotFound'] = 'Аккаунт не найден!';
-
 $language['errorRoleNotFound'] = 'Роль не найдена!';
+
+$language['errorCantBanYourself'] = 'Вы не можете забанить себя!';
+$language['errorUserIsBanned'] = 'Этот игрок уже забанен!';
+$language['errorExpirationTimeInPast'] = 'Вы не можете указать дату истечения бана в прошлом!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Текст скопирован!';
@@ -198,6 +200,8 @@ $language['successAddedGauntlet'] = 'Вы успешно добавили Гау
 
 $language['successCreatedRole'] = 'Вы успешно создали роль!';
 
+$language['successBannedUser'] = 'Вы успешно забанили игрока!';
+
 /* Page strings */
 $language['changeUsernameOld'] = 'Старый никнейм';
 $language['changeUsernameNew'] = 'Новый никнейм';
@@ -234,6 +238,7 @@ $language['manageLevel'] = 'Управление уровнем';
 $language['nothingOpened'] = 'Ничего не открыто!';
 $language['noComments'] = 'Комментариев нет!';
 $language['noScores'] = 'Рекордов нет!';
+$language['noAccounts'] = 'Аккаунтов нет!';
 
 $language['sortByLikes'] = 'Сортировать по лайкам';
 $language['sortByTime'] = 'Сортировать по времени';
@@ -588,4 +593,34 @@ $language['disallow'] = 'Запретить';
 $language['inherit'] = 'Наследовать';
 $language['allow'] = 'Разрешить';
 $language['chooseRole'] = 'Выберите роль!';
+
+$language['user'] = 'Игрок';
+$language['personType'] = 'Тип игрока';
+$language['choosePersonType'] = 'Выберите тип игрока...';
+$language['personTypeAccountDesc'] = 'Забанить игрока по его ID';
+$language['personTypeIPDesc'] = 'Забанить игрока по его IP';
+$language['banType'] = 'Тип бана';
+$language['chooseBanType'] = 'Выберите тип бана...';
+$language['playersLeaderboard'] = 'Топ игроков';
+$language['banTypePlayersLeaderboardDesc'] = 'Забанить игрока из топа игроков';
+$language['creatorsLeaderboard'] = 'Топ креаторов';
+$language['banTypeCreatorsLeaderboardDesc'] = 'Забанить игрока из топа креаторов';
+$language['uploadingLevels'] = 'Загрузка уровней';
+$language['banTypeUploadingLevelsDesc'] = 'Забанить игроку возможность выкладывать уровни';
+$language['commenting'] = 'Комментирование';
+$language['banTypeCommentingDesc'] = 'Забанить игроку что-либо комментировать';
+$language['usingAccount'] = 'Использование аккаунта';
+$language['banTypeUsingAccountDesc'] = 'Забанить игроку возможность использовать свой аккаунт';
+$language['banReason'] = 'Причина бана';
+$language['modBanReason'] = 'Дополнительная информация';
+$language['banReasonDesc'] = 'Причина бана, её может увидеть игрок.';
+$language['modBanReasonDesc'] = 'Заметка, которую увидят только другие модераторы, о том, почему игрок был забанен.';
+$language['alsoBanIP'] = 'Забанить IP игрока';
+$language['alsoBanIPDesc'] = 'Вместе с баном аккаунта забанить и его IP';
+$language['expiryTime'] = 'Дата истечения';
+$language['expiryTimeDesc'] = 'Дата, когда бан истечёт автоматически. Необязательно.';
+
+$language['players'] = 'Игроки';
+$language['global'] = 'Глобально';
+$language['creators'] = 'Креаторы';
 ?>

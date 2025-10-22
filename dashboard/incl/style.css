@@ -580,7 +580,8 @@ form {
 }
 
 .inputDiv.hide,
-.settingDescription.hide {
+.settingDescription.hide,
+.languageDiv.hide {
 	display: none;
 }
 
@@ -2159,14 +2160,14 @@ i[dashboard-caret]::before {
 .select:has(.option:not(.hide)).show .options {
 	pointer-events: initial;
 	
-	background: #86868624;
+	background: #12121275;
 	border: 1px solid #86868634;
 	backdrop-filter: blur(5px);
 	
 	@starting-style {
 		pointer-events: none;
 	
-		background: #86868600;
+		background: #12121200;
 		border: 1px solid #86868600;
 		backdrop-filter: blur(0px);
 	}

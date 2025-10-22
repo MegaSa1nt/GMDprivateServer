@@ -37,6 +37,7 @@ $language['yourSFXsTitle'] = 'Your SFXs';
 
 $language['browse'] = 'Browse';
 $language['accountsTitle'] = 'Accounts'; // "Accounts" as page title
+$language['leaderboardsTitle'] = 'Leaderboards';
 $language['levelsTitle'] = 'Levels'; // "Levels" as page title
 $language['listsTitle'] = 'Lists';
 $language['mapPacksTitle'] = 'Map Packs';
@@ -53,6 +54,7 @@ $language['reuploadLevelTitle'] = 'Reupload a level';
 $language['runCron'] = 'Run Cron';
 
 $language['moderatorTools'] = 'Moderator tools';
+$language['banUserTitle'] = 'Ban user';
 $language['addMapPackTitle'] = 'Add Map Pack';
 $language['addGauntletTitle'] = 'Add Gauntlet';
 $language['unlistedLevelsTitle'] = 'Unlisted levels';
@@ -131,7 +133,7 @@ $language['errorFailedToWriteLevel'] = 'An error has occured while trying to sav
 
 $language['errorCronTooFast'] = 'Please wait a few minutes before running Cron again!';
 
-$language['errorPlayerNotFound'] = 'Player wasn\'t found!';
+$language['errorPlayerNotFound'] = 'User wasn\'t found!';
 $language['errorBadName'] = 'Please choose another name!';
 $language['errorBadDesc'] = 'Please choose another description!';
 
@@ -152,13 +154,13 @@ $language['errorFailedToGetGMD'] = 'An error occured while trying to get level d
 $language['errorMapPackNotFound'] = 'Map Pack wasn\'t found!';
 $language['errorMapPackNoLevels'] = 'You didn\'t specify any levels!';
 
-$language['errorListNotFound'] = 'List wasn\'t found!';
-
 $language['errorGauntletAlreadyExists'] = 'This Gauntlet already exists!';
-
 $language['errorAccountNotFound'] = 'Account wasn\'t found!';
-
 $language['errorRoleNotFound'] = 'Role wasn\'t found!';
+
+$language['errorCantBanYourself'] = 'You can\'t ban yourself!';
+$language['errorUserIsBanned'] = 'This user is already banned!';
+$language['errorExpirationTimeInPast'] = 'You cannot set someone\'s ban expiration before the current time!';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -198,6 +200,8 @@ $language['successAddedGauntlet'] = 'You successfullty added a Gauntlet!';
 
 $language['successCreatedRole'] = 'You successfullty created a role!';
 
+$language['successBannedUser'] = 'You successfullty banned an user!';
+
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
 $language['changeUsernameNew'] = 'New username';
@@ -234,6 +238,7 @@ $language['nothingOpened'] = 'Nothing is opened!';
 $language['manageLevel'] = 'Manage level';
 $language['noComments'] = 'No comments!';
 $language['noScores'] = 'No scores!';
+$language['noAccounts'] = 'No accounts!';
 
 $language['sortByLikes'] = 'Sort by likes';
 $language['sortByTime'] = 'Sort by time';
@@ -588,4 +593,34 @@ $language['disallow'] = 'Disallow';
 $language['inherit'] = 'Inherit';
 $language['allow'] = 'Allow';
 $language['chooseRole'] = 'Choose a role!';
+
+$language['user'] = 'User';
+$language['personType'] = 'User type';
+$language['choosePersonType'] = 'Choose user type...';
+$language['personTypeAccountDesc'] = 'Ban user by their ID';
+$language['personTypeIPDesc'] = 'Ban user by their IP';
+$language['banType'] = 'Ban type';
+$language['chooseBanType'] = 'Choose ban type...';
+$language['playersLeaderboard'] = 'Players leaderboard';
+$language['banTypePlayersLeaderboardDesc'] = 'Ban user from players leaderboard';
+$language['creatorsLeaderboard'] = 'Creators leaderboard';
+$language['banTypeCreatorsLeaderboardDesc'] = 'Ban user from creators leaderboard';
+$language['uploadingLevels'] = 'Levels uploads';
+$language['banTypeUploadingLevelsDesc'] = 'Ban user from uploading levels';
+$language['commenting'] = 'Commenting';
+$language['banTypeCommentingDesc'] = 'Ban user from commenting anything';
+$language['usingAccount'] = 'Account usage';
+$language['banTypeUsingAccountDesc'] = 'Ban user from using their account';
+$language['banReason'] = 'Ban reason';
+$language['modBanReason'] = 'Additional details';
+$language['banReasonDesc'] = 'Reason for the ban. Can be seen by the banned user.';
+$language['modBanReasonDesc'] = 'A notice that only moderators can view to know why this user was banned.';
+$language['alsoBanIP'] = 'Ban user\'s IP';
+$language['alsoBanIPDesc'] = 'Ban this user\'s IP too';
+$language['expiryTime'] = 'Expiration';
+$language['expiryTimeDesc'] = 'Date on which the user will be unbanned automatically. This is optional.';
+
+$language['players'] = 'Players';
+$language['global'] = 'Global';
+$language['creators'] = 'Creators';
 ?>
