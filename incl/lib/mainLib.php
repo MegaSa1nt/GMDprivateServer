@@ -3151,7 +3151,7 @@ class Library {
 				$request = self::sendRequest($serverURL.'downloadGJLevel22.php', http_build_query($requestData), $headers, "POST", false);
 				$requestArray = Security::mapGDString(explode("#", $request)[0], ":");
 				
-				$reuploadLevelString = Escape::text($requestArray[4]) ?: '';
+				$reuploadLevelString = Escape::base64($requestArray[4]) ?: '';
 				$reuploadUserID = Escape::number($requestArray[6]) ?: 0;
 				$reuploadLevelID = Escape::number($requestArray[1]) ?: 0;
 				
@@ -3173,7 +3173,7 @@ class Library {
 				if(substr($levelString, 0, 2) == 'eJ') $levelString = gzuncompress(Escape::url_base64_decode($levelString));
 				
 				$levelGameVersion = abs(Escape:number($requestArray[13]) ?: 0);
-				$levelName = Escape::text($requestArray[2], 30);
+				$levelName = Escape::latin($requestArray[2], 30);
 				$levelDesc = Escape::text(Escape::url_base64_decode($requestArray[3]), 300);
 				
 				if(!Security::validateLevel($levelString, $levelGameVersion)) {
@@ -3193,9 +3193,9 @@ class Library {
 				$objects = Escape::number($requestArray[45]) ?: 0;
 				$coins = Security::limitValue(0, Escape::number($requestArray[37]) ?: 0, 3);
 				$requestedStars = Security::limitValue(0, Escape::number($requestArray[39]) ?: 0, 10);
-				$extraString = Escape::text($requestArray[36]) ?: '';
+				$extraString = Escape::base64($requestArray[36]) ?: '';
 				$isLDM = $requestArray[40] ? 1 : 0;
-				$levelPassword = Escape::text($requestArray[27]) ?: 0;
+				$levelPassword = Escape::base64($requestArray[27]) ?: 0;
 				$songIDs = Escape::multiple_ids($requestArray[52]) ?: '';
 				$sfxIDs = Escape::multiple_ids($requestArray[53]) ?: '';
 				$ts = Escape::number($requestArray[57]) ?: 0;

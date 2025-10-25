@@ -10,7 +10,7 @@ $person = $sec->loginPlayer();
 if(!$person["success"]) exit(CommonError::InvalidRequest);
 $userID = $person['userID'];
 
-$udid = Escape::text($_POST['udid']) ?: '';
+$udid = Escape::base64($_POST['udid']) ?: '';
 
 $stars = $demons = $coins = $userCoins = $moons = $diamonds = $creatorPoints = 0;
 $leaderboardsString = "";

@@ -77,7 +77,7 @@ class Security {
 		
 		self::updateLastPlayed($userID);
 		
-		$udid = isset($_POST['udid']) ? Escape::text($_POST['udid']) : '';
+		$udid = isset($_POST['udid']) ? Escape::base64($_POST['udid']) : '';
 		if($udid) self::assignUDIDToRegisteredAccount($userID, $udid, $userName);
 		
 		if($sessionGrants && !$skipValidating) {
@@ -179,6 +179,7 @@ class Security {
 	}
 	
 	public function loginPlayer() {
+		require __DIR__."/../../config/dashboard.php";
 		require __DIR__."/../../config/security.php";
 		require_once __DIR__."/mainLib.php";
 		require_once __DIR__."/exploitPatch.php";
@@ -207,9 +208,13 @@ class Security {
 				$accountID = Library::getAccountID($userID);
 				break;
 			case empty($_POST['password']) && empty($_POST['gjp']) && empty($_POST['gjp2']) && empty($_POST['auth']):
-				if(!$unregisteredSubmissions) return ["success" => true, "accountID" => "0", "userID" => "0", "userName" => "Undefined", "IP" => $IP];
+				if(!$unregisteredSubmissions) {
+					if($maintenanceMode) exit(CommonError::InvalidRequest);
+					
+					return ["success" => true, "accountID" => "0", "userID" => "0", "userName" => "Undefined", "IP" => $IP];
+				}
 				
-				$udid = isset($_POST['udid']) ? Escape::text($_POST['udid']) : '';
+				$udid = isset($_POST['udid']) ? Escape::base64($_POST['udid']) : '';
 				$userName = isset($_POST['userName']) ? Escape::latin($_POST['userName']) : "Undefined";
 				$accountID = isset($_POST['accountID']) ? abs(Escape::number($_POST['accountID'])) : 0;
 				
@@ -230,8 +235,12 @@ class Security {
 						self::checkRateLimits($logPerson, RateLimit::LoginTries);
 					}
 					
+					if($maintenanceMode) exit(CommonError::InvalidRequest);
+					
 					return ["success" => true, "accountID" => "0", "userID" => "0", "userName" => "Undefined", "IP" => $IP];
 				}
+				
+				if($maintenanceMode && !Library::checkPermission(["success" => true, "accountID" => (!$accountID ? (string)$verifyUDID['unregisteredID'] : $accountID), "userID" => (string)$verifyUDID['userID'], "userName" => (string)$verifyUDID["userName"], "IP" => $IP], "dashboardBypassMaintenance")) exit(CommonError::InvalidRequest);
 				
 				return ["success" => true, "accountID" => (!$accountID ? (string)$verifyUDID['unregisteredID'] : $accountID), "userID" => (string)$verifyUDID['userID'], "userName" => (string)$verifyUDID["userName"], "IP" => $IP];
 				break;

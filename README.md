@@ -24,4 +24,4 @@ Please go to [wiki page](https://github.com/MegaSa1nt/GMDprivateServer/wiki) to 
 - file-type — https://github.com/sindresorhus/file-type — `dashboard`
 
 ## License
-This project is licensed under the GPL 3.0 License - see the [LICENSE](./license.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./license.md) file for details.

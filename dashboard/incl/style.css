@@ -124,7 +124,10 @@ nav button {
 	width: 100%;
 	height: fit-content;
 	padding: 15px 23px;
+	
 	font-size: 25px;
+	font-weight: 900;
+	color: white;
 	
 	border-radius: 15px;
 
@@ -687,8 +690,9 @@ form.empty-fields .select:has(input:not([dashboard-not-required]):placeholder-sh
 
 nav .dropdown-items button {
 	font-size: 23px;
+	font-weight: 400;
 	
-	gap: 7px;
+	gap: 10px;
 	
 	padding: 10px 13px;
 }
@@ -851,6 +855,16 @@ nav::-webkit-scrollbar,
 .levelTitle h2 {
 	font-size: 28px;
 	font-weight: 400;
+	
+	transition: 0.2s;
+}
+
+.levelTitle[href] h2:active {
+	scale: 97%;
+}
+
+.levelTitle[href] h2:active:has(.username:active span[href]) {
+	scale: 100%;
 }
 
 .levelTitle h2 text,
@@ -2703,12 +2717,16 @@ hr {
 	transition: 0.2s;
 }
 
-.username:active {
+.username:has(span[href]):active {
 	scale: 95%;	
 }
 
-.username:active span::after {
+.username:active span[href]::after {
 	scale: 105%;
+}
+
+.levelTitle[href] h2:active span[href]::after {
+	scale: 103%;
 }
 
 .levelDescription .username:has(img),

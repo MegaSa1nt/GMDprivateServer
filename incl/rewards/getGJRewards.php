@@ -17,7 +17,7 @@ $smallChestStuff = $bigChestStuff = '0,0,0,0';
 
 $rewardType = abs(Escape::number($_POST["rewardType"]));
 $chk = XORCipher::cipher(Escape::url_base64_decode(substr(Escape::latin($_POST["chk"]), 5)), 59182);
-$udid = Escape::text($_POST["udid"]);
+$udid = Escape::base64($_POST["udid"]);
 
 $getChestsTime = Library::getDailyChests($userID);
 

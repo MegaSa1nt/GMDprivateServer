@@ -9,7 +9,7 @@ $person = $sec->loginPlayer();
 if(!$person["success"]) exit(CommonError::InvalidRequest);
 
 $toAccountID = Escape::latin_no_spaces($_POST["toAccountID"]);
-$comment = Escape::text($_POST["comment"]);
+$comment = Escape::base64($_POST["comment"]);
 
 $canSendFriendRequest = Library::canSendFriendRequest($person, $toAccountID);
 if(!$canSendFriendRequest) exit(CommonError::InvalidRequest);

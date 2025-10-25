@@ -12,7 +12,7 @@ $accountID = $person["accountID"];
 $userID = $person["userID"];
 
 $chk = XORCipher::cipher(Escape::url_base64_decode(substr(Escape::latin($_POST["chk"]), 5)), 19847);
-$udid = Escape::text($_POST["udid"]);
+$udid = Escape::base64($_POST["udid"]);
 
 $questID = floor(time() / 100000);
 $timeLeft = strtotime("tomorrow 00:00:00") - time();

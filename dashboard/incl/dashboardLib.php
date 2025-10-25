@@ -259,8 +259,6 @@ class Dashboard {
 		require __DIR__."/../".$dbPath."config/dashboard.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
-		if(isset($GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']])) return $GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']];
-		
 		if(!$user) {
 			return [
 				'mainIcon' => $iconsRendererServer."/icon.png?type=cube&value=1&color1=0&color2=3",
@@ -270,9 +268,11 @@ class Dashboard {
 					'modBadgeLevel' => 0,
 					'commentColor' => '255,255,255'
 				],
-				'userAttributes' => ''
+				'userAttributes' => 'dashboard-remove="href title"'
 			];
 		}
+		
+		if(isset($GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']])) return $GLOBALS['core_cache']['dashboard']['userMetadata'][$user['userID']];
 		
 		$userAttributes = [];
 		
@@ -802,7 +802,7 @@ class Dashboard {
 		
 		$contextMenuData = [];
 		$isPersonThemselves = $person['userID'] == $comment['userID'];
-		$isCreatorThemselves = $person['userID'] == $comment['creatorUserID'] || $person['accountID'] == $comment['creatorAccountID'];
+		$isCreatorThemselves = (isset($comment['userID']) && $comment['userID'] == $comment['creatorUserID']) || (isset($comment['accountID']) && $comment['accountID'] == $comment['creatorAccountID']);
 		
 		$user = Library::getUserByID($comment['userID']);
 		$userName = $user ? $user['userName'] : 'Undefined';
@@ -1128,7 +1128,7 @@ class Dashboard {
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		
 		$isPersonThemselves = $person['accountID'] == $user['extID'];
-	
+		
 		$userName = $user ? $user['userName'] : 'Undefined';
 		$userMetadata = self::getUserMetadata($user);
 

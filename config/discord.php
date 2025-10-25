@@ -129,8 +129,8 @@ $downloadEmoji = ":arrow_heading_down:";
 $tadaEmoji = ":tada:";
 $sobEmoji = ":sob:";
 
-$difficultiesURL = "https://gcs.skin/WTFIcons/difficulties/";
-$gauntletsURL = "https://gcs.skin/WTFIcons/gauntlets/";
+$difficultiesURL = "https://images.gcs.skin/difficulties/";
+$gauntletsURL = "https://images.gcs.skin/gauntlets/";
 
 $authorURL = "";
 $authorIconURL = "";

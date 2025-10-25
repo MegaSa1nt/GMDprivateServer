@@ -10,8 +10,8 @@ $person = $sec->loginPlayer();
 if(!$person["success"]) exit(CommonError::InvalidRequest);
 
 $toAccountID = Escape::latin_no_spaces($_POST["toAccountID"]);
-$subject = Escape::text($_POST["subject"]);
-$body = Escape::text($_POST["body"]);
+$subject = Escape::base64($_POST["subject"]);
+$body = Escape::base64($_POST["body"]);
 
 $canMessage = Library::canSendMessage($person, $toAccountID);
 if(!$canMessage) exit(CommonError::InvalidRequest);

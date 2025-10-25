@@ -11,7 +11,7 @@ if(!$person["success"]) exit(CommonError::InvalidRequest);
 
 $levelID = Escape::number($_POST['levelID']);
 $gameVersion = abs(Escape::number($_POST['gameVersion']));
-$comment = Escape::text($_POST['comment']);
+$comment = Escape::base64($_POST['comment']);
 $percent = Escape::number($_POST['percent']) ?: 0;
 
 if(empty($comment)) exit(CommonError::InvalidRequest);
