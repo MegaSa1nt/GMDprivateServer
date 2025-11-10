@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__."/../incl/dashboardLib.php";
+require __DIR__."/../".$dbPath."config/misc.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
@@ -129,6 +130,7 @@ if($_GET['id']) {
 				'LEVEL_ID' => $listID * -1,
 				
 				'COMMENT_CAN_POST' => 'true',
+				'COMMENT_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxCommentLength : '-1',
 				
 				'COMMENT_EMOJIS_DIV' => $emojisDiv,
 				
@@ -232,6 +234,29 @@ if($_GET['id']) {
 			];
 			
 			$list['LIST_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/list', $additionalData);
+			break;
+		case 'delete':
+			if($accountID != $list['accountID'] && !Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			
+			$pageBase = '../../../';
+			
+			$dataArray = [
+				'INFO_TITLE' => Dashboard::string("deleteList"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteListDesc"),
+				'INFO_EXTRA' => Dashboard::renderListCard($list, $person, true),
+				
+				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+				'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/lists', 'list')",
+				'INFO_BUTTON_STYLE_FIRST' => "",
+				'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteList"),
+				'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteList', 'infoForm', 'list')",
+				'INFO_BUTTON_STYLE_SECOND' => "error",
+				
+				'INFO_INPUT_NAME' => 'listID',
+				'INFO_INPUT_VALUE' => $listID
+			];
+			
+			exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteList"), $pageBase, $dataArray));
 			break;
 		default:
 			exit(http_response_code(404));

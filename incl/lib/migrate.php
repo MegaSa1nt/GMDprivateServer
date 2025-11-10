@@ -696,7 +696,8 @@ if(!$installed) {
 		['value3', 'varchar(255)', '', 'value2'],
 		['value5', 'varchar(255)', '', 'value4'],
 		['value6', 'varchar(255)', '', 'value5'],
-		['account', 'varchar(255)', '', 'value7'],
+		['value8', 'varchar(2048)', '', 'value7'],
+		['account', 'varchar(255)', '', 'value8'],
 		['IP', 'varchar(255)', '', 'account']
 	];
 	

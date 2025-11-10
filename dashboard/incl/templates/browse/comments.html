@@ -28,7 +28,7 @@
 
 <form onsubmit="return false;" class="inlineForm" name="uploadCommentForm" autocomplete="off" dashboard-show="%COMMENT_CAN_POST%">
 	<div class="emojisInput" dashboard-emojis-div>
-		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" />
+		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" maxlength="%COMMENT_MAX_COMMENT_LENGTH%" />
 		<input type="hidden" name="levelID" value="%LEVEL_ID%" />
 		
 		<button class="eyeButton emojisButton" onclick="toggleEmojisDiv()">

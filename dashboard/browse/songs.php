@@ -15,6 +15,71 @@ if($person['success']) {
 	foreach($favouriteSongsArray['songs'] AS &$favouriteSong) $favouriteSongs[] = $favouriteSong["songID"];
 }
 
+if($_GET['id']) {
+	$contextMenuData = [];
+	$pageBase = '../../';
+	
+	$parameters = explode("/", Escape::text($_GET['id']));
+	
+	$songID = Escape::number($parameters[0]);
+	
+	$song = Library::getSongByID($songID);
+	if(!$song || !$song['reuploadID']) exit(Dashboard::renderErrorPage(Dashboard::string("songsTitle"), Dashboard::string("errorSongNotFound"), '../../'));
+	
+	switch($parameters[1]) {
+		case 'manage':
+			$pageBase = '../../../';
+			
+			$manageSongPermission = Library::checkPermission($person, "dashboardManageSongs");
+			if($accountID != $song['reuploadID'] && !$manageSongPermission) exit(Dashboard::renderErrorPage(Dashboard::string("songsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+
+			$songReuploader = Library::getUserByAccountID($song['reuploadID']);
+			
+			$songArtist = htmlspecialchars($song['authorName']);
+			$songTitle = htmlspecialchars($song['name']);
+			
+			$dataArray = [
+				'SONG_ID' => $songID,
+				
+				'SONG_ARTIST' => $songArtist,
+				'SONG_TITLE' => $songTitle,
+
+				'SONG_ENABLED_VALUE' => $song["isDisabled"] ? 0 : 1,
+				'SONG_ENABLED_REMOVE_CHECK' => $song["isDisabled"] ? 'checked' : '',
+				'SONG_CAN_DISABLE' => $manageSongPermission ? 'true' : 'false',
+			];
+			
+			exit(Dashboard::renderPage("manage/song", Dashboard::string("manageSongTitle"), $pageBase, $dataArray));
+			break;
+		case 'delete':
+			$pageBase = '../../../';
+			
+			$manageSongPermission = Library::checkPermission($person, "dashboardManageSongs");
+			if($accountID != $song['reuploadID'] && !$manageSongPermission) exit(Dashboard::renderErrorPage(Dashboard::string("songsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			
+			$dataArray = [
+				'INFO_TITLE' => Dashboard::string("deleteSong"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteSongDesc"),
+				'INFO_EXTRA' => Dashboard::renderSongCard($song, $person, $favouriteSongs),
+				
+				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+				'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/songs', 'list')",
+				'INFO_BUTTON_STYLE_FIRST' => "",
+				'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteSong"),
+				'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteSong', 'infoForm', 'list')",
+				'INFO_BUTTON_STYLE_SECOND' => "error",
+				
+				'INFO_INPUT_NAME' => 'songID',
+				'INFO_INPUT_VALUE' => $songID
+			];
+			
+			exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteSong"), $pageBase, $dataArray));
+			break;
+		default:
+			exit(http_response_code(404));
+	}
+}
+
 $order = "reuploadTime";
 $orderSorting = "DESC";
 $filters = ["songs.reuploadID > 0", "songs.isDisabled = 0"];

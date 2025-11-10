@@ -153,6 +153,29 @@ if($_GET['id']) {
 			
 			$mapPack['MAPPACK_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/mappack', $additionalData);
 			break;
+		case 'delete':
+			if(!Library::checkPermission($person, "dashboardManageMapPacks")) exit(Dashboard::renderErrorPage(Dashboard::string("mapPacksTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			
+			$pageBase = '../../../';
+			
+			$dataArray = [
+				'INFO_TITLE' => Dashboard::string("deleteMapPack"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteMapPackDesc"),
+				'INFO_EXTRA' => '<p class="error">'.Dashboard::string("deleteMapPackNotice").'</p>
+					'.Dashboard::renderMapPackCard($mapPack, $person),
+				
+				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+				'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/mappacks', 'list')",
+				'INFO_BUTTON_STYLE_FIRST' => "",
+				'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteMapPack"),
+				'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteMapPack', 'infoForm', 'list')",
+				'INFO_BUTTON_STYLE_SECOND' => "error",
+				
+				'INFO_INPUT_NAME' => 'mapPackID',
+				'INFO_INPUT_VALUE' => $mapPackID
+			];
+			
+			exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteMapPack"), $pageBase, $dataArray));
 		default:
 			exit(http_response_code(404));
 	}

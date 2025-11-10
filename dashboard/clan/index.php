@@ -1,5 +1,6 @@
 <?php
 require __DIR__."/../../config/dashboard.php";
+require __DIR__."/../../config/misc.php";
 require_once __DIR__."/../incl/dashboardLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
@@ -58,6 +59,7 @@ switch($parameters[1]) {
 			
 			'CLAN_ID' => $clanID,
 			'CLAN_CAN_POST' => $canPostComments ? 'true' : 'false',
+			'CLAN_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxAccountCommentLength : '-1',
 			
 			'CLAN_EMOJIS_DIV' => $emojisDiv,
 			

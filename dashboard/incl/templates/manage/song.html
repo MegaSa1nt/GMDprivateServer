@@ -1,0 +1,40 @@
+<form class="boxSized" name="songSettingsForm" dashboard-change-form>
+	<input type="hidden" name="songID" value="%SONG_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-user"></i>
+				%TEXT_songArtistText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="songAuthor" value="%SONG_ARTIST%" autocomplete="gdps-dashboard-songAuthor" dashboard-change-default placeholder="Artist the Cool" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-pen-to-square"></i>
+				%TEXT_songTitleText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="songTitle" value="%SONG_TITLE%" autocomplete="gdps-dashboard-songTitle" dashboard-change-default placeholder="The Incredible Song Title" />
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle dashboard-show="%SONG_CAN_DISABLE%">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-check"></i>
+					%TEXT_songEnabledTitle%
+				</h2>
+				<h3>%TEXT_songEnabledDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="songEnabled" value="%SONG_ENABLED_VALUE%" dashboard-change-default checked dashboard-remove="%SONG_ENABLED_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageSong', 'songSettingsForm', 'box')">%TEXT_applySettings%</button>
+	</div>
+</form>

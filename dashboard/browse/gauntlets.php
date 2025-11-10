@@ -133,6 +133,29 @@ if($_GET['id']) {
 			
 			$gauntlet['GAUNTLET_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/gauntlet', $additionalData);
 			break;
+		case 'delete':
+			if(!Library::checkPermission($person, "dashboardManageGauntlets")) exit(Dashboard::renderErrorPage(Dashboard::string("gauntletsTitle"), Dashboard::string("errorNoPermission"), $pageBase));
+			
+			$pageBase = '../../../';
+			
+			$dataArray = [
+				'INFO_TITLE' => Dashboard::string("deleteGauntlet"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteGauntletDesc"),
+				'INFO_EXTRA' => '<p class="error">'.Dashboard::string("deleteGauntletNotice").'</p>
+					'.Dashboard::renderGauntletCard($gauntlet, $person),
+				
+				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+				'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/gauntlets', 'list')",
+				'INFO_BUTTON_STYLE_FIRST' => "",
+				'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteGauntlet"),
+				'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteGauntlet', 'infoForm', 'list')",
+				'INFO_BUTTON_STYLE_SECOND' => "error",
+				
+				'INFO_INPUT_NAME' => 'gauntletID',
+				'INFO_INPUT_VALUE' => $gauntletID
+			];
+			
+			exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteGauntlet"), $pageBase, $dataArray));
 		default:
 			exit(http_response_code(404));
 	}

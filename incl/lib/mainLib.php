@@ -437,15 +437,18 @@ class Library {
 		$userName = $person['userName'];
 		$userID = $person['userID'];
 		
-		$getComment = $db->prepare("SELECT * FROM acccomments WHERE userID = :userID AND commentID = :commentID");
+		$getComment = $db->prepare("SELECT * FROM acccomments WHERE commentID = :commentID");
 		$getComment->execute([':userID' => $userID, ':commentID' => $commentID]);
 		$getComment = $getComment->fetch();
-		if(!$getComment) return false;
+		if(!$getComment || ($getComment['userID'] != $userID && !self::checkPermission($person, 'gameDeleteComments'))) return false;
+		
+		$user = self::getUserByID($getComment['userID']);
 		
 		$deleteAccountComment = $db->prepare("DELETE FROM acccomments WHERE commentID = :commentID");
 		$deleteAccountComment->execute([':commentID' => $commentID]);
 		
-		self::logAction($person, Action::AccountCommentDeletion, $userName, $getComment['comment'], $accountID, $getComment['commentID'], $getComment['likes'], $getComment['dislikes']);
+		if($getComment['userID'] == $userID) self::logAction($person, Action::AccountCommentDeletion, $userName, $getComment['comment'], $user['extID'], $getComment['commentID'], $getComment['likes'], $getComment['dislikes']);
+		else self::logModeratorAction($person, ModeratorAction::AccountCommentDeletion, $userName, $getComment['comment'], $user['extID'], $getComment['commentID'], $getComment['likes'], $getComment['dislikes']);
 		
 		return true;
 	}
@@ -1394,42 +1397,7 @@ class Library {
 	}
 	
 	public static function getPermissions() {
-		return [
-			'gameSuggestLevel',
-			'gameRateLevel',
-			'gameSetDifficulty',
-			'gameSetFeatured',
-			'gameSetEpic',
-			'gameDeleteLevel',
-			'gameMoveLevel',
-			'gameRenameLevel',
-			'gameSetPassword',
-			'gameSetDescription',
-			'gameSetLevelPrivacy',
-			'gameShareCreatorPoints',
-			'gameSetLevelSong',
-			'gameLockLevelComments',
-			'gameLockLevelUpdating',
-			'gameSetListLevels',
-			'gameDeleteComments',
-			'gameVerifyCoins',
-			'gameSetDaily',
-			'gameSetWeekly',
-			'gameSetEvent',
-			'dashboardModeratorTools',
-			'dashboardDeleteLeaderboards',
-			'dashboardManageMapPacks',
-			'dashboardManageGauntlets',
-			'dashboardManageSongs',
-			'dashboardManageAccounts',
-			'dashboardManageLevels',
-			'dashboardManageClans',
-			'dashboardManageAutomod',
-			'dashboardManageRoles',
-			'dashboardManageVaultCodes',
-			'dashboardBypassMaintenance',
-			'dashboardSetAccountRoles'
-		];
+		return Permission::All;
 	}
 	
 	public static function getPersonPermissions($person) {
@@ -1732,21 +1700,24 @@ class Library {
 		require __DIR__."/connection.php";
 		
 		if($roleID) {
-			$permissionsArray = [];
-			$permissionsString = '';
+			$permissionsArray = $changedPermissionsArray = [];
+			$permissionsString = $changedPermissionsString = '';
 			
 			$role = self::getRoleByID($roleID);
 			if(!$role) return false;
 			
 			foreach($rolePermissions AS $permissionName => $permissionValue) {
 				$permissionsArray[] = $permissionName." = ".$permissionValue;
+				
+				if($role[$permissionName] != $permissionValue) $changedPermissionsArray[] = Permission::IDs[$permissionName].','.$permissionValue;
 			}
 			$permissionsString = implode(", ", $permissionsArray);
+			$changedPermissionsString = implode(";", $changedPermissionsArray);
 			
 			$changeRole = $db->prepare("UPDATE roles SET roleName = :roleName, commentsExtraText = :roleCommentsCaption, commentColor = :roleColor, priority = :rolePriority, modBadgeLevel = :roleModBadge, isDefault = :roleIsDefault, ".$permissionsString." WHERE roleID = :roleID");
 			$changeRole->execute([':roleName' => $roleName, ':roleCommentsCaption' => $roleCommentsCaption, ':roleColor' => $roleColor, ':rolePriority' => $rolePriority, ':roleModBadge' => $roleModBadge, ':roleIsDefault' => $roleIsDefault, ':roleID' => $roleID]);
 			
-			self::logModeratorAction($person, ModeratorAction::RoleChange, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault);
+			self::logModeratorAction($person, ModeratorAction::RoleChange, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault, $changedPermissionsString);
 		} else {
 			$permissionsNamesArray = $permissionsValuesArray = [];
 			$permissionsString = '';
@@ -2414,7 +2385,8 @@ class Library {
 		$deleteComment = $db->prepare("DELETE FROM comments WHERE commentID = :commentID");
 		$deleteComment->execute([':commentID' => $commentID]);
 		
-		self::logAction($person, Action::CommentDeletion, $person['userName'], $getComment['comment'], $user['extID'], $getComment['commentID'], $getComment['likes'] - $getComment['dislikes'], $getComment['levelID']);
+		if($getComment['userID'] == $userID) self::logAction($person, Action::CommentDeletion, $person['userName'], $getComment['comment'], $user['extID'], $getComment['commentID'], $getComment['likes'] - $getComment['dislikes'], $getComment['levelID']);
+		else self::logModeratorAction($person, ModeratorAction::CommentDeletion, $person['userName'], $getComment['comment'], $user['extID'], $getComment['commentID'], $getComment['likes'] - $getComment['dislikes'], $getComment['levelID']);
 		
 		return true;
 	}
@@ -2966,7 +2938,7 @@ class Library {
 		$deleteScore = $db->prepare("DELETE FROM ".($isPlatformer ? 'plat' : 'level')."scores WHERE ".($isPlatformer ? 'ID' : 'scoreID')." = :scoreID");
 		$deleteScore->execute([':scoreID' => $scoreID]);
 		
-		self::logModeratorAction($person, ModeratorAction::LevelScoreDelete, $getScore['percent'] ?: '', $getScore['attempts'] ?: '', $getScore['coins'] ?: '', $getScore['clicks'] ?: '', $getScore['time'] ?: '', $getScore['points'] ?: '');
+		self::logModeratorAction($person, ModeratorAction::LevelScoreDeletion, $getScore['percent'] ?: '', $getScore['attempts'] ?: '', $getScore['coins'] ?: '', $getScore['clicks'] ?: '', $getScore['time'] ?: '', $getScore['points'] ?: '');
 		
 		return true;
 	}
@@ -3603,8 +3575,8 @@ class Library {
 		$deleteList = $db->prepare("DELETE FROM lists WHERE listID = :listID");
 		$deleteList->execute([':listID' => $listID]);
 		
-		if($list['accountID'] == $accountID) self::logAction($person, Action::ListDeletion, $list['listName'], $list['listLevels'], $listID, $list['difficulty'], $list['unlisted']);
-		else self::logModeratorAction($person, ModeratorAction::ListDeletion, 1, $list['listName'], $list['listLevels'], $listID, $list['difficulty'], $list['unlisted']);
+		if($list['accountID'] == $accountID) self::logAction($person, Action::ListDeletion, $list['listName'], $list['listlevels'], $listID, $list['starDifficulty'], $list['unlisted']);
+		else self::logModeratorAction($person, ModeratorAction::ListDeletion, 1, $list['listName'], $list['listlevels'], $listID, $list['starDifficulty'], $list['unlisted']);
 		
 		return true;
 	}
@@ -4053,6 +4025,42 @@ class Library {
 		return $gauntletID;
 	}
 	
+	public static function deleteMapPack($person, $mapPackID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$accountID = $person['accountID'];
+		
+		$mapPack = self::getMapPackByID($mapPackID);
+		if(!$mapPack || !self::checkPermission($person, 'dashboardManageMapPacks')) return false;
+		
+		$deleteSong = $db->prepare("DELETE FROM mappacks WHERE ID = :mapPackID");
+		$deleteSong->execute([':mapPackID' => $mapPackID]);
+		
+		self::logModeratorAction($person, ModeratorAction::MapPackDeletion, $mapPackID, $mapPack['name'], $mapPack['stars'].','.$mapPack['coins'], $mapPack['difficulty'], $mapPack['colors2'], $mapPack['rgbcolors'], $mapPack['levels']);
+		
+		return true;
+	}
+	
+	public static function deleteGauntlet($person, $gauntletID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$accountID = $person['accountID'];
+		
+		$gauntlet = self::getGauntletByID($gauntletID);
+		if(!$gauntlet || !self::checkPermission($person, 'dashboardManageGauntlets')) return false;
+		
+		$deleteSong = $db->prepare("DELETE FROM gauntlets WHERE ID = :gauntletID");
+		$deleteSong->execute([':gauntletID' => $gauntletID]);
+		
+		self::logModeratorAction($person, ModeratorAction::GauntletDeletion, $gauntletID, $gauntlet['level1'], $gauntlet['level2'], $gauntlet['level3'], $gauntlet['level4'], $gauntlet['level5']);
+		
+		return true;
+	}
+	
 	/*
 		Audio-related functions
 	*/
@@ -4086,7 +4094,7 @@ class Library {
 		$GLOBALS['core_cache']['songs'][$songID] = $song;		
 		
 		if($column != "*") return $song[$column];
-		else return array("isLocalSong" => $isLocalSong, "ID" => $song["ID"], "name" => $song["name"], "authorName" => $song["authorName"], "size" => $song["size"], "duration" => $song["duration"], "download" => urldecode($song["download"]), "reuploadTime" => $song["reuploadTime"], "reuploadID" => $song["reuploadID"]);
+		else return array("isLocalSong" => $isLocalSong, "ID" => $song["ID"], "name" => $song["name"], "authorName" => $song["authorName"], "size" => $song["size"], "duration" => $song["duration"], "download" => urldecode($song["download"]), "reuploadTime" => $song["reuploadTime"], "reuploadID" => (isset($song["reuploadID"]) ? $song["reuploadID"] : 0), "isDisabled" => (isset($song["isDisabled"]) ? $song["isDisabled"] : 0), "levelsCount" => (isset($song["levelsCount"]) ? $song["levelsCount"] : 0), "favouritesCount" => (isset($song["favouritesCount"]) ? $song["favouritesCount"] : 0));
 	}
 	
 	public static function getSFXByID($sfxID, $column = "*") {
@@ -4104,6 +4112,8 @@ class Library {
 		$sfx->execute([':sfxID' => $sfxID]);
 		$sfx = $sfx->fetch();
 		
+		$GLOBALS['core_cache']['sfxs'][$sfxID] = $sfx;
+		
 		if(!$sfx) {
 			$sfx = self::getLibrarySongInfo($sfxID, 'sfx');
 			$isLocalSFX = $sfx['isLocalSFX'];
@@ -4118,7 +4128,7 @@ class Library {
 		$GLOBALS['core_cache']['sfxs'][$sfxID] = $sfx;
 		
 		if($column != "*") return $sfx[$column];
-		else return ["isLocalSFX" => $isLocalSFX, "ID" => $sfx["ID"], "name" => $sfx["name"], "authorName" => $sfx["authorName"], "size" => $sfx["size"], "download" => $sfx["download"], "reuploadTime" => $sfx["reuploadTime"], "reuploadID" => $sfx["reuploadID"], "levelsCount" => $sfx["levelsCount"] ?: 0];
+		else return ["isLocalSFX" => $isLocalSFX, "ID" => $sfx["ID"], "originalID" => (isset($sfx["originalID"]) ? $sfx["originalID"] : $sfx["ID"]), "name" => $sfx["name"], "authorName" => $sfx["authorName"], "size" => $sfx["size"], "download" => $sfx["download"], "reuploadTime" => $sfx["reuploadTime"], "reuploadID" => $sfx["reuploadID"], "isDisabled" => (isset($sfx["isDisabled"]) ? $sfx["isDisabled"] : 0), "levelsCount" => (isset($sfx["levelsCount"]) ? $sfx["levelsCount"] : 0)];
 	}
 	
 	public static function getSongString($songID) {
@@ -4145,7 +4155,7 @@ class Library {
 				foreach($artistsArray AS &$artistID) {
 					$artistData = self::getLibrarySongAuthorInfo($artistID);
 					if(!$artistData) continue;
-					$artistsNames[] = $artistID.','.$artistData['name'];
+					$artistsNames[] = $artistID.','.str_replace(["~|~", ","], ["", "."], $artistData['name']);
 				}
 			}
 			
@@ -4153,7 +4163,7 @@ class Library {
 			$extraSongString = '~|~9~|~'.$song['priorityOrder'].'~|~11~|~'.$song['ncs'].'~|~12~|~'.$song['artists'].'~|~13~|~'.($song['new'] ? 1 : 0).'~|~14~|~'.$song['new'].'~|~15~|~'.$artistsNames;
 		}
 		
-		return "1~|~".$song["ID"]."~|~2~|~".Escape::translit(str_replace("#", "", $song["name"]))."~|~3~|~".$song["authorID"]."~|~4~|~".Escape::translit($song["authorName"])."~|~5~|~".$song["size"]."~|~6~|~~|~10~|~".$downloadLink."~|~7~|~~|~8~|~1".$extraSongString;
+		return "1~|~".$song["ID"]."~|~2~|~".Escape::translit(str_replace("~|~", "", $song["name"]))."~|~3~|~".$song["authorID"]."~|~4~|~".Escape::translit(str_replace("~|~", "", $song["authorName"]))."~|~5~|~".$song["size"]."~|~6~|~~|~10~|~".$downloadLink."~|~7~|~~|~8~|~1".$extraSongString;
 	}
 	
 	public static function getLibrarySongInfo($audioID, $type = 'music') {
@@ -4190,17 +4200,17 @@ class Library {
 			
 			return $songArray;
 		} else {
-			$SFX = $library['IDs'][(int)$audioID];
+			$sfx = $library['IDs'][(int)$audioID];
 			
 			$token = self::randomString(22);
 			$expires = time() + 3600;
 			
-			$isLocalSFX = $servers[$SFX['server']] == null;
-			if($isLocalSFX) $SFX = self::getSFXByID($SFX['ID']);
+			$isLocalSFX = $servers[$sfx['server']] == null;
+			if($isLocalSFX) $sfx = self::getSFXByID($sfx['ID']);
 			
-			$link = !$isLocalSFX ? $servers[$SFX['server']].'/sfx/s'.$SFX['ID'].'.ogg?token='.$token.'&expires='.$expires : $SFX['download'];
+			$link = !$isLocalSFX ? $servers[$sfx['server']].'/sfx/s'.$sfx['ID'].'.ogg?token='.$token.'&expires='.$expires : $sfx['download'];
 			
-			$sfxArray = ['isLocalSFX' => $isLocalSFX, 'server' => $SFX['server'] ?: $serverIDs[null], 'ID' => $audioID, 'name' => $SFX['name'], 'authorName' => $serverNames[$SFX['server']], 'download' => $link, 'originalID' => $SFX['ID'], 'reuploadID' => $SFX['reuploadID'] ?: 0, 'reuploadTime' => $SFX['reuploadTime'] ?: 0, 'levelsCount' => $SFX['levelsCount'] ?: 0];
+			$sfxArray = ['isLocalSFX' => $isLocalSFX, 'server' => $sfx['server'] ?: $serverIDs[null], 'ID' => $audioID, 'name' => $sfx['name'], 'authorName' => $serverNames[$sfx['server']], 'download' => $link, 'originalID' => $sfx['ID'], 'reuploadID' => $sfx['reuploadID'] ?: 0, 'reuploadTime' => $sfx['reuploadTime'] ?: 0, "isDisabled" => (isset($sfx["isDisabled"]) ? $sfx["isDisabled"] : 0), "levelsCount" => (isset($sfx["levelsCount"]) ? $sfx["levelsCount"] : 0)];
 			
 			$GLOBALS['core_cache']['libraryAudio'][$type][$audioID] = $sfxArray;
 			
@@ -5085,6 +5095,86 @@ class Library {
 		return ['size' => $size ?: 0, 'mime' => $mime ?: ''];
 	}
 	
+	public static function changeSong($person, $songID, $songArtist, $songTitle, $songIsDisabled) {
+		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		
+		$song = self::getSongByID($songID);
+		if(!$song || !$song['reuploadID'] || ($song['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		
+		$changeSong = $db->prepare("UPDATE songs SET authorName = :songArtist, name = :songTitle, isDisabled = :songIsDisabled WHERE ID = :songID");
+		$changeSong->execute([':songArtist' => $songArtist, ':songTitle' => $songTitle, ':songIsDisabled' => ($songIsDisabled ? 1 : 0), ':songID' => $songID]);
+		
+		if($song['reuploadID'] == $accountID) self::logAction($person, Action::SongChange, $songArtist, $songTitle, $songID, ($songIsDisabled ? 1 : 0));
+		else self::logModeratorAction($person, ModeratorAction::SongChange, $songArtist, $songTitle, $songID, ($songIsDisabled ? 1 : 0));
+		
+		return true;
+	}
+	
+	public static function deleteSong($person, $songID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$accountID = $person['accountID'];
+		
+		$song = self::getSongByID($songID);
+		if(!$song || !$song['reuploadID'] || ($song['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		
+		$user = self::getUserByAccountID($song['reuploadID']);
+		
+		$deleteSong = $db->prepare("DELETE FROM songs WHERE ID = :songID");
+		$deleteSong->execute([':songID' => $songID]);
+		
+		if($song['reuploadID'] == $accountID) self::logAction($person, Action::SongDeletion, $song['authorName'], $song['name'], $songID, $song['isDisabled']);
+		else self::logModeratorAction($person, ModeratorAction::SongDeletion, $song['authorName'], $song['name'], $songID, $song['isDisabled']);
+		
+		return true;
+	}
+	
+	public static function changeSFX($person, $sfxID, $sfxTitle, $sfxIsDisabled) {
+		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		
+		$sfx = self::getSFXByID($sfxID);
+		if(!$sfx || !$sfx['reuploadID'] || ($sfx['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		
+		$sfxID = $sfx['originalID'];
+		
+		$changeSFX = $db->prepare("UPDATE sfxs SET name = :sfxTitle, isDisabled = :sfxIsDisabled WHERE ID = :sfxID");
+		$changeSFX->execute([':sfxTitle' => $sfxTitle, ':sfxIsDisabled' => ($sfxIsDisabled ? 1 : 0), ':sfxID' => $sfxID]);
+		
+		if($sfx['reuploadID'] == $accountID) self::logAction($person, Action::SFXChange, $sfx['reuploadID'], $sfxTitle, $sfxID, ($sfxIsDisabled ? 1 : 0));
+		else self::logModeratorAction($person, ModeratorAction::SFXChange, $sfx['reuploadID'], $sfxTitle, $sfxID, ($sfxIsDisabled ? 1 : 0));
+		
+		return true;
+	}
+	
+	public static function deleteSFX($person, $sfxID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$accountID = $person['accountID'];
+		
+		$sfx = self::getSFXByID($sfxID);
+		if(!$sfx || !$sfx['reuploadID'] || ($sfx['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		
+		$sfxID = $sfx['originalID'];
+		
+		$user = self::getUserByAccountID($sfx['reuploadID']);
+		
+		$deleteSFX = $db->prepare("DELETE FROM sfxs WHERE ID = :sfxID");
+		$deleteSFX->execute([':sfxID' => $sfxID]);
+		
+		if($sfx['reuploadID'] == $accountID) self::logAction($person, Action::SFXDeletion, $sfx['reuploadID'], $sfx['name'], $sfxID, $sfx['isDisabled']);
+		else self::logModeratorAction($person, ModeratorAction::SFXDeletion, $sfx['reuploadID'], $sfx['name'], $sfxID, $sfx['isDisabled']);
+		
+		return true;
+	}
+	
 	/*
 		Clans-related functions
 	*/
@@ -5289,15 +5379,15 @@ class Library {
 		return $db->lastInsertId();
 	}
 	
-	public static function logModeratorAction($person, $type, $value1 = '', $value2 = '', $value3 = '', $value4 = '', $value5 = '', $value6 = '', $value7 = '') {
+	public static function logModeratorAction($person, $type, $value1 = '', $value2 = '', $value3 = '', $value4 = '', $value5 = '', $value6 = '', $value7 = '', $value8 = '') {
 		require __DIR__."/connection.php";
 		
 		$accountID = $person['accountID'];
 		$IP = $person['IP'];
 		
-		$insertModeratorAction = $db->prepare('INSERT INTO modactions (account, type, timestamp, value, value2, value3, value4, value5, value6, value7, IP)
-			VALUES (:account, :type, :timestamp, :value, :value2, :value3, :value4, :value5, :value6, :value7, :IP)');
-		$insertModeratorAction->execute([':account' => $accountID, ':type' => $type, ':value' => $value1, ':value2' => $value2, ':value3' => $value3, ':value4' => $value4, ':value5' => $value5, ':value6' => $value6, ':value7' => $value7, ':timestamp' => time(), ':IP' => $IP]);
+		$insertModeratorAction = $db->prepare('INSERT INTO modactions (account, type, timestamp, value, value2, value3, value4, value5, value6, value7, value8, IP)
+			VALUES (:account, :type, :timestamp, :value, :value2, :value3, :value4, :value5, :value6, :value7, :value8, :IP)');
+		$insertModeratorAction->execute([':account' => $accountID, ':type' => $type, ':value' => $value1, ':value2' => $value2, ':value3' => $value3, ':value4' => $value4, ':value5' => $value5, ':value6' => $value6, ':value7' => $value7, ':value8' => $value8, ':timestamp' => time(), ':IP' => $IP]);
 		
 		return $db->lastInsertId();
 	}
@@ -5436,6 +5526,7 @@ class Library {
 	
 	public static function sendRequest($url, $data, $headers = [], $method = "GET", $includeUserAgent = true) {
 		require __DIR__."/../../config/proxy.php";
+		require __DIR__."/../../config/dashboard.php";
 		
 		$curl = curl_init($url);
 		
@@ -5450,7 +5541,7 @@ class Library {
 			curl_setopt($curl, CURLOPT_USERAGENT, "");
 			curl_setopt($curl, CURLOPT_COOKIE, "gd=1;");
 		}
-		else $headers[] = 'User-Agent: GMDprivateServer (https://github.com/MegaSa1nt/GMDprivateServer, 2.0)';
+		else $headers[] = 'User-Agent: '.$gdps.' (https://github.com/MegaSa1nt/GMDprivateServer, 2.0)';
 		
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
 		if($method != "GET") curl_setopt($curl, CURLOPT_POSTFIELDS, $data);

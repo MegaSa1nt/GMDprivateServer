@@ -49,6 +49,11 @@ p {
 	overflow-wrap: anywhere;
 }
 
+p.error {
+	color: #ffbbbb;
+	text-shadow: 0px 0px 20px #ffbbbb60;
+}
+
 h3 {
 	font-size: 25px;
 	font-weight: normal;
@@ -413,6 +418,7 @@ footer h4 span {
 	gap: 5px;
 }
 
+.boxSized,
 .box {
 	display: flex;
 	flex-direction: column;
@@ -420,9 +426,6 @@ footer h4 span {
 	align-items: center;
 	
 	position: relative;
-	
-	background-color: #86868614;
-	border: 1px solid #86868624;
 	
 	padding: 25px;
 	border-radius: 20px;
@@ -433,6 +436,11 @@ footer h4 span {
 	
 	min-width: 35%;
 	max-width: 90%;
+}
+
+.box {
+	background-color: #86868614;
+	border: 1px solid #86868624;
 }
 
 .wideBox {
@@ -475,10 +483,19 @@ footer h4 span {
 	height: max-content;
 }
 
-
 .button:hover {
 	background-color: #86868634;
 	box-shadow: 0px 0px 20px 0px #86868620;
+}
+
+.button.error {
+	border: 1px solid #92525280;
+	background: #a341415c;
+}
+
+.button.error:hover {
+	background-color: #a3414170;
+	box-shadow: 0px 0px 20px 0px #92525240;
 }
 
 .button:not(:disabled):active {

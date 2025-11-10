@@ -42,7 +42,7 @@ if($gameVersion > 18) {
 	if($gameVersion > 19) {
 		if($pass != 0) $xorPass = Escape::url_base64_encode(XORCipher::cipher($pass, 26364));
 		$levelDesc = Escape::url_base64_encode($levelDesc);
-	}
+	} else $levelDesc = Escape::gd($levelDesc);
 }
 
 if(!$level['hasMagicString']) {

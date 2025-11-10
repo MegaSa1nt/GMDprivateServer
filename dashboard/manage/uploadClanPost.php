@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__."/../incl/dashboardLib.php";
+require __DIR__."/../".$dbPath."config/misc.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -11,7 +12,7 @@ if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("
 
 if(isset($_POST['clanID']) && isset($_POST['comment'])) {
 	$clanID = abs(Escape::number($_POST['clanID']) ?: 0);
-	$comment = Escape::text($_POST['comment']);
+	$comment = Escape::text($_POST['comment'], ($enableCommentLengthLimiter ? $maxAccountCommentLength : 0));
 	if(empty($clanID) || empty($comment)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
 	$ableToComment = Library::isAbleToAccountComment($person, $comment);

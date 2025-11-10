@@ -1,5 +1,5 @@
 <?php
-require __DIR__."/../../config/security.php";
+require __DIR__."/../config/security.php";
 require_once __DIR__."/../incl/lib/mainLib.php";
 require_once __DIR__."/../incl/lib/security.php";
 require_once __DIR__."/../incl/lib/exploitPatch.php";
@@ -24,7 +24,7 @@ if(!$person["success"]) {
 $accountID = $person["accountID"];
 $userName = $person['userName'];
 
-$checkRateLimit = Library::checkRateLimits($person, RateLimit::AccountBackup);
+$checkRateLimit = Security::checkRateLimits($person, RateLimit::AccountBackup);
 if(!$checkRateLimit) exit(CommonError::InvalidRequest);
 
 if(strlen($saveData) > $maxBackupFileSize) {

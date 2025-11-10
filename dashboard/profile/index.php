@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__."/../incl/dashboardLib.php";
+require __DIR__."/../".$dbPath."config/misc.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
@@ -50,6 +51,7 @@ switch($parameters[1]) {
 				'LEVEL_ID' => 0,
 				
 				'COMMENT_CAN_POST' => 'false',
+				'COMMENT_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxCommentLength : '-1',
 				
 				'IS_FIRST_PAGE' => 'true',
 				'IS_LAST_PAGE' => 'true',
@@ -80,6 +82,7 @@ switch($parameters[1]) {
 			'COMMENT_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
 			
 			'COMMENT_CAN_POST' => 'false',
+			'COMMENT_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxCommentLength : '-1',
 			
 			'IS_FIRST_PAGE' => $pageNumber == 1 ? 'true' : 'false',
 			'IS_LAST_PAGE' => $pageNumber == $pageCount ? 'true' : 'false',
@@ -253,6 +256,7 @@ switch($parameters[1]) {
 			'POST_PAGE_TEXT' => sprintf(Dashboard::string('pageText'), $pageNumber, $pageCount),
 			
 			'PROFILE_CAN_POST' => $userID == $user['userID'] ? 'true' : 'false',
+			'PROFILE_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxAccountCommentLength : '-1',
 			
 			'POST_EMOJIS_DIV' => $emojisDiv,
 			

@@ -11,7 +11,7 @@ if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("
 
 if(isset($_POST['levelID']) && isset($_POST['comment'])) {
 	$levelID = Escape::number($_POST['levelID']);
-	$comment = Escape::text($_POST['comment']);
+	$comment = Escape::text($_POST['comment'], ($enableCommentLengthLimiter ? $maxCommentLength : 0));
 	if(empty($levelID) || empty($comment)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
 	$ableToComment = Library::isAbleToComment($levelID, $person, $comment);

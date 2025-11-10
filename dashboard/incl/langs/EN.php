@@ -108,6 +108,7 @@ $language['errorBadPost'] = 'Your post contains a bad word.';
 $language['errorPostingIsDisabled'] = 'Creating posts is disabled.';
 
 $language['errorSongNotFound'] = 'Song wasn\'t found!';
+$language['errorSFXNotFound'] = 'SFX wasn\'t found!';
 
 $language['errorListNotFound'] = 'List wasn\'t found!';
 
@@ -160,7 +161,14 @@ $language['errorRoleNotFound'] = 'Role wasn\'t found!';
 
 $language['errorCantBanYourself'] = 'You can\'t ban yourself!';
 $language['errorUserIsBanned'] = 'This user is already banned!';
-$language['errorExpirationTimeInPast'] = 'You cannot set someone\'s ban expiration before the current time!';
+$language['errorExpirationTimeInPast'] = 'You can\'t set someone\'s ban expiration before the current time!';
+
+$language['errorCantDeleteSong'] = 'You can\'t delete this song.';
+$language['errorCantDeleteSFX'] = 'You can\'t delete this SFX.';
+$language['errorCantDeleteLevel'] = 'You can\'t delete this level.';
+$language['errorCantDeleteList'] = 'You can\'t delete this list.';
+$language['errorCantDeleteGauntlet'] = 'You can\'t delete this Gauntlet.';
+$language['errorCantDeleteMapPack'] = 'You can\'t delete this Map Pack.';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -171,8 +179,8 @@ $language['successChangedUsername'] = 'You successfully changed username! Relogi
 
 $language['successChangedPassword'] = 'You successfully changed password! Relogin to account.';
 
-$language['successDeletedComment'] = 'You deleted this comment!';
-$language['successDeletedScore'] = 'You deleted this score!';
+$language['successDeletedComment'] = 'You successfully deleted this comment!';
+$language['successDeletedScore'] = 'You successfully deleted this score!';
 $language['successUploadedComment'] = 'You successfully uploaded a comment!';
 
 $language['successFavouritedSong'] = 'You successfully favourited this song!';
@@ -180,7 +188,7 @@ $language['successUnfavouritedSong'] = 'You successfully unfavourited this song!
 
 $language['successAppliedSettings'] = 'You successfully applied settings!';
 
-$language['successDeletedPost'] = 'You deleted this post!';
+$language['successDeletedPost'] = 'You successfully deleted this post!';
 $language['successUploadedPost'] = 'You successfully created a post!';
 
 $language['successUploadedSong'] = 'You successfully uploaded a song!';
@@ -199,8 +207,14 @@ $language['successAddedMapPack'] = 'You successfullty added a Map Pack!';
 $language['successAddedGauntlet'] = 'You successfullty added a Gauntlet!';
 
 $language['successCreatedRole'] = 'You successfullty created a role!';
-
 $language['successBannedUser'] = 'You successfullty banned an user!';
+
+$language['successDeletedSong'] = 'You successfully deleted this song!';
+$language['successDeletedSFX'] = 'You successfully deleted this SFX!';
+$language['successDeletedLevel'] = 'You successfully deleted this level!';
+$language['successDeletedList'] = 'You successfully deleted this list!';
+$language['successDeletedGauntlet'] = 'You successfully deleted this Gauntlet!';
+$language['successDeletedMapPack'] = 'You successfully deleted this Map Pack!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -623,4 +637,21 @@ $language['expiryTimeDesc'] = 'Date on which the user will be unbanned automatic
 $language['players'] = 'Players';
 $language['global'] = 'Global';
 $language['creators'] = 'Creators';
+
+$language['manageSongTitle'] = 'Manage song';
+$language['songEnabledTitle'] = 'Enable song';
+$language['songEnabledDesc'] = 'If the song is enabled, players will be able to use it in their own levels';
+$language['manageSFXTitle'] = 'Manage SFX';
+$language['sfxEnabledTitle'] = 'Enable SFX';
+$language['sfxEnabledDesc'] = 'If the SFX is enabled, players will be able to use it in their own levels';
+
+$language['cancel'] = 'Cancel';
+$language['deleteSongDesc'] = 'Are you sure you want to delete this song?';
+$language['deleteSFXDesc'] = 'Are you sure you want to delete this SFX?';
+$language['deleteLevelDesc'] = 'Are you sure you want to delete this level?';
+$language['deleteListDesc'] = 'Are you sure you want to delete this list?';
+$language['deleteGauntletDesc'] = 'Are you sure you want to delete this Gauntlet?';
+$language['deleteGauntletNotice'] = 'It is not recommended to delete Gauntlets, as it could interfere with current players\' stats!';
+$language['deleteMapPackDesc'] = 'Are you sure you want to delete this Map Pack?';
+$language['deleteMapPackNotice'] = 'It is not recommended to delete Map Packs, as it could interfere with current players\' stats!';
 ?>

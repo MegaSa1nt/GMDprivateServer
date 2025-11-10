@@ -1,0 +1,31 @@
+<form class="boxSized" name="sfxSettingsForm" dashboard-change-form>
+	<input type="hidden" name="sfxID" value="%SFX_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-pen-to-square"></i>
+				%TEXT_sfxTitleText%
+			</h2>
+			
+			<input class="inputStyle" type="text" name="sfxTitle" value="%SFX_TITLE%" autocomplete="gdps-dashboard-sfxTitle" dashboard-change-default placeholder="The Incredible SFX Title" />
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle dashboard-show="%SFX_CAN_DISABLE%">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-check"></i>
+					%TEXT_sfxEnabledTitle%
+				</h2>
+				<h3>%TEXT_sfxEnabledDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="sfxEnabled" value="%SFX_ENABLED_VALUE%" dashboard-change-default checked dashboard-remove="%SFX_ENABLED_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageSFX', 'sfxSettingsForm', 'box')">%TEXT_applySettings%</button>
+	</div>
+</form>

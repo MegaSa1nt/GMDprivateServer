@@ -6,6 +6,70 @@ require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
 $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
+$accountID = $person['accountID'];
+
+if($_GET['id']) {
+	$contextMenuData = [];
+	$pageBase = '../../';
+	
+	$parameters = explode("/", Escape::text($_GET['id']));
+	
+	$sfxID = Escape::number($parameters[0]);
+	
+	$sfx = Library::getSFXByID($sfxID);
+	if(!$sfx || !$sfx['reuploadID']) exit(Dashboard::renderErrorPage(Dashboard::string("sfxsTitle"), Dashboard::string("errorSFXNotFound"), '../../'));
+	
+	switch($parameters[1]) {
+		case 'manage':
+			$pageBase = '../../../';
+			
+			$manageSFXPermission = Library::checkPermission($person, "dashboardManageSongs");
+			if($accountID != $sfx['reuploadID'] && !$manageSFXPermission) exit(Dashboard::renderErrorPage(Dashboard::string("sfxsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+
+			$sfxReuploader = Library::getUserByAccountID($sfx['reuploadID']);
+			
+			$sfxTitle = htmlspecialchars($sfx['name']);
+			
+			$dataArray = [
+				'SFX_ID' => $sfxID,
+				
+				'SFX_TITLE' => $sfxTitle,
+
+				'SFX_ENABLED_VALUE' => $sfx["isDisabled"] ? 0 : 1,
+				'SFX_ENABLED_REMOVE_CHECK' => $sfx["isDisabled"] ? 'checked' : '',
+				'SFX_CAN_DISABLE' => $manageSFXPermission ? 'true' : 'false',
+			];
+			
+			exit(Dashboard::renderPage("manage/sfx", Dashboard::string("manageSFXTitle"), $pageBase, $dataArray));
+			break;
+		case 'delete':
+			$pageBase = '../../../';
+			
+			$manageSFXPermission = Library::checkPermission($person, "dashboardManageSongs");
+			if($accountID != $sfx['reuploadID'] && !$manageSFXPermission) exit(Dashboard::renderErrorPage(Dashboard::string("sfxsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			
+			$dataArray = [
+				'INFO_TITLE' => Dashboard::string("deleteSFX"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteSFXDesc"),
+				'INFO_EXTRA' => Dashboard::renderSFXCard($sfx, $person),
+				
+				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+				'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/sfxs', 'list')",
+				'INFO_BUTTON_STYLE_FIRST' => "",
+				'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteSFX"),
+				'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteSFX', 'infoForm', 'list')",
+				'INFO_BUTTON_STYLE_SECOND' => "error",
+				
+				'INFO_INPUT_NAME' => 'sfxID',
+				'INFO_INPUT_VALUE' => $sfxID
+			];
+			
+			exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteSFX"), $pageBase, $dataArray));
+			break;
+		default:
+			exit(http_response_code(404));
+	}
+}
 
 $order = "reuploadTime";
 $orderSorting = "DESC";

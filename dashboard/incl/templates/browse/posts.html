@@ -28,7 +28,7 @@
 
 <form onsubmit="return false;" class="inlineForm" name="uploadPostForm" autocomplete="off" dashboard-show="%PROFILE_CAN_POST%">
 	<div class="emojisInput" dashboard-emojis-div>
-		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" />
+		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" maxlength="%PROFILE_MAX_COMMENT_LENGTH%" />
 		
 		<button class="eyeButton emojisButton" onclick="toggleEmojisDiv()">
 			<i class="fa-solid fa-face-smile-beam"></i>

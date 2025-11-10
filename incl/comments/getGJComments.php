@@ -87,7 +87,7 @@ foreach($comments['comments'] AS &$comment) {
 		];
 		
 		$appearance = Library::getPersonCommentAppearance($playerPerson);
-		if(!empty($appearance['commentsExtraText'])) $extraTextArray[] = $appearance['commentsExtraText'];
+		if(!empty($appearance['commentsExtraText'])) $extraTextArray[] = Escape::gd($appearance['commentsExtraText']);
 		
 		$personString = "~11~".$appearance['modBadgeLevel'].'~12~'.$appearance['commentColor'].":1~".$user["userName"]."~7~1~9~".$user["icon"]."~10~".$user["color1"]."~11~".$user["color2"]."~14~".$user["iconType"]."~15~".$user["special"]."~16~".$user["extID"];
 	} elseif(!isset($users[$user["userID"]])) {

@@ -530,7 +530,7 @@ class Automod {
 	}
 	
 	/*
-		self::check_comments_similarity($str1, $str2)
+		self::checkCommentsSimilarity($str1, $str2)
 		
 		This private function checks similarity of 2 strings
 		
@@ -542,7 +542,7 @@ class Automod {
 			
 		Taken from https://www.php.net/manual/ru/function.similar-text.php#118799
 	*/
-	private static function check_comments_similarity($str1, $str2) {
+	private static function checkCommentsSimilarity($str1, $str2) {
 		$len1 = strlen($str1);
 		$len2 = strlen($str2);
 		$max = max($len1, $len2);
@@ -580,8 +580,8 @@ class Automod {
 		https://images.gcs.skin/checking_speed.png
 	*/
 	public static function similarity($str1, $str2) {
-		$check1 = self::check_comments_similarity($str1, $str2);
-		$check2 = self::check_comments_similarity($str2, $str1);
+		$check1 = self::checkCommentsSimilarity($str1, $str2);
+		$check2 = self::checkCommentsSimilarity($str2, $str1);
 		
 		similar_text($str1, $str2, $perc);
 		$check3 = round($perc / 100, 2);
@@ -997,7 +997,7 @@ class Automod {
 		
 		This function checks how fast user gains stats
 		
-		$accountID — account ID of user (Number)
+		$person — array of user's IDs (Array)
 		
 		Return value:
 			true — everything is good, no cheating

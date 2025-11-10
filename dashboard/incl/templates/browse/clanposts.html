@@ -29,7 +29,7 @@
 <form onsubmit="return false;" class="inlineForm" name="uploadClanPostForm" autocomplete="off" dashboard-show="%CLAN_CAN_POST%">
 	<input type="hidden" name="clanID" value="%CLAN_ID%" />
 	<div class="emojisInput" dashboard-emojis-div>
-		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" />
+		<input dashboard-emoji-input class="inputStyle bordered" type="text" name="comment" placeholder="%TEXT_writeSomething%" maxlength="%CLAN_MAX_COMMENT_LENGTH%" />
 		
 		<button class="eyeButton emojisButton" onclick="toggleEmojisDiv()">
 			<i class="fa-solid fa-face-smile-beam"></i>

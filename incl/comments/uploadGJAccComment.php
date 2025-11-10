@@ -1,4 +1,5 @@
 <?php
+require __DIR__."/../../config/misc.php";
 require_once __DIR__."/../lib/mainLib.php";
 require_once __DIR__."/../lib/security.php";
 require_once __DIR__."/../lib/exploitPatch.php";
@@ -16,6 +17,7 @@ $comment = Escape::base64($_POST['comment']);
 if(empty($comment)) exit(CommonError::InvalidRequest);
 
 if($gameVersion >= 20) $comment = Escape::url_base64_decode($comment);
+$comment = Escape::text($comment, ($enableCommentLengthLimiter ? $maxAccountCommentLength : 0));
 
 $account = Library::getAccountByID($accountID);
 

@@ -174,7 +174,7 @@ class Action { // Last action ID is 71
 	const LevelDescriptionChange = 21;
 }
 
-class ModeratorAction { // Last action ID is 53
+class ModeratorAction { // Last action ID is 60
 	const LevelRate = 1;
 	const LevelDailySet = 5;
 	const LevelDeletion = 6;
@@ -190,7 +190,7 @@ class ModeratorAction { // Last action ID is 53
 	const LevelSuggestRemove = 40;
 	const LevelSuggest = 41;
 	const LevelEventSet = 44;
-	const LevelScoreDelete = 45;
+	const LevelScoreDeletion = 45;
 
 	const PersonBan = 28;
 	const PersonUnban = 46;
@@ -198,18 +198,23 @@ class ModeratorAction { // Last action ID is 53
 	
 	const GauntletCreate = 18;
 	const GauntletChange = 22;
+	const GauntletDeletion = 59;
 
 	const MapPackCreate = 17;
 	const MapPackChange = 21;
+	const MapPackDeletion = 60;
+	
+	const SongChange = 19;
+	const SongDeletion = 54;
+	const SFXChange = 27;
+	const SFXDeletion = 58;
 	
 	// To be done with dashboard
-	const SongChange = 19;
 	const ModeratorPromote = 20;
 	const QuestChange = 23;
 	const ModeratorRoleChange = 24;
 	const QuestCreate = 25;
 	const AccountCredentialsChange = 26;
-	const SFXChange = 27;
 	const VaultCodeCreate = 42;
 	const VaultCodeChange = 43;
 	
@@ -228,7 +233,11 @@ class ModeratorAction { // Last action ID is 53
 	
 	const RoleCreate = 51;
 	const RoleChange = 52;
-	const RoleDelete = 53;
+	const RoleDeletion = 53;
+	
+	const AccountCommentDeletion = 55;
+	const CommentDeletion = 56;
+	const ClanCommentDeletion = 57;
 	
 	// Unused
 	const LevelFeature = 2;
@@ -300,7 +309,7 @@ class RateLimit {
 	const AudioUpload = 8;
 }
 
-class AutomodAction {
+class AutomodAction { // Last action ID is 17
 	const LevelsSpamWarning = 1;
 	
 	const LevelUploadingDisable = 2;
@@ -325,5 +334,119 @@ class AutomodAction {
 	
 	const ClanPostsSpammingWarning = 16;
 	const ClanPostsSpammerWarning = 17;
+}
+
+class Permission { // Last permission ID is 34
+	const GameSuggestLevel = 1;
+	const GameRateLevel = 2;
+	const GameSetDifficulty = 3;
+	const GameSetFeatured = 4;
+	const GameSetEpic = 5;
+	const GameDeleteLevel = 6;
+	const GameMoveLevel = 7;
+	const GameRenameLevel = 8;
+	const GameSetPassword = 9;
+	const GameSetDescription = 10;
+	const GameSetLevelPrivacy = 11;
+	const GameShareCreatorPoints = 12;
+	const GameSetLevelSong = 13;
+	const GameLockLevelComments = 14;
+	const GameLockLevelUpdating = 15;
+	const GameSetListLevels = 16;
+	const GameDeleteComments = 17;
+	const GameVerifyCoins = 18;
+	const GameSetDaily = 19;
+	const GameSetWeekly = 20;
+	const GameSetEvent = 21;
+	
+	const DashboardModeratorTools = 22;
+	const DashboardDeleteLeaderboards = 23;
+	const DashboardManageMapPacks = 24;
+	const DashboardManageGauntlets = 25;
+	const DashboardManageSongs = 26;
+	const DashboardManageAccounts = 27;
+	const DashboardManageLevels = 28;
+	const DashboardManageClans = 29;
+	const DashboardManageAutomod = 30;
+	const DashboardManageRoles = 31;
+	const DashboardManageVaultCodes = 32;
+	const DashboardBypassMaintenance = 33;
+	const DashboardSetAccountRoles = 34;
+	
+	const All = [
+		'gameSuggestLevel',
+		'gameRateLevel',
+		'gameSetDifficulty',
+		'gameSetFeatured',
+		'gameSetEpic',
+		'gameDeleteLevel',
+		'gameMoveLevel',
+		'gameRenameLevel',
+		'gameSetPassword',
+		'gameSetDescription',
+		'gameSetLevelPrivacy',
+		'gameShareCreatorPoints',
+		'gameSetLevelSong',
+		'gameLockLevelComments',
+		'gameLockLevelUpdating',
+		'gameSetListLevels',
+		'gameDeleteComments',
+		'gameVerifyCoins',
+		'gameSetDaily',
+		'gameSetWeekly',
+		'gameSetEvent',
+		
+		'dashboardModeratorTools',
+		'dashboardDeleteLeaderboards',
+		'dashboardManageMapPacks',
+		'dashboardManageGauntlets',
+		'dashboardManageSongs',
+		'dashboardManageAccounts',
+		'dashboardManageLevels',
+		'dashboardManageClans',
+		'dashboardManageAutomod',
+		'dashboardManageRoles',
+		'dashboardManageVaultCodes',
+		'dashboardBypassMaintenance',
+		'dashboardSetAccountRoles'
+	];
+	
+	const IDs = [
+		'gameSuggestLevel' => 1,
+		'gameRateLevel' => 2,
+		'gameSetDifficulty' => 3,
+		'gameSetFeatured' => 4,
+		'gameSetEpic' => 5,
+		'gameDeleteLevel' => 6,
+		'gameMoveLevel' => 7,
+		'gameRenameLevel' => 8,
+		'gameSetPassword' => 9,
+		'gameSetDescription' => 10,
+		'gameSetLevelPrivacy' => 11,
+		'gameShareCreatorPoints' => 12,
+		'gameSetLevelSong' => 13,
+		'gameLockLevelComments' => 14,
+		'gameLockLevelUpdating' => 15,
+		'gameSetListLevels' => 16,
+		'gameDeleteComments' => 17,
+		'gameVerifyCoins' => 18,
+		'gameSetDaily' => 19,
+		'gameSetWeekly' => 20,
+		'gameSetEvent' => 21,
+		
+		'dashboardModeratorTools' => 22,
+		'dashboardDeleteLeaderboards' => 23,
+		'dashboardManageMapPacks' => 24,
+		'dashboardManageGauntlets' => 25,
+		'dashboardManageSongs' => 26,
+		'dashboardManageAccounts' => 27,
+		'dashboardManageLevels' => 28,
+		'dashboardManageClans' => 29,
+		'dashboardManageAutomod' => 30,
+		'dashboardManageRoles' => 31,
+		'dashboardManageVaultCodes' => 32,
+		'dashboardBypassMaintenance' => 33,
+		'dashboardSetAccountRoles' => 34
+	];
 }
 ?>

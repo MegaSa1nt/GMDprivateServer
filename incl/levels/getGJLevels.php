@@ -203,6 +203,7 @@ foreach($levels['levels'] as &$level) {
 	$levelsStatsArray[] = ["levelID" => $level["levelID"], "stars" => $level["starStars"], 'coins' => $level["starCoins"]];
 	
 	$level['levelDesc'] = Escape::translit(Escape::url_base64_decode($level['levelDesc']));
+	
 	if($gameVersion < 20) $level['levelDesc'] = Escape::gd($level['levelDesc']);
 	else $level['levelDesc'] = Escape::url_base64_encode($level['levelDesc']);
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__."/../incl/dashboardLib.php";
+require __DIR__."/../".$dbPath."config/misc.php";
 require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 require_once __DIR__."/../".$dbPath."incl/lib/security.php";
 require_once __DIR__."/../".$dbPath."incl/lib/enums.php";
@@ -47,11 +48,11 @@ if($_GET['id']) {
 	
 	$song = $level['songID'] ? Library::getSongByID($level['songID']) : Library::getAudioTrack($level['audioTrack']);
 	
-	if($song) $level['LEVEL_SONG'] = $song['authorName']." - ".$song['name'];
+	if($song) $level['LEVEL_SONG'] = htmlspecialchars($song['authorName']." - ".$song['name']);
 	else $level['LEVEL_SONG'] = Dashboard::string("unknownSong");
 	$level['LEVEL_SONG_ID'] = $song['ID'] ?: '';
-	$level['LEVEL_SONG_AUTHOR'] = $song['authorName'] ?: '';
-	$level['LEVEL_SONG_TITLE'] = $song['name'] ?: '';
+	$level['LEVEL_SONG_AUTHOR'] = htmlspecialchars($song['authorName']) ?: '';
+	$level['LEVEL_SONG_TITLE'] = htmlspecialchars($song['name']) ?: '';
 	$level['LEVEL_SONG_URL'] = urlencode(urldecode($song['download'])) ?: '';
 	$level['LEVEL_IS_CUSTOM_SONG'] = isset($song['ID']) ? 'true' : 'false';
 	
@@ -129,6 +130,7 @@ if($_GET['id']) {
 					'LEVEL_ID' => $levelID,
 					
 					'COMMENT_CAN_POST' => 'true',
+					'COMMENT_MAX_COMMENT_LENGTH' => $enableCommentLengthLimiter ? $maxCommentLength : '-1',
 					
 					'COMMENT_EMOJIS_DIV' => $emojisDiv,
 					
@@ -360,6 +362,29 @@ if($_GET['id']) {
 				];
 				
 				$level['LEVEL_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/level', $additionalData);
+				break;
+			case 'delete':
+				if($userID != $level['userID'] && !Library::checkPermission($person, "dashboardManageLevels")) exit(Dashboard::renderErrorPage(Dashboard::string("levelsTitle"), Dashboard::string("errorNoPermission"), '../../../'));
+			
+				$pageBase = '../../../';
+				
+				$dataArray = [
+					'INFO_TITLE' => Dashboard::string("deleteLevel"),
+					'INFO_DESCRIPTION' => Dashboard::string("deleteLevelDesc"),
+					'INFO_EXTRA' => Dashboard::renderLevelCard($level, $person, true),
+					
+					'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+					'INFO_BUTTON_ONCLICK_FIRST' => "getPage('browse/levels', 'list')",
+					'INFO_BUTTON_STYLE_FIRST' => "",
+					'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteLevel"),
+					'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteLevel', 'infoForm', 'list')",
+					'INFO_BUTTON_STYLE_SECOND' => "error",
+					
+					'INFO_INPUT_NAME' => 'levelID',
+					'INFO_INPUT_VALUE' => $levelID
+				];
+				
+				exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteLevel"), $pageBase, $dataArray));
 				break;
 			default:
 				exit(http_response_code(404));

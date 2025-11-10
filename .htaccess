@@ -40,6 +40,12 @@
 	RewriteRule ^dashboard/browse/accounts/(.+)$ dashboard/browse/accounts.php?id=$1 [L,QSA]
 	
 	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^dashboard/browse/songs/(.+)$ dashboard/browse/songs.php?id=$1 [L,QSA]
+	
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^dashboard/browse/sfxs/(.+)$ dashboard/browse/sfxs.php?id=$1 [L,QSA]
+	
+	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^dashboard/mod/roles/(.+)$ dashboard/mod/roles.php?id=$1 [L,QSA]
 	
 	RewriteCond %{REQUEST_FILENAME} !-f

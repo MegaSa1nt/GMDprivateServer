@@ -96,7 +96,7 @@ switch($type) {
 $lists = Library::getLists($person, $filters, $order, $pageOffset);
 
 foreach($lists['lists'] as &$list) {
-	$list['listName'] = Escape::translit($list['listName']);
+	$list['listName'] = Escape::gd(Escape::translit($list['listName']));
 	$list['listDesc'] = Escape::translit($list['listDesc']);
 	
 	$list['likes'] = $list['likes'] - $list['dislikes'];

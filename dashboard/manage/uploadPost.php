@@ -10,7 +10,7 @@ $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
 if(isset($_POST['comment'])) {
-	$comment = Escape::text($_POST['comment']);
+	$comment = Escape::text($_POST['comment'], ($enableCommentLengthLimiter ? $maxAccountCommentLength : 0));
 	if(empty($comment)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
 	$ableToComment = Library::isAbleToAccountComment($person, $comment);
