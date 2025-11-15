@@ -22,7 +22,6 @@ if(isset($_POST['songAuthor']) && isset($_POST['songTitle']) && isset($_POST['so
 	$pathToSongsFolder = realpath(__DIR__.'/../songs/');
 	
 	$uploadSong = Library::uploadSong($person, $songType, $songAuthor, $songTitle, $songFile, $songURL, $pathToSongsFolder);
-	
 	if(!$uploadSong['success']) {
 		switch($uploadSong['error']) {
 			case SongError::UnknownError:
@@ -43,6 +42,10 @@ if(isset($_POST['songAuthor']) && isset($_POST['songTitle']) && isset($_POST['so
 				exit(Dashboard::renderToast("xmark", sprintf(Dashboard::string("errorAlreadyReuploaded"), $uploadSong['songID']), "error"));
 			case SongError::TooBig:
 				exit(Dashboard::renderToast("xmark", sprintf(Dashboard::string("errorMaxFileSize"), $songSize), "error"));
+			case SongError::BadSongArtist:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadArtist"), "error"));
+			case SongError::BadSongTitle:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadName"), "error"));
 			default:
 				exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 		}

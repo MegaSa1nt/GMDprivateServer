@@ -19,7 +19,7 @@ $commentsPage = $page * 10;
 $isBlocked = Library::isPersonBlocked($accountID, $targetAccountID);
 if($isBlocked) exit(CommonError::InvalidRequest);
 
-$accountComments = Library::getAccountComments($targetUserID, $commentsPage);
+$accountComments = Library::getAccountComments($person, $targetUserID, $commentsPage);
 $echoString = '';
 foreach($accountComments['comments'] AS &$accountComment) {
 	$timestamp = Library::makeTime($accountComment['timestamp']);

@@ -19,7 +19,9 @@ if($_GET['id']) {
 	
 	$level = Library::getLevelByID($levelID);
 	if(!$level || !Library::canAccountPlayLevel($person, $level)) exit(Dashboard::renderErrorPage(Dashboard::string("levelsTitle"), Dashboard::string("errorLevelNotFound"), '../../'));
-
+	
+	$rating = Library::getItemRating($person, $levelID, RatingItem::Level);
+	
 	$user = Library::getUserByID($level['userID']);
 	$userName = $user ? $user['userName'] : 'Undefined';
 	
@@ -34,6 +36,12 @@ if($_GET['id']) {
 	$level['LEVEL_DIFFICULTY_IMAGE'] = Library::getLevelDifficultyImage($level);
 	
 	$level['LEVEL_LENGTH'] = $levelLengths[$level['levelLength']];
+		
+	$level['LEVEL_PERSON_LIKED'] = $level['LEVEL_PERSON_DISLIKED'] = 'false';
+	if($rating) {
+		if($rating == 1) $level['LEVEL_PERSON_LIKED'] = 'true';
+		else $level['LEVEL_PERSON_DISLIKED'] = 'true';
+	}
 		
 	$contextMenuData['MENU_SHOW_NAME'] = 'false';
 		
@@ -112,9 +120,9 @@ if($_GET['id']) {
 				$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 				$sortMode = $mode ? "comments.likes - comments.dislikes" : "comments.timestamp";
 				
-				$comments = Library::getCommentsOfLevel($levelID, $sortMode, $pageOffset);
+				$comments = Library::getCommentsOfLevel($person, $levelID, $sortMode, $pageOffset);
 				
-				foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person);
+				foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person, false, $comments['ratings']);
 				
 				$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 				$pageCount = floor(($comments['count'] - 1) / 10) + 1;
@@ -370,7 +378,7 @@ if($_GET['id']) {
 				
 				$dataArray = [
 					'INFO_TITLE' => Dashboard::string("deleteLevel"),
-					'INFO_DESCRIPTION' => Dashboard::string("deleteLevelDesc"),
+					'INFO_DESCRIPTION' => Dashboard::string("deleteLevelQuestionDesc"),
 					'INFO_EXTRA' => Dashboard::renderLevelCard($level, $person, true),
 					
 					'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),

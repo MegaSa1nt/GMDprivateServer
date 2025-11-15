@@ -11,12 +11,18 @@
 					<input type="hidden" name="commentID" value="%commentID%"></input>
 				</form>
 				
-				<text title="%TEXT_likes%">
+				<text title="%TEXT_likes%" dashboard-show="%COMMENT_PERSON_LIKED%">
 					<i class="fa-solid fa-thumbs-up"></i> %likes%
 				</text>
-				•
-				<text title="%TEXT_dislikes%">
+				<text title="%TEXT_likes%" dashboard-hide="%COMMENT_PERSON_LIKED%">
+					<i class="fa-regular fa-thumbs-up"></i> %likes%
+				</text>
+				
+				<text title="%TEXT_dislikes%" dashboard-show="%COMMENT_PERSON_DISLIKED%">
 					<i class="fa-solid fa-thumbs-down"></i> %dislikes%
+				</text>
+				<text title="%TEXT_dislikes%" dashboard-hide="%COMMENT_PERSON_DISLIKED%">
+					<i class="fa-regular fa-thumbs-down"></i> %dislikes%
 				</text>
 			</div>
 		</div>

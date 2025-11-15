@@ -50,7 +50,7 @@ if($_GET['id']) {
 			
 			$dataArray = [
 				'INFO_TITLE' => Dashboard::string("deleteSFX"),
-				'INFO_DESCRIPTION' => Dashboard::string("deleteSFXDesc"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteSFXQuestionDesc"),
 				'INFO_EXTRA' => Dashboard::renderSFXCard($sfx, $person),
 				
 				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),

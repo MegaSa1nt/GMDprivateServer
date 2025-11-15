@@ -1,4 +1,4 @@
-<form class="wideBox" name="levelSettingsForm" dashboard-change-form>
+<form class="wideBox short" name="levelSettingsForm" dashboard-change-form>
 	<input type="hidden" name="levelID" value="%LEVEL_ID%" />
 	
 	<div class="contentDiv vertical">
@@ -9,7 +9,7 @@
 					%TEXT_levelName%
 				</h2>
 				
-				<input class="inputStyle" type="text" name="levelName" value="%LEVEL_NAME%" autocomplete="gdps-dashboard-levelName" dashboard-change-default placeholder="The Level Name" />
+				<input class="inputStyle" type="text" name="levelName" value="%LEVEL_NAME%" autocomplete="gdps-dashboard-levelName" dashboard-change-default placeholder="The Level Name" maxlength="25" />
 			</div>
 			
 			<div class="settingDescription">
@@ -35,7 +35,7 @@
 				%TEXT_levelDesc%
 			</h2>
 				
-			<input class="inputStyle" type="text" name="levelDesc" value="%LEVEL_DESC%" autocomplete="gdps-dashboard-levelDesc" dashboard-change-default placeholder="Cool description about this level, good good..." dashboard-not-required />
+			<input class="inputStyle" type="text" name="levelDesc" value="%LEVEL_DESC%" autocomplete="gdps-dashboard-levelDesc" dashboard-change-default placeholder="Cool description about this level, good good..." dashboard-not-required maxlength="300" />
 		</div>
 		
 		<div class="horisontal">
@@ -306,7 +306,7 @@
 					</span>
 				</h2>
 				
-				<input class="inputStyle" type="number" name="levelPass" value="%LEVEL_PASSWORD%" autocomplete="gdps-dashboard-levelPass" dashboard-change-default dashboard-not-required placeholder="141412" />
+				<input class="inputStyle" type="number" name="levelPass" value="%LEVEL_PASSWORD%" autocomplete="gdps-dashboard-levelPass" dashboard-change-default dashboard-not-required placeholder="141412" maxlength="6" />
 			</div>
 			
 			<div class="settingDescription">
@@ -379,6 +379,22 @@
 			</div>
 			
 			<input class="toggle" type="checkbox" name="commentingLock" value="%COMMENTING_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%COMMENTING_LOCK_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteLevel%
+				</h2>
+				<h3>%TEXT_deleteLevelDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteLevel%" href="browse/levels/%LEVEL_ID%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
 		</div>
 	</div>
 

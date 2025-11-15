@@ -19,7 +19,7 @@ if(!Library::checkPermission($person, "dashboardModeratorTools")) exit(Dashboard
 
 if(isset($_POST["personType"]) && isset($_POST["banType"]) && isset($_POST["person"]) && isset($_POST["banReason"])) {
 	$personType = Security::limitValue(0, abs(Escape::number($_POST["personType"]) ?: 0), 2);
-	$banType = Security::limitValue(0, abs(Escape::number($_POST["banType"]) ?: 0), 4);
+	$banType = Security::limitValue(0, abs(Escape::number($_POST["banType"]) ?: 0), 5);
 	$banPerson = trim(Escape::text($_POST["person"]));
 	$banReason = trim(Escape::text($_POST["banReason"]));
 	$modBanReason = trim(Escape::text($_POST["modBanReason"])) ?: '';

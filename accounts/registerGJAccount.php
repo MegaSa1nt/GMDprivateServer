@@ -3,9 +3,9 @@ require_once __DIR__."/../incl/lib/mainLib.php";
 require_once __DIR__."/../incl/lib/exploitPatch.php";
 require_once __DIR__."/../incl/lib/enums.php";
 
-$userName = Escape::latin_no_spaces($_POST['userName']);
+$userName = Escape::latin_no_spaces($_POST['userName'], 16);
 $password = $_POST['password'];
-$email = Escape::text($_POST['email']);
+$email = Escape::text($_POST['email'], 50);
 
 if(empty($userName) || empty($password) || empty($email)) exit(CommonError::InvalidRequest);
 

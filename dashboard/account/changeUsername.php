@@ -13,7 +13,7 @@ if(isset($_POST['userName']) && isset($_POST['password'])) {
 	$person = $sec->loginPlayer();
 	if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorWrongLoginOrPassword"), "error"));
 	
-	$targetUserName = Escape::latin_no_spaces($_POST['targetUserName']);
+	$targetUserName = Escape::latin_no_spaces($_POST['targetUserName'], 16);
 	
 	$accountExists = Library::getAccountByUserName($targetUserName);
 	if($accountExists) exit(Dashboard::renderToast("xmark", Dashboard::string("errorUsernameIsTaken"), "error"));

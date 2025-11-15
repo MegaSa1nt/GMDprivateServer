@@ -21,7 +21,23 @@ if(($song["reuploadID"] == $accountID || Library::checkPermission($person, "dash
 	
 	$songIsDisabled = isset($_POST['songEnabled']) ? 0 : 1;
 	
-	Library::changeSong($person, $songID, $songArtist, $songTitle, $songIsDisabled);
+	$changeSong = Library::changeSong($person, $songID, $songArtist, $songTitle, $songIsDisabled);
+	if(!$changeSong['success']) {
+		switch($changeSong['error']) {
+			case SongError::NothingFound:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorSongNotFound"), "error"));
+			case SongError::Banned:
+				exit(Dashboard::renderToast("gavel", sprintf(Dashboard::string("bannedToast"), htmlspecialchars(Escape::url_base64_decode($uploadSong['info']['reason'])), '<text dashboard-date="'.$uploadSong['info']['expires'].'"></text>'), "error"));
+			case SongError::BadSongArtist:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadArtist"), "error"));
+			case SongError::BadSongTitle:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadName"), "error"));
+			case SongError::NoPermissions:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorNoUsagePermission"), "error"));
+			default:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+		}
+	}
 	
 	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@', "box"));
 }

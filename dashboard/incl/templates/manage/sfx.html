@@ -1,4 +1,4 @@
-<form class="boxSized" name="sfxSettingsForm" dashboard-change-form>
+<form class="boxSized short" name="sfxSettingsForm" dashboard-change-form>
 	<input type="hidden" name="sfxID" value="%SFX_ID%" />
 	
 	<div class="contentDiv vertical">
@@ -8,7 +8,7 @@
 				%TEXT_sfxTitleText%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="sfxTitle" value="%SFX_TITLE%" autocomplete="gdps-dashboard-sfxTitle" dashboard-change-default placeholder="The Incredible SFX Title" />
+			<input class="inputStyle" type="text" name="sfxTitle" value="%SFX_TITLE%" autocomplete="gdps-dashboard-sfxTitle" dashboard-change-default placeholder="The Incredible SFX Title" maxlength="35" />
 		</div>
 				
 		<div class="languageDiv" dashboard-toggle dashboard-show="%SFX_CAN_DISABLE%">
@@ -21,6 +21,22 @@
 			</div>
 			
 			<input class="toggle" type="checkbox" name="sfxEnabled" value="%SFX_ENABLED_VALUE%" dashboard-change-default checked dashboard-remove="%SFX_ENABLED_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteSFX%
+				</h2>
+				<h3>%TEXT_deleteSFXDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteSFX%" href="browse/sfxs/%SFX_ID%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
 		</div>
 	</div>
 

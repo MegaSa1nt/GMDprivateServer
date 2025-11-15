@@ -14,7 +14,7 @@ $page = abs(Escape::number($_POST["page"]) ?: 0);
 $pageOffset = $page * 10;
 
 $messages = Library::getAccountMessages($person, $getSent, $pageOffset);
-if(!$messages['messages']) exit(CommentsError::NothingFound);
+if(!$messages['messages']) exit(CommonError::NothingFound);
 
 foreach($messages['messages'] AS &$message) {
 	$message['subject'] = Escape::url_base64_encode(Escape::translit(Escape::url_base64_decode($message["subject"])));

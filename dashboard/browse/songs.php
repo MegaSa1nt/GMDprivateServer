@@ -59,7 +59,7 @@ if($_GET['id']) {
 			
 			$dataArray = [
 				'INFO_TITLE' => Dashboard::string("deleteSong"),
-				'INFO_DESCRIPTION' => Dashboard::string("deleteSongDesc"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteSongQuestionDesc"),
 				'INFO_EXTRA' => Dashboard::renderSongCard($song, $person, $favouriteSongs),
 				
 				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),

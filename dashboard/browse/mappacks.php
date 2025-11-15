@@ -160,7 +160,7 @@ if($_GET['id']) {
 			
 			$dataArray = [
 				'INFO_TITLE' => Dashboard::string("deleteMapPack"),
-				'INFO_DESCRIPTION' => Dashboard::string("deleteMapPackDesc"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteMapPackQuestionDesc"),
 				'INFO_EXTRA' => '<p class="error">'.Dashboard::string("deleteMapPackNotice").'</p>
 					'.Dashboard::renderMapPackCard($mapPack, $person),
 				

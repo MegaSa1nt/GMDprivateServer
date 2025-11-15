@@ -8,10 +8,15 @@ $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
+$userID = $person['userID'];
 
 if(isset($_POST['levelID'])) {
 	$levelID = Escape::number($_POST['levelID']);
 	if(empty($levelID)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+	
+	$level = Library::getLevelByID($levelID);
+	
+	if(!$level || ($userID != $level['userID'] && !Library::checkPermission($person, "dashboardManageLevels"))) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
 	$deleteLevel = Library::deleteLevel($levelID, $person);
 	if(!$deleteLevel) exit(Dashboard::renderToast("xmark", Dashboard::string("errorCantDeleteLevel"), "error"));

@@ -20,6 +20,8 @@ if($_GET['id']) {
 	$list = Library::getListByID($listID);
 	if(!$list || !Library::canAccountSeeList($person, $list)) exit(Dashboard::renderErrorPage(Dashboard::string("listsTitle"), Dashboard::string("errorListNotFound"), '../../'));
 	$isPersonThemselves = $accountID == $list['accountID'];
+	
+	$rating = Library::getItemRating($person, $listID, RatingItem::List);
 
 	$user = Library::getUserByAccountID($list['accountID']);
 	$userName = $user ? $user['userName'] : 'Undefined';
@@ -31,6 +33,12 @@ if($_GET['id']) {
 	$list['LIST_TITLE'] = sprintf(Dashboard::string('levelTitle'), $list['listName'], Dashboard::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']));
 	$list['LIST_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($list['listDesc']))) ?: "<i>".Dashboard::string('noDescription')."</i>";
 	$list['LIST_DIFFICULTY_IMAGE'] = Library::getListDifficultyImage($list);
+		
+	$list['LIST_PERSON_LIKED'] = $list['LIST_PERSON_DISLIKED'] = 'false';
+	if($rating) {
+		if($rating == 1) $list['LIST_PERSON_LIKED'] = 'true';
+		else $list['LIST_PERSON_DISLIKED'] = 'true';
+	}
 		
 	$contextMenuData['MENU_SHOW_NAME'] = 'false';
 		
@@ -112,9 +120,9 @@ if($_GET['id']) {
 			$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 			$sortMode = $mode ? "comments.likes - comments.dislikes" : "comments.timestamp";
 			
-			$comments = Library::getCommentsOfList($listID, $sortMode, $pageOffset);
+			$comments = Library::getCommentsOfList($person, $listID, $sortMode, $pageOffset);
 			
-			foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person);
+			foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person, false, $comments['ratings']);
 			
 			$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 			$pageCount = floor(($comments['count'] - 1) / 10) + 1;
@@ -242,7 +250,7 @@ if($_GET['id']) {
 			
 			$dataArray = [
 				'INFO_TITLE' => Dashboard::string("deleteList"),
-				'INFO_DESCRIPTION' => Dashboard::string("deleteListDesc"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteListQuestionDesc"),
 				'INFO_EXTRA' => Dashboard::renderListCard($list, $person, true),
 				
 				'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),

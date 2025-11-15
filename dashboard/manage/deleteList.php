@@ -8,10 +8,15 @@ $sec = new Security();
 
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
+$accountID = $person['accountID'];
 
 if(isset($_POST['listID'])) {
 	$listID = Escape::number($_POST['listID']);
 	if(empty($listID)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+	
+	$list = Library::getListByID($listID);
+	
+	if(!$list || ($accountID != $list['accountID'] && !Library::checkPermission($person, "dashboardManageLevels"))) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
 	
 	$deleteList = Library::deleteList($listID, $person);
 	if(!$deleteList) exit(Dashboard::renderToast("xmark", Dashboard::string("errorCantDeleteList"), "error"));

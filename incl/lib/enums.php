@@ -49,6 +49,7 @@ class CommonError {
 	
 	const Banned = "-10";
 	const Disabled = "-2";
+	const NothingFound = "-2";
 	
 	const Filter = "-15";
 	const Automod = "-16";
@@ -71,11 +72,29 @@ class LevelUploadError {
 	const SameServer = "-18";
 }
 
-class CommentsError {
-	const NothingFound = "-2";
+class ClanError {
+	const Success = "1";
+	
+	const NothingFound = "-1";
+	
+	const ClanNameExists = "-2";
+	const ClanTagExists = "-3";
+	
+	const BadClanName = "-5";
+	const BadClanTag = "-6";
+	const BadClanDescription = "-7";
+	
+	const NoPermissions = "-4";
 }
 
-class Action { // Last action ID is 71
+class RatingItem {
+	const Level = 1;
+	const Comment = 2;
+	const AccountComment = 3;
+	const List = 4;
+}
+
+class Action { // Last action ID is 74
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -158,23 +177,27 @@ class Action { // Last action ID is 71
 	const AudioUploadRateLimit = 68;
 	
 	const SongUpload = 62;
-	const SongDeletion = 63;
 	const SongChange = 64;
+	const SongDeletion = 63;
 	const SFXUpload = 65;
-	const SFXDeletion = 66;
 	const SFXChange = 67;
+	const SFXDeletion = 66;
 	
 	const ReuploadLevelToGDPS = 69;
 	const ReuploadLevelFromGDPS = 70;
 	
 	const LevelsRecommendationsGenerate = 71;
 	
+	const ClanCreation = 72;
+	const ClanChange = 73;
+	const ClanDeletion = 74;
+	
 	// Unused
 	const LevelReport = 20;
 	const LevelDescriptionChange = 21;
 }
 
-class ModeratorAction { // Last action ID is 60
+class ModeratorAction { // Last action ID is 63
 	const LevelRate = 1;
 	const LevelDailySet = 5;
 	const LevelDeletion = 6;
@@ -239,6 +262,10 @@ class ModeratorAction { // Last action ID is 60
 	const CommentDeletion = 56;
 	const ClanCommentDeletion = 57;
 	
+	const ClanCreation = 61;
+	const ClanChange = 62;
+	const ClanDeletion = 63;
+	
 	// Unused
 	const LevelFeature = 2;
 	const LevelCoinsVerify = 3;
@@ -295,6 +322,12 @@ class SongError {
 	const AlreadyUploaded = "-3";
 
 	const TooBig = "-5";
+	
+	const BadSongArtist = "-10";
+	const BadSongTitle = "-11";
+	
+	const NothingFound = "-12";
+	const NoPermissions = "-13";
 }
 
 class RateLimit {

@@ -457,6 +457,11 @@ footer h4 span {
 	justify-content: flex-start;
 }
 
+.wideBox.short,
+.boxSized.short {
+	gap: 10px;
+}
+
 .button {
 	display: flex;
 	align-items: center;
@@ -480,6 +485,11 @@ footer h4 span {
 
 .button.short {
 	width: max-content;
+	height: max-content;
+}
+
+.levelStats.short {
+	min-width: max-content !important;
 	height: max-content;
 }
 
@@ -1672,6 +1682,7 @@ nav [title]::after,
 	cursor: pointer;
 	
 	padding: 10px 25px;
+	margin: 0px;
 	
 	background-color: #86868624;
 	border: 1px solid #86868634;
@@ -1951,6 +1962,12 @@ nav [title]::after,
 
 .squareButton.big {
 	padding: 10px !important;
+}
+
+.toggleButton {
+	width: max-content;
+	padding: 12.5px !important;
+	font-size: 27.5px;
 }
 
 .modalPage {

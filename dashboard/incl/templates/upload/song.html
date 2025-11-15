@@ -45,7 +45,7 @@
 				%TEXT_songURL%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="songURL" autocomplete="gdps-dashboard-songURL" placeholder="https://example.com/verycoolsong.mp3" disabled />
+			<input class="inputStyle" type="text" name="songURL" autocomplete="gdps-dashboard-songURL" placeholder="https://example.com/verycoolsong.mp3" disabled maxlength="255" />
 		</div>
 		
 		<div class="inputDiv">
@@ -54,7 +54,7 @@
 				%TEXT_songArtistText%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="songAuthor" autocomplete="gdps-dashboard-songArtist" placeholder="Artist the Cool" dashboard-not-required />
+			<input class="inputStyle" type="text" name="songAuthor" autocomplete="gdps-dashboard-songArtist" placeholder="Artist the Cool" dashboard-not-required maxlength="40" />
 		</div>
 		
 		<div class="inputDiv">
@@ -63,7 +63,7 @@
 				%TEXT_songTitleText%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="songTitle" autocomplete="gdps-dashboard-songTitle" placeholder="The Incredible Song Title" dashboard-not-required />
+			<input class="inputStyle" type="text" name="songTitle" autocomplete="gdps-dashboard-songTitle" placeholder="The Incredible Song Title" dashboard-not-required maxlength="35" />
 		</div>
 		
 		<button class="button" type="button" onclick="%UPLOAD_SONG_BUTTON_ONCLICK%">%TEXT_uploadSongTitle%</button>

@@ -9,6 +9,8 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
+if(!Library::checkPermission($person, "dashboardManageMapPacks")) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+
 if(isset($_POST['mapPackID'])) {
 	$mapPackID = Escape::number($_POST['mapPackID']);
 	if(empty($mapPackID)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

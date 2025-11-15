@@ -795,7 +795,7 @@ class Dashboard {
 		return self::renderTemplate('components/level', $level);
 	}
 	
-	public static function renderCommentCard($comment, $person, $showLevel = false) {
+	public static function renderCommentCard($comment, $person, $showLevel = false, $commentsRatings = []) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -815,6 +815,12 @@ class Dashboard {
 			$comment['COMMENT_LEVEL_TEXT'] = $comment['itemID'] >= 0 ? self::getLevelString($person, $comment['creatorAccountID'], $comment['itemID'], $comment['itemName']) : self::getListString($person, $comment['creatorAccountID'], $comment['itemID'] * -1, $comment['itemName']);
 			$comment['COMMENT_SHOW_LEVEL'] = 'true';
 		} else $comment['COMMENT_SHOW_LEVEL'] = 'false';
+		
+		$comment['COMMENT_PERSON_LIKED'] = $comment['COMMENT_PERSON_DISLIKED'] = 'false';
+		if($commentsRatings[$comment['commentID']]) {
+			if($commentsRatings[$comment['commentID']] == 1) $comment['COMMENT_PERSON_LIKED'] = 'true';
+			else $comment['COMMENT_PERSON_DISLIKED'] = 'true';
+		}
 		
 		$comment['COMMENT_SHOW_RATING'] = $comment['creatorRating'] ? 'true' : 'false';
 		$comment['COMMENT_RATING_TITLE'] = $comment['itemID'] >= 0 ? self::string("creatorRatingLevel") : self::string("creatorRatingList");
@@ -842,7 +848,7 @@ class Dashboard {
 		return self::renderTemplate('components/comment', $comment);
 	}
 	
-	public static function renderPostCard($accountPost, $person) {
+	public static function renderPostCard($accountPost, $person, $commentsRatings = []) {
 		global $dbPath;
 		require_once __DIR__."/../".$dbPath."incl/lib/mainLib.php";
 		require_once __DIR__."/../".$dbPath."incl/lib/exploitPatch.php";
@@ -857,6 +863,12 @@ class Dashboard {
 		
 		$accountPost['POST_USER'] = self::getUsernameString($person, $user, $userName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
 		$accountPost['POST_CONTENT'] = self::parseMentions($person, htmlspecialchars(Escape::url_base64_decode($accountPost['comment']))) ?: "<i>".self::string('emptyPost')."</i>";
+		
+		$accountPost['POST_PERSON_LIKED'] = $accountPost['POST_PERSON_DISLIKED'] = 'false';
+		if($commentsRatings[$accountPost['commentID']]) {
+			if($commentsRatings[$accountPost['commentID']] == 1) $accountPost['POST_PERSON_LIKED'] = 'true';
+			else $accountPost['POST_PERSON_DISLIKED'] = 'true';
+		}
 		
 		$contextMenuData['MENU_ID'] = $accountPost['commentID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
@@ -1180,11 +1192,13 @@ class Dashboard {
 		$ownerUserName = $ownerUser ? $ownerUser['userName'] : 'Undefined';
 		$userMetadata = self::getUserMetadata($ownerUser);
 
-		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $ownerUser['userID']);
+		$canOpenSettings = $isClanOwner || Library::checkPermission($person, 'dashboardManageClans');
 
 		$contextMenuData = [];
 		
 		$contextMenuData['MENU_SHOW_NAME'] = 'false';
+		
+		if(!isset($clan['clanMembersCount'])) $clan['clanMembersCount'] = count(explode(',', $clan['clanMembers']));
 		
 		$clan['CLAN_NAME'] = $contextMenuData['MENU_NAME'] = htmlspecialchars($clan['clanName']);
 		$clan['CLAN_DESCRIPTION'] = self::parseMentions($person, htmlspecialchars($clan['clanDesc'])) ?: "<i>".self::string('noDescription')."</i>";
@@ -1200,8 +1214,10 @@ class Dashboard {
 		$clan['CLAN_IS_CLOSED'] = $clan['isClosed'] ? 'true' : 'false';
 
 		$clan['CLAN_OWNER_CARD'] = self::getUsernameString($person, $ownerUser, $ownerUserName, $userMetadata['mainIcon'], $userMetadata['userAppearance'], $userMetadata['userAttributes']);
-		
-		$contextMenuData['MENU_SHOW_MANAGE_HR'] = $contextMenuData['MENU_CAN_MANAGE'] == 'true' ? 'true' : 'false';
+
+		$clan['CLAN_CAN_OPEN_SETTINGS'] = $contextMenuData['MENU_CAN_OPEN_SETTINGS'] = $canOpenSettings ? 'true' : 'false';
+
+		$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true') ? 'true' : 'false';
 		
 		$clan['CLAN_CONTEXT_MENU'] = self::renderTemplate('components/menus/clan', $contextMenuData);
 		

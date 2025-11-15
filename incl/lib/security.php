@@ -29,12 +29,12 @@ class Security {
 			$searchIP = Library::convertIPForSearching($IP, true);
 			$hourAgo = time() - 3600;
 			
-			$searchFilters = ['type = '.Action::PasswordChange, 'timestamp >= '.$hourAgo, 'account = '.$accountID, "IP REGEXP '((\\\D[^.])|^)(".$searchIP.")(\\\D[^$])'"];
+			$searchFilters = ['type = '.Action::PasswordChange, 'timestamp >= '.$hourAgo, 'account = '.$accountID, "IP REGEXP '(".$searchIP.".*)'"];
 			$passwordChanges = Library::getActions($searchFilters, 1);
 			
 			$sessionTimeToCheck = $passwordChanges && $passwordChanges[0]['timestamp'] >= $hourAgo ? $passwordChanges[0]['timestamp'] : $hourAgo;
 			
-			$searchFilters = ['type = '.Action::GJPSessionGrant, 'timestamp >= '.$sessionTimeToCheck, 'account = '.$accountID, "IP REGEXP '((\\\D[^.])|^)(".$searchIP.")(\\\D[^$])'"];
+			$searchFilters = ['type = '.Action::GJPSessionGrant, 'timestamp >= '.$sessionTimeToCheck, 'account = '.$accountID, "IP REGEXP '(".$searchIP.".*)'"];
 			$session = Library::getActions($searchFilters, 1);
 			
 			if($session) $skipValidating = true;
@@ -520,7 +520,7 @@ class Security {
 			case RateLimit::PerUserLevelsUpload:
 				if(!$perUserLevelsUploadDelay) return true;
 			
-				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])'))");
+				$lastUploadedLevelByUser = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate >= :time AND isDeleted = 0 AND (userID = :userID OR IP REGEXP CONCAT('(', :IP, '.*)')");
 				$lastUploadedLevelByUser->execute([':time' => time() - $perUserLevelsUploadDelay, ':userID' => $userID, ':IP' => Library::convertIPForSearching($IP, true)]);
 				$lastUploadedLevelByUser = $lastUploadedLevelByUser->fetchColumn();
 				

@@ -82,6 +82,7 @@ $language['maintenanceModeDesc'] = '%1$s is currently in maintenance, please try
 $language['errorTitle'] = 'An error has occured';
 
 $language['errorNoPermission'] = 'You have no permission to view this page.';
+$language['errorNoUsagePermission'] = 'You have no permission for this.';
 
 $language['errorFailedToLoadPage'] = 'Failed to load page!';
 $language['errorAlreadyLoggedIn'] = 'You\'re already logged in!';
@@ -137,6 +138,8 @@ $language['errorCronTooFast'] = 'Please wait a few minutes before running Cron a
 $language['errorPlayerNotFound'] = 'User wasn\'t found!';
 $language['errorBadName'] = 'Please choose another name!';
 $language['errorBadDesc'] = 'Please choose another description!';
+$language['errorBadTag'] = 'Please choose another tag!';
+$language['errorBadArtist'] = 'Please choose another artist name!';
 
 $language['errorAccountsAutomod'] = 'You may not create accounts for now!';
 $language['errorUsernameTooShort'] = 'This username is too short!';
@@ -169,6 +172,12 @@ $language['errorCantDeleteLevel'] = 'You can\'t delete this level.';
 $language['errorCantDeleteList'] = 'You can\'t delete this list.';
 $language['errorCantDeleteGauntlet'] = 'You can\'t delete this Gauntlet.';
 $language['errorCantDeleteMapPack'] = 'You can\'t delete this Map Pack.';
+$language['errorCantDeleteRole'] = 'You can\'t delete this role.';
+
+$language['errorClanNotFound'] = 'Clan wasn\'t found!';
+$language['errorClanNameTaken'] = 'This clan name is already taken!';
+$language['errorClanTagTaken'] = 'This clan tag is already taken!';
+$language['errorCantDeleteClan'] = 'You can\'t delete this clan.';
 
 /* Success strings */
 $language['successCopiedText'] = 'Copied text!';
@@ -215,6 +224,9 @@ $language['successDeletedLevel'] = 'You successfully deleted this level!';
 $language['successDeletedList'] = 'You successfully deleted this list!';
 $language['successDeletedGauntlet'] = 'You successfully deleted this Gauntlet!';
 $language['successDeletedMapPack'] = 'You successfully deleted this Map Pack!';
+$language['successDeletedRole'] = 'You successfully deleted this role!';
+
+$language['successDeletedClan'] = 'You successfully deleted this clan!';
 
 /* Page strings */
 $language['changeUsernameOld'] = 'Old username';
@@ -625,6 +637,8 @@ $language['commenting'] = 'Commenting';
 $language['banTypeCommentingDesc'] = 'Ban user from commenting anything';
 $language['usingAccount'] = 'Account usage';
 $language['banTypeUsingAccountDesc'] = 'Ban user from using their account';
+$language['uploadingAudio'] = 'Audio uploads';
+$language['banTypeUploadingAudioDesc'] = 'Ban user from uploading songs and SFXs';
 $language['banReason'] = 'Ban reason';
 $language['modBanReason'] = 'Additional details';
 $language['banReasonDesc'] = 'Reason for the ban. Can be seen by the banned user.';
@@ -646,12 +660,32 @@ $language['sfxEnabledTitle'] = 'Enable SFX';
 $language['sfxEnabledDesc'] = 'If the SFX is enabled, players will be able to use it in their own levels';
 
 $language['cancel'] = 'Cancel';
-$language['deleteSongDesc'] = 'Are you sure you want to delete this song?';
-$language['deleteSFXDesc'] = 'Are you sure you want to delete this SFX?';
-$language['deleteLevelDesc'] = 'Are you sure you want to delete this level?';
-$language['deleteListDesc'] = 'Are you sure you want to delete this list?';
-$language['deleteGauntletDesc'] = 'Are you sure you want to delete this Gauntlet?';
+$language['deleteSongQuestionDesc'] = 'Are you sure you want to delete this song?';
+$language['deleteSFXQuestionDesc'] = 'Are you sure you want to delete this SFX?';
+$language['deleteLevelQuestionDesc'] = 'Are you sure you want to delete this level?';
+$language['deleteListQuestionDesc'] = 'Are you sure you want to delete this list?';
+$language['deleteGauntletQuestionDesc'] = 'Are you sure you want to delete this Gauntlet?';
 $language['deleteGauntletNotice'] = 'It is not recommended to delete Gauntlets, as it could interfere with current players\' stats!';
-$language['deleteMapPackDesc'] = 'Are you sure you want to delete this Map Pack?';
+$language['deleteMapPackQuestionDesc'] = 'Are you sure you want to delete this Map Pack?';
 $language['deleteMapPackNotice'] = 'It is not recommended to delete Map Packs, as it could interfere with current players\' stats!';
+
+$language['clanName'] = 'Clan name';
+$language['clanTag'] = 'Clan tag';
+$language['clanDesc'] = 'Clan description';
+$language['clanColor'] = 'Clan color';
+$language['clanClosedDesc'] = 'If this clan is closed, players may only join it via a join request';
+$language['transferClan'] = 'Transfer clan';
+$language['transferClanDesc'] = 'Transfer this clan to someone else, making them its owner';
+$language['deleteClan'] = 'Delete clan';
+$language['deleteClanDesc'] = 'Delete this clan permanently. This is irreversible, and you will lose your clan\'s name and tag';
+$language['deleteClanQuestionDesc'] = 'Are you sure you want to delete this clan?';
+$language['deleteSongDesc'] = 'Delete this song permanently. This is irreversible';
+$language['deleteSFXDesc'] = 'Delete this SFX permanently. This is irreversible';
+$language['deleteLevelDesc'] = 'Delete this level. Moderators may still restore this level even after its deletion';
+$language['deleteListDesc'] = 'Delete this list permanently. This is irreversible';
+$language['deleteGauntletDesc'] = 'Delete this Gauntlet permanently. This is irreversible';
+$language['deleteMapPackDesc'] = 'Delete this Map Pack permanently. This is irreversible';
+$language['deleteRole'] = 'Delete role';
+$language['deleteRoleDesc'] = 'Delete this role permanently. This is irreversible';
+$language['deleteRoleQuestionDesc'] = 'Are you sure you want to delete this role?';
 ?>

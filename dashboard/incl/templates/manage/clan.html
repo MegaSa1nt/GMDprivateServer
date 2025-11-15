@@ -1,0 +1,90 @@
+<form class="wideBox short" name="clanSettingsForm" dashboard-change-form>
+	<input type="hidden" name="clanID" value="%CLAN_ID%" />
+	
+	<div class="contentDiv vertical">
+		<div class="horisontal">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-pen-to-square"></i>
+					%TEXT_clanName%
+				</h2>
+				
+				<input class="inputStyle" type="text" name="clanName" value="%CLAN_NAME%" autocomplete="gdps-dashboard-clanName" dashboard-change-default placeholder="The Greatest CLAN" maxlength="25" />
+			</div>
+			
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-id-badge"></i>
+					%TEXT_clanTag%
+				</h2>
+				
+				<input class="inputStyle" type="text" name="clanTag" value="%CLAN_TAG%" autocomplete="gdps-dashboard-clanTag" dashboard-change-default placeholder="CL4N" maxlength="5" dashboard-regex-check="[^A-Za-z0-9]" />
+			</div>
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-comment-dots"></i>
+				%TEXT_clanDesc%
+			</h2>
+				
+			<input class="inputStyle" type="text" name="clanDesc" value="%CLAN_DESC%" autocomplete="gdps-dashboard-clanDesc" dashboard-change-default placeholder="Cool description about this clan, good good..." dashboard-not-required maxlength="300" />
+		</div>
+		
+		<div class="settingDescription">
+			<h2>
+				<i class="fa-solid fa-palette"></i>
+				%TEXT_clanColor%
+			</h2>
+			
+			<input class="inputColor" type="color" name="clanColor" value="%CLAN_COLOR_VALUE%" autocomplete="gdps-dashboard-clanColor" dashboard-change-default />
+		</div>
+				
+		<div class="languageDiv" dashboard-toggle>
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-lock"></i>
+					%TEXT_clanClosed%
+				</h2>
+				<h3>%TEXT_clanClosedDesc%</h3>
+			</div>
+			
+			<input class="toggle" type="checkbox" name="clanClosed" value="%CLAN_CLOSED_VALUE%" dashboard-change-default checked dashboard-remove="%CLAN_CLOSED_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-arrow-right"></i>
+					%TEXT_transferClan%
+				</h2>
+				<h3>%TEXT_transferClanDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_transferClan%" href="clan/%CLAN_NAME%/transfer" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
+		</div>
+				
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteClan%
+				</h2>
+				<h3>%TEXT_deleteClanDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteClan%" href="clan/%CLAN_NAME%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
+		</div>
+	</div>
+
+	<div class="saveSettingsButtons" dashboard-change-buttons>
+		<button type="button" class="button" onclick="resetSettings()">%TEXT_reset%</button>
+		<button type="button" class="button" onclick="postPage('manage/manageClan', 'clanSettingsForm', 'settings')">%TEXT_applySettings%</button>
+	</div>
+</form>

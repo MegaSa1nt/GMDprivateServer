@@ -1,4 +1,4 @@
-<form class="wideBox" name="mapPackSettingsForm" dashboard-change-form>
+<form class="wideBox short" name="mapPackSettingsForm" dashboard-change-form>
 	<input type="hidden" name="mapPackID" value="%MAPPACK_ID%" />
 	
 	<div class="contentDiv vertical">
@@ -8,7 +8,7 @@
 				%TEXT_mapPackName%
 			</h2>
 			
-			<input class="inputStyle" type="text" name="mapPackName" value="%MAPPACK_NAME%" autocomplete="gdps-dashboard-mapPackName" dashboard-change-default placeholder="The Map Pack Name" />
+			<input class="inputStyle" type="text" name="mapPackName" value="%MAPPACK_NAME%" autocomplete="gdps-dashboard-mapPackName" dashboard-change-default placeholder="The Map Pack Name" maxlength="25" />
 		</div>
 		
 		<div class="horisontal">
@@ -127,6 +127,22 @@
 			</div>
 			
 			<div class="select multiple" dashboard-select-multiple-list="levelSearch">%MAPPACK_LEVELS_OPTIONS%</div>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteMapPack%
+				</h2>
+				<h3>%TEXT_deleteMapPackDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteMapPack%" href="browse/mappacks/%MAPPACK_ID%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
 		</div>
 	</div>
 

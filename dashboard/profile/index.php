@@ -67,9 +67,9 @@ switch($parameters[1]) {
 			break;
 		}
 		
-		$comments = Library::getCommentsOfUser($user['userID'], $sortMode, $pageOffset);
+		$comments = Library::getCommentsOfUser($person, $user['userID'], $sortMode, $pageOffset);
 		
-		foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person, true);
+		foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderCommentCard($comment, $person, true, $comments['ratings']);
 		
 		$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 		$pageCount = floor(($comments['count'] - 1) / 10) + 1;
@@ -200,6 +200,8 @@ switch($parameters[1]) {
 		$pageBase = "../../";
 		break;
 	case 'settings':
+		if($accountID != $account["extID"] && !Library::checkPermission($person, "dashboardManageAccounts")) exit(Dashboard::renderErrorPage(Dashboard::string("levelsTitle"), Dashboard::string("errorNoPermission"), '../../'));
+		
 		$timezones = Dashboard::getTimezones();
 		$timezoneNames = [];
 		$timezoneElements = '';
@@ -239,9 +241,9 @@ switch($parameters[1]) {
 		$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 		$sortMode = $mode ? "acccomments.likes - acccomments.dislikes" : "acccomments.timestamp";
 		
-		$accountComments = Library::getAccountComments($user['userID'], $pageOffset, $sortMode);
+		$accountComments = Library::getAccountComments($person, $user['userID'], $pageOffset, $sortMode);
 		
-		foreach($accountComments['comments'] AS &$accountPost) $additionalPage .= Dashboard::renderPostCard($accountPost, $person);
+		foreach($accountComments['comments'] AS &$accountPost) $additionalPage .= Dashboard::renderPostCard($accountPost, $person, $accountComments['ratings']);
 		
 		$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 		$pageCount = floor(($accountComments['count'] - 1) / 10) + 1;

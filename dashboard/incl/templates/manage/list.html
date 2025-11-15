@@ -1,4 +1,4 @@
-<form class="wideBox" name="listSettingsForm" dashboard-change-form>
+<form class="wideBox short" name="listSettingsForm" dashboard-change-form>
 	<input type="hidden" name="listID" value="%LIST_ID%" />
 	
 	<div class="contentDiv vertical">
@@ -9,7 +9,7 @@
 					%TEXT_listName%
 				</h2>
 				
-				<input class="inputStyle" type="text" name="listName" value="%LIST_NAME%" autocomplete="gdps-dashboard-listName" dashboard-change-default placeholder="The List Name" />
+				<input class="inputStyle" type="text" name="listName" value="%LIST_NAME%" autocomplete="gdps-dashboard-listName" dashboard-change-default placeholder="The List Name" maxlength="25" />
 			</div>
 			
 			<div class="settingDescription">
@@ -35,7 +35,7 @@
 				%TEXT_listDesc%
 			</h2>
 				
-			<input class="inputStyle" type="text" name="listDesc" value="%LIST_DESC%" autocomplete="gdps-dashboard-listDesc" dashboard-change-default placeholder="Cool description about this list, good good..." dashboard-not-required />
+			<input class="inputStyle" type="text" name="listDesc" value="%LIST_DESC%" autocomplete="gdps-dashboard-listDesc" dashboard-change-default placeholder="Cool description about this list, good good..." dashboard-not-required maxlength="300" />
 		</div>
 		
 		<div class="horisontal">
@@ -223,6 +223,22 @@
 			</div>
 			
 			<input class="toggle" type="checkbox" name="commentingLock" value="%COMMENTING_LOCK_VALUE%" dashboard-change-default checked dashboard-remove="%COMMENTING_LOCK_REMOVE_CHECK%"></input>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteList%
+				</h2>
+				<h3>%TEXT_deleteListDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteList%" href="browse/lists/%LIST_ID%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
 		</div>
 	</div>
 

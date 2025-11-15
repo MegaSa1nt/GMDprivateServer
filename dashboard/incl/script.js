@@ -68,7 +68,7 @@ async function getPage(href, loaderType = 'loader') {
 	
 	const updatePageDetails = await changePage(response, href, loaderType);
 	
-	if(updatePageDetails) activateLoaderOfType(false);
+	if(updatePageDetails) setTimeout(() => activateLoaderOfType(false), 100);
 	
 	return true;
 }
@@ -108,7 +108,7 @@ async function postPage(href, form, loaderType = 'loader') {
 		
 		const updatePageDetails = await changePage(response, href, pageLoaderType);
 		
-		if(updatePageDetails && pageLoaderType) activateLoaderOfType(false); // false = disable loader
+		if(updatePageDetails && pageLoaderType) setTimeout(() => activateLoaderOfType(false), 100); // false = disable loader
 		
 		r(true);
 	});
@@ -135,6 +135,8 @@ function changePage(response, href, loaderType = false) {
 			
 			return r(true);
 		}
+		
+		newPage.classList.add("hide");
 		
 		if(!href.length) href = baseURL.pathname;
 		if(loaderType) history.pushState(null, null, href);
@@ -1168,8 +1170,10 @@ async function resetSettings() {
 		var defaultValue = element.getAttribute("dashboard-change-default");
 		if(!defaultValue.length) defaultValue = element.getAttribute("value");
 		
-		if(inputType != "checkbox" || inputType == 'checkbox' && ((defaultValue == false && element.checked) || (defaultValue == true && !element.checked))) element.click();
+		if((inputType != "checkbox" && inputType != "color") || inputType == 'checkbox' && ((defaultValue == false && element.checked) || (defaultValue == true && !element.checked))) element.click();
 		element.value = defaultValue;
+		
+		element.classList.remove("regex-fail");
 		
 		settingsForm.set(element.name, element.value);
 		

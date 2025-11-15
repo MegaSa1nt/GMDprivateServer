@@ -140,7 +140,7 @@ if($_GET['id']) {
 			
 			$dataArray = [
 				'INFO_TITLE' => Dashboard::string("deleteGauntlet"),
-				'INFO_DESCRIPTION' => Dashboard::string("deleteGauntletDesc"),
+				'INFO_DESCRIPTION' => Dashboard::string("deleteGauntletQuestionDesc"),
 				'INFO_EXTRA' => '<p class="error">'.Dashboard::string("deleteGauntletNotice").'</p>
 					'.Dashboard::renderGauntletCard($gauntlet, $person),
 				

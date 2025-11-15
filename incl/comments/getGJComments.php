@@ -30,17 +30,17 @@ switch(true) {
 			$level = Library::getLevelByID($levelID);
 			
 			$canSeeComments = Library::canAccountPlayLevel($person, $level);
-			if(!$canSeeComments) exit(CommentsError::NothingFound);
+			if(!$canSeeComments) exit(CommonError::NothingFound);
 			
-			$comments = Library::getCommentsOfLevel($levelID, $sortMode, $pageOffset, $count);
+			$comments = Library::getCommentsOfLevel($person, $levelID, $sortMode, $pageOffset, $count);
 		} else {
 			$listID = $levelID * -1;
 			$list = Library::getListByID($listID);
 			
 			$canSeeComments = Library::canAccountSeeList($person, $list);
-			if(!$canSeeComments) exit(CommentsError::NothingFound);
+			if(!$canSeeComments) exit(CommonError::NothingFound);
 			
-			$comments = Library::getCommentsOfList($listID, $sortMode, $pageOffset, $count);
+			$comments = Library::getCommentsOfList($person, $listID, $sortMode, $pageOffset, $count);
 		}
 		break;
 	case isset($_POST['userID']):
@@ -49,15 +49,15 @@ switch(true) {
 		$targetUserID = Escape::number($_POST['userID']);
 		
 		$canSeeCommentHistory = Library::canSeeCommentsHistory($person, $targetUserID);
-		if(!$canSeeCommentHistory) exit(CommentsError::NothingFound);
+		if(!$canSeeCommentHistory) exit(CommonError::NothingFound);
 		
-		$comments = Library::getCommentsOfUser($targetUserID, $sortMode, $pageOffset, $count);
+		$comments = Library::getCommentsOfUser($person, $targetUserID, $sortMode, $pageOffset, $count);
 		break;
 	default:
 		exit(CommonError::InvalidRequest);
 }
 
-if(empty($comments['comments'])) exit(CommentsError::NothingFound);
+if(empty($comments['comments'])) exit(CommonError::NothingFound);
 
 foreach($comments['comments'] AS &$comment) {
 	$extraTextArray = [];

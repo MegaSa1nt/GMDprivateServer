@@ -20,7 +20,23 @@ if(($sfx["reuploadID"] == $accountID || Library::checkPermission($person, "dashb
 	
 	$sfxIsDisabled = isset($_POST['sfxEnabled']) ? 0 : 1;
 	
-	Library::changeSFX($person, $sfxID, $sfxTitle, $sfxIsDisabled);
+	$changeSFX = Library::changeSFX($person, $sfxID, $sfxTitle, $sfxIsDisabled);
+	if(!$changeSFX['success']) {
+		switch($changeSFX['error']) {
+			case SongError::NothingFound:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorSFXNotFound"), "error"));
+			case SongError::Banned:
+				exit(Dashboard::renderToast("gavel", sprintf(Dashboard::string("bannedToast"), htmlspecialchars(Escape::url_base64_decode($uploadSong['info']['reason'])), '<text dashboard-date="'.$uploadSong['info']['expires'].'"></text>'), "error"));
+			case SongError::BadSongArtist:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadArtist"), "error"));
+			case SongError::BadSongTitle:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorBadName"), "error"));
+			case SongError::NoPermissions:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorNoUsagePermission"), "error"));
+			default:
+				exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+		}
+	}
 	
 	exit(Dashboard::renderToast("check", Dashboard::string("successAppliedSettings"), "success", '@', "box"));
 }

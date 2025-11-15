@@ -21,9 +21,9 @@ if(isset($_POST['accountID'])) {
 	$newFriendRequestsState = $_POST["friendRequests"] ? 1 : 0;
 	$newCommentsState = Security::limitValue(0, Escape::number($_POST["commentHistory"]), 2);
 	
-	$newSocialsYouTube = Escape::text($_POST["youtube"], 50);
-	$newSocialsTwitter = Escape::text($_POST["twitter"], 50);
-	$newSocialsTwitch = Escape::text($_POST["twitch"], 50);
+	$newSocialsYouTube = Escape::text($_POST["youtube"], 30);
+	$newSocialsTwitter = Escape::text($_POST["twitter"], 20);
+	$newSocialsTwitch = Escape::text($_POST["twitch"], 30);
 	
 	$newTimezone = Escape::text($_POST["timezone"]);
 	

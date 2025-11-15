@@ -42,6 +42,7 @@ if(!empty($parameters[0])) {
 		'ROLE_MOD_BADGE_NAME' => '',
 		'ROLE_IS_DEFAULT_VALUE' => 0,
 		'ROLE_IS_DEFAULT_REMOVE_CHECK' => 'checked',
+		'ROLE_SHOW_DELETE_BUTTON' => 'false',
 		
 		'ROLE_PERMISSION_GAME_SUGGEST_LEVEL_VALUE' => 0,
 		'ROLE_PERMISSION_GAME_RATE_LEVEL_VALUE' => 0,
@@ -87,6 +88,36 @@ if(!empty($parameters[0])) {
 		
 		$roleColor = Library::convertRGBToHEX($role['commentColor']);
 		
+		switch($parameters[1]) { // Role members later
+			case 'delete':
+				$pageBase = '../../../';
+				
+				$dataArray = [
+					'INFO_TITLE' => Dashboard::string("deleteRole"),
+					'INFO_DESCRIPTION' => Dashboard::string("deleteRoleQuestionDesc"),
+					'INFO_EXTRA' => '<div class="levelPage">
+							<div class="levelStats short">
+								<div class="levelStat" href="mod/roles/'.$role['roleID'].'" dashboard-loader-type="manage">
+									<i class="fa-solid fa-square" style="color: rgb('.$role['commentColor'].')"></i>
+									'.htmlspecialchars($role['roleName']).'
+								</div>
+							</div>
+						</div>',
+					
+					'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+					'INFO_BUTTON_ONCLICK_FIRST' => "getPage('mod/roles/".$role['roleID']."', 'manage')",
+					'INFO_BUTTON_STYLE_FIRST' => "",
+					'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteRole"),
+					'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteRole', 'infoForm', 'manage')",
+					'INFO_BUTTON_STYLE_SECOND' => "error",
+					
+					'INFO_INPUT_NAME' => 'roleID',
+					'INFO_INPUT_VALUE' => $roleID
+				];
+				
+				exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteRole"), $pageBase, $dataArray));
+		}
+		
 		$additionalData = [
 			'ROLE_ID' => $roleID,
 		
@@ -98,6 +129,7 @@ if(!empty($parameters[0])) {
 			'ROLE_MOD_BADGE_NAME' => $modBadgeNames[$role['modBadgeLevel']] ?: $modBadgeNames[0],
 			'ROLE_IS_DEFAULT_VALUE' => $role["isDefault"] ? 1 : 0,
 			'ROLE_IS_DEFAULT_REMOVE_CHECK' => !$role["isDefault"] ? 'checked' : '',
+			'ROLE_SHOW_DELETE_BUTTON' => 'true',
 			
 			'ROLE_PERMISSION_GAME_SUGGEST_LEVEL_VALUE' => $role['gameSuggestLevel'],
 			'ROLE_PERMISSION_GAME_RATE_LEVEL_VALUE' => $role['gameRateLevel'],

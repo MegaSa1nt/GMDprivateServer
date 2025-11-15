@@ -1,4 +1,4 @@
-<form class="wideBox" name="gauntletSettingsForm" dashboard-change-form>
+<form class="wideBox short" name="gauntletSettingsForm" dashboard-change-form>
 	<input type="hidden" name="gauntletID" value="%GAUNTLET_ID%" />
 	
 	<div class="contentDiv vertical">
@@ -18,6 +18,22 @@
 			</div>
 			
 			<div class="select multiple" dashboard-select-multiple-list="levelSearch">%GAUNTLET_LEVELS_OPTIONS%</div>
+		</div>
+	</div>
+	
+	<div class="contentDiv vertical">
+		<div class="languageDiv">
+			<div class="settingDescription">
+				<h2>
+					<i class="fa-solid fa-trash"></i>
+					%TEXT_deleteGauntlet%
+				</h2>
+				<h3>%TEXT_deleteGauntletDesc%</h3>
+			</div>
+			
+			<button class="button toggleButton titleToRight" type="button" title="%TEXT_deleteGauntlet%" href="browse/gauntlets/%GAUNTLET_ID%/delete" dashboard-loader-type="box">
+				<i class="fa-solid fa-up-right-from-square"></i>
+			</button>
 		</div>
 	</div>
 

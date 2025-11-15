@@ -5,7 +5,7 @@
 				<i class="fa-solid fa-user"></i>
 				%TEXT_userName%
 			</h2>
-			<input class="inputStyle" type="text" name="userName" autocomplete="gdps-dashboard-username" placeholder="YourVeryPrettyUsername" />
+			<input class="inputStyle" type="text" name="userName" autocomplete="gdps-dashboard-username" placeholder="YourVeryPrettyUsername" maxlength="16" />
 		</div>
 		
 		<div class="inputDiv" dashboard-regex-title="%TEXT_invalidPasswordHint%">
@@ -29,7 +29,7 @@
 				<i class="fa-solid fa-at"></i>
 				%TEXT_email%
 			</h2>
-			<input class="inputStyle" type="email" name="email" autocomplete="gdps-dashboard-email" placeholder="username@example.com" />
+			<input class="inputStyle" type="email" name="email" autocomplete="gdps-dashboard-email" placeholder="username@example.com" maxlength="50" />
 		</div>
 		
 		<div class="inputDiv" dashboard-show="%REGISTER_EMAIL_ENABLED%">
@@ -37,7 +37,7 @@
 				<i class="fa-solid fa-at"></i>
 				%TEXT_repeatEmail%
 			</h2>
-			<input class="inputStyle" type="email" name="email" autocomplete="new-email" placeholder="username@example.com" />
+			<input class="inputStyle" type="email" name="email" autocomplete="new-email" placeholder="username@example.com" maxlength="50" />
 		</div>
 		
 		<button class="button" type="button" onclick="%REGISTER_BUTTON_ONCLICK%">%TEXT_registerAccountTitle%</button>

@@ -145,7 +145,8 @@ if(!$installed) {
 		['value4', 'varchar(255)', '', 'value3'],
 		['value5', 'varchar(255)', '', 'value4'],
 		['value6', 'varchar(255)', '', 'value5'],
-		['account', 'varchar(255)', '', 'value6'],
+		['value7', 'varchar(255)', '', 'value6'],
+		['account', 'varchar(255)', '', 'value7'],
 		['IP', 'varchar(255)', '', 'account']
 	];
 	
@@ -693,7 +694,9 @@ if(!$installed) {
 	
 	// Migrate table "modactions"
 	$columnsToAdd = [
-		['value3', 'varchar(255)', '', 'value2'],
+		['value', 'varchar(2048)', '', 'type'],
+		['value2', 'varchar(2048)', '', 'value'],
+		['value3', 'varchar(2048)', '', 'value2'],
 		['value5', 'varchar(255)', '', 'value4'],
 		['value6', 'varchar(255)', '', 'value5'],
 		['value8', 'varchar(2048)', '', 'value7'],

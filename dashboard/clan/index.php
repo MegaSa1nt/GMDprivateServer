@@ -41,9 +41,9 @@ switch($parameters[1]) {
 		$mode = isset($_GET['mode']) ? Escape::number($_GET["mode"]) : 0;
 		$sortMode = $mode ? "clancomments.likes - clancomments.dislikes" : "clancomments.timestamp";
 		
-		$comments = Library::getCommentsOfClan($clanID, $sortMode, $pageOffset);
+		$comments = Library::getCommentsOfClan($person, $clanID, $sortMode, $pageOffset);
 		
-		foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderPostCard($comment, $person);
+		foreach($comments['comments'] AS &$comment) $additionalPage .= Dashboard::renderPostCard($comment, $person, $comments['ratings']);
 		
 		$pageNumber = ceil($pageOffset / 10) + 1 ?: 1;
 		$pageCount = floor(($comments['count'] - 1) / 10) + 1;
@@ -75,11 +75,49 @@ switch($parameters[1]) {
 		$clan['CLAN_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('browse/clanposts', $additionalData);
 		$pageBase = "../../";
 		break;
+	case 'settings':
+		if(!$isClanOwner && !Library::checkPermission($person, "dashboardManageClans")) exit(Dashboard::renderErrorPage(Dashboard::string("clans"), Dashboard::string("errorNoPermission"), '../../'));
+	
+		$additionalData = [
+			'CLAN_ID' => $clan['clanID'],
+			
+			'CLAN_DESC' => htmlspecialchars($clan['clanDesc']),
+			'CLAN_COLOR_VALUE' => '#'.$clan['clanColor'],
+			
+			'CLAN_CLOSED_VALUE' => $clan["isClosed"] ? 1 : 0,
+			'CLAN_CLOSED_REMOVE_CHECK' => !$clan["isClosed"] ? 'checked' : '',
+		];
+		
+		$clan['CLAN_ADDITIONAL_PAGE'] = Dashboard::renderTemplate('manage/clan', $additionalData);
+		$pageBase = "../../";
+		break;
+	case 'delete':
+		if(!$isClanOwner && !Library::checkPermission($person, "dashboardManageClans")) exit(Dashboard::renderErrorPage(Dashboard::string("clans"), Dashboard::string("errorNoPermission"), '../../'));
+	
+		$pageBase = '../../';
+		
+		$dataArray = [
+			'INFO_TITLE' => Dashboard::string("deleteClan"),
+			'INFO_DESCRIPTION' => Dashboard::string("deleteClanQuestionDesc"),
+			'INFO_EXTRA' => Dashboard::renderClanCard($clan, $person),
+			
+			'INFO_BUTTON_TEXT_FIRST' => Dashboard::string("cancel"),
+			'INFO_BUTTON_ONCLICK_FIRST' => "getPage('clan/".htmlspecialchars($clan['clanName'])."/settings', 'list')",
+			'INFO_BUTTON_STYLE_FIRST' => "",
+			'INFO_BUTTON_TEXT_SECOND' => Dashboard::string("deleteClan"),
+			'INFO_BUTTON_ONCLICK_SECOND' => "postPage('manage/deleteClan', 'infoForm', 'list')",
+			'INFO_BUTTON_STYLE_SECOND' => "error",
+			
+			'INFO_INPUT_NAME' => 'clanID',
+			'INFO_INPUT_VALUE' => $clanID
+		];
+		
+		exit(Dashboard::renderPage("general/infoDialogue", Dashboard::string("deleteClan"), $pageBase, $dataArray));
+		break;
 	case '': // Clan members
-		$accountsArray = explode(',', $clan['clanMembers']);
 		$accountsText = '';
 		
-		foreach($accountsArray AS $accountKey => $accountID) $accountsText .= 'WHEN accounts.accountID = '.$accountID.' THEN '.($accountID == $clan['clanOwner'] ? 1 : $accountKey + 2).PHP_EOL;
+		foreach($clanMembers AS $accountKey => $accountID) $accountsText .= 'WHEN accounts.accountID = '.$accountID.' THEN '.($accountID == $clan['clanOwner'] ? 1 : $accountKey + 2).PHP_EOL;
 		
 		$order = 'CASE
 			'.$accountsText.'
@@ -135,8 +173,8 @@ $clan['CLAN_DESCRIPTION'] = Dashboard::parseMentions($person, htmlspecialchars($
 $clan['CLAN_TITLE'] = sprintf(Dashboard::string("clanProfile"), htmlspecialchars($clan['clanName']));
 $clan['CLAN_COLOR'] = "color: #".$clan['clanColor']."; text-shadow: 0px 0px 20px #".$clan['clanColor']."61;";
 
-$clan['CLAN_HAS_TAG'] = !empty($clan['CLAN_TAG']) ? 'true' : 'false';
 $clan['CLAN_TAG'] = htmlspecialchars($clan['clanTag']);
+$clan['CLAN_HAS_TAG'] = !empty($clan['CLAN_TAG']) ? 'true' : 'false';
 
 $clan['CLAN_HAS_RANK'] = $clan['clanRank'] != 0 ? 'true' : 'false';
 $clan['CLAN_IS_TOP_100'] = $clan['clanRank'] <= 100 ? 'true' : 'false';
@@ -166,7 +204,7 @@ $contextMenuData['MENU_SHOW_NAME'] = 'false';
 
 $clan['CLAN_CAN_OPEN_SETTINGS'] = $contextMenuData['MENU_CAN_OPEN_SETTINGS'] = $canOpenSettings ? 'true' : 'false';
 
-$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true' || $contextMenuData['MENU_CAN_BLOCK'] == 'true' || $contextMenuData['MENU_CAN_BAN'] == 'true') ? 'true' : 'false';
+$contextMenuData['MENU_SHOW_MANAGE_HR'] = ($contextMenuData['MENU_CAN_SEE_BANS'] == 'true' || $contextMenuData['MENU_CAN_OPEN_SETTINGS'] == 'true') ? 'true' : 'false';
 
 $clan['CLAN_CONTEXT_MENU'] = Dashboard::renderTemplate('components/menus/clan', $contextMenuData);
 

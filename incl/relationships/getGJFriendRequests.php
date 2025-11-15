@@ -15,7 +15,7 @@ $pageOffset = $page * 10;
 
 $friendRequests = Library::getFriendRequests($person, $getSent, $pageOffset);
 
-if(empty($friendRequests['requests'])) exit(CommentsError::NothingFound);
+if(empty($friendRequests['requests'])) exit(CommonError::NothingFound);
 
 foreach($friendRequests['requests'] AS &$request) {
 	$uploadTime = Library::makeTime($request["uploadDate"]);

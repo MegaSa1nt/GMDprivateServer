@@ -9,6 +9,8 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorLoginRequired"), "error", "account/login", "box"));
 
+if(!Library::checkPermission($person, "dashboardManageGauntlets")) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));
+
 if(isset($_POST['gauntletID'])) {
 	$gauntletID = Escape::number($_POST['gauntletID']);
 	if(empty($gauntletID)) exit(Dashboard::renderToast("xmark", Dashboard::string("errorTitle"), "error"));

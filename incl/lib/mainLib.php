@@ -139,7 +139,7 @@ class Library {
 		
 		if(isset($GLOBALS['core_cache']['accounts']['ip'][$IP])) return $GLOBALS['core_cache']['accounts']['ip'][$IP];
 		
-		$accounts = $db->prepare("SELECT * FROM accounts WHERE registerIP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
+		$accounts = $db->prepare("SELECT * FROM accounts WHERE registerIP REGEXP CONCAT('(', :IP, '.*)')");
 		$accounts->execute([':IP' => $IP]);
 		$accounts = $accounts->fetchAll();
 		
@@ -317,18 +317,39 @@ class Library {
 		return $isFriends->fetchColumn() > 0;
 	}
 	
-	public static function getAccountComments($userID, $commentsPage, $mode = 'timestamp') {
+	public static function getAccountComments($person, $userID, $commentsPage, $mode = 'timestamp') {
 		require __DIR__."/connection.php";
+		
+		$commentsIDs = $commentsRatings = [];
+		
+		$accountID = $person["accountID"];
+		$IP = self::convertIPForSearching($person["IP"], true);
 
 		$accountComments = $db->prepare("SELECT * FROM acccomments WHERE userID = :userID ".($mode ? 'ORDER BY '.$mode.' DESC' : '')." LIMIT 10 OFFSET ".$commentsPage);
 		$accountComments->execute([':userID' => $userID]);
 		$accountComments = $accountComments->fetchAll();
 		
+		if($accountID != 0 && $person["userID"] != 0) {
+			foreach($accountComments AS &$comment) {
+				$commentsIDs[] = $comment['commentID'];
+				$commentsRatings[$comment['commentID']] = 0;
+			}
+			$commentsIDsString = implode(",", $commentsIDs);
+			
+			if(!empty($commentsIDsString)) {
+				$commentsRatingsArray = $db->prepare("SELECT itemID, IF(isLike = 1, 1, -1) AS rating FROM actions_likes WHERE itemID IN (".$commentsIDsString.") AND (accountID = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND type = 3 GROUP BY itemID ORDER BY timestamp DESC");
+				$commentsRatingsArray->execute([':accountID' => $accountID, ':IP' => $IP]);
+				$commentsRatingsArray = $commentsRatingsArray->fetchAll();
+				
+				foreach($commentsRatingsArray AS &$commentsRating) $commentsRatings[$commentsRating["itemID"]] = $commentsRating["rating"];
+			}
+		}
+		
 		$accountCommentsCount = $db->prepare("SELECT count(*) FROM acccomments WHERE userID = :userID");
 		$accountCommentsCount->execute([':userID' => $userID]);
 		$accountCommentsCount = $accountCommentsCount->fetchColumn();
 		
-		return ["comments" => $accountComments, "count" => $accountCommentsCount];
+		return ["comments" => $accountComments, "ratings" => $commentsRatings, "count" => $accountCommentsCount];
 	}
 	
 	public static function uploadAccountComment($person, $comment) {
@@ -402,8 +423,11 @@ class Library {
 		return $isAdmin;
 	}
 	
-	public static function getCommentsOfUser($userID, $sortMode, $pageOffset, $count = 10) {
+	public static function getCommentsOfUser($person, $userID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		$IP = self::convertIPForSearching($person["IP"], true);
 		
 		$comments = $db->prepare("SELECT * FROM comments
 			JOIN (
@@ -415,6 +439,22 @@ class Library {
 		$comments->execute([':userID' => $userID]);
 		$comments = $comments->fetchAll();
 		
+		if($accountID != 0 && $person["userID"] != 0) {
+			foreach($comments AS &$comment) {
+				$commentsIDs[] = $comment['commentID'];
+				$commentsRatings[$comment['commentID']] = 0;
+			}
+			$commentsIDsString = implode(",", $commentsIDs);
+			
+			if(!empty($commentsIDsString)) {
+				$commentsRatingsArray = $db->prepare("SELECT itemID, IF(isLike = 1, 1, -1) AS rating FROM actions_likes WHERE itemID IN (".$commentsIDsString.") AND (accountID = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND type = 2 GROUP BY itemID ORDER BY timestamp DESC");
+				$commentsRatingsArray->execute([':accountID' => $accountID, ':IP' => $IP]);
+				$commentsRatingsArray = $commentsRatingsArray->fetchAll();
+				
+				foreach($commentsRatingsArray AS &$commentsRating) $commentsRatings[$commentsRating["itemID"]] = $commentsRating["rating"];
+			}
+		}
+		
 		$commentsCount = $db->prepare("SELECT count(*) FROM comments
 			JOIN (
 				(SELECT levelID AS itemID, levelName COLLATE utf8mb3_unicode_ci AS itemName, extID AS creatorAccountID FROM levels WHERE levels.unlisted = 0 AND levels.unlisted2 = 0 AND levels.isDeleted = 0)
@@ -425,7 +465,7 @@ class Library {
 		$commentsCount->execute([':userID' => $userID]);
 		$commentsCount = $commentsCount->fetchColumn();
 		
-		return ["comments" => $comments, "count" => $commentsCount];
+		return ["comments" => $comments, "ratings" => $commentsRatings, "count" => $commentsCount];
 	}
 	
 	public static function deleteAccountComment($person, $commentID) {
@@ -470,7 +510,7 @@ class Library {
 		$userID = $person['userID'];
 		$IP = self::convertIPForSearching($person['IP'], true);
 		
-		$bans = $db->prepare('SELECT * FROM bans WHERE ((person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person = :IP AND personType = 2))'.($onlyActive ? ' AND isActive = 1' : '').' ORDER BY timestamp DESC');
+		$bans = $db->prepare('SELECT * FROM bans WHERE ((person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person = CONCAT(\'(\', :IP, \'.*)\') AND personType = 2))'.($onlyActive ? ' AND isActive = 1' : '').' ORDER BY timestamp DESC');
 		$bans->execute([':accountID' => $accountID, ':userID' => $userID, ':IP' => $IP, ':personType' => $personType]);
 		$bans = $bans->fetchAll();
 		
@@ -617,7 +657,9 @@ class Library {
 		if(strpos($IP, ":") !== false) return $IP;
 		
 		$IP = explode('.', $IP);
-		return $IP[0].'.'.$IP[1].'.'.$IP[2].($isSearch ? '' : '.0');
+		
+		if($isSearch) return $IP[0].'\\.'.$IP[1].'\\.'.$IP[2].'\\.';
+		else return $IP[0].'.'.$IP[1].'.'.$IP[2].'.0';
 	}
 	
 	public static function changeBan($banID, $modPerson, $reason, $expires, $modReason) {
@@ -649,7 +691,7 @@ class Library {
 		
 		$roleIDs = [];
 		
-		$getRoleID = $db->prepare("SELECT roleID FROM roleassign WHERE (person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') AND personType = 2)");
+		$getRoleID = $db->prepare("SELECT roleID FROM roleassign WHERE (person = :accountID AND personType = 0) OR (person = :userID AND personType = 1) OR (person REGEXP CONCAT('(', :IP, '.*)') AND personType = 2)");
 		$getRoleID->execute([':accountID' => $person['accountID'], ':userID' => $person['userID'], ':IP' => self::convertIPForSearching($person['IP'], true)]);
 		$getRoleID = $getRoleID->fetchAll();
 		
@@ -751,12 +793,12 @@ class Library {
 		return $roleAppearance;
 	}
 	
-	public static function getAllBannedPeople($type) {
+	public static function getAllBannedPeople($type, $onlyActive = true) {
 		if(isset($GLOBALS['core_cache']['bannedPeople'][$type])) return $GLOBALS['core_cache']['bannedPeople'][$type];
 		
 		$extIDs = $userIDs = $bannedIPs = [];
 		
-		$bans = self::getAllBansOfBanType($type);
+		$bans = self::getAllBansOfBanType($type, $onlyActive);
 		
 		foreach($bans AS &$ban) {
 			switch($ban['personType']) {
@@ -788,11 +830,11 @@ class Library {
 		
 		$extIDsString = implode("','", $bannedPeople['accountIDs']);
 		$userIDsString = implode("','", $bannedPeople['userIDs']);
-		$bannedIPsString = implode("|", $bannedPeople['IPs']);
+		$bannedIPsString = '('.implode(".*)|(", $bannedPeople['IPs']).'.*)';
 		
 		if(!empty($extIDsString)) $queryArray[] = "extID NOT IN ('".$extIDsString."')";
 		if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
-		if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '((\\\D[^.])|^)(".$bannedIPsString.")(\\\D[^$])'";
+		if($bannedIPsString != "(.*)") $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
 	
 		$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).')'.($addSeparator ? ' AND' : '') : '';
 		
@@ -1565,9 +1607,9 @@ class Library {
 		$userNames = [];
 		
 		foreach($getUsers AS &$user) {
-			if($userNames[strtolower($user['userName'])]) continue;
+			if($userNames[mb_strtolower($user['userName'])]) continue;
 			
-			$userNames[strtolower($user['userName'])] = true;
+			$userNames[mb_strtolower($user['userName'])] = true;
 			$GLOBALS['core_cache']['user']['userName'][$user['userName']] = $user;
 		}
 		
@@ -1699,10 +1741,10 @@ class Library {
 	public static function changeRole($person, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault, $rolePermissions) {
 		require __DIR__."/connection.php";
 		
+		$permissionsArray = $changedPermissionsArray = [];
+		$permissionsString = $changedPermissionsString = '';
+		
 		if($roleID) {
-			$permissionsArray = $changedPermissionsArray = [];
-			$permissionsString = $changedPermissionsString = '';
-			
 			$role = self::getRoleByID($roleID);
 			if(!$role) return false;
 			
@@ -1725,17 +1767,49 @@ class Library {
 			foreach($rolePermissions AS $permissionName => $permissionValue) {
 				$permissionsNamesArray[] = $permissionName;
 				$permissionsValuesArray[] = $permissionValue;
+				
+				$changedPermissionsArray[] = Permission::IDs[$permissionName].','.$permissionValue;
 			}
 			$permissionsString = "(roleName, commentsExtraText, commentColor, priority, modBadgeLevel, isDefault, ".implode(",", $permissionsNamesArray).") VALUES (:roleName, :roleCommentsCaption, :roleColor, :rolePriority, :roleModBadge, :roleIsDefault, ".implode(",", $permissionsValuesArray).")";
+			$changedPermissionsString = implode(";", $changedPermissionsArray);
 			
 			$createRole = $db->prepare("INSERT INTO roles ".$permissionsString);
 			$createRole->execute([':roleName' => $roleName, ':roleCommentsCaption' => $roleCommentsCaption, ':roleColor' => $roleColor, ':rolePriority' => $rolePriority, ':roleModBadge' => $roleModBadge, ':roleIsDefault' => $roleIsDefault]);
 			$roleID = $db->lastInsertId();
 			
-			self::logModeratorAction($person, ModeratorAction::RoleCreate, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault);
+			self::logModeratorAction($person, ModeratorAction::RoleCreate, $roleID, $roleName, $roleCommentsCaption, $roleColor, $rolePriority, $roleModBadge, $roleIsDefault, $changedPermissionsString);
 		}
 		
 		return $roleID;
+	}
+	
+	public static function deleteRole($person, $roleID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+
+		$rolesArray = $permissionsArray = [];
+		$permissionsString = '';
+		
+		$personRolePriority = self::getPersonRolePriority($person);
+		$roles = self::getRoles($personRolePriority);
+		
+		foreach($roles AS &$role) $rolesArray[$role['roleID']] = $role;
+		
+		$role = $rolesArray[$roleID];
+		if(!$role) return false;
+		
+		$allPermissions = self::getPermissions();
+		
+		foreach($allPermissions AS $permissionName) $permissionsArray[] = Permission::IDs[$permissionName].','.$role[$permissionName];
+		$permissionsString = implode(';', $permissionsArray);
+		
+		$deleteRole = $db->prepare("DELETE FROM roles WHERE roleID = :roleID");
+		$deleteRole->execute([':roleID' => $roleID]);
+		
+		self::logModeratorAction($person, ModeratorAction::RoleDeletion, $roleID, $role['roleName'], $role['commentsExtraText'], $role['commentColor'], $role['priority'], $role['modBadgeLevel'], $role['isDefault'], $permissionsString);
+		
+		return true;
 	}
 	
 	/*
@@ -1943,7 +2017,7 @@ class Library {
 		$accountID = $person['accountID'];
 		$IP = $person['IP'];
 		
-		$getDownloads = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID = :levelID AND (IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') OR accountID = :accountID)");
+		$getDownloads = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID = :levelID AND (IP REGEXP CONCAT('(', :IP, '.*)') OR accountID = :accountID)");
 		$getDownloads->execute([':levelID' => $levelID, ':IP' => self::convertIPForSearching($IP, true), ':accountID' => $accountID]);
 		$getDownloads = $getDownloads->fetchColumn();
 		if($getDownloads) return false;
@@ -1963,18 +2037,40 @@ class Library {
 		return $_POST['gameVersion'] > 20 ? 'temp_'.$time.'_</c>'.PHP_EOL.' '.$text.'<cc> ' : '-10';
 	}
 	
-	public static function getCommentsOfLevel($levelID, $sortMode, $pageOffset, $count = 10) {
+	public static function getCommentsOfLevel($person, $levelID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		$IP = self::convertIPForSearching($person["IP"], true);
+		
+		$commentsRatings = $commentsIDs = [];
+		$commentsIDsString = "";
 		
 		$comments = $db->prepare("SELECT *, levels.userID AS creatorUserID FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0 ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':levelID' => $levelID]);
 		$comments = $comments->fetchAll();
 		
+		if($accountID != 0 && $person["userID"] != 0) {
+			foreach($comments AS &$comment) {
+				$commentsIDs[] = $comment['commentID'];
+				$commentsRatings[$comment['commentID']] = 0;
+			}
+			$commentsIDsString = implode(",", $commentsIDs);
+			
+			if(!empty($commentsIDsString)) {
+				$commentsRatingsArray = $db->prepare("SELECT itemID, IF(isLike = 1, 1, -1) AS rating FROM actions_likes WHERE itemID IN (".$commentsIDsString.") AND (accountID = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND type = 2 GROUP BY itemID ORDER BY timestamp DESC");
+				$commentsRatingsArray->execute([':accountID' => $accountID, ':IP' => $IP]);
+				$commentsRatingsArray = $commentsRatingsArray->fetchAll();
+				
+				foreach($commentsRatingsArray AS &$commentsRating) $commentsRatings[$commentsRating["itemID"]] = $commentsRating["rating"];
+			}
+		}
+		
 		$commentsCount = $db->prepare("SELECT count(*) FROM levels INNER JOIN comments ON comments.levelID = levels.levelID WHERE levels.levelID = :levelID AND levels.isDeleted = 0");
 		$commentsCount->execute([':levelID' => $levelID]);
 		$commentsCount = $commentsCount->fetchColumn();
 		
-		return ["comments" => $comments, "count" => $commentsCount];
+		return ["comments" => $comments, "ratings" => $commentsRatings, "count" => $commentsCount];
 	}
 	
 	public static function uploadComment($person, $levelID, $comment, $percent) {
@@ -2021,7 +2117,7 @@ class Library {
 	}
 	
 	public static function getLevelDifficulty($difficulty) {
-		switch(strtolower($difficulty)) {
+		switch(mb_strtolower($difficulty)) {
 			case 1:
 			case "auto":
 				return ["name" => "Auto", "difficulty" => 50, "auto" => 1, "demon" => 0];
@@ -2623,7 +2719,7 @@ class Library {
 	public static function reportLevel($levelID, $IP) {
 		require __DIR__."/connection.php";
 		
-		$checkIfReported = $db->prepare("SELECT count(*) FROM reports WHERE levelID = :levelID AND IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')");
+		$checkIfReported = $db->prepare("SELECT count(*) FROM reports WHERE levelID = :levelID AND IP REGEXP CONCAT('(', :IP, '.*)')");
 		$checkIfReported->execute([':levelID' => $levelID, ':IP' => self::convertIPForSearching($IP, true)]);
 		$checkIfReported = $checkIfReported->fetchColumn();
 		if($checkIfReported) return false;
@@ -2894,7 +2990,7 @@ class Library {
 
 		$difficulty = self::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
 		$diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
-		$diffIcon = $diffArray[strtolower($difficulty)] ?? 'na';
+		$diffIcon = $diffArray[mb_strtolower($difficulty)] ?? 'na';
 		
 		return $difficultiesURL.$starsIcon.'/'.$diffIcon.'.png';
 	}
@@ -3343,7 +3439,7 @@ class Library {
 		$friendsArray[] = $accountID;
 		$friendsString = "'".implode("','", $friendsArray)."'";
 		
-		$downloadedLevels = $db->prepare("SELECT levels.levelID AS levelID, levels.extID AS creatorAccountID, actions_downloads.accountID AS accountID FROM levels INNER JOIN actions_downloads ON levels.levelID = actions_downloads.levelID AND (actions_downloads.IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') OR actions_downloads.accountID IN (".$friendsString.")) AND levels.extID != :accountID AND IF(levels.updateDate = 0, levels.uploadDate, levels.updateDate) >= :monthAgo AND levels.unlisted = 0 AND levels.isDeleted = 0 ORDER BY actions_downloads.timestamp DESC LIMIT 500");
+		$downloadedLevels = $db->prepare("SELECT levels.levelID AS levelID, levels.extID AS creatorAccountID, actions_downloads.accountID AS accountID FROM levels INNER JOIN actions_downloads ON levels.levelID = actions_downloads.levelID AND (actions_downloads.IP REGEXP CONCAT('(', :IP, '.*)') OR actions_downloads.accountID IN (".$friendsString.")) AND levels.extID != :accountID AND IF(levels.updateDate = 0, levels.uploadDate, levels.updateDate) >= :monthAgo AND levels.unlisted = 0 AND levels.isDeleted = 0 ORDER BY actions_downloads.timestamp DESC LIMIT 500");
 		$downloadedLevels->execute([':IP' => self::convertIPForSearching($IP, true), ':accountID' => $accountID, ':monthAgo' => time() - 2592000]);
 		$downloadedLevels = $downloadedLevels->fetchAll();
 		
@@ -3368,7 +3464,7 @@ class Library {
 		$friendsArray = array_merge($friendsArray, $levelCreators);
 		$friendsString = "'".implode("','", $friendsArray)."'";
 		
-		$ratedLevelsArray = $db->prepare("SELECT levels.levelID, actions_likes.isLike, levels.extID AS accountID, actions_likes.accountID AS rateAccountID FROM levels INNER JOIN actions_likes ON levels.levelID = actions_likes.itemID AND type = 1 AND (actions_likes.IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') OR actions_likes.accountID IN (".$friendsString.") OR actions_likes.accountID = levels.extID) AND levels.extID != :accountID AND IF(levels.updateDate = 0, levels.uploadDate, levels.updateDate) >= :monthAgo AND levels.unlisted = 0 AND levels.isDeleted = 0 ORDER BY actions_likes.timestamp DESC, IF(actions_likes.accountID = :accountID, 1, 0) DESC LIMIT 500");
+		$ratedLevelsArray = $db->prepare("SELECT levels.levelID, actions_likes.isLike, levels.extID AS accountID, actions_likes.accountID AS rateAccountID FROM levels INNER JOIN actions_likes ON levels.levelID = actions_likes.itemID AND type = 1 AND (actions_likes.IP REGEXP CONCAT('(', :IP, '.*)') OR actions_likes.accountID IN (".$friendsString.") OR actions_likes.accountID = levels.extID) AND levels.extID != :accountID AND IF(levels.updateDate = 0, levels.uploadDate, levels.updateDate) >= :monthAgo AND levels.unlisted = 0 AND levels.isDeleted = 0 ORDER BY actions_likes.timestamp DESC, IF(actions_likes.accountID = :accountID, 1, 0) DESC LIMIT 500");
 		$ratedLevelsArray->execute([':IP' => self::convertIPForSearching($IP, true), ':accountID' => $accountID, ':monthAgo' => time() - 2592000]);
 		$ratedLevelsArray = $ratedLevelsArray->fetchAll();
 		
@@ -3493,7 +3589,7 @@ class Library {
 		$accountID = $person['accountID'];
 		$IP = $person['IP'];
 		
-		$getDownloads = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID = :listID AND (IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') OR accountID = :accountID)");
+		$getDownloads = $db->prepare("SELECT count(*) FROM actions_downloads WHERE levelID = :listID AND (IP REGEXP CONCAT('(', :IP, '.*)') OR accountID = :accountID)");
 		$getDownloads->execute([':listID' => ($listID * -1), ':IP' => self::convertIPForSearching($IP, true), ':accountID' => $accountID]);
 		$getDownloads = $getDownloads->fetchColumn();
 		if($getDownloads) return false;
@@ -3521,18 +3617,37 @@ class Library {
 		return $list;
 	}
 	
-	public static function getCommentsOfList($listID, $sortMode, $pageOffset, $count = 10) {
+	public static function getCommentsOfList($person, $listID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		$IP = self::convertIPForSearching($person["IP"], true);
 		
 		$comments = $db->prepare("SELECT *, lists.accountID AS creatorAccountID FROM lists INNER JOIN comments ON comments.levelID = (lists.listID * -1) WHERE lists.listID = :listID ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
 		$comments->execute([':listID' => $listID]);
 		$comments = $comments->fetchAll();
 		
+		if($accountID != 0 && $person["userID"] != 0) {
+			foreach($comments AS &$comment) {
+				$commentsIDs[] = $comment['commentID'];
+				$commentsRatings[$comment['commentID']] = 0;
+			}
+			$commentsIDsString = implode(",", $commentsIDs);
+			
+			if(!empty($commentsIDsString)) {
+				$commentsRatingsArray = $db->prepare("SELECT itemID, IF(isLike = 1, 1, -1) AS rating FROM actions_likes WHERE itemID IN (".$commentsIDsString.") AND (accountID = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND type = 2 GROUP BY itemID ORDER BY timestamp DESC");
+				$commentsRatingsArray->execute([':accountID' => $accountID, ':IP' => $IP]);
+				$commentsRatingsArray = $commentsRatingsArray->fetchAll();
+				
+				foreach($commentsRatingsArray AS &$commentsRating) $commentsRatings[$commentsRating["itemID"]] = $commentsRating["rating"];
+			}
+		}
+		
 		$commentsCount = $db->prepare("SELECT count(*) FROM lists INNER JOIN comments ON comments.levelID = (lists.listID * -1) WHERE lists.listID = :listID");
 		$commentsCount->execute([':listID' => $listID]);
 		$commentsCount = $commentsCount->fetchColumn();
 		
-		return ["comments" => $comments, "count" => $commentsCount];
+		return ["comments" => $comments, "ratings" => $commentsRatings, "count" => $commentsCount];
 	}
 	
 	public static function uploadList($person, $listID, $listDetails) {
@@ -3613,7 +3728,7 @@ class Library {
 	}
 	
 	public static function getListDifficulty($difficulty) {
-		switch(strtolower($difficulty)) {
+		switch(mb_strtolower($difficulty)) {
 			case 0:
 			case "auto":
 				return ["name" => "Auto", "difficulty" => 0];
@@ -4035,8 +4150,8 @@ class Library {
 		$mapPack = self::getMapPackByID($mapPackID);
 		if(!$mapPack || !self::checkPermission($person, 'dashboardManageMapPacks')) return false;
 		
-		$deleteSong = $db->prepare("DELETE FROM mappacks WHERE ID = :mapPackID");
-		$deleteSong->execute([':mapPackID' => $mapPackID]);
+		$deleteMapPack = $db->prepare("DELETE FROM mappacks WHERE ID = :mapPackID");
+		$deleteMapPack->execute([':mapPackID' => $mapPackID]);
 		
 		self::logModeratorAction($person, ModeratorAction::MapPackDeletion, $mapPackID, $mapPack['name'], $mapPack['stars'].','.$mapPack['coins'], $mapPack['difficulty'], $mapPack['colors2'], $mapPack['rgbcolors'], $mapPack['levels']);
 		
@@ -4053,8 +4168,8 @@ class Library {
 		$gauntlet = self::getGauntletByID($gauntletID);
 		if(!$gauntlet || !self::checkPermission($person, 'dashboardManageGauntlets')) return false;
 		
-		$deleteSong = $db->prepare("DELETE FROM gauntlets WHERE ID = :gauntletID");
-		$deleteSong->execute([':gauntletID' => $gauntletID]);
+		$deleteGauntlet = $db->prepare("DELETE FROM gauntlets WHERE ID = :gauntletID");
+		$deleteGauntlet->execute([':gauntletID' => $gauntletID]);
 		
 		self::logModeratorAction($person, ModeratorAction::GauntletDeletion, $gauntletID, $gauntlet['level1'], $gauntlet['level2'], $gauntlet['level3'], $gauntlet['level4'], $gauntlet['level5']);
 		
@@ -5101,7 +5216,15 @@ class Library {
 		$accountID = $person["accountID"];
 		
 		$song = self::getSongByID($songID);
-		if(!$song || !$song['reuploadID'] || ($song['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		if(!$song || !$song['reuploadID']) return ["success" => false, "error" => SongError::NothingFound];
+		
+		if($song['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs')) return ["success" => false, "error" => SongError::NoPermissions];
+		
+		$checkBan = self::getPersonBan($person, Ban::UploadingAudio);
+		if($checkBan) return ['success' => false, 'error' => SongError::Banned, "info" => $checkBan];
+		
+		if(Security::checkFilterViolation($person, $songArtist, 3)) return ["success" => false, "error" => SongError::BadSongArtist];
+		if(Security::checkFilterViolation($person, $songTitle, 3)) return ["success" => false, "error" => SongError::BadSongTitle];
 		
 		$changeSong = $db->prepare("UPDATE songs SET authorName = :songArtist, name = :songTitle, isDisabled = :songIsDisabled WHERE ID = :songID");
 		$changeSong->execute([':songArtist' => $songArtist, ':songTitle' => $songTitle, ':songIsDisabled' => ($songIsDisabled ? 1 : 0), ':songID' => $songID]);
@@ -5109,7 +5232,7 @@ class Library {
 		if($song['reuploadID'] == $accountID) self::logAction($person, Action::SongChange, $songArtist, $songTitle, $songID, ($songIsDisabled ? 1 : 0));
 		else self::logModeratorAction($person, ModeratorAction::SongChange, $songArtist, $songTitle, $songID, ($songIsDisabled ? 1 : 0));
 		
-		return true;
+		return ["success" => true];
 	}
 	
 	public static function deleteSong($person, $songID) {
@@ -5139,9 +5262,16 @@ class Library {
 		$accountID = $person["accountID"];
 		
 		$sfx = self::getSFXByID($sfxID);
-		if(!$sfx || !$sfx['reuploadID'] || ($sfx['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs'))) return false;
+		if(!$sfx || !$sfx['reuploadID']) return ["success" => false, "error" => SongError::NothingFound];
+		
+		if($sfx['reuploadID'] != $accountID && !self::checkPermission($person, 'dashboardManageSongs')) return ["success" => false, "error" => SongError::NoPermissions];
 		
 		$sfxID = $sfx['originalID'];
+		
+		$checkBan = self::getPersonBan($person, Ban::UploadingAudio);
+		if($checkBan) return ['success' => false, 'error' => SongError::Banned, "info" => $checkBan];
+		
+		if(Security::checkFilterViolation($person, $sfxTitle, 3)) return ["success" => false, "error" => SongError::BadSongTitle];
 		
 		$changeSFX = $db->prepare("UPDATE sfxs SET name = :sfxTitle, isDisabled = :sfxIsDisabled WHERE ID = :sfxID");
 		$changeSFX->execute([':sfxTitle' => $sfxTitle, ':sfxIsDisabled' => ($sfxIsDisabled ? 1 : 0), ':sfxID' => $sfxID]);
@@ -5149,7 +5279,7 @@ class Library {
 		if($sfx['reuploadID'] == $accountID) self::logAction($person, Action::SFXChange, $sfx['reuploadID'], $sfxTitle, $sfxID, ($sfxIsDisabled ? 1 : 0));
 		else self::logModeratorAction($person, ModeratorAction::SFXChange, $sfx['reuploadID'], $sfxTitle, $sfxID, ($sfxIsDisabled ? 1 : 0));
 		
-		return true;
+		return ["success" => true];
 	}
 	
 	public static function deleteSFX($person, $sfxID) {
@@ -5308,7 +5438,7 @@ class Library {
 		return $GLOBALS['core_cache']['clanStatsCount'][$clanID];
 	}
 	
-	public static function getCommentsOfClan($clanID, $sortMode, $pageOffset, $count = 10) {
+	public static function getCommentsOfClan($person, $clanID, $sortMode, $pageOffset, $count = 10) {
 		require __DIR__."/connection.php";
 		
 		$comments = $db->prepare("SELECT * FROM clans INNER JOIN clancomments ON clancomments.clanID = clans.clanID WHERE clans.clanID = :clanID ORDER BY ".$sortMode." DESC LIMIT ".$count." OFFSET ".$pageOffset);
@@ -5319,7 +5449,7 @@ class Library {
 		$commentsCount->execute([':clanID' => $clanID]);
 		$commentsCount = $commentsCount->fetchColumn();
 		
-		return ["comments" => $comments, "count" => $commentsCount];
+		return ["comments" => $comments, "ratings" => [], "count" => $commentsCount];
 	}
 	
 	public static function uploadClanComment($person, $clanID, $comment) {
@@ -5362,19 +5492,78 @@ class Library {
 		return ["clans" => $clans, "count" => $clansCount];
 	}
 	
+	public static function changeClan($person, $clanID, $clanName, $clanTag, $clanDesc, $clanColor, $clanClosed) {
+		require __DIR__."/connection.php";
+		
+		$accountID = $person["accountID"];
+		
+		$clan = self::getClanByID($clanID);
+		if(!$clan) return ["success" => false, "error" => ClanError::NothingFound];
+		
+		if($clan["clanOwner"] != $accountID && !Library::checkPermission($person, "dashboardManageClans")) return ["success" => false, "error" => ClanError::NoPermissions];
+		
+		if(Security::checkFilterViolation($person, $clanName, 1)) return ["success" => false, "error" => ClanError::BadClanName];
+		if(Security::checkFilterViolation($person, $clanTag, 2)) return ["success" => false, "error" => ClanError::BadClanTag];
+		if(Security::checkFilterViolation($person, $clanDesc, 3)) return ["success" => false, "error" => ClanError::BadClanDescription];
+		
+		$checkClan = $db->prepare("SELECT FROM_BASE64(clanName) AS clanName, FROM_BASE64(clanTag) AS clanTag FROM clans WHERE (CONVERT(FROM_BASE64(clanName), CHAR(255)) LIKE :clanName OR CONVERT(FROM_BASE64(clanTag), CHAR(15)) LIKE :clanTag) AND clanID != :clanID");
+		$checkClan->execute([':clanName' => mb_strtolower($clanName), ':clanTag' => mb_strtolower($clanTag), ':clanID' => $clanID]);
+		$checkClan = $checkClan->fetch();
+		
+		if($checkClan) {
+			if(mb_strtolower($checkClan['clanName']) == mb_strtolower($clanName)) return ["success" => false, "error" => ClanError::ClanNameExists];
+			else return ["success" => false, "error" => ClanError::ClanTagExists];
+		}
+		
+		$clanName = base64_encode($clanName);
+		$clanTag = base64_encode($clanTag);
+		$clanDesc = base64_encode($clanDesc);
+		
+		$changeClan = $db->prepare("UPDATE clans SET clanName = :clanName, clanTag = :clanTag, clanDesc = :clanDesc, clanColor = :clanColor, isClosed = :clanClosed WHERE clanID = :clanID");
+		$changeClan->execute([':clanID' => $clanID, ':clanName' => $clanName, ':clanTag' => $clanTag, ':clanDesc' => $clanDesc, ':clanColor' => $clanColor, ':clanClosed' => $clanClosed]);
+		
+		if($clan["clanOwner"] == $accountID) self::logAction($person, Action::ClanChange, $clanID, $clanName, $clanDesc, $clanTag, $clanColor, $clanClosed);
+		else self::logModeratorAction($person, ModeratorAction::ClanChange, $clanID, $clanName, $clanDesc, $clanTag, $clanColor, $clanClosed);
+		
+		return ["success" => true];
+	}
+	
+	public static function deleteClan($person, $clanID) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return false;
+		
+		$accountID = $person['accountID'];
+		
+		$clan = self::getClanByID($clanID);
+		if(!$clan || ($clan['clanOwner'] != $accountID && !self::checkPermission($person, 'dashboardManageClans'))) return false;
+		
+		$deleteClan = $db->prepare("DELETE FROM clans WHERE clanID = :clanID");
+		$deleteClan->execute([':clanID' => $clanID]);
+		$deleteClanRequests = $db->prepare("DELETE FROM clanrequests WHERE clanID = :clanID");
+		$deleteClanRequests->execute([':clanID' => $clanID]);
+		$kickFromClan = $db->prepare("UPDATE users SET clanID = 0 WHERE clanID = :clanID");
+		$kickFromClan->execute([':clanID' => $clanID]);
+		
+		if($clan['clanOwner'] == $accountID) self::logAction($person, Action::ClanDeletion, $clanID, $clan['clanName'], $clan['clanDesc'], $clan['clanTag'], $clan['clanColor'], $clan['isClosed'], $clan['clanMembers']);
+		else self::logModeratorAction($person, ModeratorAction::ClanDeletion, $clanID, $clan['clanName'], $clan['clanDesc'], $clan['clanTag'], $clan['clanColor'], $clan['isClosed'], $clan['clanMembers']);
+		
+		return true;
+	}
+	
 	/*
 		Utils-related functions
 	*/
 	
-	public static function logAction($person, $type, $value1 = '', $value2 = '', $value3 = '', $value4 = '', $value5 = '', $value6 = '') {
+	public static function logAction($person, $type, $value1 = '', $value2 = '', $value3 = '', $value4 = '', $value5 = '', $value6 = '', $value7 = '') {
 		require __DIR__."/connection.php";
 		
 		$accountID = $person['accountID'];
 		$IP = $person['IP'];
 		
-		$insertAction = $db->prepare('INSERT INTO actions (account, type, timestamp, value, value2, value3, value4, value5, value6, IP)
-			VALUES (:account, :type, :timestamp, :value, :value2, :value3, :value4, :value5, :value6, :IP)');
-		$insertAction->execute([':account' => $accountID, ':type' => $type, ':value' => $value1, ':value2' => $value2, ':value3' => $value3, ':value4' => $value4, ':value5' => $value5, ':value6' => $value6, ':timestamp' => time(), ':IP' => $IP]);
+		$insertAction = $db->prepare('INSERT INTO actions (account, type, timestamp, value, value2, value3, value4, value5, value6, value7, IP)
+			VALUES (:account, :type, :timestamp, :value, :value2, :value3, :value4, :value5, :value6, :value7, :IP)');
+		$insertAction->execute([':account' => $accountID, ':type' => $type, ':value' => $value1, ':value2' => $value2, ':value3' => $value3, ':value4' => $value4, ':value5' => $value5, ':value6' => $value6, ':value7' => $value7, ':timestamp' => time(), ':IP' => $IP]);
 		
 		return $db->lastInsertId();
 	}
@@ -5454,29 +5643,31 @@ class Library {
 		$accountID = $person['accountID'];
 		$IP = $person['IP'];
 		
-		$checkIfRated = $db->prepare("SELECT count(*) FROM actions_likes WHERE itemID = :itemID AND type = :type AND (IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])') OR accountID = :accountID)");
+		$checkIfRated = $db->prepare("SELECT count(*) FROM actions_likes WHERE itemID = :itemID AND type = :type AND (IP REGEXP CONCAT('(', :IP, '.*)') OR accountID = :accountID)");
 		$checkIfRated->execute([':itemID' => $itemID, ':type' => $type, ':IP' => self::convertIPForSearching($IP, true), ':accountID' => $accountID]);
 		$checkIfRated = $checkIfRated->fetchColumn();
 		if($checkIfRated) return false;
 		
 		switch($type) {
-			case 1:
+			case RatingItem::Level:
 				$table = "levels";
 				$column = "levelID";
 				break;
-			case 2:
+			case RatingItem::Comment:
 				$table = "comments";
 				$column = "commentID";
 				$extraCommentsColumns = ', isSpam = IF(likes - dislikes < -1, 1, 0)';
 				break;
-			case 3:
+			case RatingItem::AccountComment:
 				$table = "acccomments";
 				$column = "commentID";
 				break;
-			case 4:
+			case RatingItem::List:
 				$table = "lists";
 				$column = "listID";
 				break;
+			default:
+				return false;
 		}
 		$rateColumn = $isLike ? 'likes' : 'dislikes';
 		
@@ -5485,7 +5676,7 @@ class Library {
 		$item = $item->fetch();
 		if(!$item) return false;
 		
-		if($type == 2) {
+		if($type == RatingItem::Comment) {
 			$commentItem = $item['levelID'] > 0 ? self::getLevelByID($item['levelID']) : self::getListByID($item['levelID'] * -1);
 			
 			if($person['userID'] == $commentItem['userID'] || $person['accountID'] == $commentItem['accountID']) $extraCommentsColumns .= ', creatorRating = '.($isLike ? '1' : '-1');
@@ -5501,13 +5692,28 @@ class Library {
 		return true;
 	}
 	
+	public static function getItemRating($person, $itemID, $type) {
+		require __DIR__."/connection.php";
+		
+		if($person['accountID'] == 0 || $person['userID'] == 0) return 0;
+		
+		$accountID = $person['accountID'];
+		$IP = self::convertIPForSearching($person['IP'], true);
+		
+		$rating = $db->prepare("SELECT IF(isLike = 1, 1, -1) AS rating FROM actions_likes WHERE itemID = :itemID AND (accountID = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND type = :type GROUP BY itemID ORDER BY timestamp DESC");
+		$rating->execute([':accountID' => $accountID, ':IP' => $IP, ':itemID' => $itemID, ':type' => $type]);
+		$rating = $rating->fetchColumn();
+		
+		return $rating ?: 0;
+	}
+	
 	public static function getPersonActions($person, $filters, $limit = false) {
 		require __DIR__."/connection.php";
 		
 		$accountID = $person['accountID'];
 		$IP = self::convertIPForSearching($person['IP'], true);
 		
-		$getActions = $db->prepare("SELECT * FROM actions WHERE (account = :accountID OR IP REGEXP CONCAT('((\\\D[^.])|^)(', :IP, ')(\\\D[^$])')) AND (".implode(") AND (", $filters).") ORDER BY timestamp DESC".($limit ? ' LIMIT '.$limit : ''));
+		$getActions = $db->prepare("SELECT * FROM actions WHERE (account = :accountID OR IP REGEXP CONCAT('(', :IP, '.*)')) AND (".implode(") AND (", $filters).") ORDER BY timestamp DESC".($limit ? ' LIMIT '.$limit : ''));
 		$getActions->execute([':accountID' => $accountID, ':IP' => $IP]);
 		$getActions = $getActions->fetchAll();
 		

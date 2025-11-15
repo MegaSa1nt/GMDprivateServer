@@ -24,7 +24,7 @@ switch($type) {
 		exit(CommonError::InvalidRequest);
 }
 
-if(empty($users)) exit(CommentsError::NothingFound);
+if(empty($users)) exit(CommonError::NothingFound);
 
 foreach($users AS &$user) $usersString .= Library::returnFriendshipsString($person, $user, $isBlocks)."|";
 

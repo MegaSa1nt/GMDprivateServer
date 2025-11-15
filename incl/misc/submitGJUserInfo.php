@@ -9,7 +9,7 @@ $sec = new Security();
 $person = $sec->loginPlayer();
 if(!$person["success"]) exit(CommonError::InvalidRequest);
 
-if(empty($_POST["levelsInfo"])) exit(CommentsError::NothingFound);
+if(empty($_POST["levelsInfo"])) exit(CommonError::NothingFound);
 
 /* GD doesn't XOR encrypt this data, i just want to encrypt it */
 $data = Escape::url_base64_encode(XORCipher::cipher($_POST["levelsInfo"], 24157));

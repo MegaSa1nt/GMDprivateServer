@@ -35,9 +35,9 @@ $user['messagesState'] = $account['mS'];
 $user['friendRequestsState'] = $account['frS'];
 $user['commentsState'] = $account['cS'];
 
-$user['youtubeurl'] = $account['youtubeurl'];
-$user['twitter'] = $account['twitter'];
-$user['twitch'] = $account['twitch'];
+$user['youtubeurl'] = Escape::gd($account['youtubeurl']);
+$user['twitter'] = Escape::gd($account['twitter']);
+$user['twitch'] = Escape::gd($account['twitch']);
 
 $userAppearance = Library::getPersonCommentAppearance($targetPerson);
 $user['badge'] = $userAppearance['modBadgeLevel'];

@@ -11,11 +11,11 @@ $person = Dashboard::loginDashboardUser();
 if($person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("registerAccountTitle"), Dashboard::string("errorAlreadyLoggedIn")));
 
 if(isset($_POST['userName']) && isset($_POST['password']) && isset($_POST['repeatPassword'])) {
-	$userName = Escape::latin_no_spaces($_POST['userName']);
+	$userName = Escape::latin_no_spaces($_POST['userName'], 16);
 	$password = $_POST['password'];
 	$repeatPassword = $_POST['repeatPassword'];
-	$email = Escape::text($_POST['email']) ?: '';
-	$repeatEmail = Escape::text($_POST['repeatEmail']) ?: '';
+	$email = Escape::text($_POST['email'], 50) ?: '';
+	$repeatEmail = Escape::text($_POST['repeatEmail'], 50) ?: '';
 	
 	$createAccount = Library::createAccount($userName, $password, $repeatPassword, $email, $repeatEmail);
 	if(!$createAccount['success']) {

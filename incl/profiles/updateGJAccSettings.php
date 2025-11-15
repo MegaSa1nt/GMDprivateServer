@@ -12,9 +12,9 @@ $accountID = $person['accountID'];
 $messagesState = Security::limitValue(0, Escape::number($_POST["mS"]), 2);
 $friendRequestsState = $_POST["frS"] ? 1 : 0;
 $commentsState = Security::limitValue(0, Escape::number($_POST["cS"]), 2);
-$socialsYouTube = Escape::text($_POST["yt"], 50);
-$socialsTwitter = Escape::text($_POST["twitter"], 50);
-$socialsTwitch = Escape::text($_POST["twitch"], 50);
+$socialsYouTube = Escape::text($_POST["yt"], 30);
+$socialsTwitter = Escape::text($_POST["twitter"], 20);
+$socialsTwitch = Escape::text($_POST["twitch"], 30);
 
 Library::updateAccountSettings($person, $accountID, $messagesState, $friendRequestsState, $commentsState, $socialsYouTube, $socialsTwitter, $socialsTwitch);
 
