@@ -46,8 +46,8 @@ $CaptchaSecret = "";
 	Syntax: $proxies['NAME OF IPs'] = 'LINK';
 */
 
-$blockFreeProxies = true; // true = check if person uses free proxy
-$blockCommonVPNs = true; // true = check if person uses a common VPN
+$blockFreeProxies = false; // true = check if person uses free proxy
+$blockCommonVPNs = false; // true = check if person uses a common VPN
 // URLs for IPs of proxies
 $proxies['http'] = 'https://fhgdps.com/proxies/http.txt';
 $proxies['https'] = 'https://fhgdps.com/proxies/https.txt';

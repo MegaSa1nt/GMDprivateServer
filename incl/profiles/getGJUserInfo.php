@@ -59,14 +59,17 @@ $isBanned = $gs->getPersonBan($user['extID'], $user['userID'], 0, $user['IP']);
 if($isBanned) $rank = 0;
 //var_dump($leaderboard);
 	//accinfo
-		$query = "SELECT youtubeurl,twitter,twitch, frS, mS, cS FROM accounts WHERE accountID = :extID";
+		$query = "SELECT youtubeurl, twitter, twitch, frS, mS, cS, instagram, tiktok, discord, custom FROM accounts WHERE accountID = :extID";
 		$query = $db->prepare($query);
 		$query->execute([':extID' => $extid]);
 		$accinfo = $query->fetch();
 		$accinfo['youtubeurl'] = mb_ereg_replace("(?!^@)[^a-zA-Z0-9_]", "", $accinfo['youtubeurl']);
 		$accinfo['twitter'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['twitter']);
 		$accinfo['twitch'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['twitch']);
-		if(substr($accinfo['youtubeurl'], 0, 1) == "@") $accinfo['youtubeurl'] = "../".$accinfo['youtubeurl'];
+		$accinfo['instagram'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['instagram']);
+		$accinfo['tiktok'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['tiktok']);
+		$accinfo['discord'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['discord']);
+		$accinfo['custom'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['custom']);
 		$reqsstate = $accinfo["frS"];
 		$msgstate = $accinfo["mS"];
 		$commentstate = $accinfo["cS"];
@@ -134,5 +137,5 @@ if($me == $extid) {
 }
 $user["userName"] = $gs->makeClanUsername($user);
 $user['extID'] = is_numeric($user['extID']) ? $user['extID'] : 0;
-echo "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":3:".$user["stars"].":46:".$user["diamonds"].":52:".$user["moons"].":4:".$user["demons"].":8:".$creatorpoints.":18:".$msgstate.":19:".$reqsstate.":50:".$commentstate.":20:".$accinfo["youtubeurl"].":21:".$user["accIcon"].":22:".$user["accShip"].":23:".$user["accBall"].":24:".$user["accBird"].":25:".$user["accDart"].":26:".$user["accRobot"].":28:".$user["accGlow"].":43:".$user["accSpider"].":48:".$user["accExplosion"].":53:".$user["accSwing"].":54:".$user["accJetpack"].":30:".$rank.":16:".$user["extID"].":31:".$friendstate.":44:".$accinfo["twitter"].":45:".$accinfo["twitch"].":49:".$badge.":55:".$user["dinfo"].":56:".$user["sinfo"].":57:".$user["pinfo"].$appendix.":29:1";
+echo "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":3:".$user["stars"].":46:".$user["diamonds"].":52:".$user["moons"].":4:".$user["demons"].":8:".$creatorpoints.":18:".$msgstate.":19:".$reqsstate.":50:".$commentstate.":20:".$accinfo["youtubeurl"].":21:".$user["accIcon"].":22:".$user["accShip"].":23:".$user["accBall"].":24:".$user["accBird"].":25:".$user["accDart"].":26:".$user["accRobot"].":28:".$user["accGlow"].":43:".$user["accSpider"].":48:".$user["accExplosion"].":53:".$user["accSwing"].":54:".$user["accJetpack"].":30:".$rank.":16:".$user["extID"].":31:".$friendstate.":44:".$accinfo["twitter"].":45:".$accinfo["twitch"].":59:".$accinfo["instagram"].":60:".$accinfo["tiktok"].":58:".$accinfo["discord"].":61:".$accinfo["custom"].":49:".$badge.":55:".$user["dinfo"].":56:".$user["sinfo"].":57:".$user["pinfo"].$appendix.":29:1";
 ?>

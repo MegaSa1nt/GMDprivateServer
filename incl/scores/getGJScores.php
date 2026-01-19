@@ -14,7 +14,12 @@ $count = 0;
 $xi = 0;
 $lbstring = "";
 $accountID = $gs->getIDFromPost();
+
 $type = ExploitPatch::charclean($_POST["type"]);
+$stat = ExploitPatch::number($_POST["stat"]) ?: 0;
+$statTypes = ['stars', 'moons', 'demons', 'userCoins'];
+$leaderboardSortStat = $statTypes[$stat] ?: 'stars';
+
 switch($type) {
 	case 'top':
 		$bans = $gs->getAllBansOfBanType(0);
@@ -40,8 +45,8 @@ switch($type) {
 		if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
 		if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
 		$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).') AND' : '';
-		$query = $db->prepare("SELECT * FROM users WHERE ".$queryText." stars >= :stars ORDER BY stars + moons DESC LIMIT 100");
-		$query->execute([':stars' => $leaderboardMinStars]);
+		$query = $db->prepare("SELECT * FROM users WHERE ".$queryText." ".$leaderboardSortStat." >= :stat ORDER BY ".$leaderboardSortStat." DESC LIMIT 100");
+		$query->execute([':stat' => $leaderboardMinStars]);
 		break;
 	case 'creators':
 		$bans = $gs->getAllBansOfBanType(1);
@@ -99,28 +104,28 @@ switch($type) {
 			$query = $db->prepare($query);
 			$query->execute([':accountID' => $accountID]);
 			$user = $query->fetch();
-			$stars = $user["stars"];
+			$userStat = $user[$leaderboardSortStat];
 			$count = $_POST["count"] ? ExploitPatch::number($_POST["count"]) : 50;
 			$count = floor($count / 2);
 			$query = $db->prepare("SELECT A.* FROM (
 				(
 					SELECT * FROM users
-					WHERE stars <= :stars
+					WHERE ".$leaderboardSortStat." <= :stat
 					".$queryText."
-					ORDER BY stars + moons DESC
+					ORDER BY ".$leaderboardSortStat." DESC
 					LIMIT $count
 				)
 				UNION
 				(
 					SELECT * FROM users
-					WHERE stars >= :stars
+					WHERE ".$leaderboardSortStat." >= :stat
 					".$queryText."
-					ORDER BY stars + moons ASC
+					ORDER BY ".$leaderboardSortStat." ASC
 					LIMIT $count
 				)
 			) as A
-			ORDER BY A.stars DESC");
-		$query->execute([':stars' => $stars]);
+			ORDER BY A.".$leaderboardSortStat." DESC");
+		$query->execute([':stat' => $userStat]);
 		} else {
 			$query = $db->prepare("SELECT * FROM users INNER JOIN roleassign ON users.extID = roleassign.accountID ORDER BY users.userName ASC");
 			$query ->execute();
@@ -136,7 +141,7 @@ switch($type) {
 			$person = $friendship["person2"] == $accountID ? $friendship["person1"] : $friendship["person2"];
 			$people .= ",".$person;
 		}
-		$query = "SELECT * FROM users WHERE extID IN (:accountID $people ) ORDER BY stars DESC";
+		$query = "SELECT * FROM users WHERE extID IN (:accountID $people ) ORDER BY ".$leaderboardSortStat." DESC";
 		$query = $db->prepare($query);
 		$query->execute([':accountID' => $accountID]);
 		break;
@@ -164,7 +169,7 @@ switch($type) {
 		if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
 		if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
 		$queryText = !empty($queryArray) ? 'AND ('.implode(' AND ', $queryArray).')' : '';
-		$query = $db->prepare("SELECT users.*, SUM(actions.value) AS stars, SUM(actions.value2) AS coins, SUM(actions.value3) AS demons FROM actions INNER JOIN users ON actions.account = users.extID WHERE type = '9' AND timestamp > :time ".$queryText." AND actions.value > 0 GROUP BY (stars) DESC ORDER BY stars + moons DESC LIMIT 100");
+		$query = $db->prepare("SELECT users.*, SUM(actions.value) AS stars, SUM(actions.value2) AS coins, SUM(actions.value3) AS demons FROM actions INNER JOIN users ON actions.account = users.extID WHERE type = '9' AND timestamp > :time ".$queryText." AND actions.value > 0 GROUP BY (stars) DESC ORDER BY stars DESC LIMIT 100");
 		$query->execute([':time' => time() - 604800]);
 		break;
 }
@@ -177,9 +182,9 @@ if($type == "relative") {
 		$query = $db->prepare($e);
 		$query->execute();
 		$queryText = !empty($queryText) && trim($queryText) != 'AND' ? 'WHERE '.substr($queryText, 4) : '';
-		$f = "SELECT rank, stars FROM (
-							SELECT @rownum := @rownum + 1 AS rank, stars, extID
-							FROM users ".$queryText." ORDER BY stars + moons DESC
+		$f = "SELECT rank, ".$leaderboardSortStat." FROM (
+							SELECT @rownum := @rownum + 1 AS rank, ".$leaderboardSortStat.", extID
+							FROM users ".$queryText." ORDER BY ".$leaderboardSortStat." DESC
 							) as result WHERE extID = :extid";
 		$query = $db->prepare($f);
 		$query->execute([':extid' => $extid]);

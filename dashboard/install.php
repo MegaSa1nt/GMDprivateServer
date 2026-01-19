@@ -312,6 +312,18 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `messages` LIKE 'readTime'");
 			$exist = $check->fetchAll();
 			if(empty($exist)) $db->query("ALTER TABLE `messages` ADD `readTime` INT NOT NULL DEFAULT '0' AFTER `isNew`");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'instagram'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `instagram` varchar(255) NOT NULL DEFAULT '' AFTER `twitch`");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'tiktok'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `tiktok` varchar(255) NOT NULL DEFAULT '' AFTER `instagram`");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'discord'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `discord` varchar(255) NOT NULL DEFAULT '' AFTER `tiktok`");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'custom'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `custom` varchar(255) NOT NULL DEFAULT '' AFTER `discord`");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);
