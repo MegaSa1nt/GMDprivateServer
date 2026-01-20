@@ -47,5 +47,5 @@ foreach($result as &$request) {
 }
 $reqstring = substr($reqstring, 0, -1);
 echo $reqstring;
-echo "#${reqcount}:${offset}:10";
+echo "#{$reqcount}:{$offset}:10";
 ?>

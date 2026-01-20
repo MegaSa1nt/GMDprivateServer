@@ -46,7 +46,7 @@ function generate_timezone_list()
         $offset_prefix = $offset < 0 ? '-' : '+';
         $offset_formatted = gmdate( 'H:i', abs($offset) );
 
-        $pretty_offset = "UTC${offset_prefix}${offset_formatted}";
+        $pretty_offset = "UTC{$offset_prefix}{$offset_formatted}";
 
         $timezone_list .= '<option value="'.$timezone.'">('.$pretty_offset.') '.$timezone.'</option>';
     }

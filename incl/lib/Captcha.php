@@ -7,15 +7,15 @@ class Captcha {
 				switch($captchaType) {
 					case 1:
 						return "<script src='https://js.hCaptcha.com/1/api.js' id='captchascript' async defer></script>
-						<div class=\"h-captcha\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark' style='border-width: 0px !important;border-radius: 20px !important;'></div>";
+						<div class=\"h-captcha\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark' style='border-width: 0px !important;border-radius: 20px !important;'></div>";
 						break;
 					case 2:
 						return "<script src='https://www.google.com/recaptcha/api.js' id='captchascript' async defer></script>
-						<div class=\"g-recaptcha\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark'></div>";
+						<div class=\"g-recaptcha\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark'></div>";
 						break;
 					case 3:
 						return "<script src='https://challenges.cloudflare.com/turnstile/v0/api.js' id='captchascript' async defer></script>
-						<div class=\"cf-turnstile\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark' data-callback=\"javascriptCallback\"></div>";
+						<div class=\"cf-turnstile\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark' data-callback=\"javascriptCallback\"></div>";
 						break;
 					default:
 						return '';
@@ -25,15 +25,15 @@ class Captcha {
 				switch($captchaType) {
 					case 1:
 						echo "<script src='https://js.hCaptcha.com/1/api.js' id='captchascript' async defer></script>
-						<div class=\"h-captcha\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark' style='border-width: 0px !important;border-radius: 20px !important;'></div>";
+						<div class=\"h-captcha\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark' style='border-width: 0px !important;border-radius: 20px !important;'></div>";
 						break;
 					case 2:
 						echo "<script src='https://www.google.com/recaptcha/api.js' id='captchascript' async defer></script>
-						<div class=\"g-recaptcha\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark'></div>";
+						<div class=\"g-recaptcha\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark'></div>";
 						break;
 					case 3:
 						echo "<script src='https://challenges.cloudflare.com/turnstile/v0/api.js' id='captchascript' async defer></script>
-						<div class=\"cf-turnstile\" id=\"coolcaptcha\" data-sitekey=\"${CaptchaKey}\" data-theme='dark' data-callback=\"javascriptCallback\"></div>";
+						<div class=\"cf-turnstile\" id=\"coolcaptcha\" data-sitekey=\"{$CaptchaKey}\" data-theme='dark' data-callback=\"javascriptCallback\"></div>";
 						break;
 					default:
 						break;
