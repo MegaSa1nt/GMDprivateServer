@@ -6144,5 +6144,30 @@ class Library {
 		
 		return "1:".$user["userName"].":2:".$user["userID"].":9:".$user['icon'].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":32:".$user["ID"].":35:".$user["comment"].":41:".$user["isNew"].":37:".$user['uploadTime'];
 	}
+
+	public static function randomSong() {
+		require_once __DIR__ . "/connection.php";
+		
+		$song = $db->prepare("SELECT ID, name, authorID, authorName, size, download, reuploadID, reuploadTime
+			FROM songs WHERE isDisabled = 0 AND download != 'CUSTOMURL'
+			ORDER BY RAND() ASC LIMIT 1");
+		$song->execute();
+		$song = $song->fetch();
+		
+		return [
+			"ID" => $song["ID"],
+			"name" => $song["name"],
+			"author" => [
+				"ID" => $song["authorID"],
+				"name" => $song["authorName"]
+			],
+			"size" => $song["size"],
+			"download" => $song["download"],
+			"reupload" => [
+				"ID" => $song["reuploadID"],
+				"time" => $song["reuploadTime"]
+			]
+		];
+	}
 }
 ?>
