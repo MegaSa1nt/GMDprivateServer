@@ -329,7 +329,11 @@ if(isset($_GET['id']) && $_GET['id']) {
 				$levelPrivacy = $level['unlisted'];
 				$levelPrivacyName = $levelPrivacyNames[$levelPrivacy];
 				
-				$difficulty = Escape::latin_no_spaces(Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']));
+				$difficultyValue = 0;
+        		if(!empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0) {
+        			$difficultyValue = $level['starDifficulty'] / $level['difficultyDenominator'];
+        		}
+				$difficulty = Escape::latin_no_spaces(Library::prepareDifficultyForRating(($difficultyValue), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']));
 				$difficultyArray = Library::getLevelDifficulty($difficulty);
 				$difficultyName = $difficultyArray['name'];
 				

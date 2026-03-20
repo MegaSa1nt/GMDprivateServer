@@ -2547,7 +2547,7 @@ body:has(.modalPage.show) span.background {
 	border: 1px solid var(--content-color-34);
 	
 	position: fixed;
-	bottom: 170px;
+	bottom: 50px;
 	
 	white-space: nowrap;
 	

@@ -77,19 +77,19 @@ if(isset($_GET['id']) && $_GET['id']) {
 				"levelID IN (".$listLevels.")",
 				"(
 					unlisted != 1 OR
-					(unlisted = 1 AND (extID IN (".$friendsString.")))
-				)"
-			];
-			
-			$levelsArray = explode(',', $listLevels);
-			$levelsText = '';
-			
-			foreach($levelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
-			
-			$order = 'CASE
-				'.$levelsText.'
-			END';
-			$orderSorting = 'ASC';
+				(unlisted = 1 AND (levels.extID IN (".$friendsString.")))
+			)"
+		];
+		
+		$levelsArray = explode(',', $listLevels);
+		$levelsText = '';
+		
+		foreach($levelsArray AS $levelKey => $levelID) $levelsText .= 'WHEN levelID = '.$levelID.' THEN '.($levelKey + 1).PHP_EOL;
+		
+		$order = 'CASE
+			'.$levelsText.'
+		END';
+		$orderSorting = 'ASC';
 			
 			$levels = Library::getLevels($filters, $order, $orderSorting, '', $pageOffset);
 			

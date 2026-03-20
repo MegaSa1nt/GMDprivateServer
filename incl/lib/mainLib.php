@@ -2160,11 +2160,11 @@ class Library {
 	public static function getLevels($filters, $order, $orderSorting, $queryJoin, $pageOffset, $limit = 10) {
 		require __DIR__."/connection.php";
 		
-		$levels = $db->prepare("SELECT * FROM levels ".$queryJoin." INNER JOIN users ON users.extID = levels.extID WHERE (".implode(") AND (", $filters).") AND isDeleted = 0 ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
+		$levels = $db->prepare("SELECT * FROM levels ".$queryJoin." INNER JOIN users ON users.extID = levels.extID WHERE (".implode(") AND (", $filters).") AND levels.isDeleted = 0 ".($order ? "ORDER BY ".$order." ".$orderSorting : "")." ".($limit ? "LIMIT ".$limit." OFFSET ".$pageOffset : ''));
 		$levels->execute();
 		$levels = $levels->fetchAll();
 		
-		$levelsCount = $db->prepare("SELECT count(*) FROM levels ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).") AND isDeleted = 0");
+		$levelsCount = $db->prepare("SELECT count(*) FROM levels ".$queryJoin." WHERE (".implode(" ) AND ( ", $filters).") AND levels.isDeleted = 0");
 		$levelsCount->execute();
 		$levelsCount = $levelsCount->fetchColumn();
 		
