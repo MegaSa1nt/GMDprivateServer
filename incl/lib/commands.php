@@ -60,7 +60,8 @@ class Commands {
 				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to unrate ".Library::textColor($level['levelName'], Color::SkyBlue)."?".PHP_EOL
 					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
 				
-				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), 0, 0, 0);
+				$diffValue = !empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0 ? $level['starDifficulty'] / $level['difficultyDenominator'] : 0;
+				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating($diffValue, $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), 0, 0, 0);
 				
 				return "You ".Library::textColor("successfully", Color::Green)." unrated ".Library::textColor($level['levelName'], Color::SkyBlue).'!';
 			case '!feature':
@@ -101,16 +102,8 @@ class Commands {
 				
 				if(($featured == 1 && $level['starFeatured'] && !$level['starEpic']) || ($featured - 1 == $level['starEpic'])) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("is already", Color::Green)." ".($featured ? '' : 'un')."featured!";
 				
-				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), $level['starStars'], $level['starCoins'], $featured);
-				
-				return "You ".Library::textColor("successfully", Color::Green)." ".sprintf($returnTextArray[$featured], Library::textColor($level['levelName'], Color::SkyBlue));
-			case '!verifycoins':
-			case '!unverifycoins':
-			case '!vc':
-			case '!unvc':
-				if(!Library::checkPermission($person, 'gameVerifyCoins')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
-				
-				$commandArray = [
+				$diffValue = !empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0 ? $level['starDifficulty'] / $level['difficultyDenominator'] : 0;
+				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating($diffValue, $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), $level['starStars'], $level['starCoins'], $featured);
 					'!verifycoins' => 1, '!vc' => 1,
 					'!unverifycoins' => 0, '!unvc' => 0
 				];
@@ -124,7 +117,8 @@ class Commands {
 				
 				$featured = $level['starEpic'] + ($level['starFeatured'] ? 1 : 0);
 				
-				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), $level['starStars'], $verifyCoins, $featured);
+				$diffValue = !empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0 ? $level['starDifficulty'] / $level['difficultyDenominator'] : 0;
+				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating($diffValue, $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), $level['starStars'], $verifyCoins, $featured);
 				
 				return "You ".Library::textColor("successfully", Color::Green)." ".sprintf($returnTextArray[$verifyCoins], Library::textColor($level['levelName'], Color::SkyBlue));
 			case '!daily':

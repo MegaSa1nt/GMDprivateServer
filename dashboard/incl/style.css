@@ -2547,7 +2547,7 @@ body:has(.modalPage.show) span.background {
 	border: 1px solid var(--content-color-34);
 	
 	position: fixed;
-	bottom: 50px;
+	bottom: 170px;
 	
 	white-space: nowrap;
 	
@@ -2694,7 +2694,7 @@ body:has(.modalPage.show) span.background {
 	justify-content: space-between;
 	align-items: center;
 	
-	width: max-content;
+	/* width: max-content; */
 	background-color: var(--content-color-24);
 	border: 1px solid var(--content-color-44);
 	
@@ -2742,6 +2742,7 @@ hr {
 
 .flexEnd {
 	align-items: flex-end;
+    flex-wrap: wrap;
 }
 
 .contextMenuButton text,

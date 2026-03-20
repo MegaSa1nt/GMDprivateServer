@@ -546,6 +546,9 @@ class Automod {
 		$len1 = strlen($str1);
 		$len2 = strlen($str2);
 		$max = max($len1, $len2);
+		
+		if($max == 0) return 0;
+		
 		$similarity = $i = $j = 0;
 		while(($i < $len1) && isset($str2[$j])) {
 			if($str1[$i] == $str2[$j]) {
@@ -1044,6 +1047,8 @@ class Automod {
 		$demonsAfter = $statChanges[0]['value3'];
 		
 		$timeRatio = ($timeAfter - $timeBefore) / $statsTimeCheck;
+		
+		if($timeRatio <= 0) return false;
 		
 		$starsRatio = ($starsAfter + $starsBefore) / $timeRatio;
 		$moonsRatio = ($moonsAfter + $moonsBefore) / $timeRatio;
