@@ -9,7 +9,7 @@ $person = Dashboard::loginDashboardUser();
 $accountID = $person['accountID'];
 
 // Gauntlet page
-if($_GET['id']) {
+if(isset($_GET['id']) && $_GET['id']) {
 	$contextMenuData = [];
 	
 	$parameters = explode("/", Escape::text($_GET['id']));

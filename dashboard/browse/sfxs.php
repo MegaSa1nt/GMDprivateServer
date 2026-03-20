@@ -8,7 +8,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 $accountID = $person['accountID'];
 
-if($_GET['id']) {
+if(isset($_GET['id']) && $_GET['id']) {
 	$contextMenuData = [];
 	$pageBase = '../../';
 	

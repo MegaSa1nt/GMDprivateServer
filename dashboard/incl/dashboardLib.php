@@ -600,11 +600,26 @@ class Dashboard {
 	
 	public static function renderTemplate($template, $dataArray = []) {
 		if(!isset($GLOBALS['core_cache']['dashboard']['template'][$template])) {
-			$templatePage = file_get_contents(__DIR__."/templates/".$template.".html");
+			$templateFile = __DIR__."/templates/".$template.".html";
+			if(!file_exists($templateFile)) {
+				error_log("Dashboard template not found: ".$templateFile);
+				return "[ERROR] Template not found: ".$template;
+			}
+			
+			$templatePage = @file_get_contents($templateFile);
+			if($templatePage === false) {
+				error_log("Failed to read dashboard template: ".$templateFile);
+				return "[ERROR] Failed to read template: ".$template;
+			}
+			
 			$GLOBALS['core_cache']['dashboard']['template'][$template] = $templatePage;
 		} else $templatePage = $GLOBALS['core_cache']['dashboard']['template'][$template];
 		
-		if(!empty($dataArray)) foreach($dataArray AS $key => $value) $templatePage = str_replace("%".$key."%", (string)$value, $templatePage);
+		if(!empty($dataArray)) {
+			foreach($dataArray AS $key => $value) {
+				$templatePage = str_replace("%".$key."%", (string)$value, $templatePage);
+			}
+		}
 		
 		return $templatePage;
 	}

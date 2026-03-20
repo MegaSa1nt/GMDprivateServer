@@ -15,7 +15,7 @@ if($person['success']) {
 	foreach($favouriteSongsArray['songs'] AS &$favouriteSong) $favouriteSongs[] = $favouriteSong["songID"];
 }
 
-if($_GET['id']) {
+if(isset($_GET['id']) && $_GET['id']) {
 	$contextMenuData = [];
 	$pageBase = '../../';
 	

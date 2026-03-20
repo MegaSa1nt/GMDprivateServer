@@ -10,7 +10,7 @@ $person = Dashboard::loginDashboardUser();
 $userID = $person['userID'];
 
 // Level page
-if($_GET['id']) {
+if(isset($_GET['id']) && $_GET['id']) {
 	$contextMenuData = [];
 	
 	$parameters = explode("/", Escape::text($_GET['id']));

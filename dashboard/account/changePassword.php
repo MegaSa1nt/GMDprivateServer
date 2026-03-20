@@ -9,7 +9,7 @@ $sec = new Security();
 $person = Dashboard::loginDashboardUser();
 if(!$person['success']) exit(Dashboard::renderErrorPage(Dashboard::string("changePasswordTitle"), Dashboard::string("errorLoginRequired")));
 
-if(isset($_POST['userName']) && isset($_POST['password'])) {
+if(isset($_POST['userName']) && isset($_POST['password']) && isset($_POST['targetPassword'])) {
 	$person = $sec->loginPlayer();
 	if(!$person['success']) exit(Dashboard::renderToast("xmark", Dashboard::string("errorWrongLoginOrPassword"), "error"));
 	

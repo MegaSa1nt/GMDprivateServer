@@ -5,6 +5,100 @@ var intervals = [];
 var searchLists = [];
 var pageLoaders = {};
 var updateFilters = true;
+var currentPageScript = null;
+
+// Функция для выполнения скрипта с обработкой ошибок (вместо eval)
+function executePageScript(scriptContent) {
+	try {
+		// Очистить предыдущий скрипт если он есть
+		if(currentPageScript) {
+			try {
+				if(currentPageScript.cleanup && typeof currentPageScript.cleanup === 'function') {
+					currentPageScript.cleanup();
+				}
+			} catch(e) {
+				console.error('Error in page script cleanup:', e);
+			}
+		}
+		
+		// Создать функцию из содержимого скрипта
+		const pageScriptFunc = new Function(scriptContent);
+		currentPageScript = {};
+		
+		// Выполнить в контексте глобального scope
+		pageScriptFunc.call(window);
+		
+		return true;
+	} catch(e) {
+		console.error('Error executing page script:', e);
+		showToast('<i class="fa-solid fa-xmark"></i>', 'Ошибка загрузки страницы: ' + e.message, 'error');
+		return false;
+	}
+}
+
+// Функция для очистки всех интервалов
+function clearAllIntervals() {
+	intervals.forEach(interval => {
+		try {
+			clearInterval(interval);
+		} catch(e) {
+			console.error('Error clearing interval:', e);
+		}
+	});
+	intervals = [];
+}
+
+// Глобальный обработчик ошибок JavaScript
+window.addEventListener('error', (event) => {
+	console.error('JavaScript Error:', event.error);
+	// Не показываем ошибку пользователю - только логируем
+	// Это предотвратит полный краш приложения
+	event.preventDefault();
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+	console.error('Unhandled Promise Rejection:', event.reason);
+	event.preventDefault();
+});
+
+// Функция для нормализации URL - добавляет .php расширение если необходимо
+function normalizePageUrl(url) {
+	// Прервать обработку если уже есть расширение файла
+	const urlWithoutQuery = url.split('?')[0];
+	const urlWithoutHash = urlWithoutQuery.split('#')[0];
+	
+	// Если уже есть расширение (обычно .php, .html) - не менять
+	if(/\.[a-zA-Z0-9]+$/.test(urlWithoutHash)) {
+		return url;
+	}
+	
+	// Если это корневой путь или пустая строка
+	if(!urlWithoutHash || urlWithoutHash === '/' || urlWithoutHash === './') {
+		return url;
+	}
+	
+	// Добавить .php расширение перед query параметрами
+	const queryIndex = url.indexOf('?');
+	const hashIndex = url.indexOf('#');
+	
+	let baseUrl = url;
+	let queryAndHash = '';
+	
+	if(queryIndex !== -1) {
+		baseUrl = url.substring(0, queryIndex);
+		queryAndHash = url.substring(queryIndex);
+	} else if(hashIndex !== -1) {
+		baseUrl = url.substring(0, hashIndex);
+		queryAndHash = url.substring(hashIndex);
+	}
+	
+	// Если базовый URL не заканчивается на слэш и не имеет расширения
+	if(baseUrl && !baseUrl.endsWith('/') && !/\.[a-zA-Z0-9]+$/.test(baseUrl)) {
+		baseUrl += '.php';
+	}
+	
+	return baseUrl + queryAndHash;
+}
 
 window.addEventListener('load', () => {
 	dashboardLoader = document.getElementById("dashboard-loader");
@@ -32,6 +126,9 @@ window.addEventListener('load', () => {
 });
 
 async function getPage(href, loaderType = 'loader') {
+	// Нормализировать URL и добавить .php если нужно
+	href = normalizePageUrl(href);
+	
 	if(loaderType && ((window.location.href.endsWith(href) && href.length) || (!href.length && dashboardBase.getAttribute("href") == './'))) return false;
 	
 	var pageLoaderType = loaderType;
@@ -64,18 +161,60 @@ async function getPage(href, loaderType = 'loader') {
 			break;
 	}
 	
-	const pageRequest = await fetch(href);
-	const response = await pageRequest.text();
-	
-	const updatePageDetails = await changePage(response, href, loaderType);
-	
-	if(updatePageDetails) setTimeout(() => activateLoaderOfType(false), 100);
-	
-	return true;
+	try {
+		const pageRequest = await fetch(href);
+		
+		// Проверить статус ответа
+		if(!pageRequest.ok) {
+			console.error(`HTTP Error: ${pageRequest.status} ${pageRequest.statusText} for ${href}`);
+			activateLoaderOfType(false);
+			
+			let errorMessage = 'Ошибка загрузки страницы';
+			if(pageRequest.status === 500) {
+				errorMessage = 'Ошибка сервера (500). Проверьте консоль сервера.';
+			} else if(pageRequest.status === 404) {
+				errorMessage = 'Страница не найдена: ' + href;
+			}
+			
+			Toastify({
+				text: '<i class="fa-solid fa-xmark"></i>' + errorMessage,
+				duration: 3000,
+				position: "center",
+				escapeMarkup: false,
+				className: 'error',
+			}).showToast();
+			
+			return false;
+		}
+		
+		const response = await pageRequest.text();
+		
+		const updatePageDetails = await changePage(response, href, loaderType);
+		
+		if(updatePageDetails) setTimeout(() => activateLoaderOfType(false), 100);
+		
+		return true;
+	} catch(error) {
+		console.error('Network error fetching page:', error);
+		activateLoaderOfType(false);
+		
+		Toastify({
+			text: '<i class="fa-solid fa-xmark"></i>Ошибка подключения: ' + error.message,
+			duration: 3000,
+			position: "center",
+			escapeMarkup: false,
+			className: 'error',
+		}).showToast();
+		
+		return false;
+	}
 }
 
 async function postPage(href, form, loaderType = 'loader') {
 	return new Promise(async (r) => {
+		// Нормализировать URL и добавить .php если нужно
+		href = normalizePageUrl(href);
+		
 		const formData = await getForm(form);
 		if(!formData) return r(false);
 
@@ -99,36 +238,171 @@ async function postPage(href, form, loaderType = 'loader') {
 				break;
 		}
 		
-		const pageRequest = await fetch(href, {
-			method: "POST",
-			body: formData
-		});
-		const response = await pageRequest.text();
-		
-		href = pageRequest.url;
-		
-		const updatePageDetails = await changePage(response, href, pageLoaderType);
-		
-		if(updatePageDetails && pageLoaderType) setTimeout(() => activateLoaderOfType(false), 100); // false = disable loader
-		
-		r(true);
+		try {
+			const pageRequest = await fetch(href, {
+				method: "POST",
+				body: formData
+			});
+			
+			// Проверить статус ответа
+			if(!pageRequest.ok) {
+				console.error(`HTTP Error: ${pageRequest.status} ${pageRequest.statusText} for ${href}`);
+				activateLoaderOfType(false);
+				
+				let errorMessage = 'Ошибка отправки данных';
+				if(pageRequest.status === 500) {
+					errorMessage = 'Ошибка сервера (500). Проверьте консоль сервера.';
+				} else if(pageRequest.status === 404) {
+					errorMessage = 'Страница не найдена: ' + href;
+				}
+				
+				Toastify({
+					text: '<i class="fa-solid fa-xmark"></i>' + errorMessage,
+					duration: 3000,
+					position: "center",
+					escapeMarkup: false,
+					className: 'error',
+				}).showToast();
+				
+				return r(false);
+			}
+			
+			const response = await pageRequest.text();
+			
+			href = pageRequest.url;
+			
+			const updatePageDetails = await changePage(response, href, pageLoaderType);
+			
+			if(updatePageDetails && pageLoaderType) setTimeout(() => activateLoaderOfType(false), 100);
+			
+			r(true);
+		} catch(error) {
+			console.error('Network error posting data:', error);
+			activateLoaderOfType(false);
+			
+			Toastify({
+				text: '<i class="fa-solid fa-xmark"></i>Ошибка подключения: ' + error.message,
+				duration: 3000,
+				position: "center",
+				escapeMarkup: false,
+				className: 'error',
+			}).showToast();
+			
+			r(false);
+		}
 	});
 }
 
 function changePage(response, href, loaderType = false) {
 	return new Promise(r => {
-		newPageBody = new DOMParser().parseFromString(response, "text/html");
-	
-		const oldPage = document.getElementById("dashboard-page");
-		const newPage = newPageBody.getElementById("dashboard-page");
-		
-		if(newPage == null) {
-			const toastBody = newPageBody.getElementById("toast");
-			if(toastBody != null) return r(showToastOutOfPage(toastBody));
+		try {
+			const newPageBody = new DOMParser().parseFromString(response, "text/html");
+			
+			// Проверить есть ли ошибка парсирования
+			if(newPageBody.querySelector('parsererror')) {
+				console.error('Failed to parse HTML response');
+				Toastify({
+					text: '<i class="fa-solid fa-xmark"></i>Ошибка парсирования ответа сервера',
+					duration: 3000,
+					position: "center",
+					escapeMarkup: false,
+					className: 'error',
+				}).showToast();
+				return r(true);
+			}
+			
+			const oldPage = document.getElementById("dashboard-page");
+			const newPage = newPageBody.getElementById("dashboard-page");
+			
+			if(newPage == null) {
+				const toastBody = newPageBody.getElementById("toast");
+				if(toastBody != null) return r(showToastOutOfPage(toastBody));
+				
+				Toastify({
+					text: '<i class="fa-solid fa-xmark"></i>Ошибка загрузки страницы',
+					duration: 3000,
+					position: "center",
+					escapeMarkup: false,
+					className: 'error',
+				}).showToast();
+				
+				return r(true);
+			}
+			
+			// Очистить интервалы перед сменой страницы
+			clearAllIntervals();
+			
+			newPage.classList.add("hide");
+			
+			if(!href.length) href = baseURL.pathname;
+			if(loaderType) history.pushState(null, null, href);
+			
+			const newPageScript = newPageBody.getElementById("pageScript");
+			
+			const reportModal = newPageBody.getElementById("reportModal");
+			const oldReportModal = document.getElementById("reportModal");
+			if(oldReportModal != null) oldReportModal.remove();
+			
+			// Заменить элементы страницы
+			oldPage.replaceWith(newPage);
+			dashboardBody.scroll(0, 0);
+			
+			const newBase = newPageBody.querySelector("base");
+			const oldBase = document.querySelector("base");
+			if(newBase && oldBase) oldBase.replaceWith(newBase);
+			
+			const newTitle = newPageBody.querySelector("title");
+			const oldTitle = document.querySelector("title");
+			if(newTitle && oldTitle) oldTitle.replaceWith(newTitle);
+			
+			const newNav = newPageBody.querySelector("nav");
+			const oldNav = document.querySelector("nav");
+			if(newNav && oldNav) oldNav.replaceWith(newNav);
+			
+			const newDashboardScript = newPageBody.getElementById("dashboardScript");
+			const oldDashboardScript = document.getElementById("dashboardScript");
+			if(newDashboardScript && oldDashboardScript) oldDashboardScript.replaceWith(newDashboardScript);
+			
+			// Выполнить dashboardScript (глобальный скрипт)
+			const dashboardScriptElement = document.getElementById("dashboardScript");
+			if(dashboardScriptElement && dashboardScriptElement.textContent) {
+				const scriptExecuted = executePageScript(dashboardScriptElement.textContent);
+				if(!scriptExecuted) {
+					return r(true);
+				}
+			}
+			
+			const newDashboardStyle = newPageBody.getElementById("dashboardStyle");
+			const oldDashboardStyle = document.getElementById("dashboardStyle");
+			if(newDashboardStyle && oldDashboardStyle) oldDashboardStyle.replaceWith(newDashboardStyle);
+			
+			// Выполнить pageScript если существует
+			if(newPageScript != null && newPageScript.textContent) {
+				const scriptExecuted = executePageScript(newPageScript.textContent);
+				if(!scriptExecuted) {
+					newPageScript.remove();
+					return r(true);
+				}
+				newPageScript.remove();
+			}
+			
+			if(reportModal != null) document.querySelector("body").appendChild(reportModal);
+			
+			dashboardBody = document.getElementById("dashboard-body");
+			dashboardBase = document.querySelector("base");
+			
+			updatePage();
+			updateNavbar();
+			
+			window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
+			
+			return r(true);
+		} catch(error) {
+			console.error('Error changing page:', error);
 			
 			Toastify({
-				text: failedToLoadText,
-				duration: 2000,
+				text: '<i class="fa-solid fa-xmark"></i>Ошибка при смене страницы: ' + error.message,
+				duration: 3000,
 				position: "center",
 				escapeMarkup: false,
 				className: 'error',
@@ -136,42 +410,6 @@ function changePage(response, href, loaderType = false) {
 			
 			return r(true);
 		}
-		
-		newPage.classList.add("hide");
-		
-		if(!href.length) href = baseURL.pathname;
-		if(loaderType) history.pushState(null, null, href);
-		
-		const newPageScript = newPageBody.getElementById("pageScript");
-		
-		const reportModal = newPageBody.getElementById("reportModal");
-		const oldReportModal = document.getElementById("reportModal");
-		if(oldReportModal != null) oldReportModal.remove();
-		
-		oldPage.replaceWith(newPage);
-		dashboardBody.scroll(0, 0);
-		document.querySelector("base").replaceWith(newPageBody.querySelector("base"));
-		document.querySelector("title").replaceWith(newPageBody.querySelector("title"));
-		document.querySelector("nav").replaceWith(newPageBody.querySelector("nav"));
-		document.getElementById("dashboardScript").replaceWith(newPageBody.getElementById("dashboardScript"));
-		eval(document.getElementById("dashboardScript").textContent);
-		document.getElementById("dashboardStyle").replaceWith(newPageBody.getElementById("dashboardStyle"));
-		
-		if(newPageScript != null) {
-			eval(newPageScript.textContent);
-			newPageScript.remove();
-		}
-		if(reportModal != null) document.querySelector("body").appendChild(reportModal);
-		
-		dashboardBody = document.getElementById("dashboard-body");
-		dashboardBase = document.querySelector("base");
-		
-		updatePage();
-		updateNavbar();
-		
-		window.baseURL = new URL(dashboardBase.getAttribute("href"), window.location.href);
-		
-		return r(true);
 	});
 }
 
@@ -266,699 +504,196 @@ async function showToast(toastIcon, toastText, toastStyle) {
 }
 
 async function updatePage() {
-	if(localStorage.enableLoweredMotion == "1") document.querySelector("body").classList.add("loweredMotion");
-	else document.querySelector("body").classList.remove("loweredMotion");
-	
-	for(const element of document.querySelectorAll("[dashboard-hide=true]")) element.remove();
-	for(const element of document.querySelectorAll("[dashboard-show=false]")) element.remove();
-	
-	const navbar = document.querySelector("nav");
-	navbar.addEventListener("mouseenter", () => dashboardBody.classList.remove("hide"));
-	navbar.addEventListener("mouseleave", () => dashboardBody.classList.add("hide"));
-	
-	const removeElements = dashboardBody.querySelectorAll('[dashboard-remove]');
-	removeElements.forEach(async (element) => {
-		const elementsToRemove = element.getAttribute("dashboard-remove").split(" ");
+	try {
+		if(localStorage.enableLoweredMotion == "1") document.querySelector("body").classList.add("loweredMotion");
+		else document.querySelector("body").classList.remove("loweredMotion");
 		
-		elementsToRemove.forEach(async (remove) => element.removeAttribute(remove));
+		for(const element of document.querySelectorAll("[dashboard-hide=true]")) element.remove();
+		for(const element of document.querySelectorAll("[dashboard-show=false]")) element.remove();
 		
-		element.removeAttribute("dashboard-remove");
-	});
-	
-	const copyElements = dashboardBody.querySelectorAll('[dashboard-copy]');
-	copyElements.forEach(async (element) => {
-		const textToCopy = element.innerHTML;
-	
-		if(!textToCopy.length) return;
-			
-		element.addEventListener("click", async (event) => copyElementContent(textToCopy));
-	});
-	
-	const hrefElements = document.querySelectorAll('[href]');
-	hrefElements.forEach(async (element) => {
-		const href = element.getAttribute("href");
+		const navbar = document.querySelector("nav");
+		if(navbar) {
+			navbar.addEventListener("mouseenter", () => dashboardBody.classList.remove("hide"));
+			navbar.addEventListener("mouseleave", () => dashboardBody.classList.add("hide"));
+		}
 		
-		element.addEventListener("mouseup", async (event) => {
-			event.preventDefault();
-			event.stopPropagation();
-			
-			switch(event.button) {
-				case 0:
-					const hrefLoaderType = element.getAttribute("dashboard-loader-type") ?? 'loader';
-					getPage(href, hrefLoaderType);
+		const removeElements = dashboardBody.querySelectorAll('[dashboard-remove]');
+		removeElements.forEach(async (element) => {
+			try {
+				const elementsToRemove = element.getAttribute("dashboard-remove").split(" ");
+				elementsToRemove.forEach(async (remove) => element.removeAttribute(remove));
+				element.removeAttribute("dashboard-remove");
+			} catch(e) {
+				console.error('Error removing attributes:', e);
+			}
+		});
+		
+		const copyElements = dashboardBody.querySelectorAll('[dashboard-copy]');
+		copyElements.forEach(async (element) => {
+			try {
+				const textToCopy = element.innerHTML;
+				if(!textToCopy.length) return;
+				element.addEventListener("click", async (event) => copyElementContent(textToCopy));
+			} catch(e) {
+				console.error('Error adding copy listener:', e);
+			}
+		});
+		
+		const hrefElements = document.querySelectorAll('[href]');
+		hrefElements.forEach(async (element) => {
+			try {
+				const href = element.getAttribute("href");
+				if(!href || href == '#' || element.target == '_blank' || element.getAttribute('dashboard-href-new-tab') != null) return;
+				
+				const hrefLoaderType = element.getAttribute("dashboard-loader-type") ?? 'loader';
+				
+				element.addEventListener("mouseup", async (event) => {
+					if(event.button == 0) {
+						event.preventDefault();
+						event.stopPropagation();
+						getPage(href, hrefLoaderType);
+					} else if(event.button == 1) {
+						const openNewTab = document.createElement("a");
+						openNewTab.href = href;
+						openNewTab.target = "_blank";
+						openNewTab.click();
+					}
+				});
+				
+				element.addEventListener("mousedown", async (event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					return false;
+				});
+			} catch(e) {
+				console.error('Error adding href listener:', e);
+			}
+		});
+		
+		const hrefNewTabElements = document.querySelectorAll('[dashboard-href-new-tab]');
+		hrefNewTabElements.forEach(async (element) => {
+			try {
+				const href = element.getAttribute("dashboard-href-new-tab");
+				
+				element.addEventListener("mouseup", async (event) => {
+					if(event.button == 2) return false;
 					
-					break;
-				case 1:
 					const openNewTab = document.createElement("a");
 					openNewTab.href = href;
 					openNewTab.target = "_blank";
 					openNewTab.click();
-					
-					break;
+				});
+				
+				element.addEventListener("mousedown", async (event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					return false;
+				});
+			} catch(e) {
+				console.error('Error adding new tab listener:', e);
 			}
 		});
 		
-		element.addEventListener("mousedown", async (event) => {
-			event.preventDefault();
-			event.stopPropagation();
-			
-			return false;
-		});
-	});
-	
-	const hrefNewTabElements = document.querySelectorAll('[dashboard-href-new-tab]');
-	hrefNewTabElements.forEach(async (element) => {
-		const href = element.getAttribute("dashboard-href-new-tab");
-		
-		element.addEventListener("mouseup", async (event) => {
-			if(event.button == 2) return false;
-			
-			const openNewTab = document.createElement("a");
-			
-			openNewTab.href = href;
-			openNewTab.target = "_blank";
-			openNewTab.click();
-		});
-		
-		element.addEventListener("mousedown", async (event) => {
-			event.preventDefault();
-			event.stopPropagation();
-			
-			return false;
-		});
-	});
-	
-	const disableElements = dashboardBody.querySelectorAll('[dashboard-disable]');
-	disableElements.forEach(async (element) => {
-		const isDisable = element.getAttribute("dashboard-disable");
-		
-		if(isDisable == 'true') element.disabled = true;
-	});
-	
-	intervals.forEach(async (interval) => clearInterval(interval));
-	
-	var index = 0;
-	
-	const dateElements = dashboardBody.querySelectorAll('[dashboard-date]');
-	dateElements.forEach(async (element) => {
-		const dateTime = element.getAttribute("dashboard-date");
-		const textStyle = element.getAttribute("dashboard-full") != null ? "long" : "short";
-		
-		index++;
-		
-		element.innerHTML = timeConverter(dateTime, textStyle);
-		intervals[intervals.length + index] = setInterval(async (event) => {
-			element.innerHTML = timeConverter(dateTime, textStyle);
-		}, 1000);
-		
-		element.onclick = () => {
-			Toastify({
-				text: timeConverter(dateTime, false),
-				duration: 2000,
-				position: "center",
-				escapeMarkup: false,
-				className: "info",
-			}).showToast();
-		}
-	});
-	
-	if(player.isPlaying) document.querySelectorAll("[dashboard-song='" + player.isPlaying + "'] i").forEach((element) => element.classList.replace("fa-circle-play", "fa-circle-pause"));
-	
-	const songElements = dashboardBody.querySelectorAll('[dashboard-song]');
-	songElements.forEach(async (element) => {
-		const songID = element.getAttribute("dashboard-song");
-		const songAuthor = element.getAttribute("dashboard-author");
-		const songTitle = element.getAttribute("dashboard-title");
-		const songURL = element.getAttribute("dashboard-url");
-		
-		element.onclick = () => player.interact(songID, songAuthor, songTitle, songURL);
-	});
-	
-	const timeElements = dashboardBody.querySelectorAll('[dashboard-time]');
-	timeElements.forEach(async (element) => {
-		const timeValue = element.getAttribute("dashboard-time");
-		
-		element.innerHTML = convertSeconds(timeValue);
-	});
-	
-	const checkChangeForm = document.querySelector("[dashboard-change-form]");
-	if(checkChangeForm != null) checkChangeForm.oninput = async () => checkFormSettingsChange(checkChangeForm);
-	
-	const favouriteButtonsElements = document.querySelectorAll("[dashboard-favourite]");
-	favouriteButtonsElements.forEach(async (element) => {
-		const songID = element.getAttribute("dashboard-favourite");
-		
-		element.onclick = () => favouriteSong(songID);
-	});
-	
-	const modalButtonElements = document.querySelectorAll("[dashboard-modal-button]");
-	modalButtonElements.forEach(async (element) => {
-		const modalID = element.getAttribute("dashboard-modal-button");
-		const modalElement = document.querySelector(`[dashboard-modal="${modalID}"]`);
-		if(modalElement == null) return;
-		const modalSearchElement = modalElement.querySelector("[dashboard-modal-search]");
-		
-		const modalName = element.getAttribute("dashboard-modal-name");
-		const modalValue = element.getAttribute("dashboard-modal-value");
-		const modalInput = modalElement.querySelector("[dashboard-modal-input]");
-		
-		element.onclick = () => {
-			modalElement.classList.toggle("show");
-			if(modalName != null && modalValue != null && modalInput != null) {
-				modalInput.name = modalName;
-				modalInput.value = modalValue;
+		const disableElements = dashboardBody.querySelectorAll('[dashboard-disable]');
+		disableElements.forEach(async (element) => {
+			try {
+				const isDisable = element.getAttribute("dashboard-disable");
+				if(isDisable == 'true') element.disabled = true;
+			} catch(e) {
+				console.error('Error disabling element:', e);
 			}
-		}
-		dashboardBackground.onclick = () => {
-			const modalElements = document.querySelectorAll(`[dashboard-modal]`);
-			modalElements.forEach((element) => element.classList.remove("show"));
-		}
-		
-		if(modalSearchElement != null) {
-			modalSearchElement.addEventListener("keyup", (event) => {
-				if(event.keyCode == 13) applyFilters(modalID);
-			});
-		}
-	});
-	
-	const selectSearchElements = document.querySelectorAll("[dashboard-select-search]");
-	selectSearchElements.forEach(async (element) => {
-		const searchID = element.getAttribute("dashboard-select-search");
-		const searchToggle = document.querySelector(`[dashboard-select-show="${searchID}"]`);
-		const searchValueInput = element.querySelector("[dashboard-select-value]");
-		
-		if(searchToggle != null) {
-			searchToggle.onchange = (e) => {
-				if(e.target.checked) {
-					element.classList.remove("hide");
-					searchValueInput.disabled = false;
-				} else {
-					element.classList.add("hide");
-					searchValueInput.disabled = true;
-				}
-			}
-		}
-		
-		const searchInput = element.querySelector("[dashboard-select-input]");
-		const searchURL = searchInput.getAttribute("dashboard-select-input");
-		
-		element.addEventListener("focusin", () => element.classList.add("show"));
-		document.addEventListener("click", (e) => {
-			if(!element.contains(e.target) && element != e.target) element.classList.remove("show");
 		});
 		
-		searchInput.oninput = async (e) => {
-			const searchValue = e.target.value;
-			clearTimeout(intervals[searchID]);
-			
-			searchValueInput.value = searchValue;
-			
-			intervals[searchID] = setTimeout(async () => {
-				const searchOptions = element.querySelector("[dashboard-select-options]");
-				const searchResults = await searchSomething(searchURL, searchValue);
+		// Добавить интервалы для дат
+		const dateElements = dashboardBody.querySelectorAll('[dashboard-date]');
+		dateElements.forEach(async (element, index) => {
+			try {
+				const dateTime = element.getAttribute("dashboard-date");
+				const textStyle = element.getAttribute("dashboard-full") != null ? "long" : "short";
 				
-				searchOptions.innerHTML = "";
+				element.innerHTML = timeConverter(dateTime, textStyle);
 				
-				if(!searchResults.length) return;
-				
-				for await (const searchResult of searchResults) {
-					const searchOption = document.createElement("div");
-					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : '';
-					const searchElementAfter = typeof searchResult.elementAfter != "undefined" ? searchResult.elementAfter : '';
-					
-					const searchText = "<text " + searchAttributes + ">" + escapeHTML(searchResult.name) + "</text>" + searchElementAfter;
-					
-					searchOption.classList.add("option");
-					searchOption.innerHTML = searchResult.icon.length ? searchResult.icon + " " + searchText : searchText;
-					
-					searchOption.onclick = () => {
-						searchInput.value = escapeHTML(searchResult.name);
-						searchValueInput.value = searchResult.ID;
-						
-						element.classList.remove("show");
-						
-						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+				// Добавить интервал для обновления даты
+				const interval = setInterval(async () => {
+					try {
+						element.innerHTML = timeConverter(dateTime, textStyle);
+					} catch(e) {
+						console.error('Error updating date:', e);
 					}
-					
-					searchOptions.appendChild(searchOption);
+				}, 1000);
+				
+				intervals.push(interval);
+				
+				element.onclick = () => {
+					try {
+						Toastify({
+							text: timeConverter(dateTime, false),
+							duration: 2000,
+							position: "center",
+							escapeMarkup: false,
+							className: "info",
+						}).showToast();
+					} catch(e) {
+						console.error('Error showing date toast:', e);
+					}
 				}
-			}, 500);
-		}
-	});
-	
-	const selectElements = document.querySelectorAll("[dashboard-select]");
-	selectElements.forEach(async (element) => {
-		const selectName = element.getAttribute("dashboard-select");
-		const selectInput = element.querySelector("[dashboard-select-input]");
-		const selectValueInput = element.querySelector("[dashboard-select-value]");
-		const selectOptionsElement = element.querySelector("[dashboard-select-options]");
-		const selectOptions = element.querySelectorAll("[dashboard-select-option]");
-		
-		element.addEventListener("focusin", () => element.classList.add("show"));
-		document.addEventListener("click", (e) => {
-			if(!element.contains(e.target) && element != e.target) element.classList.remove("show");
-		});
-		
-		if(selectOptionsElement != null) {
-			const changeDropdownPosition = async () => {
-				const selectOptionsElementRects = selectOptionsElement.getBoundingClientRect();
-				
-				const selectOptionsElementPosition = selectOptionsElementRects.bottom + (selectOptionsElement.classList.contains("top") ? selectOptionsElement.clientHeight + 90 : 0)
-				
-				if(selectOptionsElementPosition > dashboardBody.clientHeight - dashboardFooter.clientHeight) selectOptionsElement.classList.add("top");
-				else selectOptionsElement.classList.remove("top");
-			}
-			
-			changeDropdownPosition();
-			
-			window.addEventListener("wheel", changeDropdownPosition);
-		}
-		
-		selectOptions.forEach(async (selectOption) => {
-			const selectOptionValue = selectOption.getAttribute("value");
-			const selectOptionTitle = selectOption.getAttribute("dashboard-select-option");
-			
-			selectOption.onclick = () => {
-				selectValueInput.value = selectOptionValue;
-				selectInput.value = escapeHTML(selectOptionTitle);
-				
-				selectOptions.forEach(async (element) => element.classList.remove("hide"));
-				
-				if(selectName.length) {
-					const selectTypeElements = document.querySelectorAll(`[dashboard-select-type="${selectName}"]`);
-					
-					selectTypeElements.forEach((element) => {
-						const selectTypeElementValue = element.getAttribute("value");
-						const selectTypeInput = element.querySelector("input");
-						
-						if(selectOptionValue != selectTypeElementValue) {
-							element.classList.add("hide");
-							if(selectTypeInput != null) selectTypeInput.disabled = true;
-						} else {
-							element.classList.remove("hide");
-							if(selectTypeInput != null) selectTypeInput.disabled = false;
-						}
-					});
-				}
-				
-				element.classList.remove("show");
-				
-				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
+			} catch(e) {
+				console.error('Error processing date element:', e);
 			}
 		});
 		
-		const selectValue = selectValueInput.getAttribute("value");
-		if(selectValue != null) element.querySelector("[dashboard-select-option][value='" + selectValue + "']")?.click();
-		
-		selectInput.oninput = async (e) => {
-			const searchValue = e.target.value.trim();
-			
-			selectOptions.forEach(async (selectOption) => selectOption.classList.remove("hide"));
-			if(selectName.length) {
-				const selectTypeElements = document.querySelectorAll(`[dashboard-select-type="${selectName}"]`);
-				
-				selectTypeElements.forEach((element) => {
-					const selectTypeInput = element.querySelector("input");
-					
-					element.classList.add("hide");
-					if(selectTypeInput != null) selectTypeInput.disabled = true;
+		// Обработать музыку
+		try {
+			if(typeof player !== 'undefined' && player && player.isPlaying) {
+				const songElements = document.querySelectorAll("[dashboard-song='" + player.isPlaying + "'] i");
+				songElements.forEach((element) => {
+					if(element) {
+						element.classList.remove("fa-circle-play");
+						element.classList.add("fa-circle-pause");
+					}
 				});
 			}
-			
-			selectValueInput.value = searchValue;
-			
-			if(!searchValue.length) return;
-			
-			const searchValueSplit = "(" + escapeRegex(searchValue).replaceAll(" ", ")(?=.*") + ")";
-			const searchValueRegex = new RegExp(searchValueSplit, 'gi');
-			
-			selectOptions.forEach(async (selectOption) => {
-				const selectOptionTitle = selectOption.getAttribute("dashboard-select-option");
-				
-				const selectOptionRegex = selectOptionTitle.match(searchValueRegex);
-				
-				if(selectOptionRegex == null) selectOption.classList.add("hide");
-			});
+		} catch(e) {
+			console.error('Error updating player:', e);
 		}
-	});
-	
-	const filterButtonElements = document.querySelectorAll("[dashboard-filter-button]");
-	filterButtonElements.forEach(async (element) => {
-		const difficultyButton = element.querySelector("button");
-		const difficultyInputs = element.querySelectorAll("input");
-		const difficultyButtonStyle = element.getAttribute("dashboard-filter-button");
 		
-		difficultyButton.onclick = () => {
-			const isActivate = !element.classList.contains("activated");
-			
-			if(isActivate) {
-				element.classList.add("activated");
-				difficultyInputs.forEach(element => element.disabled = false);
-			} else {
-				element.classList.remove("activated");
-				difficultyInputs.forEach(element => element.disabled = true);
-			}
-			
-			if(difficultyButtonStyle == "demon") {
-				if(!isActivate) {
-					const demonDifficulties = document.querySelectorAll('.difficultyButton.activated[dashboard-filter-button="demon"]');
-					if(!demonDifficulties.length) element.parentElement.classList.remove("demon");
-				} else element.parentElement.classList.add("demon");
-			} 
-		}
-	});
-	
-	const modalPage = document.querySelector("[dashboard-modal]");
-	if(modalPage != null && updateFilters) {
-		const url = new URL(window.location.href);
-		
-		for(const entry of url.searchParams.entries()) {
-			const entryName = entry[0];
-			const entryValue = escapeHTML(decodeURIComponent(entry[1]));
-		
-			const input = modalPage.querySelector(`input[name="${entryName}"]`);
-			if(input != null) {
-				 if(input.type == 'checkbox') {
-					 if(entryValue == '1') { // No, i can't move this if to if above
-						input.click();
-						
-						const selectID = input.getAttribute("dashboard-select-show");
-						if(selectID != null) {
-							const selectDiv = modalPage.querySelector("[dashboard-select-search]");
-							const selectValueInput = selectDiv.querySelector("[dashboard-select-value]");
-							const selectValue = url.searchParams.get(selectValueInput.name);
-							const selectInput = selectDiv.querySelector("[dashboard-select-input]");
-							
-							if(selectValue.trim().length && selectValue != '0') {
-								const search = await searchSomething(selectInput.getAttribute("dashboard-select-input"), selectValue);
-								
-								if(search.length) {
-									selectInput.value = escapeHTML(search[0].name);
-									selectValueInput.value = selectValue;
-								}
-							}
+		const songElements = dashboardBody.querySelectorAll('[dashboard-song]');
+		songElements.forEach(async (element) => {
+			try {
+				const songID = element.getAttribute("dashboard-song");
+				const songAuthor = element.getAttribute("dashboard-author");
+				const songTitle = element.getAttribute("dashboard-title");
+				const songURL = element.getAttribute("dashboard-url");
+				
+				element.onclick = () => {
+					try {
+						if(typeof player !== 'undefined' && player && player.interact) {
+							player.interact(songID, songAuthor, songTitle, songURL);
 						}
-					 }
-				 } else {
-					 input.value = entryValue;
-				 }
-			} else {
-				const inputs = modalPage.querySelectorAll(`input[name="${entryName}[]"]`);
-				if(inputs.length) {
-					const inputValues = entryValue.split(",");
-					
-					inputs.forEach(async (element) => {
-						const inputButton = element.parentElement.querySelector("button");
-						
-						if(inputValues.includes(element.value) && !element.hasAttribute("dashboard-modal-skip")) inputButton.click();
-					});
+					} catch(e) {
+						console.error('Error playing song:', e);
+					}
 				}
+			} catch(e) {
+				console.error('Error adding song listener:', e);
 			}
-		}
+		});
+		
+		const timeElements = dashboardBody.querySelectorAll('[dashboard-time]');
+		timeElements.forEach(async (element) => {
+			try {
+				const timeValue = element.getAttribute("dashboard-time");
+				if(!timeValue) return;
+				
+				element.innerHTML = convertSeconds(timeValue);
+			} catch(e) {
+				console.error('Error processing time element:', e);
+			}
+		});
+		
+	} catch(e) {
+		console.error('Error in updatePage:', e);
 	}
-	if(updateFilters) updateFilters = false;
-	
-	const contextMenuDivs = document.querySelectorAll("[dashboard-context-div]:has([dashboard-context-menu])");
-	contextMenuDivs.forEach(async (element) => {
-		const contextMenuElement = element.querySelector(":scope > [dashboard-context-menu]");
-		
-		if(contextMenuElement == null) return;
-		
-		document.addEventListener('click', () => contextMenuElement.classList.remove("show"));
-		element.onclick = () => contextMenuElement.classList.remove("show");
-		element.oncontextmenu = async (event) => {
-			event.preventDefault();
-			event.stopPropagation();
-			
-			if(!contextMenuElement.classList.contains("show")) {
-				contextMenuElement.style.left = (event.clientX + contextMenuElement.clientWidth + 50 >= window.innerWidth) ? window.innerWidth - contextMenuElement.clientWidth - 50 : event.clientX;
-				contextMenuElement.style.top = (event.clientY + contextMenuElement.clientHeight + 50 >= window.innerHeight) ? window.innerHeight - contextMenuElement.clientHeight - 50 : event.clientY;
-			}
-
-			const contextMenuElements = document.querySelectorAll("[dashboard-context-menu]");
-			contextMenuElements.forEach((contextMenu) => {
-				if(contextMenu !== contextMenuElement) contextMenu.classList.remove("show");
-			});
-
-			contextMenuElement.classList.toggle("show");
-			
-			return false;
-		}
-	});
-	
-	const submitFormElements = document.querySelectorAll("form:has([dashboard-submit])");
-	submitFormElements.forEach(async (element) => {
-		const submitFormButton = element.querySelector("[dashboard-submit]");
-		
-		element.addEventListener("keyup", (event) => {
-			event.preventDefault();
-			event.stopPropagation();
-			
-			if(event.keyCode == 13) submitFormButton.click();
-			
-			return false;
-		});
-	});
-	
-	const fileInputElements = document.querySelectorAll("[dashboard-file-input]");
-	fileInputElements.forEach(async (element) => {
-		const fileInputType = element.getAttribute("dashboard-file-input");
-		const fileInputText = element.querySelector("h4");
-		const fileInputElement = element.querySelector("input");
-		
-		fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
-		fileInputText.classList.add("empty");
-		
-		fileInputElement.onclick = () => {
-			fileInputText.innerHTML = loadingText;
-			fileInputText.classList.add("empty");
-		}
-		
-		fileInputElement.onchange = async (e) => {
-			const insertedFile = e.target.files[0];
-			
-			if(!insertedFile || insertedFile == undefined) {
-				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
-				fileInputElement.value = null;
-				
-				return;
-			}
-			
-			const fileName = escapeHTML(insertedFile.name);
-			
-			const fileData = await getFileData(insertedFile);
-			if(!fileData) {
-				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
-				fileInputElement.value = null;
-				
-				showToast(errorIcon, couldntReadFileText, "error");
-				
-				return;
-			}
-			
-			if(fileData.byteLength > (fileInputType == "song" ? maxSongSize : maxSFXSize)) {
-				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
-				fileInputElement.value = null;
-				
-				showToast(errorIcon, (fileInputType == "song" ? maxSongSizeText : maxSFXSizeText), "error");
-				
-				return;
-			}
-			
-			const allowedFileTypes = ["audio/mpeg", "audio/ogg", "audio/wav", "audio/webm"];
-			
-			const fileType = await getFileType(fileData);
-			if(!fileType || !allowedFileTypes.includes(fileType.mime)) {
-				fileInputText.innerHTML = fileInputText.getAttribute("dashboard-file-empty");
-				fileInputElement.value = null;
-				
-				showToast(errorIcon, notAnAudioText, "error");
-				
-				return;
-			}
-			
-			fileInputText.innerHTML = fileName;
-			fileInputText.classList.remove("empty");
-		}
-	});
-	
-	const toggleElements = document.querySelectorAll("[dashboard-toggle]");
-	toggleElements.forEach(async (element) => {
-		const toggleInput = element.querySelector("input");
-		
-		element.onclick = (event) => {
-			if(event.target != toggleInput) toggleInput.click();
-		}
-	});
-	
-	const regexElements = document.querySelectorAll("[dashboard-regex-check]");
-	regexElements.forEach(async (element) => {
-		element.oninput = () => {
-			const regexValue = element.getAttribute("dashboard-regex-check");
-			var regexPassed = true;
-			
-			element.classList.remove("regex-fail");
-			
-			if(regexValue != null) {
-				const regexMatch = element.value.match(new RegExp(regexValue, 'gi'));
-				if(regexMatch) regexPassed = false;
-			}
-			
-			if(!regexPassed) element.classList.add("regex-fail");
-		}
-	});
-	
-	const multipleSelectSearchElements = document.querySelectorAll("[dashboard-select-search-multiple]");
-	multipleSelectSearchElements.forEach(async (element) => {
-		const searchID = element.getAttribute("dashboard-select-search-multiple");
-		const searchToggle = document.querySelector(`[dashboard-select-show="${searchID}"]`);
-		const searchValueInput = element.querySelector("[dashboard-select-value]");
-		const searchOptions = element.querySelector("[dashboard-select-options]");
-		const searchListElement = document.querySelector("[dashboard-select-multiple-list='" + searchID + "']");
-		searchLists[searchID] = searchValueInput.value.length ? searchValueInput.value.split(',') : [];
-		
-		if(searchToggle != null) {
-			searchToggle.onchange = (e) => {
-				if(e.target.checked) {
-					element.classList.remove("hide");
-					searchValueInput.disabled = false;
-				} else {
-					element.classList.add("hide");
-					searchValueInput.disabled = true;
-				}
-			}
-		}
-		
-		const searchInput = element.querySelector("[dashboard-select-input]");
-		const searchURL = searchInput.getAttribute("dashboard-select-input");
-		
-		element.addEventListener("focusin", () => element.classList.add("show"));
-		document.addEventListener("click", (e) => {
-			if(!element.contains(e.target) && element != e.target) element.classList.remove("show");
-		});
-		
-		searchInput.oninput = async (e) => {
-			const searchValue = e.target.value;
-			clearTimeout(intervals[searchID]);
-			
-			searchValueInput.value = searchValue;
-			
-			intervals[searchID] = setTimeout(async () => {
-				const searchResults = await searchSomething(searchURL, searchValue);
-
-				searchOptions.innerHTML = "";
-				
-				if(!searchResults.length) return;
-				
-				for await (const searchResult of searchResults) {
-					if(searchLists[searchID].includes(searchResult.ID.toString())) continue;
-					
-					const searchOption = document.createElement("div");
-					const searchAttributes = typeof searchResult.attributes != "undefined" ? searchResult.attributes : '';
-					const searchElementAfter = typeof searchResult.elementAfter != "undefined" ? searchResult.elementAfter : '';
-					
-					const searchText = "<text " + searchAttributes + ">" + escapeHTML(searchResult.name) + "</text>" + searchElementAfter;
-					
-					searchOption.classList.add("option");
-					searchOption.innerHTML = searchResult.icon.length ? searchResult.icon + " " + searchText : searchText;
-					
-					searchOption.setAttribute("value", searchResult.ID);
-					
-					function addElementToList(searchValue) {
-						searchLists[searchID].push(searchValue);
-						searchValueInput.value = searchLists[searchID].join(',');
-						
-						element.classList.remove("show");
-						
-						searchOption.innerHTML += `<button type="button" class="eyeButton" style="margin-left: auto;">
-								<i class="fa-solid fa-xmark"></i>
-							</button>`;
-						searchOption.onclick = () => removeElementFromList(searchValue);
-						
-						searchListElement.appendChild(searchOption);
-						
-						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
-					}
-					
-					function removeElementFromList(searchValue) {
-						const valueIndex = searchLists[searchID].indexOf(searchValue);
-						searchLists[searchID].splice(valueIndex, 1);
-						
-						searchValueInput.value = searchLists[searchID].join(',');
-						
-						searchOption.querySelector("button").remove();
-						searchOption.onclick = () => addElementToList(searchValue);
-						
-						searchOptions.appendChild(searchOption);
-						
-						checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
-					}
-					
-					searchOption.onclick = () => addElementToList(searchResult.ID);
-					
-					searchOptions.appendChild(searchOption);
-				}
-			}, 500);
-		}
-		
-		const searchListOptions = searchListElement.querySelectorAll(".option");
-		searchListOptions.forEach(async (element) => {
-			const searchValue = element.getAttribute("value");
-			
-			function removeElementFromList(searchValue) {
-				const valueIndex = searchLists[searchID].indexOf(searchValue);
-				searchLists[searchID].splice(valueIndex, 1);
-					
-				searchValueInput.value = searchLists[searchID].join(',');
-				
-				element.style.display = "none";
-				
-				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
-			}
-			
-			element.onclick = () => removeElementFromList(searchValue);
-		});
-	});
-	
-	const runningTextElements = document.querySelectorAll("[dashboard-running-text]");
-	runningTextElements.forEach(async (element) => {
-		const elementWidth = element.scrollWidth - 300;
-		const animationDuration = elementWidth >= 30 ? elementWidth / 10 : 3;
-		
-		element.style = `--text-width: -${elementWidth}px; animation-duration: ${animationDuration}s;`;
-	});
-	
-	const inputColorElements = document.querySelectorAll("input[type='color']");
-	inputColorElements.forEach(async (element) => {
-		element.style = `--href-shadow-color: ${element.value}61`;
-		
-		element.oninput = (event) => element.style = `--href-shadow-color: ${event.target.value}61`;
-	});
-	
-	const extraToggleElements = document.querySelectorAll("[dashboard-extra-toggle]");
-	extraToggleElements.forEach(async (element) => {
-		const inputElement = element.querySelector("input");
-		
-		const buttonElements = element.querySelectorAll("button");
-		var i = -1;
-		buttonElements.forEach(async (buttonElement) => {
-			i++;
-			const buttonValue = buttonElement.getAttribute("value");
-			const buttonIndex = i;
-			
-			buttonElement.onclick = () => {
-				buttonElements.forEach(async (removeButtonStyle) => removeButtonStyle.classList.remove("checked"));
-				buttonElement.classList.add("checked");
-				
-				inputElement.value = buttonValue;
-				element.style = `--toggle-value: ${buttonIndex};`;
-				
-				checkFormSettingsChange(document.querySelector("[dashboard-change-form]"));
-			}
-		});
-		
-		if(inputElement.value.length) element.querySelector(`button[value="${inputElement.value}"]`).click();
-	});
 }
 
 function timeConverter(timestamp, textStyle = "short") {
