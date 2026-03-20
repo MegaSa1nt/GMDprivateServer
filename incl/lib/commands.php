@@ -104,6 +104,15 @@ class Commands {
 				
 				$diffValue = !empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0 ? $level['starDifficulty'] / $level['difficultyDenominator'] : 0;
 				Library::rateLevel($levelID, $person, Library::prepareDifficultyForRating($diffValue, $level['starAuto'], $level['starDemon'], $level['starDemonDiff']), $level['starStars'], $level['starCoins'], $featured);
+				
+				return "You ".Library::textColor("successfully", Color::Green)." ".sprintf($returnTextArray[$featured], Library::textColor($level['levelName'], Color::SkyBlue));
+			case '!verifycoins':
+			case '!unverifycoins':
+			case '!vc':
+			case '!unvc':
+				if(!Library::checkPermission($person, 'gameVerifyCoins')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
+				
+				$commandArray = [
 					'!verifycoins' => 1, '!vc' => 1,
 					'!unverifycoins' => 0, '!unvc' => 0
 				];
