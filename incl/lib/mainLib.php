@@ -3215,7 +3215,12 @@ class Library {
 		$starsDiff = ['stars', 'featured', 'epic', 'legendary', 'mythic'];
 		$starsIcon = $starsDiff[$featured];
 
-		$difficulty = self::prepareDifficultyForRating(($level['starDifficulty'] / $level['difficultyDenominator']), $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
+		$difficultyValue = 0;
+		if(!empty($level['difficultyDenominator']) && $level['difficultyDenominator'] != 0) {
+			$difficultyValue = $level['starDifficulty'] / $level['difficultyDenominator'];
+		}
+		
+		$difficulty = self::prepareDifficultyForRating($difficultyValue, $level['starAuto'], $level['starDemon'], $level['starDemonDiff']);
 		$diffArray = ['n/a' => 'na', 'auto' => 'auto', 'easy' => 'easy', 'normal' => 'normal', 'hard' => 'hard', 'harder' => 'harder', 'insane' => 'insane', 'demon' => 'demon-hard', 'easy demon' => 'demon-easy', 'medium demon' => 'demon-medium', 'hard demon' => 'demon-hard', 'insane demon' => 'demon-insane', 'extreme demon' => 'demon-extreme'];
 		$diffIcon = $diffArray[mb_strtolower($difficulty)] ?? 'na';
 		
