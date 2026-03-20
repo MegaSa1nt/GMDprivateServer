@@ -62,6 +62,7 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // Функция для нормализации URL - добавляет .php расширение если необходимо
+// НО не добавляет .php для путей, которые обрабатываются web server rewrite rules
 function normalizePageUrl(url) {
 	// Прервать обработку если уже есть расширение файла
 	const urlWithoutQuery = url.split('?')[0];
@@ -77,7 +78,32 @@ function normalizePageUrl(url) {
 		return url;
 	}
 	
-	// Добавить .php расширение перед query параметрами
+	// Пути которые обрабатываются web server rewrite rules и НЕ должны получать .php
+	// Это пути с параметрами как: profile/username, clan/clanname, browse/levels/123 и т.д.
+	const rewriteRulePrefixes = [
+		'profile/',
+		'clan/',
+		'messenger/',
+		'browse/levels/',
+		'browse/lists/',
+		'browse/mappacks/',
+		'browse/gauntlets/',
+		'browse/accounts/',
+		'browse/songs/',
+		'browse/sfxs/',
+		'mod/roles/'
+	];
+	
+	// Проверить если путь начинается с одного из prefixes с параметром
+	for(let prefix of rewriteRulePrefixes) {
+		if(urlWithoutHash.startsWith(prefix)) {
+			// Если есть слэш после prefix (например profile/username) - это параметр
+			// Не добавляем .php, web server обработает через rewrite rule
+			return url;
+		}
+	}
+	
+	// Добавить .php расширение перед query параметрами для остальных путей
 	const queryIndex = url.indexOf('?');
 	const hashIndex = url.indexOf('#');
 	

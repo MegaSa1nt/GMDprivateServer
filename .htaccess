@@ -9,6 +9,14 @@
 	RewriteCond %{REQUEST_URI} \.json$ [NC]
 	RewriteRule ^ - [F]
 
+	# Cleanup: redirect URLs with incorrect .php extensions back to proper rewrite rules
+	# These rules handle cases where .php extension was incorrectly added to parameterized paths
+	RewriteRule ^dashboard/profile/([\w\-]+)/([\w\-]+)\.php$ dashboard/profile/$1/$2 [L,R=301]
+	RewriteRule ^dashboard/clan/([\w\-]+)/([\w\-]+)\.php$ dashboard/clan/$1/$2 [L,R=301]
+	RewriteRule ^dashboard/messenger/([\w\-]+)/([\w\-]+)\.php$ dashboard/messenger/$1/$2 [L,R=301]
+	RewriteRule ^dashboard/browse/(levels|lists|mappacks|gauntlets|accounts|songs|sfxs)/([\w\-]+)\.php$ dashboard/browse/$1/$2 [L,R=301]
+	RewriteRule ^dashboard/mod/roles/([\w\-]+)\.php$ dashboard/mod/roles/$1 [L,R=301]
+
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^sfx/(.+)$ sfx/handler.php?request=$1 [L,QSA]
 
