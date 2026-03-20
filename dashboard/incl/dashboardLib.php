@@ -123,8 +123,25 @@ class Dashboard {
 			return $iconKit;
 		}
 		
+		// Маппинг iconType индекса к названию типа и соответствующему полю БД
+		$accFieldMap = [
+			0 => 'accIcon',    // cube
+			1 => 'accShip',    // ship
+			2 => 'accBall',    // ball
+			3 => 'accBird',    // ufo
+			4 => 'accDart',    // wave
+			5 => 'accRobot',   // robot
+			6 => 'accSpider',  // spider
+			7 => 'accSwing',   // swing
+			8 => 'accJetpack'  // jetpack
+		];
+		
+		// Получить правильное поле для main иконки на основе iconType
+		$mainAccField = $accFieldMap[$user['iconType']] ?? 'accIcon';
+		$mainValue = $user[$mainAccField] ? $user[$mainAccField] : 1;
+		
 		$iconKit = [
-			'main' => $iconsRendererServer.'/icon.png?type='.$iconTypes[$user['iconType']].'&value='.($user['accIcon'] ? $user['accIcon'] : 1).'&color1='.$user['color1'].'&color2='.$user['color2'].($user['accGlow'] ? '&glow='.$user['accGlow'].'&color3='.$user['color3'] : ''),
+			'main' => $iconsRendererServer.'/icon.png?type='.$iconTypes[$user['iconType']].'&value='.$mainValue.'&color1='.$user['color1'].'&color2='.$user['color2'].($user['accGlow'] ? '&glow='.$user['accGlow'].'&color3='.$user['color3'] : ''),
 			'cube' => $iconsRendererServer.'/icon.png?type=cube&value='.($user['accIcon'] ? $user['accIcon'] : 1).'&color1='.$user['color1'].'&color2='.$user['color2'].($user['accGlow'] ? '&glow='.$user['accGlow'].'&color3='.$user['color3'] : ''),
 			'ship' => $iconsRendererServer.'/icon.png?type=ship&value='.($user['accShip'] ? $user['accShip'] : 1).'&color1='.$user['color1'].'&color2='.$user['color2'].($user['accGlow'] ? '&glow='.$user['accGlow'].'&color3='.$user['color3'] : ''),
 			'ball' => $iconsRendererServer.'/icon.png?type=ball&value='.($user['accBall'] ? $user['accBall'] : 1).'&color1='.$user['color1'].'&color2='.$user['color2'].($user['accGlow'] ? '&glow='.$user['accGlow'].'&color3='.$user['color3'] : ''),
