@@ -1,0 +1,71 @@
+
+
+services:
+  # The PHP-FPM Service (Handles PHP execution)
+  app:
+    build: .
+    container_name: gdps-app
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-gdps}
+      - DB_PASSWORD=${DB_PASSWORD:-123123}
+      - DB_NAME=${DB_NAME:-gcs}
+    depends_on:
+      - db
+    networks:
+      - gdps-network
+
+  # The Nginx Service (Handles web requests and rewrites)
+  web:
+    image: nginx:alpine
+    container_name: gdps-web
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - gdps-network
+
+  # The MariaDB Database
+  db:
+    image: mariadb:10.6
+    container_name: gdps-database
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-123123}
+      MARIADB_DATABASE: ${DB_NAME:-gcs}
+      MARIADB_USER: ${DB_USER:-gdps}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-123123}
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      # Persistent database data
+      - ./docker/db_data:/var/lib/mysql
+      # Auto-import database structure on first run
+      - ./database.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - gdps-network
+
+  # phpMyAdmin for easy database management
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: gdps-pma
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-123123}
+    depends_on:
+      - db
+    networks:
+      - gdps-network
+
+networks:
+  gdps-network:
+    driver: bridge

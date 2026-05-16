@@ -3,6 +3,9 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
+    RewriteCond %{ENV:REDIRECT_STATUS} 200
+    RewriteRule ^ - [L]
+
 	RewriteCond %{REQUEST_URI} ^/(config|data|incl)/ [NC]
 	RewriteRule ^ - [F]
 
@@ -65,6 +68,10 @@
 	
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_URI} !\.php$ [NC]
+	RewriteCond %{REQUEST_URI} !\.ico$ [NC]
+	RewriteCond %{REQUEST_URI} !\.png$ [NC]
+	RewriteCond %{REQUEST_URI} !\.jpg$ [NC]
 	RewriteRule ^(.*)$ $1.php [L,QSA]
 
 	RewriteCond %{REQUEST_FILENAME} !-f

@@ -65,3 +65,8 @@ dashboard/songs/*.mp3
 dashboard/songs/*.ogg
 dashboard/sfxs/*.ogg
 incl/misc/topArtists.cache
+
+# Docker
+docker/db_data/
+.env
+
