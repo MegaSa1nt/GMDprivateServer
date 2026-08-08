@@ -292,7 +292,7 @@ class mainLib {
 		require_once __DIR__ . "/exploitPatch.php";
 		require_once __DIR__ . "/GJPCheck.php";
 		if(!empty($_POST["udid"]) && $unregisteredSubmissions) {
-			$id = ExploitPatch::remove($_POST["udid"]);
+			$id = str_replace([".", "/"], "", ExploitPatch::remove($_POST["udid"]));
 			if(is_numeric($id)) exit("-1");
 		} elseif(!empty($_POST["accountID"]) AND $_POST["accountID"] !="0") $id = GJPCheck::getAccountIDOrDie();
 		else exit("-1");
