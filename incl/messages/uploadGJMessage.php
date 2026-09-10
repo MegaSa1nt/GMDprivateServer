@@ -20,9 +20,8 @@ $query3 = $db->prepare($query3);
 $query3->execute([':accID' => $accID]);
 $userName = $query3->fetchColumn();
 //continuing the accounts system
-$id = ExploitPatch::remove($_POST["accountID"]);
 $register = 1;
-$userID = $gs->getUserID($id);
+$userID = $gs->getUserID($accID);
 $uploadDate = time();
 
 $checkBan = $gs->getPersonBan($accID, $userID, 3);
@@ -43,7 +42,7 @@ if (!empty($mSOnly[0]) and $mSOnly[0] == 2) {
     echo -1;
 } else {
     if (empty($blocked[0]) and (empty($mSOnly[0]) || !empty($friend[0]))) {
-        $query->execute([':subject' => $subject, ':body' => $body, ':accID' => $id, ':userID' => $userID, ':userName' => $userName, ':toAccountID' => $toAccountID, ':secret' => $secret, ':uploadDate' => $uploadDate]);
+        $query->execute([':subject' => $subject, ':body' => $body, ':accID' => $accID, ':userID' => $userID, ':userName' => $userName, ':toAccountID' => $toAccountID, ':secret' => $secret, ':uploadDate' => $uploadDate]);
         echo 1;
     } else {
         echo -1;
