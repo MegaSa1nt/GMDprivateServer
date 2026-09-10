@@ -6,7 +6,7 @@ require_once "../".$dbPath."incl/lib/mainLib.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 $gs = new mainLib();
 $accID = $_SESSION["accountID"];
-$songid = ExploitPatch::remove($_GET["ID"]);
+$songid = ExploitPatch::number($_GET["ID"]);
 $type = 'songs';
 $format = 'mp3';
 if(isset($_GET['sfx'])) {
