@@ -42,8 +42,8 @@ class GJPCheck {
 
 		$accountID = ExploitPatch::remove($_POST["accountID"]);
 
-		if(!empty($_POST['gjp'])) return self::validateGJPOrDie($_POST['gjp'], $accountID, $dontDie);
-		elseif(!empty($_POST['gjp2'])) return self::validateGJP2OrDie($_POST['gjp2'], $accountID, $dontDie);
+		if(!empty($_POST['gjp'])) { if(self::validateGJP2OrDie($_POST['gjp2'], $accountID, $dontDie) === false) return false; }
+		elseif(!empty($_POST['gjp2'])) { if(self::validateGJP2OrDie($_POST['gjp2'], $accountID, $dontDie) === false) return false; }
 		elseif(!empty($_POST['auth'])) {
 			$tokenAuth = GeneratePass::isValidToken($_POST['auth']);
 			if(!is_array($tokenAuth)) {
