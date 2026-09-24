@@ -1,3 +1,14 @@
+> [!CAUTION]  
+> This core is **not finished**, use it at your own risk. There is **no way** to revert to old core after updating.
+> 
+> **Missing stuff before releasing**:
+> - Captcha
+> - Mail verification
+> - Automod rewrite
+> - Discord webhooks
+> - Mobile adaptation of dashboard
+> - Some structural changes
+
 ## GMDprivateServer
 ### A server emulator for Geometry Dash. Supports GD from 1.0 to 2.208
 
