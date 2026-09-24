@@ -1,5 +1,9 @@
-## This version of core is deprecated
-### [Repository with new GDPS core](https://github.com/MegaSa1nt/GMDprivateServer/tree/new)
+> [!CAUTION]  
+> This version of core is **deprecated**. Core will **not receive** any new features, except new GD updates and security fixes.
+> 
+> However, new core is in development and should release one day or another. [Repository with new GDPS core.](https://github.com/MegaSa1nt/GMDprivateServer/tree/new)
+> 
+> Do **not** use new core in production.
 
 # GMDprivateServer
 ## Geometry Dash Private Server
