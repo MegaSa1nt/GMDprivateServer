@@ -9,6 +9,7 @@ class Commands {
 		if(substr($comment, 0, 1) != '!') return false;
 		
 		$levelID = $level['levelID'];
+		$gameVersion = $_POST['gameVersion'] ?: 22;
 		
 		$commentSplit = explode(' ', $comment);
 		$increaseSplit = 0;
@@ -47,10 +48,14 @@ class Commands {
 				
 				if($forceCommandFlag && !$forceFlagSet) return "Are you sure you want to rate ".Library::textColor($level['levelName'], Color::SkyBlue).' to '.$stars .' star'.($stars > 1 ? 's' : '').'?'.PHP_EOL
 					.Library::textColor('Add "-f" flag after '.$command.' to execute it.', Color::Yellow);
+					
+				$tooShortWarning = "";
+				if(($gameVersion >= 22 && !$level['levelLength']) || ($gameVersion == 21 && $level['levelLength'] < 2)) $tooShortWarning = PHP_EOL.Library::textColor("This level is too short and will cause the player to be kicked out of the level on completion!", Color::Green);
 				
 				$rateLevel = Library::rateLevel($levelID, $person, $difficulty, $stars, $verifyCoins, $featured);
 				
-				return "You ".Library::textColor("successfully", Color::Green)." rated ".Library::textColor($level['levelName'], Color::SkyBlue).' as '.Library::textColor($rateLevel, Color::Yellow).', '.$stars .' star'.($stars > 1 ? 's!' : '!');
+				return "You ".Library::textColor("successfully", Color::Green)." rated ".Library::textColor($level['levelName'], Color::SkyBlue).' as '.Library::textColor($rateLevel, Color::Yellow).', '.$stars .' star'.($stars > 1 ? 's!' : '!')
+					.$tooShortWarning;
 			case '!unrate':
 			case '!unr':
 				if(!Library::checkPermission($person, 'gameRateLevel')) return "You ".Library::textColor("don't have permissions", Color::Red)." to use command ".Library::textColor($command, Color::SkyBlue)."!";
@@ -326,7 +331,7 @@ class Commands {
 				}
 				
 				$newPassword = '1'.sprintf("%06d", abs(Escape::number($commentSplit[1])));
-				if($newPassword == "1000000") $newPassword = $level['gameVersion'] > 21 ? 1 : 0;
+				if($newPassword == "1000000") $newPassword = $gameVersion > 21 ? 1 : 0;
 				
 				if($level['password'] == $newPassword) return Library::textColor($level['levelName'], Color::SkyBlue)." ".Library::textColor("already has", Color::Green)." this password!";
 				

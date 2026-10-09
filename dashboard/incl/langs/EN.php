@@ -257,7 +257,7 @@ $language['loginToAccountButton'] = 'Login';
 $language['changePasswordOld'] = 'Old password';
 $language['changePasswordNew'] = 'New password';
 
-$language['levelTitle'] = '<text class="big">%1$s</text> by %2$s'; // %1$s — level name, %2$s — username
+$language['levelTitle'] = '<text class="big">%1$s</text> <text dashboard-pc>by</text> %2$s'; // %1$s — level name, %2$s — username
 $language['levelTitlePlain'] = '%1$s by %2$s'; // %1$s — level name, %2$s — username
 $language['stars'] = 'Stars';
 $language['requestedStars'] = 'Requested stars';

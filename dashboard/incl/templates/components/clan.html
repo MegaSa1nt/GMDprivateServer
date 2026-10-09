@@ -25,13 +25,25 @@
 				%CLAN_DESCRIPTION%
 			</h3>
 	
+			<div class="horisontal stats" dashboard-mobile>
+				<text class="levelStat" title="%TEXT_clanID%">
+					<i class="fa-solid fa-shield-halved"></i>
+					<text dashboard-copy>%clanID%</text>
+				</text>
+				
+				<button class="button small titleToRight" type="button" title="%TEXT_viewClan%" href="clan/%CLAN_NAME%" dashboard-loader-type="settings">
+					<i class="fa-solid fa-eye"></i>
+					<text>%TEXT_viewClan%</text>
+				</button>
+			</div>
+	
 			<div class="viewMoreDiv" dashboard-view-more>
 				<button class="button" type="button" dashboard-mobile dashboard-view-more-button>
 					<i class="fa-solid fa-caret-right" dashboard-view-more-icon></i>
 				
 					<div class="viewMoreText">
-						<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 						<text dashboard-view-more-text-opened>%TEXT_hide%</text>
+						<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 					</div>
 				</button>
 				
@@ -41,7 +53,7 @@
 					</div>
 					
 					<div class="levelStats card">
-						<text class="levelStat" title="%TEXT_clanID%">
+						<text class="levelStat" title="%TEXT_clanID%" dashboard-pc>
 							<i class="fa-solid fa-shield-halved"></i>
 							<text dashboard-copy>%clanID%</text>
 						</text>
@@ -56,7 +68,7 @@
 							<text dashboard-date="%creationDate%"></text>
 						</text>
 					
-						<button class="button short titleToRight" type="button" title="%TEXT_viewClan%" href="clan/%CLAN_NAME%" dashboard-loader-type="settings">
+						<button class="button short titleToRight" type="button" title="%TEXT_viewClan%" href="clan/%CLAN_NAME%" dashboard-loader-type="settings" dashboard-pc>
 							<i class="fa-solid fa-eye"></i>
 						</button>
 					</div>

@@ -257,7 +257,7 @@ $language['loginToAccountButton'] = 'Войти';
 $language['changePasswordOld'] = 'Старый пароль';
 $language['changePasswordNew'] = 'Новый пароль';
 
-$language['levelTitle'] = '<text class="big">%1$s</text> от %2$s'; // %1$s — level name, %2$s — username
+$language['levelTitle'] = '<text class="big">%1$s</text> <text dashboard-pc>от</text> %2$s'; // %1$s — level name, %2$s — username
 $language['levelTitlePlain'] = '%1$s от %2$s'; // %1$s — level name, %2$s — username
 $language['stars'] = 'Звёзды';
 $language['requestedStars'] = 'Запрошенные звёзды';

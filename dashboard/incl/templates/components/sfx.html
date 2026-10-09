@@ -16,13 +16,25 @@
 		</div>
 	</div>
 	
+	<div class="horisontal stats" dashboard-mobile>
+		<text class="levelStat" title="%TEXT_sfxID%">
+			<i class="fa-solid fa-music"></i>
+			<text dashboard-copy>%ID%</text>
+		</text>
+			
+		<text class="levelStat" title="%TEXT_sfxSize%">
+			<i class="fa-solid fa-weight-hanging"></i>
+			<text>%SFX_SIZE%</text>
+		</text>
+	</div>
+	
 	<div class="viewMoreDiv" dashboard-view-more>
 		<button class="button" type="button" dashboard-mobile dashboard-view-more-button>
 			<i class="fa-solid fa-caret-right" dashboard-view-more-icon></i>
 		
 			<div class="viewMoreText">
-				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 				<text dashboard-view-more-text-opened>%TEXT_hide%</text>
+				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 			</div>
 		</button>
 	
@@ -40,6 +52,11 @@
 				<text class="levelStat" title="%TEXT_sfxID%">
 					<i class="fa-solid fa-drum"></i>
 					<text dashboard-copy>%SFX_ID%</text>
+				</text>
+				
+				<text class="levelStat" title="%TEXT_sfxSize%">
+					<i class="fa-solid fa-weight-hanging"></i>
+					<text>%SFX_SIZE%</text>
 				</text>
 			
 				<text class="levelStat" title="%TEXT_uploadDate%" dashboard-show="%SFX_IS_LOCAL%">

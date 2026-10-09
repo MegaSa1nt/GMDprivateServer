@@ -16,13 +16,25 @@
 		</div>
 	</div>
 	
+	<div class="horisontal stats" dashboard-mobile>
+		<text class="levelStat" title="%TEXT_songID%">
+			<i class="fa-solid fa-music"></i>
+			<text dashboard-copy>%ID%</text>
+		</text>
+			
+		<text class="levelStat" title="%TEXT_songSize%">
+			<i class="fa-solid fa-weight-hanging"></i>
+			<text>%SONG_SIZE%</text>
+		</text>
+	</div>
+	
 	<div class="viewMoreDiv" dashboard-view-more>
 		<button class="button" type="button" dashboard-mobile dashboard-view-more-button>
 			<i class="fa-solid fa-caret-right" dashboard-view-more-icon></i>
 		
 			<div class="viewMoreText">
-				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 				<text dashboard-view-more-text-opened>%TEXT_hide%</text>
+				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 			</div>
 		</button>
 	
@@ -32,12 +44,12 @@
 			</div>
 			
 			<div class="levelStats card">
-				<text class="levelStat" title="%TEXT_songID%">
+				<text class="levelStat" title="%TEXT_songID%" dashboard-pc>
 					<i class="fa-solid fa-music"></i>
 					<text dashboard-copy>%ID%</text>
 				</text>
 			
-				<text class="levelStat" title="%TEXT_songSize%">
+				<text class="levelStat" title="%TEXT_songSize%" dashboard-pc>
 					<i class="fa-solid fa-weight-hanging"></i>
 					<text>%SONG_SIZE%</text>
 				</text>

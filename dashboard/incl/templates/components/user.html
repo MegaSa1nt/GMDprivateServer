@@ -1,20 +1,41 @@
 <div class="contentDiv" dashboard-context-div>
-	<div class="horisontal spaceBetween">
-		<div class="levelTitle">
-			<h2 class="horisontal">
-				%USER_CARD%
-				
-				<span class="extraIcon" title="%USER_EXTRA_ICON_TITLE%">
-					<i dashboard-show="%USER_SHOW_EXTRA_ICON%" class="fa-solid fa-%USER_EXTRA_ICON%" ></i>
-				</span>
-			</h2>
+	<div class="vertical noGap">
+		<div class="horisontal spaceBetween">
+			<div class="levelTitle onlyUser">
+				<h2 class="horisontal">
+					%USER_CARD%
+					
+					<span class="extraIcon" title="%USER_EXTRA_ICON_TITLE%">
+						<i dashboard-show="%USER_SHOW_EXTRA_ICON%" class="fa-solid fa-%USER_EXTRA_ICON%" ></i>
+					</span>
+				</h2>
+			</div>
+			
+			<h1 dashboard-score="%USER_RANK%" dashboard-show="%USER_SHOW_RANK%">
+				<i dashboard-show="%USER_IS_LEADER%" class="fa-solid fa-trophy"></i>
+				<i dashboard-hide="%USER_IS_LEADER%" class="fa-solid fa-hashtag"></i>
+				%USER_RANK%
+			</h1>
 		</div>
 		
-		<h1 dashboard-score="%USER_RANK%" dashboard-show="%USER_SHOW_RANK%">
-			<i dashboard-show="%USER_IS_LEADER%" class="fa-solid fa-trophy"></i>
-			<i dashboard-hide="%USER_IS_LEADER%" class="fa-solid fa-hashtag"></i>
-			%USER_RANK%
-		</h1>
+		<div class="horisontal stats" dashboard-mobile>
+			<div class="levelStats card">
+				<text class="levelStat" title="%TEXT_accountID%">
+					<i class="fa-solid fa-user"></i>
+					<text dashboard-copy>%extID%</text>
+				</text>
+				
+				<text class="levelStat" title="%TEXT_userID%">
+					<i class="fa-regular fa-user"></i>
+					<text dashboard-copy>%userID%</text>
+				</text>
+			</div>
+			
+			<button class="button small titleToRight" type="button" title="%TEXT_viewAccount%" href="profile/%USER_NAME%" dashboard-loader-type="settings">
+				<i class="fa-solid fa-eye"></i>
+				<text>%TEXT_viewAccount%</text>
+			</button>
+		</div>
 	</div>
 	
 	<div class="viewMoreDiv" dashboard-view-more>
@@ -22,13 +43,13 @@
 			<i class="fa-solid fa-caret-right" dashboard-view-more-icon></i>
 			
 			<div class="viewMoreText">
-				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 				<text dashboard-view-more-text-opened>%TEXT_hide%</text>
+				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 			</div>
 		</button>
 	
 		<div class="horisontal stats">
-			<div class="levelStats card">
+			<div class="levelStats card" dashboard-pc>
 				<text class="levelStat" title="%TEXT_accountID%">
 					<i class="fa-solid fa-user"></i>
 					<text dashboard-copy>%extID%</text>
@@ -81,9 +102,8 @@
 					%creatorPoints%
 				</div>
 				
-				<button class="button titleToRight" type="button" title="%TEXT_viewAccount%" href="profile/%USER_NAME%" dashboard-loader-type="settings">
+				<button class="button titleToRight" type="button" title="%TEXT_viewAccount%" href="profile/%USER_NAME%" dashboard-loader-type="settings" dashboard-pc>
 					<i class="fa-solid fa-eye"></i>
-					<text dashboard-mobile>%TEXT_viewAccount%</text>
 				</button>
 			</div>
 		</div>

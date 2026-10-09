@@ -4511,7 +4511,7 @@ class Library {
 				foreach($artistsArray AS &$artistID) {
 					$artistData = self::getLibrarySongAuthorInfo($artistID);
 					if(!$artistData) continue;
-					$artistsNames[] = $artistID.','.str_replace(["~|~", ","], ["", "."], $artistData['name']);
+					$artistsNames[] = $artistID.','.str_replace(["~|~", ","], ["", "."], Escape::gd($artistData['name']));
 				}
 			}
 			
@@ -4519,7 +4519,7 @@ class Library {
 			$extraSongString = '~|~9~|~'.$song['priorityOrder'].'~|~11~|~'.$song['ncs'].'~|~12~|~'.$song['artists'].'~|~13~|~'.($song['new'] ? 1 : 0).'~|~14~|~'.$song['new'].'~|~15~|~'.$artistsNames;
 		}
 		
-		return "1~|~".$song["ID"]."~|~2~|~".Escape::translit(str_replace("~|~", "", $song["name"]))."~|~3~|~".$song["authorID"]."~|~4~|~".Escape::translit(str_replace("~|~", "", $song["authorName"]))."~|~5~|~".$song["size"]."~|~6~|~~|~10~|~".$downloadLink."~|~7~|~~|~8~|~1".$extraSongString;
+		return "1~|~".$song["ID"]."~|~2~|~".Escape::gd(Escape::translit(str_replace("~|~", "", $song["name"])))."~|~3~|~".$song["authorID"]."~|~4~|~".Escape::gd(Escape::translit(str_replace("~|~", "", $song["authorName"])))."~|~5~|~".$song["size"]."~|~6~|~~|~10~|~".$downloadLink."~|~7~|~~|~8~|~1".$extraSongString;
 	}
 	
 	public static function getLibrarySongInfo($audioID, $type = 'music') {
@@ -5409,7 +5409,6 @@ class Library {
 		if($fileType != "audio/ogg") return ['success' => false, 'error' => SongError::NotAnAudio];
 		
 		$filePath = $pathToSFXsFolder.'/'.$accountID.'_'.$time.'.ogg';
-		$realSFXSize = round($sfxFile['size'] / 1048576, 2);
 		
 		move_uploaded_file($sfxFile['tmp_name'], $filePath);
 		
@@ -5419,7 +5418,7 @@ class Library {
 		$sfxTitle = Escape::text($sfxTitle, 40) ?: Escape::text($sfxInfo['tags']["vorbiscomment"]['title'][0], 40) ?: 'Unknown';
 				
 		$insertSFX = $db->prepare("INSERT INTO sfxs (ID, name, authorName, size, milliseconds, download, reuploadTime, reuploadID, isDisabled) VALUES (:id, :name, :author, :size, :duration, :download, :reuploadTime, :reuploadID, :isDisabled)");
-		$insertSFX->execute([':id' => $sfxID, ':name' => $sfxTitle, ':download' => '', ':author' => $userName, ':size' => $realSFXSize, ':duration' => $sfxDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSFXs ? 0 : 1)]);
+		$insertSFX->execute([':id' => $sfxID, ':name' => $sfxTitle, ':download' => '', ':author' => $userName, ':size' => $sfxFile['size'], ':duration' => $sfxDuration, ':reuploadTime' => time(), ':reuploadID' => $accountID, ':isDisabled' => ($preenableSFXs ? 0 : 1)]);
 		$sfxID = $db->lastInsertId();
 		
 		$realFilePath = $pathToSFXsFolder.'/'.$sfxID.'.ogg';

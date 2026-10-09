@@ -412,6 +412,12 @@
 		font-size: 18px;
 	}
 	
+	.levelTitle h2:has(.username) {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	
 	.levelTitle h2 text.big {
 		font-size: 20px;
 	}
@@ -422,16 +428,24 @@
 	
 	.levelTitle h2 img,
 	.contextMenuButton img {
-		max-width: 22px;
-		max-height: 22px;
+		max-width: 18px;
+		max-height: 18px;
 	}
 	
 	.username span {
-		gap: 5px;
+		gap: 3px;
+	}
+	
+	.levelTitle:not(.onlyUser) .username span {
+		font-size: 16px;
 	}
 	
 	.contentDiv .vertical {
 		gap: 5px;
+	}
+	
+	.contentDiv .vertical.noGap {
+		gap: 0px;
 	}
 	
 	.commentsDiv .contentDiv .vertical {
@@ -439,10 +453,10 @@
 	}
 	
 	.contentDiv .difficultyImage {
-		width: 80px;
-		height: 80px;
+		width: 70px;
+		height: 70px;
 		
-		margin: -15px;
+		margin: -10px;
 	}
 	
 	.contentDiv .difficultyImage.gauntlet {

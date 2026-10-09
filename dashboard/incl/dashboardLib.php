@@ -1098,6 +1098,8 @@ class Dashboard {
 		$sfx['SFX_NAME'] = $contextMenuData['MENU_SFX_NAME'] = htmlspecialchars($sfx['name']);
 		$sfx['SFX_URL'] = $contextMenuData['MENU_SFX_URL'] = htmlspecialchars($downloadLink);
 		
+		$sfx['SFX_SIZE'] = sprintf(self::string("songSizeTemplate"), round((int)$sfx['size'] / 1048576, 2) ?: 0);
+		
 		$sfx['SFX_ID'] = $contextMenuData['MENU_ID'] = $sfx['ID'] ?: $sfx['originalID'];
 		$contextMenuData['MENU_NAME'] = htmlspecialchars($userName);
 		

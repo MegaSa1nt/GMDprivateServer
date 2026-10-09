@@ -1,17 +1,29 @@
-<div class="contentDiv" dashboard-context-div>
-	<div class="horisontal">
-		<div class="vertical">
+<div class="contentDiv smallGap" dashboard-context-div>
+	<div class="vertical noGap">
+		<div class="horisontal">
+			<img loading="lazy" class="difficultyImage" src="%LEVEL_DIFFICULTY_IMAGE%"></img>
+			
 			<div class="levelTitle" href="browse/levels/%levelID%" dashboard-loader-type="settings">
 				<h2>%LEVEL_TITLE%</h2>
-			</div>
-			
-			<h3 class="levelDescription">
-				<span class="emptySymbol">:(</span>
-				%LEVEL_DESCRIPTION%
-			</h3>
+			</div>	
 		</div>
 		
-		<img loading="lazy" class="difficultyImage" src="%LEVEL_DIFFICULTY_IMAGE%"></img>
+		<h3 class="levelDescription">
+			<span class="emptySymbol">:(</span>
+			%LEVEL_DESCRIPTION%
+		</h3>
+	</div>
+	
+	<div class="horisontal stats" dashboard-mobile>
+		<text class="levelStat" title="%TEXT_levelID%">
+			<i class="fa-solid fa-gamepad"></i>
+			<text dashboard-copy>%levelID%</text>
+		</text>
+		
+		<button class="button small titleToRight" type="button" title="%TEXT_viewLevel%" href="browse/levels/%levelID%" dashboard-loader-type="settings">
+			<i class="fa-solid fa-eye"></i>
+			<text>%TEXT_viewLevel%</text>
+		</button>
 	</div>
 	
 	<div class="viewMoreDiv" dashboard-view-more>
@@ -19,8 +31,8 @@
 			<i class="fa-solid fa-caret-right" dashboard-view-more-icon></i>
 		
 			<div class="viewMoreText">
-				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 				<text dashboard-view-more-text-opened>%TEXT_hide%</text>
+				<text dashboard-view-more-text-closed>%TEXT_viewMore%</text>
 			</div>
 		</button>
 		
@@ -45,7 +57,7 @@
 			</div>
 			
 			<div class="levelStats card">
-				<text class="levelStat" title="%TEXT_levelID%">
+				<text class="levelStat" title="%TEXT_levelID%" dashboard-pc>
 					<i class="fa-solid fa-gamepad"></i>
 					<text dashboard-copy>%levelID%</text>
 				</text>
@@ -86,9 +98,8 @@
 					%LEVEL_LIKES%
 				</text>
 				
-				<button class="button titleToRight" type="button" title="%TEXT_viewLevel%" href="browse/levels/%levelID%" dashboard-loader-type="settings">
+				<button class="button titleToRight" type="button" title="%TEXT_viewLevel%" href="browse/levels/%levelID%" dashboard-loader-type="settings" dashboard-pc>
 					<i class="fa-solid fa-eye"></i>
-					<text dashboard-mobile>%TEXT_viewLevel%</text>
 				</button>
 			</div>
 		</div>

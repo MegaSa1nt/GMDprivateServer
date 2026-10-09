@@ -38,10 +38,10 @@ switch($type) {
 			if(is_numeric($str)) {
 				$friendsString = Library::getFriendsQueryString($accountID);
 				
-				$filters = ["levels.levelID = ".$str." AND (
+				$filters = $str && $friendsString ? ["levels.levelID = ".$str." AND (
 					levels.unlisted != 1 OR
 					(levels.unlisted = 1 AND (levels.extID IN (".$friendsString.")))
-				)"];
+				)"]  : ["1 != 1"];
 				
 				$isIDSearch = true;
 			} else {
@@ -82,7 +82,6 @@ switch($type) {
 		$filters[] = "levels.userID = '".$str."'";
 		break;
 	case 6: // Featured
-	case 17: // Featured in GDW
 		if($gameVersion > 21) $filters[] = "NOT levels.starFeatured = 0 OR NOT levels.starEpic = 0";
 		else $filters[] = "NOT levels.starFeatured = 0";
 		$order = "levels.starFeatured DESC, levels.rateDate DESC, levels.uploadDate";
@@ -107,7 +106,7 @@ switch($type) {
 		END';
 		$orderSorting = 'ASC';
 		
-		$filters[] = "levels.levelID IN (".$str.")";
+		$filters[] = $str ? "levels.levelID IN (".$str.")" : "1 != 1";
 		break;
 	case 10: // Map Packs
 	case 19: // Unknown, but same as Map Packs (on real GD type 10 has star rated filter and 19 doesn't)
@@ -124,10 +123,10 @@ switch($type) {
 		
 		$friendsString = Library::getFriendsQueryString($accountID);
 		
-		$filters[] = "levels.levelID IN (".$str.") AND (
+		$filters[] = $str && $friendsString ? "levels.levelID IN (".$str.") AND (
 				levels.unlisted != 1 OR
 				(levels.unlisted = 1 AND (levels.extID IN (".$friendsString.")))
-			)";
+			)" : "1 != 1";
 			
 		$limit = false;
 		break;
@@ -146,6 +145,7 @@ switch($type) {
 		$filters[] = $friendsString ? "levels.extID IN (".$friendsString.")" : "1 != 1";
 		break;
 	case 21: // Daily safe
+	case 17: // Featured in GDW
 		$queryJoin = "INNER JOIN dailyfeatures ON levels.levelID = dailyfeatures.levelID";
 		$filters[] = "dailyfeatures.type = 0 AND dailyfeatures.timestamp < ".$time;
 		$order = "dailyfeatures.feaID";
@@ -179,10 +179,10 @@ switch($type) {
 		
 		$friendsString = Library::getFriendsQueryString($accountID);
 		
-		$filters = ["levels.levelID IN (".$listLevels.") AND (
+		$filters = $listLevels && $friendsString ["levels.levelID IN (".$listLevels.") AND (
 				levels.unlisted != 1 OR
 				(levels.unlisted = 1 AND (levels.extID IN (".$friendsString.")))
-			)"];
+			)"] : ["1 != 1"];
 			
 		$limit = false;
 		break;

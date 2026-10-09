@@ -30,10 +30,10 @@ switch($type) {
 			if(is_numeric($str)) {
 				$friendsString = Library::getFriendsQueryString($accountID);
 
-				$filters = ["lists.listID = ".$str." AND (
+				$filters = $str && $friendsString ? ["lists.listID = ".$str." AND (
 					lists.unlisted != 1 OR
 					(lists.unlisted = 1 AND (lists.accountID IN (".$friendsString.")))
-				)"];
+				)"] : ["1 != 1"];
 			} else {
 				$firstCharacter = $enableUserLevelsSearching ? substr($str, 0, 1) : '';
 				
