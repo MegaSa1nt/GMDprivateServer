@@ -7,22 +7,23 @@ require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
-$threadsArray = [];
 $search = ExploitPatch::charclean(ExploitPatch::url_base64_decode($_POST["search"]));
+$filter = ExploitPatch::number($_POST["filter"]) ?: 0;
+$filterArray = ["", "isDMThread = 1", "isDMThread = 0"];
+
+$threadsArray = [];
 $page = ExploitPatch::number($_POST["page"]) ?: 0;
 $offset = $page * 20;
 
-$threadsSynced = $db->prepare("SELECT count(*) FROM actions WHERE type = 83 AND account = :accountID");
-$threadsSynced->execute([":accountID" => $accountID]);
-$threadsSynced = $threadsSynced->fetchColumn();
-if(!$threadsSynced) $gs->syncAccountDMThreads($accountID);
+$gs->syncAccountDMThreads($accountID);
 
-$threads = $db->prepare("SELECT * FROM threads ORDER BY lastMessageTimestamp DESC");
+$threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filterArray[$filter] ? " WHERE ".$filterArray[$filter] : "")." ORDER BY lastMessageTimestamp DESC");
 $threads->execute();
 $threads = $threads->fetchAll();
 
 foreach($threads AS &$thread) {
 	$threadArray = $usersArray = [];
+	$lastMessageSenderID = $thread["accID"];
 	for($i = 0; $i < 26; $i++) $threadArray[$i] = "";
 	
 	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$thread["threadMembers"].")");
@@ -40,24 +41,23 @@ foreach($threads AS &$thread) {
 		$threadArray[1] = $threadReceiver;
 		$threadArray[2] = ExploitPatch::url_base64_encode($usersArray[$threadReceiver]["userName"]);
 		$threadArray[4] = $thread["newMessagesCount"];
-		$threadArray[5] = "0"; // Last sender ID
+		$threadArray[5] = $lastMessageSenderID;
 		$threadArray[6] = $gs->makeTime($thread["lastMessageTimestamp"]);
-		$threadArray[7] = "2";
-		$threadArray[8] = ""; // Last sender username
+		$threadArray[7] = "2"; // Thread members
+		$threadArray[8] = ExploitPatch::url_base64_encode($usersArray[$lastMessageSenderID]["userName"]);
 		$threadArray[9] = $accountID;
-		$threadArray[10] = "0";
-		$threadArray[11] = "0";
-		$threadArray[12] = "1";
-		$threadArray[14] = "0";
+		$threadArray[10] = "0"; // Is thread muted
+		$threadArray[12] = "1"; // Thread type
+		$threadArray[14] = "0"; // Is thread pinned
 		$threadArray[15] = $usersArray[$threadReceiver]["icon"];
 		$threadArray[16] = $usersArray[$threadReceiver]["color1"];
 		$threadArray[17] = $usersArray[$threadReceiver]["color2"];
 		$threadArray[18] = $usersArray[$threadReceiver]["color3"];
 		$threadArray[19] = $usersArray[$threadReceiver]["iconType"];
 		$threadArray[20] = $usersArray[$threadReceiver]["special"];
-		$threadArray[23] = $usersArray[$threadReceiver]["timestamp"];
+		$threadArray[23] = $thread["lastMessageTimestamp"];
 		$threadArray[24] = $gs->getMaxValuePermission($threadReceiver, "modBadgeLevel");
-		$threadArray[25] = "0";
+		$threadArray[25] = "0"; // Thread status
 	}
 	
 	/*
@@ -96,7 +96,7 @@ foreach($threads AS &$thread) {
 
 $threadsString = implode("|", $threadsArray);
 
-$threadsCount = $db->prepare("SELECT count(*) FROM threads ORDER BY lastMessageTimestamp DESC");
+$threadsCount = $db->prepare("SELECT count(*) FROM threads ".($filterArray[$filter] ? " WHERE ".$filterArray[$filter] : "")."");
 $threadsCount->execute();
 $threadsCount = $threadsCount->fetchColumn();
 

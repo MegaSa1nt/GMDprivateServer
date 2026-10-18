@@ -11,7 +11,10 @@ $accountID = GJPCheck::getAccountIDOrDie();
 $threadID = ExploitPatch::number($_POST["threadID"]) ?: 0;
 $beforeID = ExploitPatch::number($_POST["beforeID"]) ?: 0;
 $afterID = ExploitPatch::number($_POST["afterID"]) ?: 0;
-$messagesArray = $threadMembersArray = $invitedMembersArray = $threadArray = [];
+$mv = isset($_POST["mv"]);
+
+$messagesArray = $userIDsArray = $usersArray = $threadMembersArray = $formerMembersArray = $invitedMembersArray = $threadArray = [];
+$userIDsString = "";
 
 $thread = $gs->getThreadByID($threadID);
 if(!$thread) exit("-1");
@@ -44,63 +47,101 @@ foreach($messages AS &$message) {
 	$messagesArray[] = implode(":", $messageArray);
 }
 
-if($thread["threadMembers"]) {
-	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$thread["threadMembers"].")");
-	$users->execute();
-	$users = $users->fetchAll();
-	
-	foreach($users AS &$user) $threadMembersArray[] = "1:".$user["userName"].":2:".$user["userID"].":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":3:".$user["stars"].":52:".$user["moons"].":4:".$user["demons"].":13:".$user["coins"].":17:".$user["userCoins"].":46:".$user["diamonds"];
-}
+if(!$mv) {
+	if($thread["threadMembers"]) $userIDsArray[] = $thread["threadMembers"];
+	if($thread["invitedUsers"]) $userIDsArray[] = $thread["invitedUsers"];
+	if($thread["formerMembers"]) $userIDsArray[] = $thread["formerMembers"];
+	$userIDsString = implode(",", $userIDsArray);
 
-if($thread["threadInvites"]) {
-	$friendships = $gs->getFriendships($accountID);
-	
-	$invitedUsers = $db->prepare("SELECT * FROM users WHERE extID IN (".$thread["threadInvites"].")");
-	$invitedUsers->execute();
-	$invitedUsers = $invitedUsers->fetchAll();
-	
-	foreach($invitedUsers AS &$user) {
-		$invitedMemberArray = [];
+	if($userIDsString) {
+		$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$userIDsString.")");
+		$users->execute();
+		$users = $users->fetchAll();
 		
-		$invitedMemberArray[0] = $user["extID"];
-		$invitedMemberArray[1] = $user["userID"];
-		$invitedMemberArray[2] = ExploitPatch::url_base64_encode($user["userName"]);
-		$invitedMemberArray[3] = $thread["threadOwner"];
-		$invitedMemberArray[4] = $user["icon"];
-		$invitedMemberArray[5] = $user["color1"];
-		$invitedMemberArray[6] = $user["color2"];
-		$invitedMemberArray[7] = $user["color3"];
-		$invitedMemberArray[8] = $user["iconType"];
-		$invitedMemberArray[9] = $user["special"];
-		$invitedMemberArray[10] = $user["stars"];
-		$invitedMemberArray[11] = $user["moons"];
-		$invitedMemberArray[12] = $user["demons"];
-		$invitedMemberArray[13] = $user["coins"];
-		$invitedMemberArray[14] = $user["userCoins"];
-		$invitedMemberArray[15] = $user["diamonds"];
-		$invitedMemberArray[16] = $friendships[$user["extID"]] ?: 0;
-		
-		$invitedMembersArray[] = implode(":", $invitedMemberArray);
+		foreach($users AS &$user) $usersArray[$user["extID"]] = $user;
 	}
-}
 
-$threadArray[0] = $thread["threadID"];
-$threadArray[1] = "0";
-$threadArray[2] = count($threadMembersArray);
-$threadArray[3] = ExploitPatch::url_base64_encode($thread["threadDesc"]);
-$threadArray[4] = "0"; // Key `mv`, GD sends it when it refreshes messages
-$threadArray[5] = "0"; // Show "Load earlier" button
-$threadArray[6] = "0";
-$threadArray[7] = "0";
-$threadArray[8] = ExploitPatch::url_base64_encode($thread["threadName"]);
-$threadArray[9] = "0"; // 1 if thread is locked
-$threadArray[10] = "0";
+	if($thread["threadMembers"]) {
+		$threadMembersIDsArray = explode(",", $thread["threadMembers"]);
+		
+		foreach($threadMembersIDsArray AS &$memberID) {
+			$user = $usersArray[$memberID];
+			
+			$threadMembersArray[] = "1:".$user["userName"].":2:".$user["userID"].":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":3:".$user["stars"].":52:".$user["moons"].":4:".$user["demons"].":13:".$user["coins"].":17:".$user["userCoins"].":46:".$user["diamonds"];
+		}
+	}
+
+	if($thread["formerMembers"]) {
+		$formerMembersIDsArray = explode(",", $thread["formerMembers"]);
+		
+		foreach($formerMembersIDsArray AS &$user) {
+			$formerMemberArray = [];
+			$user = $usersArray[$memberID];
+			
+			$formerMemberArray[0] = $user["extID"];
+			$formerMemberArray[1] = $user["userID"];
+			$formerMemberArray[2] = ExploitPatch::url_base64_encode($user["userName"]);
+			$formerMemberArray[3] = $user["icon"];
+			$formerMemberArray[4] = $user["color1"];
+			$formerMemberArray[5] = $user["color2"];
+			$formerMemberArray[6] = $user["color3"];
+			$formerMemberArray[7] = $user["iconType"];
+			$formerMemberArray[8] = $user["special"];
+			
+			$formerMembersArray[] = implode(":", $formerMemberArray);
+		}
+	}
+
+	if($thread["invitedUsers"]) {
+		$friendships = $gs->getFriendships($accountID);
+		
+		$invitedUsersIDsArray = explode(",", $thread["invitedUsers"]);
+		
+		foreach($invitedUsersIDsArray AS &$memberID) {
+			$invitedMemberArray = [];
+			$user = $usersArray[$memberID];
+			
+			$invitedMemberArray[0] = $user["extID"];
+			$invitedMemberArray[1] = $user["userID"];
+			$invitedMemberArray[2] = ExploitPatch::url_base64_encode($user["userName"]);
+			$invitedMemberArray[3] = $thread["threadOwner"];
+			$invitedMemberArray[4] = $user["icon"];
+			$invitedMemberArray[5] = $user["color1"];
+			$invitedMemberArray[6] = $user["color2"];
+			$invitedMemberArray[7] = $user["color3"];
+			$invitedMemberArray[8] = $user["iconType"];
+			$invitedMemberArray[9] = $user["special"];
+			$invitedMemberArray[10] = $user["stars"];
+			$invitedMemberArray[11] = $user["moons"];
+			$invitedMemberArray[12] = $user["demons"];
+			$invitedMemberArray[13] = $user["coins"];
+			$invitedMemberArray[14] = $user["userCoins"];
+			$invitedMemberArray[15] = $user["diamonds"];
+			$invitedMemberArray[16] = $friendships[$user["extID"]] ?: 0;
+			
+			$invitedMembersArray[] = implode(":", $invitedMemberArray);
+		}
+	}
+
+	$threadArray[0] = $thread["threadID"];
+	$threadArray[1] = "0";
+	$threadArray[2] = count($threadMembersArray);
+	$threadArray[3] = ExploitPatch::url_base64_encode($thread["threadDesc"]);
+	$threadArray[4] = "0"; // Key `mv`, GD sends it when it refreshes messages
+	$threadArray[5] = "0"; // Show "Load earlier" button
+	$threadArray[6] = "0";
+	$threadArray[7] = "0";
+	$threadArray[8] = ExploitPatch::url_base64_encode($thread["threadName"]);
+	$threadArray[9] = "0"; // 1 if thread is locked
+	$threadArray[10] = "0";
+}
 
 $messagesString = implode("|", $messagesArray) ?: "none";
 $threadMembersString = implode("|", $threadMembersArray);
+$formerMemberString = implode("|", $formerMembersArray);
 $invitedMembersString = implode("|", $invitedMembersArray);
 $threadString = implode(":", $threadArray);
 
 $messagesRefreshInterval = 3; // How often GD retrieves messages, min value is 3
-exit($messagesString."#".$threadMembersString."##".$invitedMembersString."#".$threadString."#0#".$messagesRefreshInterval.",1,10,50");
+exit($messagesString."#".$threadMembersString."#".$formerMemberString."#".$invitedMembersString."#".$threadString."#0#".$messagesRefreshInterval.",1,10,50");
 ?>

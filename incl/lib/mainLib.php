@@ -2020,9 +2020,14 @@ class mainLib {
 	public function syncAccountDMThreads($accountID) {
 		require __DIR__."/connection.php";
 		
+		$threadsSynced = $db->prepare("SELECT count(*) FROM actions WHERE type = 83 AND account = :accountID");
+		$threadsSynced->execute([":accountID" => $accountID]);
+		$threadsSynced = $threadsSynced->fetchColumn();
+		if($threadsSynced) return;
+		
 		$dmThreadsArray = $newDMThreadsArray = $dmThreadsMembersArray = $existingThreadsMembersArray = [];
 		
-		$dmThreads = $db->prepare("SELECT * FROM messages, (SELECT min(messageID) messageIDs, (CASE WHEN accID = :accountID THEN toAccountID ELSE accID END) receiverID FROM messages WHERE accID = :accountID OR toAccountID = :accountID GROUP BY receiverID ORDER BY timestamp DESC) messageIDs INNER JOIN users ON users.extID = receiverID WHERE messageID = messageIDs ORDER BY timestamp ASC");
+		$dmThreads = $db->prepare("SELECT * FROM messages, (SELECT max(messageID) messageIDs, (CASE WHEN accID = :accountID THEN toAccountID ELSE accID END) receiverID FROM messages WHERE accID = :accountID OR toAccountID = :accountID GROUP BY receiverID ORDER BY timestamp DESC) messageIDs INNER JOIN users ON users.extID = receiverID WHERE messageID = messageIDs ORDER BY timestamp ASC");
 		$dmThreads->execute([':accountID' => $accountID]);
 		$dmThreads = $dmThreads->fetchAll();
 		
@@ -2032,7 +2037,7 @@ class mainLib {
 			$dmThreadMembers = implode(",", $dmThreadMembers);
 			
 			$dmThreadsMembersArray[] = $dmThreadMembers;
-			$dmThreadsArray[$dmThreadMembers] = "('".$dmThreadMembers."', 1, ".$dmThread["timestamp"].", ".time().")";
+			$dmThreadsArray[$dmThreadMembers] = "('".$dmThreadMembers."', 1, ".$dmThread["messageID"].", ".time().")";
 		}
 		
 		$existingThreads = $db->prepare("SELECT threadMembers FROM threads WHERE threadMembers IN ('".implode("','", $dmThreadsMembersArray)."') AND isDMThread = 1");
@@ -2045,7 +2050,7 @@ class mainLib {
 		}
 		
 		if(!empty($newDMThreadsArray)) {
-			$syncThreads = $db->prepare("INSERT INTO threads (threadMembers, isDMThread, lastMessageTimestamp, createTimestamp) VALUES ".implode(",", $newDMThreadsArray));
+			$syncThreads = $db->prepare("INSERT INTO threads (threadMembers, isDMThread, lastMessageID, timestamp) VALUES ".implode(",", $newDMThreadsArray));
 			$syncThreads->execute();
 		}
 		
@@ -2059,6 +2064,40 @@ class mainLib {
 		$thread = $thread->fetch();
 		
 		return $thread;
+	}
+	public function getDMThreadByMembersID($accountID, $targetAccountID) {
+		require __DIR__."/connection.php";
+		
+		$threadMembers = [$accountID, $targetAccountID];
+		sort($threadMembers);
+		$threadMembers = implode(",", $threadMembers);
+		
+		$thread = $db->prepare("SELECT * FROM threads WHERE threadMembers IN (".$threadMembers.") AND isDMThread = 1");
+		$thread->execute();
+		$thread = $thread->fetch();
+		
+		return $thread;
+	}
+	public function sendMessage($accountID, $targetAccountID, $subject, $body, $isThreadMessage) {
+		require __DIR__."/connection.php";
+		
+		$userID = $this->getUserID($accountID);
+		$isThreadMessage = $isThreadMessage ? 1 : 0;
+		$threadID = $targetAccountID;
+		
+		$sendMessage = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES (:userID, '', :subject, :body, :accID, :toAccountID, :timestamp, :isThreadMessage)");
+		$sendMessage->execute([":userID" => $userID, ":subject" => $subject, ":body" => $body, ":accID" => $accountID, ":toAccountID" => $targetAccountID, ":timestamp" => time(), ":isThreadMessage" => $isThreadMessage]);
+		$messageID = $db->lastInsertId();
+		
+		if(!$isThreadMessage) {
+			$thread = $this->getDMThreadByMembersID($accountID, $targetAccountID);
+			$threadID = $thread["threadID"];
+		}
+		
+		$updateThread = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
+		$updateThread->execute([":messageID" => $messageID, ":threadID" => $threadID]);
+		
+		return ["threadID" => $threadID, "messageID" => $messageID];
 	}
 	public function sendLogsRegisterWebhook($accountID) {
 		require __DIR__."/connection.php";

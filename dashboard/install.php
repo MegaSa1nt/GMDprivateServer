@@ -142,10 +142,12 @@ if(!$installed) {
 			 `threadIcon` varchar(50) NOT NULL DEFAULT '',
 			 `threadOwner` int(11) NOT NULL DEFAULT 0,
 			 `threadMembers` text NOT NULL DEFAULT '',
-			 `threadInvites` text NOT NULL DEFAULT '',
+			 `invitedUsers` text NOT NULL DEFAULT '',
+			 `formerMembers` text NOT NULL DEFAULT '',
 			 `isDMThread` int(11) NOT NULL DEFAULT 0,
-			 `lastMessageTimestamp` int(11) NOT NULL DEFAULT 0,
-			 `createTimestamp` int(11) NOT NULL DEFAULT 0,
+			 `isLocked` int(11) NOT NULL DEFAULT 0,
+			 `lastMessageID` int(11) NOT NULL DEFAULT 0,
+			 `timestamp` int(11) NOT NULL DEFAULT 0,
 			 PRIMARY KEY (`threadID`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardLevelPackCreate'");

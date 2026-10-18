@@ -34,11 +34,10 @@ if(empty($db)) {
 			else {
 				$json = file_get_contents('http://ip-api.com/json/'.$ip);
 				$ipData = json_decode($json, true);
-				if($ipData['timezone']) {
-					$update = $db->prepare('UPDATE accounts SET timezone = :tz WHERE accountID = :id');
-					$update->execute([':tz' => $ipData['timezone'], ':id' => $accountIDcheck]);
-					date_default_timezone_set($ipData['timezone']);
-				}
+				if(!isset($ipData['timezone'])) $ipData['timezone'] = "America/Danmarkshavn"; // UTC
+				$update = $db->prepare('UPDATE accounts SET timezone = :tz WHERE accountID = :id');
+				$update->execute([':tz' => $ipData['timezone'], ':id' => $accountIDcheck]);
+				date_default_timezone_set($ipData['timezone']);
 			}
 		}
 	}
