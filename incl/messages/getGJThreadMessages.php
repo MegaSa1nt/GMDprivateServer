@@ -12,35 +12,70 @@ $threadID = ExploitPatch::number($_POST["threadID"]) ?: 0;
 $beforeID = ExploitPatch::number($_POST["beforeID"]) ?: 0;
 $afterID = ExploitPatch::number($_POST["afterID"]) ?: 0;
 $mv = isset($_POST["mv"]);
+$showLoadEarlier = false;
 
 $messagesArray = $userIDsArray = $usersArray = $threadMembersArray = $formerMembersArray = $invitedMembersArray = $threadArray = [];
 $userIDsString = "";
 
 $thread = $gs->getThreadByID($threadID);
-if(!$thread) exit("-1");
-//$thread["threadOwner"] = $accountID;
+if(!$thread) exit("##P##t=".ExploitPatch::url_base64_encode("Unknown thread").":b=".ExploitPatch::url_base64_encode("This thread does not exist.")."##P##-1");
+
+$threadMembersIDsArray = explode(",", $thread["threadMembers"]);
+if(!in_array($accountID, $threadMembersIDsArray)) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You are not member of this thread.")."##P##-1");
 
 if($thread["isDMThread"]) {
 	$threadMembers = explode(",", $thread["threadMembers"]);
 	$threadReceiver = $threadMembers[0] == $accountID ? $threadMembers[1] : $threadMembers[0];
 	
-	$messages = $db->prepare("SELECT * FROM messages WHERE ((accID = :accountID AND toAccountID = :receiver) OR (accID = :receiver AND toAccountID = :accountID)) AND isThreadMessage = 0 ".($beforeID > 0 ? "AND messageID < ".$beforeID : "")." ".($afterID > 0 ? "AND messageID > ".$afterID : "")." ORDER BY timestamp ASC LIMIT 10");
+	$messages = $db->prepare("SELECT * FROM messages WHERE ((accID = :accountID AND toAccountID = :receiver) OR (accID = :receiver AND toAccountID = :accountID)) AND isThreadMessage = 0 ".($beforeID > 0 ? "AND messageID < ".$beforeID : "")." ".($afterID > 0 ? "AND messageID > ".$afterID : "")." ORDER BY messageID DESC LIMIT ".($mv ? 10 : 50));
 	$messages->execute([':accountID' => $accountID, ':receiver' => $threadReceiver]);
 	$messages = $messages->fetchAll();
+	
+	$messagesCount = $db->prepare("SELECT messageID, count(*) AS messagesCount FROM messages WHERE ((accID = :accountID AND toAccountID = :receiver) OR (accID = :receiver AND toAccountID = :accountID)) AND isThreadMessage = 0 ORDER BY messageID ASC");
+	$messagesCount ->execute([':accountID' => $accountID, ':receiver' => $threadReceiver]);
+	$messagesCount = $messagesCount->fetch();
 } else {
-	$messages = $db->prepare("SELECT * FROM messages WHERE toAccountID = :threadID AND isThreadMessage = 1 ".($beforeID > 0 ? "AND messageID < ".$beforeID : "")." ".($afterID > 0 ? "AND messageID > ".$afterID : "")." ORDER BY timestamp ASC LIMIT 10");
+	$messages = $db->prepare("SELECT * FROM messages WHERE toAccountID = :threadID AND isThreadMessage = 1 ".($beforeID > 0 ? "AND messageID < ".$beforeID : "")." ".($afterID > 0 ? "AND messageID > ".$afterID : "")." ORDER BY messageID DESC LIMIT ".($mv ? 10 : 50));
 	$messages->execute([':threadID' => $threadID]);
 	$messages = $messages->fetchAll();
+	
+	$messagesCount = $db->prepare("SELECT messageID, count(*) AS messagesCount FROM messages WHERE toAccountID = :threadID AND isThreadMessage = 1 ORDER BY messageID ASC");
+	$messagesCount ->execute([':threadID' => $threadID]);
+	$messagesCount = $messagesCount->fetch();
 }
+
+$messages = array_reverse($messages);
 
 foreach($messages AS &$message) {
 	if($message["isDeleted"] && $message["accID"] != $accountID) continue;
 		
 	$messageArray = [];
+	$messageContent = XORCipher::cipher(ExploitPatch::url_base64_decode($message["body"]), 14251);
+	
+	if($message["accID"] == 0) {
+		$messageContentArray = explode(",", $messageContent);
+		$usersToGet = [];
+		
+		if(!isset($usersArray[$messageContentArray[1]])) $usersToGet[] = $messageContentArray[1];
+		if(isset($messageContentArray[3]) && !isset($usersArray[$messageContentArray[3]])) $usersToGet[] = $messageContentArray[3];
+		
+		if(!empty($usersToGet)) {
+			$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $usersToGet).")");
+			$users->execute();
+			$users = $users->fetchAll();
+			
+			foreach($users AS &$user) $usersArray[$user["extID"]] = $user;
+		}
+		
+		$messageContentArray[2] = $usersArray[$messageContentArray[1]]["userName"] ?: "Undefined";
+		if(isset($messageContentArray[3])) $messageContentArray[4] = $usersArray[$messageContentArray[3]]["userName"] ?: "Undefined";
+		
+		$messageContent = implode(",", $messageContentArray);
+	}
 	
 	$messageArray[0] = $message["messageID"];
 	$messageArray[1] = $message["accID"];
-	$messageArray[2] = ExploitPatch::url_base64_encode(XORCipher::cipher(ExploitPatch::url_base64_decode($message["body"]), 14251));
+	$messageArray[2] = ExploitPatch::url_base64_encode($messageContent);
 	$messageArray[3] = $message["timestamp"];
 	$messageArray[4] = $message["isDeleted"];
 	
@@ -51,7 +86,7 @@ if(!$mv) {
 	if($thread["threadMembers"]) $userIDsArray[] = $thread["threadMembers"];
 	if($thread["invitedUsers"]) $userIDsArray[] = $thread["invitedUsers"];
 	if($thread["formerMembers"]) $userIDsArray[] = $thread["formerMembers"];
-	$userIDsString = implode(",", $userIDsArray);
+	$userIDsString = trim(implode(",", $userIDsArray), ",");
 
 	if($userIDsString) {
 		$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$userIDsString.")");
@@ -62,9 +97,8 @@ if(!$mv) {
 	}
 
 	if($thread["threadMembers"]) {
-		$threadMembersIDsArray = explode(",", $thread["threadMembers"]);
-		
 		foreach($threadMembersIDsArray AS &$memberID) {
+			$user["userName"] = $gs->makeClanUsername($user);
 			$user = $usersArray[$memberID];
 			
 			$threadMembersArray[] = "1:".$user["userName"].":2:".$user["userID"].":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":3:".$user["stars"].":52:".$user["moons"].":4:".$user["demons"].":13:".$user["coins"].":17:".$user["userCoins"].":46:".$user["diamonds"];
@@ -122,17 +156,19 @@ if(!$mv) {
 			$invitedMembersArray[] = implode(":", $invitedMemberArray);
 		}
 	}
+	
+	if($messages[0]["messageID"] != $messagesCount["messageID"]) $showLoadEarlier = true;
 
 	$threadArray[0] = $thread["threadID"];
 	$threadArray[1] = "0";
 	$threadArray[2] = count($threadMembersArray);
-	$threadArray[3] = ExploitPatch::url_base64_encode($thread["threadDesc"]);
+	$threadArray[3] = $thread["threadDesc"];
 	$threadArray[4] = "0"; // Key `mv`, GD sends it when it refreshes messages
-	$threadArray[5] = "0"; // Show "Load earlier" button
+	$threadArray[5] = $showLoadEarlier ? "1" : "0";
 	$threadArray[6] = "0";
 	$threadArray[7] = "0";
-	$threadArray[8] = ExploitPatch::url_base64_encode($thread["threadName"]);
-	$threadArray[9] = "0"; // 1 if thread is locked
+	$threadArray[8] = $thread["threadName"];
+	$threadArray[9] = $thread["isLocked"];
 	$threadArray[10] = "0";
 }
 

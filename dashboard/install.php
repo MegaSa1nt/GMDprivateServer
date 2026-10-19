@@ -150,6 +150,17 @@ if(!$installed) {
 			 `timestamp` int(11) NOT NULL DEFAULT 0,
 			 PRIMARY KEY (`threadID`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		$check = $db->query("SHOW TABLES LIKE 'threadinvites'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("CREATE TABLE `threadinvites` (
+			 `inviteID` int(11) NOT NULL AUTO_INCREMENT,
+			 `threadID` int(11) NOT NULL DEFAULT 0,
+			 `accountID` int(11) NOT NULL DEFAULT 0,
+			 `toAccountID` int(11) NOT NULL DEFAULT 0,
+			 `isIgnored` int(11) NOT NULL DEFAULT 0,
+			 `timestamp` int(11) NOT NULL DEFAULT 0,
+			 PRIMARY KEY (`inviteID`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardLevelPackCreate'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools");
@@ -402,6 +413,9 @@ if(!$installed) {
 					END)");
 				$fillTimestamps->execute();
 			}
+		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameAddMembersWithoutInvite'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameAddMembersWithoutInvite` INT NOT NULL DEFAULT '0' AFTER `toolSuggestlist`");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

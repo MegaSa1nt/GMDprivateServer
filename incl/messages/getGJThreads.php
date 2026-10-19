@@ -8,16 +8,43 @@ $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
 $search = ExploitPatch::charclean(ExploitPatch::url_base64_decode($_POST["search"]));
+$user = ExploitPatch::numbercolon($_POST["user"]) ?: 0;
 $filter = ExploitPatch::number($_POST["filter"]) ?: 0;
-$filterArray = ["", "isDMThread = 1", "isDMThread = 0"];
-
-$threadsArray = [];
+$filtersArray = $threadsArray = [];
 $page = ExploitPatch::number($_POST["page"]) ?: 0;
 $offset = $page * 20;
 
+$filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)' OR formerMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)'";
+if($filter) $filtersArray[] = $filter == 1 ? "isDMThread = 1" : "isDMThread = 0";
+if($search) {
+	$userSearchFilter = [];
+	
+	if(!$filter || $filter == 1) {
+		$accountIDsArray = [];
+		
+		$usersSearch = $db->prepare("SELECT accountID FROM accounts WHERE userName LIKE '%".$search."%'");
+		$usersSearch->execute();
+		$usersSearch = $usersSearch->fetchAll();
+		
+		foreach($usersSearch AS &$accountData) $accountIDsArray[] = $accountData["accountID"];
+		
+		$accountIDsString = implode("|", $accountIDsArray);
+		
+		if(!empty($accountIDsString)) $userSearchFilter[] = "threadMembers REGEXP '(\\\D|^)(".$accountIDsString.")(\\\D|$)'";
+	}
+	if(!$filter || $filter == 2) $userSearchFilter[] = "FROM_BASE64(threadName) LIKE '%".$search."%'";
+	
+	if(!empty($userSearchFilter)) $filtersArray[] = "(".implode(") OR (", $userSearchFilter).")";
+}
+if($user) {
+	$userIDs = str_replace(",", "|", $user);
+	
+	$filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$userIDs.")(\\\D|$)'";
+}
+
 $gs->syncAccountDMThreads($accountID);
 
-$threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filterArray[$filter] ? " WHERE ".$filterArray[$filter] : "")." ORDER BY lastMessageTimestamp DESC");
+$threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filtersArray ? " WHERE (".implode(") AND (", $filtersArray).")" : "")." ORDER BY lastMessageTimestamp DESC");
 $threads->execute();
 $threads = $threads->fetchAll();
 
@@ -29,8 +56,9 @@ foreach($threads AS &$thread) {
 	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$thread["threadMembers"].")");
 	$users->execute();
 	$users = $users->fetchAll();
-	foreach($users AS &$user) {
-		$usersArray[$user["extID"]] = $user;
+	foreach($users AS &$userData) {
+		$userData["userName"] = $gs->makeClanUsername($userData);
+		$usersArray[$userData["extID"]] = $userData;
 	}
 
 	if($thread["isDMThread"]) {
@@ -58,6 +86,23 @@ foreach($threads AS &$thread) {
 		$threadArray[23] = $thread["lastMessageTimestamp"];
 		$threadArray[24] = $gs->getMaxValuePermission($threadReceiver, "modBadgeLevel");
 		$threadArray[25] = "0"; // Thread status
+	} else {
+		$threadArray[0] = $thread["threadID"];
+		$threadArray[1] = $thread["threadOwner"];
+		$threadArray[3] = $thread["threadName"];
+		$threadArray[4] = $thread["newMessagesCount"];
+		$threadArray[5] = $lastMessageSenderID;
+		$threadArray[6] = $gs->makeTime($thread["lastMessageTimestamp"]);
+		$threadArray[7] = count(explode(",", $thread["threadMembers"]));
+		$threadArray[8] = ExploitPatch::url_base64_encode($usersArray[$lastMessageSenderID]["userName"]);
+		$threadArray[9] = $thread["threadOwner"];
+		$threadArray[10] = "0";
+		$threadArray[12] = "0";
+		$threadArray[14] = "0";
+		$threadArray[21] = $thread["threadDesc"];
+		$threadArray[22] = $thread["threadIcon"];
+		$threadArray[23] = $thread["lastMessageTimestamp"];
+		$threadArray[25] = "0";
 	}
 	
 	/*
@@ -96,11 +141,14 @@ foreach($threads AS &$thread) {
 
 $threadsString = implode("|", $threadsArray);
 
-$threadsCount = $db->prepare("SELECT count(*) FROM threads ".($filterArray[$filter] ? " WHERE ".$filterArray[$filter] : "")."");
+$threadsCount = $db->prepare("SELECT count(*) FROM threads ".($filtersArray ? " WHERE (".implode(") AND (", $filtersArray).")" : ""));
 $threadsCount->execute();
 $threadsCount = $threadsCount->fetchColumn();
 
-$newInvitesCount = 0;
+$newInvitesCount = $db->prepare("SELECT count(*) FROM threadinvites WHERE toAccountID = :accountID AND timestamp >= :timestamp");
+$newInvitesCount->execute([":accountID" => $accountID, ":timestamp" => time() - 1209600]);
+$newInvitesCount = $newInvitesCount->fetchColumn();
+
 $refreshThreadsInterval = 10;
 exit($threadsString."#".$threadsCount.":".$offset.":20:".$newInvitesCount.":".$refreshThreadsInterval);
 ?>

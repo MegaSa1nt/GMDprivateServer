@@ -300,6 +300,9 @@ class mainLib {
 	}
 	public function getUserID($extID, $userName = "Undefined") {
 		require __DIR__ . "/connection.php";
+		
+		if($extID == 0) return 0;
+		
 		if(is_numeric($extID)){
 			$register = 1;
 		}else{
@@ -723,7 +726,7 @@ class mainLib {
 
 		require __DIR__ . "/connection.php";
 		$friendsarray = array();
-		$query = $db->prepare("SELECT person1, person2, timestamp FROM friendships WHERE person1 = :accountID OR person2 = :accountID");
+		$query = $db->prepare("SELECT person1, person2 FROM friendships WHERE person1 = :accountID OR person2 = :accountID");
 		$query->execute([':accountID' => $accountID]);
 		$result = $query->fetchAll();//getting friends
 		if($query->rowCount() == 0){
@@ -742,9 +745,9 @@ class mainLib {
 		return $friendsarray;
 	}
 	public function getFriendships($accountID) { // Friends and timestamp
-		require __DIR__ . "/connection.php";
+		require __DIR__."/connection.php";
 		
-		if(!is_numeric($accountID)) return false;
+		if(!is_numeric($accountID)) return [];
 
 		$friendshipsArray = [];
 		
@@ -2059,6 +2062,8 @@ class mainLib {
 	public function getThreadByID($threadID) {
 		require __DIR__."/connection.php";
 		
+		if($threadID == 0) return NULL;
+		
 		$thread = $db->prepare("SELECT * FROM threads WHERE threadID = :threadID");
 		$thread->execute([":threadID" => $threadID]);
 		$thread = $thread->fetch();
@@ -2098,6 +2103,96 @@ class mainLib {
 		$updateThread->execute([":messageID" => $messageID, ":threadID" => $threadID]);
 		
 		return ["threadID" => $threadID, "messageID" => $messageID];
+	}
+	public function createGroupThread($accountID, $threadName, $threadDesc, $threadIcon, $invitedUsers, $createWithoutInvite = false) {
+		require __DIR__."/connection.php";
+		
+		if($createWithoutInvite) {
+			$membersArray = [$accountID, $invitedUsers];
+			
+			$threadMembers = implode(",", $membersArray);
+			$invitedUsers = "";
+		} else $threadMembers = $accountID;
+		
+		$createGroupThread = $db->prepare("INSERT INTO threads (threadName, threadDesc, threadIcon, threadOwner, threadMembers, invitedUsers, isDMThread, timestamp) VALUES (:threadName, :threadDesc, :threadIcon, :threadOwner, '', '', 0, :timestamp)");
+		$createGroupThread->execute([":threadName" => $threadName, ":threadDesc" => $threadDesc, ":threadIcon" => $threadIcon, ":threadOwner" => $accountID, ":timestamp" => time()]);
+		$threadID = $db->lastInsertId();
+		
+		$this->inviteMembersToThread($accountID, $threadID, $invitedUsers);
+		$this->addMembersToThread($accountID, $threadID, $threadMembers);
+		
+		return $threadID;
+	}
+	public function inviteMembersToThread($accountID, $threadID, $invitedUsers) {
+		require __DIR__."/connection.php";
+		require_once __DIR__."/exploitPatch.php";
+		require_once __DIR__."/XORCipher.php";
+		
+		$thread = $this->getThreadByID($threadID);
+		if(!$thread) return;
+		
+		$inviteMembersInsertArray = $sendMessagesInsertArray = [];
+		$inviteMembersInsertString = $sendMessagesInsertString = "";
+		
+		$invitedUsersArray = explode(",", $invitedUsers);
+		foreach($invitedUsersArray AS &$invitedAccountID) {
+			$systemMessage = ExploitPatch::url_base64_encode(XORCipher::cipher("6,".$accountID.",,".$invitedAccountID.",", 14251));
+			
+			$inviteMembersInsertArray[] = "('".$threadID."', '".$accountID."', '".$invitedAccountID."', '".time()."')";
+			$sendMessagesInsertArray[] = "('0', '', '', '".$systemMessage."', '0', '".$threadID."', '".time()."', '1')";
+		}
+		
+		$inviteMembersInsertString = implode(",", $inviteMembersInsertArray);
+		$sendMessagesInsertString = implode(",", $sendMessagesInsertArray);
+		if(empty($inviteMembersInsertString)) return;
+		
+		$actualInvitedUsers = trim($thread["invitedUsers"].",".$invitedUsers, ",");
+		
+		$addMembers = $db->prepare("UPDATE threads SET invitedUsers = '".$actualInvitedUsers."' WHERE threadID = :threadID");
+		$addMembers->execute([":threadID" => $threadID]);
+		$inviteMembers = $db->prepare("INSERT INTO threadinvites (threadID, accountID, toAccountID, timestamp) VALUES ".$inviteMembersInsertString);
+		$inviteMembers->execute();
+		$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
+		$sendMessages->execute();
+		
+		$messageID = $db->lastInsertId();
+		$lastMessage = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
+		$lastMessage->execute([":messageID" => $messageID, ":threadID" => $threadID]);
+	}
+	public function addMembersToThread($accountID, $threadID, $threadMembers) {
+		require __DIR__."/connection.php";
+		require_once __DIR__."/exploitPatch.php";
+		require_once __DIR__."/XORCipher.php";
+		
+		$thread = $this->getThreadByID($threadID);
+		if(!$thread) return;
+		
+		$sendMessagesInsertArray = [];
+		$sendMessagesInsertString = "";
+		
+		$threadMembersArray = explode(",", $threadMembers);
+		foreach($threadMembersArray AS &$addedAccountID) {
+			if($accountID == $addedAccountID) continue;
+			
+			$systemMessage = ExploitPatch::url_base64_encode(XORCipher::cipher("1,".$accountID.",,".$addedAccountID.",", 14251));
+
+			$sendMessagesInsertArray[] = "('0', '', '', '".$systemMessage."', '0', '".$threadID."', '".time()."', '1')";
+		}
+		
+		$sendMessagesInsertString = implode(",", $sendMessagesInsertArray);
+		
+		$actualThreadMembers = trim($thread["threadMembers"].",".$threadMembers, ",");
+		
+		$addMembers = $db->prepare("UPDATE threads SET threadMembers = '".$actualThreadMembers."' WHERE threadID = :threadID");
+		$addMembers->execute([":threadID" => $threadID]);
+		if(!empty($sendMessagesInsertString)) {
+			$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
+			$sendMessages->execute();
+			
+			$messageID = $db->lastInsertId();
+			$lastMessage = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
+			$lastMessage->execute([":messageID" => $messageID, ":threadID" => $threadID]);
+		}
 	}
 	public function sendLogsRegisterWebhook($accountID) {
 		require __DIR__."/connection.php";
