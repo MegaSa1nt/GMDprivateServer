@@ -161,6 +161,17 @@ if(!$installed) {
 			 `timestamp` int(11) NOT NULL DEFAULT 0,
 			 PRIMARY KEY (`inviteID`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		$check = $db->query("SHOW TABLES LIKE 'threadevents'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("CREATE TABLE `threadevents` (
+			 `eventID` int(11) NOT NULL AUTO_INCREMENT,
+			 `threadID` int(11) NOT NULL DEFAULT 0,
+			 `type` int(11) NOT NULL DEFAULT 0,
+			 `value` int(11) NOT NULL DEFAULT 0,
+			 `accountID` int(11) NOT NULL DEFAULT 0,
+			 `timestamp` int(11) NOT NULL DEFAULT 0,
+			 PRIMARY KEY (`eventID`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'dashboardLevelPackCreate'");
       		$exist = $check->fetchAll();
       		if(empty($exist)) $db->query("ALTER TABLE roles ADD dashboardLevelPackCreate INT NOT NULL DEFAULT '0' AFTER dashboardModTools");

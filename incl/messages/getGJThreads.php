@@ -13,6 +13,7 @@ $filter = ExploitPatch::number($_POST["filter"]) ?: 0;
 $filtersArray = $threadsArray = [];
 $page = ExploitPatch::number($_POST["page"]) ?: 0;
 $offset = $page * 20;
+$threadIDs = $threadValuesArray = $newMessagesCountArray = [];
 
 $filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)' OR formerMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)'";
 if($filter) $filtersArray[] = $filter == 1 ? "isDMThread = 1" : "isDMThread = 0";
@@ -49,11 +50,74 @@ $threads->execute();
 $threads = $threads->fetchAll();
 
 foreach($threads AS &$thread) {
+	$threadIDs[] = $thread["threadID"];
+	$threadValuesArray[$thread["threadID"]] = $thread;
+}
+
+if(!empty($threadIDs)) { // Yes ik shit code
+	$readThreadIDsArray = $readDMIDsArray = $lastMessageIDsArray = [];
+	$lastThreadMessageIDsSelectString = $lastDMMessageIDsSelectString = "";
+	
+	$readTimes = $db->prepare("SELECT threadID, value FROM threadevents WHERE type = 1 AND accountID = :accountID AND threadID IN (".implode(",", $threadIDs).")");
+	$readTimes->execute([":accountID" => $accountID]);
+	$readTimes = $readTimes->fetchAll();
+	if($readTimes) {
+		foreach($readTimes AS &$threadEvent) {
+			$lastMessageIDsArray[] = $threadEvent["value"];
+			
+			if($threadValuesArray[$threadEvent["threadID"]]["isDMThread"]) {
+				$threadMembersArray = explode(",", $threadValuesArray[$threadEvent["threadID"]]["threadMembers"]);
+				if(count($threadMembersArray) < 2) continue;
+				$lastDMMessageIDsSelectString .= "WHEN ((accID = '".$threadMembersArray[0]."' AND toAccountID = '".$threadMembersArray[1]."') OR (accID = '".$threadMembersArray[1]."' AND toAccountID = '".$threadMembersArray[0]."')) THEN '".$threadEvent["value"]."'".PHP_EOL;
+			} else {
+				$readThreadIDsArray[] = $threadEvent["threadID"];
+				
+				$lastThreadMessageIDsSelectString .= "WHEN toAccountID = '".$threadEvent["threadID"]."' THEN '".$threadEvent["value"]."'".PHP_EOL;
+			}
+		}
+		
+		$messagesCountFilterArray = [];
+		
+		if(!empty($lastThreadMessageIDsSelectString)) $messagesCountFilterArray[] = "(messageID > (CASE
+			".$lastThreadMessageIDsSelectString."
+			END)
+			AND isThreadMessage = 1)";
+		if(!empty($lastDMMessageIDsSelectString)) $messagesCountFilterArray[] = "(messageID > (CASE
+			".$lastDMMessageIDsSelectString."
+			END)
+			AND isThreadMessage = 0)";
+		
+		if(!empty($messagesCountFilterArray)) {
+			$messagesCount = $db->prepare("SELECT accID, toAccountID AS threadID, isThreadMessage FROM messages
+				WHERE (
+					(toAccountID IN (".implode(",", $readThreadIDsArray).") AND isThreadMessage = 1)
+					OR (toAccountID = :accountID AND isThreadMessage = 0)
+				)
+				AND (
+					".implode(" OR ", $messagesCountFilterArray)."
+				)");
+			$messagesCount->execute([":accountID" => $accountID]);
+			$messagesCount = $messagesCount->fetchAll();
+			
+			foreach($messagesCount AS &$messageCount) {
+				if(!$messageCount["isThreadMessage"]) {
+					$countThreadMembers = [$messageCount["accID"], $messageCount["threadID"]];
+					sort($countThreadMembers);
+					$messageCount["threadID"] = implode(",", $countThreadMembers);
+				}
+				
+				$newMessagesCountArray[$messageCount["threadID"]]++;
+			}
+		}
+	}
+}
+
+foreach($threads AS &$thread) {
 	$threadArray = $usersArray = [];
 	$lastMessageSenderID = $thread["accID"];
 	for($i = 0; $i < 26; $i++) $threadArray[$i] = "";
 	
-	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".$thread["threadMembers"].")");
+	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".trim($thread["threadMembers"].",".$thread["invitedUsers"], ",").")");
 	$users->execute();
 	$users = $users->fetchAll();
 	foreach($users AS &$userData) {
@@ -62,13 +126,23 @@ foreach($threads AS &$thread) {
 	}
 
 	if($thread["isDMThread"]) {
-		$threadMembers = explode(",", $thread["threadMembers"]);
-		$threadReceiver = $threadMembers[0] == $accountID ? $threadMembers[1] : $threadMembers[0];
+		$isPendingThread = $thread["threadMembers"] == $accountID;
+		if(!$isPendingThread) {
+			$threadMembers = explode(",", $thread["threadMembers"]);
+			$threadReceiver = $threadMembers[0] == $accountID ? $threadMembers[1] : $threadMembers[0];
+			$threadMembersIDs = $thread["threadMembers"];
+		} else {
+			$threadReceiver = $thread["invitedUsers"];
+			
+			$pendingThreadMembers = [$accountID, $threadReceiver];
+			sort($pendingThreadMembers);
+			$threadMembersIDs = implode(",", $pendingThreadMembers);
+		}
 		
 		$threadArray[0] = $thread["threadID"];
 		$threadArray[1] = $threadReceiver;
 		$threadArray[2] = ExploitPatch::url_base64_encode($usersArray[$threadReceiver]["userName"]);
-		$threadArray[4] = $thread["newMessagesCount"];
+		$threadArray[4] = $newMessagesCountArray[$threadMembersIDs];
 		$threadArray[5] = $lastMessageSenderID;
 		$threadArray[6] = $gs->makeTime($thread["lastMessageTimestamp"]);
 		$threadArray[7] = "2"; // Thread members
@@ -85,12 +159,12 @@ foreach($threads AS &$thread) {
 		$threadArray[20] = $usersArray[$threadReceiver]["special"];
 		$threadArray[23] = $thread["lastMessageTimestamp"];
 		$threadArray[24] = $gs->getMaxValuePermission($threadReceiver, "modBadgeLevel");
-		$threadArray[25] = "0"; // Thread status
+		$threadArray[25] = $isPendingThread ? 2 : 0;
 	} else {
 		$threadArray[0] = $thread["threadID"];
 		$threadArray[1] = $thread["threadOwner"];
 		$threadArray[3] = $thread["threadName"];
-		$threadArray[4] = $thread["newMessagesCount"];
+		$threadArray[4] = $newMessagesCountArray[$thread["threadID"]];
 		$threadArray[5] = $lastMessageSenderID;
 		$threadArray[6] = $gs->makeTime($thread["lastMessageTimestamp"]);
 		$threadArray[7] = count(explode(",", $thread["threadMembers"]));
@@ -104,37 +178,6 @@ foreach($threads AS &$thread) {
 		$threadArray[23] = $thread["lastMessageTimestamp"];
 		$threadArray[25] = "0";
 	}
-	
-	/*
-	$modBadgeLevel = $gs->getMaxValuePermission($thread["receiverID"], "modBadgeLevel");
-
-	$threadArray[0] = $thread["receiverID"];
-	$threadArray[1] = $thread["receiverID"];
-	$threadArray[2] = ExploitPatch::url_base64_encode($thread["userName"]);
-	$threadArray[3] = "";
-	$threadArray[4] = $thread["newMessagesCount"];
-	$threadArray[5] = $accountID;
-	$threadArray[6] = $gs->makeTime($thread["timestamp"]);
-	$threadArray[7] = "2";
-	$threadArray[8] = "";
-	$threadArray[9] = $accountID;
-	$threadArray[10] = "0";
-	$threadArray[11] = "";
-	$threadArray[12] = "1";
-	$threadArray[13] = "";
-	$threadArray[14] = "0";
-	$threadArray[15] = $thread["icon"];
-	$threadArray[16] = $thread["color1"];
-	$threadArray[17] = $thread["color2"];
-	$threadArray[18] = $thread["color3"];
-	$threadArray[19] = $thread["iconType"];
-	$threadArray[20] = $thread["special"];
-	$threadArray[21] = "";
-	$threadArray[22] = "";
-	$threadArray[23] = $thread["timestamp"];
-	$threadArray[24] = $modBadgeLevel;
-	$threadArray[25] = "0";
-	*/
 	
 	$threadsArray[] = implode(":", $threadArray);
 }

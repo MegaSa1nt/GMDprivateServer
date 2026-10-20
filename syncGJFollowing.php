@@ -1,3 +1,3 @@
 <?php
-require "incl/relationships/getGJFollowing.php";
+require "incl/relationships/syncGJFollowing.php";
 ?>

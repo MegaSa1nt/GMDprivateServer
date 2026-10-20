@@ -2077,8 +2077,8 @@ class mainLib {
 		sort($threadMembers);
 		$threadMembers = implode(",", $threadMembers);
 		
-		$thread = $db->prepare("SELECT * FROM threads WHERE threadMembers IN (".$threadMembers.") AND isDMThread = 1");
-		$thread->execute();
+		$thread = $db->prepare("SELECT * FROM threads WHERE (threadMembers = '".$threadMembers."' OR (threadMembers = :accountID AND invitedUsers = :targetAccountID)) AND isDMThread = 1");
+		$thread->execute([":accountID" => $accountID, ":targetAccountID" => $targetAccountID]);
 		$thread = $thread->fetch();
 		
 		return $thread;
@@ -2118,12 +2118,56 @@ class mainLib {
 		$createGroupThread->execute([":threadName" => $threadName, ":threadDesc" => $threadDesc, ":threadIcon" => $threadIcon, ":threadOwner" => $accountID, ":timestamp" => time()]);
 		$threadID = $db->lastInsertId();
 		
+		if($createWithoutInvite) {
+			$modBadge = $this->getMaxValuePermission($accountID, "modBadgeLevel");
+			$messageTypes = [1 => 9, 2 => 10];
+			
+			if(isset($messageTypes[$modBadge])) $this->sendThreadSystemMessage($threadID, $messageTypes[$modBadge], $accountID);
+		}
 		$this->inviteMembersToThread($accountID, $threadID, $invitedUsers);
 		$this->addMembersToThread($accountID, $threadID, $threadMembers);
 		
 		return $threadID;
 	}
-	public function inviteMembersToThread($accountID, $threadID, $invitedUsers) {
+	public function createDMThread($accountID, $targetAccountID, $inviteMessage, $createWithoutInvite = false) {
+		require __DIR__."/connection.php";
+		
+		$DMThread = $this->getDMThreadByMembersID($accountID, $targetAccountID);
+		if($DMThread) {
+			if($DMThread["isDMThread"] && $accountID == $DMThread["threadMembers"]) return false;
+				
+			$this->sendMessage($accountID, $targetAccountID, "", $inviteMessage, false);
+			return $DMThread["threadID"];
+		}
+		
+		if($createWithoutInvite) {
+			$membersArray = [$accountID, $targetAccountID];
+			sort($membersArray);
+			
+			$threadMembers = implode(",", $membersArray);
+			$invitedUsers = "";
+		} else {
+			$threadMembers = $accountID;
+			$invitedUsers = $targetAccountID;
+		}
+		
+		$createDMThread = $db->prepare("INSERT INTO threads (threadMembers, invitedUsers, isDMThread, timestamp) VALUES ('', '', 1, :timestamp)");
+		$createDMThread->execute([":timestamp" => time()]);
+		$threadID = $db->lastInsertId();
+		
+		if($createWithoutInvite) {
+			$modBadge = $this->getMaxValuePermission($accountID, "modBadgeLevel");
+			$messageTypes = [1 => 9, 2 => 10];
+			
+			if(isset($messageTypes[$modBadge])) $this->sendThreadSystemMessage($threadID, $messageTypes[$modBadge], $accountID);
+		}
+		$this->inviteMembersToThread($accountID, $threadID, $invitedUsers, false);
+		$this->addMembersToThread($accountID, $threadID, $threadMembers, false);
+		$this->sendMessage($accountID, $targetAccountID, "", $inviteMessage, false);
+		
+		return $threadID;
+	}
+	public function inviteMembersToThread($accountID, $threadID, $invitedUsers, $sendSystemMessage = true) {
 		require __DIR__."/connection.php";
 		require_once __DIR__."/exploitPatch.php";
 		require_once __DIR__."/XORCipher.php";
@@ -2136,6 +2180,8 @@ class mainLib {
 		
 		$invitedUsersArray = explode(",", $invitedUsers);
 		foreach($invitedUsersArray AS &$invitedAccountID) {
+			if(!$invitedAccountID || $accountID == $invitedAccountID) continue;
+				
 			$systemMessage = ExploitPatch::url_base64_encode(XORCipher::cipher("6,".$accountID.",,".$invitedAccountID.",", 14251));
 			
 			$inviteMembersInsertArray[] = "('".$threadID."', '".$accountID."', '".$invitedAccountID."', '".time()."')";
@@ -2152,14 +2198,16 @@ class mainLib {
 		$addMembers->execute([":threadID" => $threadID]);
 		$inviteMembers = $db->prepare("INSERT INTO threadinvites (threadID, accountID, toAccountID, timestamp) VALUES ".$inviteMembersInsertString);
 		$inviteMembers->execute();
-		$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
-		$sendMessages->execute();
-		
-		$messageID = $db->lastInsertId();
-		$lastMessage = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
-		$lastMessage->execute([":messageID" => $messageID, ":threadID" => $threadID]);
+		if($sendSystemMessage) {
+			$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
+			$sendMessages->execute();
+			
+			$messageID = $db->lastInsertId();
+			$lastMessage = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
+			$lastMessage->execute([":messageID" => $messageID, ":threadID" => $threadID]);
+		}
 	}
-	public function addMembersToThread($accountID, $threadID, $threadMembers) {
+	public function addMembersToThread($accountID, $threadID, $threadMembers, $sendSystemMessage = true) {
 		require __DIR__."/connection.php";
 		require_once __DIR__."/exploitPatch.php";
 		require_once __DIR__."/XORCipher.php";
@@ -2172,7 +2220,7 @@ class mainLib {
 		
 		$threadMembersArray = explode(",", $threadMembers);
 		foreach($threadMembersArray AS &$addedAccountID) {
-			if($accountID == $addedAccountID) continue;
+			if(!$addedAccountID || $accountID == $addedAccountID) continue;
 			
 			$systemMessage = ExploitPatch::url_base64_encode(XORCipher::cipher("1,".$accountID.",,".$addedAccountID.",", 14251));
 
@@ -2185,7 +2233,7 @@ class mainLib {
 		
 		$addMembers = $db->prepare("UPDATE threads SET threadMembers = '".$actualThreadMembers."' WHERE threadID = :threadID");
 		$addMembers->execute([":threadID" => $threadID]);
-		if(!empty($sendMessagesInsertString)) {
+		if(!empty($sendMessagesInsertString) && $sendSystemMessage) {
 			$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
 			$sendMessages->execute();
 			
@@ -2193,6 +2241,41 @@ class mainLib {
 			$lastMessage = $db->prepare("UPDATE threads SET lastMessageID = :messageID WHERE threadID = :threadID");
 			$lastMessage->execute([":messageID" => $messageID, ":threadID" => $threadID]);
 		}
+	}
+	public function sendThreadSystemMessage($threadID, $type, $mainAccountID, $secondaryAccountID = false) {
+		require_once __DIR__."/exploitPatch.php";
+		require_once __DIR__."/XORCipher.php";
+		
+		$systemMessage = ExploitPatch::url_base64_encode(XORCipher::cipher(trim($type.",".$mainAccountID.",,".$secondaryAccountID.",", ","), 14251));
+		
+		return $this->sendMessage(0, $threadID, "", $systemMessage, true);
+	}
+	public function readThread($accountID, $threadID, $lastMessageID, $toAccountID = false) {
+		require __DIR__."/connection.php";
+		
+		$readEvent = $db->prepare("SELECT * FROM threadevents WHERE type = 1 AND accountID = :accountID AND threadID = :threadID");
+		$readEvent->execute([":accountID" => $accountID, ":threadID" => $threadID]);
+		$readEvent = $readEvent->fetch();
+		
+		if(!$readEvent) {
+			$insertEvent = $db->prepare("INSERT INTO threadevents (threadID, type, value, accountID, timestamp) VALUES (:threadID, 1, :value, :accountID, :timestamp)");
+			$insertEvent->execute([":threadID" => $threadID, ":value" => $lastMessageID, ":accountID" => $accountID, ":timestamp" => time()]);
+		} else {
+			if($lastMessageID <= $readEvent["value"]) return false;
+			
+			$updateEvent = $db->prepare("UPDATE threadevents SET value = :messageID WHERE eventID = :eventID");
+			$updateEvent->execute([":messageID" => $lastMessageID, ":eventID" => $readEvent["eventID"]]);
+		}
+		
+		if(!$toAccountID) {
+			$readMessages = $db->prepare("UPDATE messages SET isNew = 1, readTime = :timestamp WHERE messageID <= :messageID AND toAccountID = :threadID AND accID != :accountID AND readTime = 0 AND isThreadMessage = 1");
+			$readMessages->execute([":timestamp" => time(), ":messageID" => $lastMessageID, ":threadID" => $threadID, ":accountID" => $accountID]);
+		} else {
+			$readMessages = $db->prepare("UPDATE messages SET isNew = 1, readTime = :timestamp WHERE messageID <= :messageID AND accID = :toAccountID AND toAccountID = :accountID AND readTime = 0 AND isThreadMessage = 0");
+			$readMessages->execute([":timestamp" => time(), ":messageID" => $lastMessageID, ":toAccountID" => $toAccountID, ":accountID" => $accountID]);
+		}
+		
+		return true;
 	}
 	public function sendLogsRegisterWebhook($accountID) {
 		require __DIR__."/connection.php";

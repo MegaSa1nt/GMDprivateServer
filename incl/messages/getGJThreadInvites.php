@@ -3,13 +3,14 @@ chdir(dirname(__FILE__));
 require "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
+require_once "../lib/XORCipher.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
 $accountID = GJPCheck::getAccountIDOrDie();
 $invitesArray = [];
 
-$invites = $db->prepare("SELECT *, threadinvites.timestamp AS inviteTimestamp FROM threadinvites INNER JOIN threads ON threadinvites.threadID = threads.threadID INNER JOIN users ON users.extID = threadinvites.accountID WHERE toAccountID = :accountID AND threadinvites.timestamp >= :timestamp ORDER BY threadinvites.timestamp DESC");
+$invites = $db->prepare("SELECT *, threadinvites.timestamp AS inviteTimestamp, messages.timestamp AS messageTimestamp FROM threadinvites INNER JOIN threads ON threadinvites.threadID = threads.threadID INNER JOIN messages ON messages.messageID = threads.lastMessageID INNER JOIN users ON users.extID = threadinvites.accountID WHERE threadinvites.toAccountID = :accountID AND threadinvites.timestamp >= :timestamp ORDER BY threadinvites.timestamp DESC");
 $invites->execute([":accountID" => $accountID, ":timestamp" => time() - 1209600]);
 $invites = $invites->fetchAll();
 
@@ -21,9 +22,9 @@ foreach($invites AS &$invite) {
 	$inviteArray[2] = ExploitPatch::url_base64_encode($invite["userName"]);
 	$inviteArray[3] = $invite["threadName"];
 	$inviteArray[4] = count(explode(",", $invite["threadMembers"]));
-	$inviteArray[5] = $gs->makeTime($thread["inviteTimestamp"]);
-	$inviteArray[6] = "";
-	$inviteArray[7] = "";
+	$inviteArray[5] = $gs->makeTime($invite["inviteTimestamp"]);
+	$inviteArray[6] = $gs->makeTime($invite["messageTimestamp"]);
+	$inviteArray[7] = $invite["isDMThread"] ? ExploitPatch::url_base64_encode(XORCipher::cipher(ExploitPatch::url_base64_decode($invite["body"]), 14251)) : "";
 	$inviteArray[8] = $invite["threadDesc"];
 	$inviteArray[9] = $invite["isDMThread"];
 	$inviteArray[10] = $invite["isIgnored"];
@@ -34,7 +35,7 @@ foreach($invites AS &$invite) {
 	$inviteArray[15] = $invite["iconType"];
 	$inviteArray[16] = $invite["special"];
 	$inviteArray[17] = $invite["threadIcon"];
-	$inviteArray[18] = $thread["inviteTimestamp"];
+	$inviteArray[18] = $invite["inviteTimestamp"];
 	
 	$invitesArray[] = implode(":", $inviteArray);
 }

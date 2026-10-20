@@ -32,7 +32,7 @@ if(!$thread) {
 		if($account["accountID"] == $accountID) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot create a conversation with yourself.")."##P##-1");
 		
 		$account = $db->prepare("SELECT * FROM accounts WHERE accountID = :accountID");
-		$account->execute([":accountID"]);
+		$account->execute([":accountID" => $accountID]);
 		$account = $account->fetch();
 		
 		if($account["mS"] == 2) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot create a conversation with this player.")."##P##-1");
@@ -72,15 +72,19 @@ if(!$thread) {
 	if(empty($accountsString)) exit("##P##t=".ExploitPatch::url_base64_encode("Select members").":b=".ExploitPatch::url_base64_encode("You haven't selected any members or you can't invite them.")."##P##-1");
 	
 	if($isDMThread) {
+		$body = ExploitPatch::url_base64_encode(XORCipher::cipher($body, 14251));
 		
-	} else {
-		$threadID = $gs->createGroupThread($accountID, ExploitPatch::url_base64_encode($subject), ExploitPatch::url_base64_encode($description), $emote, $accountsString, $canAddWithoutInvite);
-		exit($threadID.":0");
+		$threadID = $gs->createDMThread($accountID, $toAccountID, $body, $canAddWithoutInvite);
 	}
+	else $threadID = $gs->createGroupThread($accountID, ExploitPatch::url_base64_encode($subject), ExploitPatch::url_base64_encode($description), $emote, $accountsString, $canAddWithoutInvite);
+	
+	if(!$threadID) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot send messages here.")."##P##-1");
+	
+	exit($threadID.":0");
 }
 
 $threadMembers = explode(",", $thread["threadMembers"]);
-if(!in_array($accountID, $threadMembers) || $thread["isLocked"]) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot send messages here.")."##P##-1");
+if(!in_array($accountID, $threadMembers) || $thread["isLocked"] || ($thread["isDMThread"] && $accountID == $thread["threadMembers"])) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot send messages here.")."##P##-1");
 
 if(!$thread["isDMThread"]) {
 	$isThreadMessage = true;
