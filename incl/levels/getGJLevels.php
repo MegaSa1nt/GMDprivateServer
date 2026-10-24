@@ -110,7 +110,7 @@ switch($diff) {
 }
 // Type detection
 // TODO: the 2 non-friend types that send GJP in 2.11
-if(isset($_POST["str"])) $str = ExploitPatch::rucharclean($_POST["str"]) ?: '';
+if(isset($_POST["str"])) $str = ExploitPatch::charclean($_POST["str"]) ?: '';
 $offset = is_numeric($_POST["page"]) ? ExploitPatch::number($_POST["page"]) . "0" : 0;
 switch($type){
 	case 0: // Search
