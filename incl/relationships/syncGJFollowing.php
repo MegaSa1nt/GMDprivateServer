@@ -8,4 +8,5 @@ require_once "../lib/mainLib.php";
 require_once "../lib/cron.php";
 $gs = new mainLib();
 
+exit("-1");
 ?>

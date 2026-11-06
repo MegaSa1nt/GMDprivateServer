@@ -249,8 +249,10 @@ class Cron {
 			$IPBans[] = $gs->IPForBan($ban['person'], true);
 		}
 		$bannedIPsString = implode("|", $IPBans);
-		$unbanIPs = $db->prepare('DELETE FROM bannedips WHERE IP REGEXP "'.$bannedIPsString.'"');
-		$unbanIPs->execute();
+		if(!empty($bannedIPsString)) {
+			$unbanIPs = $db->prepare('DELETE FROM bannedips WHERE IP REGEXP "'.$bannedIPsString.'"');
+			$unbanIPs->execute();
+		}
 		$gs->logAction($accountID, 43);
 		return true;
 	}

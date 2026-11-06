@@ -126,8 +126,8 @@ if(!$mv) {
 	
 	if($messages[0]["messageID"] != $messagesCount["messageID"]) $showLoadEarlier = true;
 
-	$threadArray[0] = $thread["threadID"];
-	$threadArray[1] = "0";
+	$threadArray[0] = $thread["threadOwner"];
+	$threadArray[1] = $thread["isInviteLocked"];
 	$threadArray[2] = count($threadMembersArray);
 	$threadArray[3] = $thread["threadDesc"];
 	$threadArray[4] = "0"; // Key `mv`, GD sends it when it refreshes messages

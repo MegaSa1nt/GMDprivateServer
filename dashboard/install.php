@@ -146,6 +146,7 @@ if(!$installed) {
 			 `formerMembers` text NOT NULL DEFAULT '',
 			 `isDMThread` int(11) NOT NULL DEFAULT 0,
 			 `isLocked` int(11) NOT NULL DEFAULT 0,
+			 `isInviteLocked` int(11) NOT NULL DEFAULT 1,
 			 `lastMessageID` int(11) NOT NULL DEFAULT 0,
 			 `timestamp` int(11) NOT NULL DEFAULT 0,
 			 PRIMARY KEY (`threadID`)
@@ -427,6 +428,9 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `roles` LIKE 'gameAddMembersWithoutInvite'");
 			$exist = $check->fetchAll();
 			if(empty($exist)) $db->query("ALTER TABLE `roles` ADD `gameAddMembersWithoutInvite` INT NOT NULL DEFAULT '0' AFTER `toolSuggestlist`");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'followersCount'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `followersCount` INT NOT NULL DEFAULT '0' AFTER `friendsCount`");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

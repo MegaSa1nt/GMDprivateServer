@@ -6,147 +6,94 @@ require_once "../lib/GJPCheck.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
-$appendix = "";
-$extid = ExploitPatch::number($_POST["targetAccountID"]);
-$me = !empty($_POST["accountID"]) ? GJPCheck::getAccountIDOrDie() : 0;
-//checking who has blocked them
-$query = "SELECT count(*) FROM blocks WHERE (person1 = :extid AND person2 = :me) OR (person2 = :extid AND person1 = :me)";
-$query = $db->prepare($query);
-$query->execute([':extid' => $extid, ':me' => $me]);
-if($query->fetchColumn() > 0) exit("-1");
+$accountID = !empty($_POST["accountID"]) ? GJPCheck::getAccountIDOrDie() : 0;
+$targetAccountID = ExploitPatch::number($_POST["targetAccountID"]) ?: 0;
+$targetUserID = $gs->getUserID($targetAccountID); // Forcefully creates users row for an account // i hope i will get accused of using ai because of comments 😊😊😊
+$isSelf = $accountID == $targetAccountID;
 
-$query = "SELECT * FROM users WHERE extID = :extid";
-$query = $db->prepare($query);
-$query->execute([':extid' => $extid]);
-if($query->rowCount() == 0) exit("-1");
+$isBlocked = $db->prepare("SELECT count(*) FROM blocks WHERE (person1 = :accountID AND person2 = :targetAccountID) OR (person1 = :targetAccountID AND person2 = :accountID)");
+$isBlocked->execute([":accountID" => $accountID, ":targetAccountID" => $targetAccountID]);
+$isBlocked = $isBlocked->fetchColumn();
+if($isBlocked) exit("-1");
 
-$user = $query->fetch();
-//placeholders
-$creatorpoints = round($user["creatorPoints"], PHP_ROUND_HALF_DOWN);
-// GET POSITION
-$e = "SET @rownum := 0;";
-$query = $db->prepare($e);
-$query->execute();
-$bans = $gs->getAllBansOfBanType(0);
-$extIDs = $userIDs = $bannedIPs = [];
-foreach($bans AS &$ban) {
-	switch($ban['personType']) {
-		case 0:
-			$extIDs[] = $ban['person'];
-			break;
-		case 1:
-			$userIDs[] = $ban['person'];
-			break;
-		case 2:
-			$bannedIPs[] = $gs->IPForBan($ban['person'], true);
-			break;
+$person = $db->prepare("SELECT *, accounts.userName AS accountUsername FROM users INNER JOIN accounts ON accounts.accountID = users.extID WHERE users.extID = :targetAccountID");
+$person->execute([":targetAccountID" => $targetAccountID]);
+$person = $person->fetch();
+if(!$person) exit("-1");
+
+$rank = $friendState = 0;
+
+$isBanned = $gs->getPersonBan($person['extID'], $person['userID'], 0, $person['IP']);
+if(!$isBanned) {
+	$bans = $gs->getAllBansOfBanType(0);
+	$extIDs = $userIDs = $bannedIPs = [];
+	foreach($bans AS &$ban) {
+		switch($ban['personType']) {
+			case 0:
+				$extIDs[] = $ban['person'];
+				break;
+			case 1:
+				$userIDs[] = $ban['person'];
+				break;
+			case 2:
+				$bannedIPs[] = $gs->IPForBan($ban['person'], true);
+				break;
+		}
+	}
+	$extIDsString = implode("','", $extIDs);
+	$userIDsString = implode("','", $userIDs);
+	$bannedIPsString = implode("|", $bannedIPs);
+	
+	$queryArray = [];
+	if(!empty($extIDsString)) $queryArray[] = "extID NOT IN ('".$extIDsString."')";
+	if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
+	if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
+	$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).') AND' : '';
+	
+	$query = $db->prepare("SELECT count(*) FROM users WHERE ".$queryText." stars > :stars");
+	$query->execute([':stars' => $person["stars"]]);
+	if($query->rowCount() > 0) $rank = $query->fetchColumn() + 1;
+}
+
+$person['youtubeurl'] = mb_ereg_replace("(?!^@)[^a-zA-Z0-9_]", "", $person['youtubeurl']);
+$person['twitter'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['twitter']);
+$person['twitch'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['twitch']);
+$person['instagram'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['instagram']);
+$person['tiktok'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['tiktok']);
+$person['discord'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['discord']);
+$person['custom'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $person['custom']);
+$creatorPoints = round($person["creatorPoints"], PHP_ROUND_HALF_DOWN);
+$modBadge = $gs->getMaxValuePermission($targetAccountID, "modBadgeLevel");
+
+if($isSelf) {
+	$newMessagesCount = 0; // Will make threads count later
+	$newNotifications = 0;
+	
+	$newFriendRequestsCount = $db->prepare("SELECT count(*) FROM friendreqs WHERE toAccountID = :accountID AND isNew != 2 AND uploadDate >= :timestamp");
+	$newFriendRequestsCount->execute([":accountID" => $accountID, ":timestamp" => time() - 10368000]); // Friend requests expire after 120 days
+	$newFriendRequestsCount = $newFriendRequestsCount->fetchColumn();
+	
+	$newFriendsCount = $db->prepare("SELECT count(*) FROM friendships WHERE (person1 = :accountID AND isNew2 = 1) OR (person2 = :accountID AND isNew1 = 1)");
+	$newFriendsCount->execute([":accountID" => $accountID]);
+	$newFriendsCount = $newFriendsCount->fetchColumn();
+	
+	$friendState = "0:38:".$newMessagesCount.":39:".$newFriendRequestsCount.":40:".$newFriendsCount;
+} else {
+	$isFriends = $gs->isFriends($accountID, $targetAccountID);
+	if($isFriends) $friendState = 1;
+	else {
+		$friendRequest = $db->prepare("SELECT * FROM friendreqs WHERE ((accountID = :accountID AND toAccountID = :targetAccountID) OR (accountID = :targetAccountID AND toAccountID = :accountID)) AND uploadDate >= :timestamp LIMIT 1");
+		$friendRequest->execute([":accountID" => $accountID, ":targetAccountID" => $targetAccountID, ":timestamp" => time() - 10368000]);
+		$friendRequest = $friendRequest->fetch();
+		
+		if($friendRequest["person1"] == $accountID) $friendState = 4;
+		else {
+			$uploadDate = $gs->makeTime($friendRequest["uploadDate"]);
+			$friendState = "3:32:".$friendRequest["ID"].":35:".$friendRequest["comment"].":37:".$uploadDate;
+		}
 	}
 }
-$extIDsString = implode("','", $extIDs);
-$userIDsString = implode("','", $userIDs);
-$bannedIPsString = implode("|", $bannedIPs);
-$queryArray = [];
-if(!empty($extIDsString)) $queryArray[] = "extID NOT IN ('".$extIDsString."')";
-if(!empty($userIDsString)) $queryArray[] = "userID NOT IN ('".$userIDsString."')";
-if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
-$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).') AND' : '';
-$f = "SELECT count(*) FROM users WHERE ".$queryText." stars + moons > :stars + :moons";
-$query = $db->prepare($f);
-$query->execute([':stars' => $user["stars"], ':moons' => $user["moons"]]);
-if($query->rowCount() > 0) $rank = $query->fetchColumn() + 1;
-else $rank = 0;
-$isBanned = $gs->getPersonBan($user['extID'], $user['userID'], 0, $user['IP']);
-if($isBanned) $rank = 0;
-//var_dump($leaderboard);
-	//accinfo
-		$query = "SELECT youtubeurl, twitter, twitch, frS, mS, cS, gF, gO, instagram, tiktok, discord, custom FROM accounts WHERE accountID = :extID";
-		$query = $db->prepare($query);
-		$query->execute([':extID' => $extid]);
-		$accinfo = $query->fetch();
-		$accinfo['youtubeurl'] = mb_ereg_replace("(?!^@)[^a-zA-Z0-9_]", "", $accinfo['youtubeurl']);
-		$accinfo['twitter'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['twitter']);
-		$accinfo['twitch'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['twitch']);
-		$accinfo['instagram'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['instagram']);
-		$accinfo['tiktok'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['tiktok']);
-		$accinfo['discord'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['discord']);
-		$accinfo['custom'] = mb_ereg_replace("[^a-zA-Z0-9_]", "", $accinfo['custom']);
-		$reqsstate = $accinfo["frS"];
-		$msgstate = $accinfo["mS"];
-		$commentstate = $accinfo["cS"];
-		$badge = $gs->getMaxValuePermission($extid, "modBadgeLevel");
-if($me == $extid) {
-	/* notifications */
-		//friendreqs
-			$query = "SELECT count(*) FROM friendreqs WHERE toAccountID = :me";
-			$query = $db->prepare($query);
-			$query->execute([':me' => $me]);
-			$requests = $query->fetchColumn();
-		//messages
-			$query = "SELECT count(*) FROM messages WHERE toAccountID = :me AND isNew=0";
-			$query = $db->prepare($query);
-			$query->execute([':me' => $me]);
-			$pms = $query->fetchColumn();
-		//friends
-			$query = "SELECT count(*) FROM friendships WHERE (person1 = :me AND isNew2 = '1') OR  (person2 = :me AND isNew1 = '1')";
-			$query = $db->prepare($query);
-			$query->execute([':me' => $me]);
-			$friends = $query->fetchColumn();
-		// follows
-			$followersCount = $followingCount = 0;
-			$follows = $db->prepare("SELECT * FROM follows WHERE person1 = :accountID OR person2 = :accountID");
-			$follows->execute([":accountID" => $me]);
-			$follows = $follows->fetchAll();
-			foreach($follows AS &$follow) {
-				if($follow["person1"] == $me) $followingCount++;
-				else $followersCount++;
-			}
-		// notifications
-			$newNotifications = 0; // will make later
-	/* sending the data */
-		//38,39,40 are notification counters
-		//18 = enabled (0) or disabled (1) messaging
-		//19 = enabled (0) disabled (1) friend requests
-		//31 = isnt (0) or is (1) friend or (3) incoming request or (4) outgoing request
-		//:32:9558256:35:XiB0cnU=:37:3 months
-		$friendstate = 0;
-		$appendix = ":38:".$pms.":39:".$requests.":40:".$friends;
-}else{
-	/* friend state */
-		$friendstate=0;
-	//check if INCOING friend request
-		$query = "SELECT ID,comment,uploadDate FROM friendreqs WHERE accountID = :extid AND toAccountID = :me";
-		$query = $db->prepare($query);
-		$query->execute([':extid' => $extid, ':me' => $me]);
-		$INCrequests = $query->rowCount();
-		$INCrequestinfo = $query->fetch();
-		if($INCrequests > 0){
-			$uploaddate = date("d/m/Y G.i", $INCrequestinfo["uploadDate"]);
-			$friendstate = 3;
-		}
-	//check if OUTCOMING friend request
-		$query = "SELECT count(*) FROM friendreqs WHERE toAccountID = :extid AND accountID = :me";
-		$query = $db->prepare($query);
-		$query->execute([':extid' => $extid, ':me' => $me]);
-		$OUTrequests = $query->fetchColumn();
-		if($OUTrequests > 0){
-			$friendstate = 4;
-		}
-	//check if friend ALREADY
-		$query = "SELECT count(*) FROM friendships WHERE (person1 = :me AND person2 = :extID) OR (person2 = :me AND person1 = :extID)";
-		$query = $db->prepare($query);
-		$query->execute([':me' => $me, ':extID' => $extid]);
-		$frs = $query->fetchColumn();
-		if($frs > 0){
-			$friendstate = 1;
-		}
-	/* sending the data */
-	//$friendstate is :31:
-	//$reqsstate is :19:
-	if ($INCrequests > 0){
-		$appendix = ":32:".$INCrequestinfo["ID"].":35:".$INCrequestinfo["comment"].":37:".$uploaddate;
-	}
-}
-$user["userName"] = $gs->makeClanUsername($user);
-$user['extID'] = is_numeric($user['extID']) ? $user['extID'] : 0;
-echo "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":3:".$user["stars"].":46:".$user["diamonds"].":52:".$user["moons"].":4:".$user["demons"].":8:".$creatorpoints.":18:".$msgstate.":19:".$reqsstate.":50:".$commentstate.":62:".$accinfo["gF"].":63:".$accinfo["gO"].":67:".$followersCount.":65:".$newNotifications.":66:0:68:".$followingCount.":70:1:20:".$accinfo["youtubeurl"].":21:".$user["accIcon"].":22:".$user["accShip"].":23:".$user["accBall"].":24:".$user["accBird"].":25:".$user["accDart"].":26:".$user["accRobot"].":28:".$user["accGlow"].":43:".$user["accSpider"].":48:".$user["accExplosion"].":53:".$user["accSwing"].":54:".$user["accJetpack"].":30:".$rank.":16:".$user["extID"].":31:".$friendstate.":44:".$accinfo["twitter"].":45:".$accinfo["twitch"].":59:".$accinfo["instagram"].":60:".$accinfo["tiktok"].":58:".$accinfo["discord"].":61:".$accinfo["custom"].":49:".$badge.":55:".$user["dinfo"].":56:".$user["sinfo"].":57:".$user["pinfo"].$appendix.":29:1";
+
+$person["accountUsername"] = $gs->makeClanUsername($person);
+echo "1:".$person["accountUsername"].":2:".$person["userID"].":13:".$person["coins"].":17:".$person["userCoins"].":10:".$person["color1"].":11:".$person["color2"].":51:".$person["color3"].":3:".$person["stars"].":46:".$person["diamonds"].":52:".$person["moons"].":4:".$person["demons"].":8:".$creatorPoints.":18:".$person["mS"].":19:".$person["frS"].":50:".$person["cS"].":62:".$person["gF"].":63:".$person["gO"].":67:".$person["followersCount"].":65:".$newNotifications.":66:0:68:".$followingCount.":70:1:20:".$person["youtubeurl"].":21:".$person["accIcon"].":22:".$person["accShip"].":23:".$person["accBall"].":24:".$person["accBird"].":25:".$person["accDart"].":26:".$person["accRobot"].":28:".$person["accGlow"].":43:".$person["accSpider"].":48:".$person["accExplosion"].":53:".$person["accSwing"].":54:".$person["accJetpack"].":30:".$rank.":16:".$person["extID"].":31:".$friendState.":44:".$person["twitter"].":45:".$person["twitch"].":59:".$person["instagram"].":60:".$person["tiktok"].":58:".$person["discord"].":61:".$person["custom"].":49:".$modBadge.":55:".$person["dinfo"].":56:".$person["sinfo"].":57:".$person["pinfo"].":29:1";
 ?>

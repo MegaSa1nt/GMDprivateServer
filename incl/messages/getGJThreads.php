@@ -13,7 +13,7 @@ $filter = ExploitPatch::number($_POST["filter"]) ?: 0;
 $filtersArray = $threadsArray = [];
 $page = ExploitPatch::number($_POST["page"]) ?: 0;
 $offset = $page * 20;
-$threadIDs = $threadValuesArray = $newMessagesCountArray = [];
+$threadIDs = $usersArray = $threadValuesArray = $newMessagesCountArray = [];
 
 $filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)' OR formerMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)'";
 if($filter) $filtersArray[] = $filter == 1 ? "isDMThread = 1" : "isDMThread = 0";
@@ -45,7 +45,7 @@ if($user) {
 
 $gs->syncAccountDMThreads($accountID);
 
-$threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filtersArray ? " WHERE (".implode(") AND (", $filtersArray).")" : "")." ORDER BY lastMessageTimestamp DESC");
+$threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filtersArray ? " WHERE (".implode(") AND (", $filtersArray).")" : "")." ORDER BY lastMessageTimestamp DESC LIMIT 20 OFFSET ".$offset);
 $threads->execute();
 $threads = $threads->fetchAll();
 
@@ -90,7 +90,7 @@ if(!empty($threadIDs)) { // Yes ik shit code
 		if(!empty($messagesCountFilterArray)) {
 			$messagesCount = $db->prepare("SELECT accID, toAccountID AS threadID, isThreadMessage FROM messages
 				WHERE (
-					(toAccountID IN (".implode(",", $readThreadIDsArray).") AND isThreadMessage = 1)
+					(toAccountID IN (".(implode(",", $readThreadIDsArray) ?: 0).") AND isThreadMessage = 1)
 					OR (toAccountID = :accountID AND isThreadMessage = 0)
 				)
 				AND (
@@ -112,18 +112,28 @@ if(!empty($threadIDs)) { // Yes ik shit code
 	}
 }
 
+$threadMemberIDsArray = [];
+foreach($threads AS &$thread) { // Retrieve users first
+	$threadMembersArray = explode(",", $thread["threadMembers"]);
+	$invitedUsersArray = explode(",", $thread["invitedUsers"]);
+	
+	foreach($threadMembersArray AS &$memberID) if($memberID) $threadMemberIDsArray[] = $memberID;
+	foreach($invitedUsersArray AS &$memberID) if($memberID) $threadMemberIDsArray[] = $memberID;
+}
+$threadMemberIDsArray = array_unique($threadMemberIDsArray);
+
+$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $threadMemberIDsArray).")");
+$users->execute();
+$users = $users->fetchAll();
+foreach($users AS &$userData) {
+	$userData["userName"] = $gs->makeClanUsername($userData);
+	$usersArray[$userData["extID"]] = $userData;
+}
+
 foreach($threads AS &$thread) {
-	$threadArray = $usersArray = [];
+	$threadArray = [];
 	$lastMessageSenderID = $thread["accID"];
 	for($i = 0; $i < 26; $i++) $threadArray[$i] = "";
-	
-	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".trim($thread["threadMembers"].",".$thread["invitedUsers"], ",").")");
-	$users->execute();
-	$users = $users->fetchAll();
-	foreach($users AS &$userData) {
-		$userData["userName"] = $gs->makeClanUsername($userData);
-		$usersArray[$userData["extID"]] = $userData;
-	}
 
 	if($thread["isDMThread"]) {
 		$isPendingThread = $thread["threadMembers"] == $accountID;
@@ -188,7 +198,7 @@ $threadsCount = $db->prepare("SELECT count(*) FROM threads ".($filtersArray ? " 
 $threadsCount->execute();
 $threadsCount = $threadsCount->fetchColumn();
 
-$newInvitesCount = $db->prepare("SELECT count(*) FROM threadinvites WHERE toAccountID = :accountID AND timestamp >= :timestamp");
+$newInvitesCount = $db->prepare("SELECT count(*) FROM threadinvites WHERE toAccountID = :accountID AND isIgnored = 0 AND timestamp >= :timestamp");
 $newInvitesCount->execute([":accountID" => $accountID, ":timestamp" => time() - 1209600]);
 $newInvitesCount = $newInvitesCount->fetchColumn();
 
