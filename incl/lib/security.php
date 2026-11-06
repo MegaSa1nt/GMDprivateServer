@@ -607,8 +607,10 @@ class Security {
 			case RateLimit::LoginTries:
 				if(!$maxLoginTries) return true;
 				
-				$searchFilters = ['type = '.Action::FailedLogin, 'timestamp >= '.time() - $rateLimitBanTime];
-				$isRateLimited = Library::getPersonActions($person, $searchFilters);
+				$searchIP = Library::convertIPForSearching($person['IP'], true);
+				
+				$searchFilters = ['IP REGEXP "('.$searchIP.')"', 'type = '.Action::FailedLogin, 'timestamp >= '.time() - $rateLimitBanTime];
+				$isRateLimited = Library::getActions($searchFilters);
 				
 				if(count($isRateLimited) > $maxLoginTries) {
 					Library::banPerson(0, $person, "You exceeded rate limit for logging in.", Ban::Account, Person::IP, (time() + $rateLimitBanTime), "Person failed to login too much. (".count($isRateLimited)." > ".$maxLoginTries.")");

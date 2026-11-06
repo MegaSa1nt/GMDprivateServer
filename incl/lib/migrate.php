@@ -81,7 +81,11 @@ if(!$installed) {
 		['discord', 'varchar(255)', '', 'tiktok'],
 		['custom', 'varchar(255)', '', 'discord'],
 		
+		['gF', 'int(11)', '1', 'cS'],
+		['gO', 'int(11)', '2', 'gF'],
+		
 		['registerIP', 'varchar(255)', '', 'registerDate'],
+		['followersCount', 'int(11)', '0', 'friendsCount'],
 		['isDeleted', 'tinyint(1)', '0', 'isActive'],
 		['mailExpires', 'int(11)', '0', 'mail'],
 		['passCodeExpires', 'int(11)', '0', 'passCode']
@@ -310,6 +314,28 @@ if(!$installed) {
 		}
 	}
 	
+	// Migrate table "blocks"
+	$columnsToAdd = [
+		['timestamp', 'int(11)', '0', 'person2']
+	];
+	
+	$blocksColumns = getTableColumns('blocks');
+	if(!$blocksColumns) exit(sprintf($errorNoRequiredColumn, 'blocks'));
+	
+	foreach($columnsToAdd AS &$column) {
+		if(isset($blocksColumns[$column[0]])) {
+			if($blocksColumns[$column[0]] == $column[1]) continue;
+			
+			$db->query("ALTER TABLE `blocks` CHANGE `".$column[0]."` `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."'");
+			
+			continue;
+		}
+		
+		// Add timestamp migration later
+		
+		$db->query("ALTER TABLE `blocks` ADD `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."' AFTER `".$column[3]."`");
+	}
+	
 	// Migrate table "clanrequests"
 	$clanrequestsColumns = getTableColumns('clanrequests');
 	if(!$clanrequestsColumns) {
@@ -534,6 +560,42 @@ if(!$installed) {
 		$favsongsColumns = getTableColumns('favsongs');
 	}
 	
+	// Migrate table "follows"
+	$followsColumns = getTableColumns('follows');
+	if(!$followsColumns) {
+		$db->query("CREATE TABLE `follows` (
+			`ID` int(11) NOT NULL AUTO_INCREMENT,
+			`person1` int(11) NOT NULL DEFAULT 0,
+			`person2` int(11) NOT NULL DEFAULT 0,
+			`timestamp` int(11) NOT NULL DEFAULT 0,
+			PRIMARY KEY (`ID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		
+		$followsColumns = getTableColumns('follows');
+	}
+	
+	// Migrate table "friendships"
+	$columnsToAdd = [
+		['timestamp', 'int(11)', '0', 'isNew2']
+	];
+	
+	$friendshipsColumns = getTableColumns('friendships');
+	if(!$friendshipsColumns) exit(sprintf($errorNoRequiredColumn, 'friendships'));
+	
+	foreach($columnsToAdd AS &$column) {
+		if(isset($friendshipsColumns[$column[0]])) {
+			if($friendshipsColumns[$column[0]] == $column[1]) continue;
+			
+			$db->query("ALTER TABLE `friendships` CHANGE `".$column[0]."` `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."'");
+			
+			continue;
+		}
+		
+		// Add timestamp migration later
+		
+		$db->query("ALTER TABLE `friendships` ADD `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."' AFTER `".$column[3]."`");
+	}
+	
 	// Migrate table "gauntlets"
 	$columnsToAdd = [
 		['timestamp', 'int(11)', '0', 'level5']
@@ -662,7 +724,9 @@ if(!$installed) {
 	];
 	$columnsToAdd = [
 		['toAccountID', 'varchar(255)', '', 'accountID'],
-		['readTime', 'int(11)', '0', 'isNew']
+		['readTime', 'int(11)', '0', 'isNew'],
+		['isThreadMessage', 'int(11)', '0', 'readTime'],
+		['isDeleted', 'int(11)', '0', 'isThreadMessage']
 	];
 	
 	$messagesColumns = getTableColumns('messages');
@@ -722,6 +786,21 @@ if(!$installed) {
 		}
 		
 		$db->query("ALTER TABLE `modactions` ADD `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."' AFTER `".$column[3]."`");
+	}
+	
+	// Migrate table "mutes"
+	$mutesColumns = getTableColumns('mutes');
+	if(!$mutesColumns) {
+		$db->query("CREATE TABLE `mutes` (
+			`ID` int(11) NOT NULL AUTO_INCREMENT,
+			`person1` int(11) NOT NULL DEFAULT 0,
+			`person2` int(11) NOT NULL DEFAULT 0,
+			`isThread` int(11) NOT NULL DEFAULT 0,
+			`timestamp` int(11) NOT NULL DEFAULT 0,
+			PRIMARY KEY (`ID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		
+		$mutesColumns = getTableColumns('mutes');
 	}
 	
 	// Migrate table "notifies"
@@ -928,9 +1007,10 @@ if(!$installed) {
 	];
 	$columnsToAdd = [
 		['commentsExtraText', 'varchar(255)', '', 'roleName'],
-		['gameLockLevelComments', 'varchar(255)', '', 'gameSetLevelSong'],
-		['gameLockLevelUpdating', 'varchar(255)', '', 'gameLockLevelComments'],
-		['gameSetListLevels', 'varchar(255)', '', 'gameLockLevelUpdating'],
+		['gameLockLevelComments', 'tinyint(1)', '0', 'gameSetLevelSong'],
+		['gameLockLevelUpdating', 'tinyint(1)', '0', 'gameLockLevelComments'],
+		['gameSetListLevels', 'tinyint(1)', '0', 'gameLockLevelUpdating'],
+		['gameAddMembersWithoutInvite', 'tinyint(1)', '0', 'gameSetDifficulty'],
 		['dashboardManageMapPacks', 'tinyint(1)', '0', 'dashboardModeratorTools'],
 		['dashboardManageSongs', 'tinyint(1)', '0', 'dashboardManageMapPacks'],
 		['dashboardManageAccounts', 'tinyint(1)', '0', 'dashboardManageSongs'],
@@ -1031,6 +1111,61 @@ if(!$installed) {
 		}
 		
 		$db->query("ALTER TABLE `songs` ADD `".$column[0]."` ".$column[1]." NOT NULL DEFAULT '".$column[2]."' AFTER `".$column[3]."`");
+	}
+	
+	// Migrate table "threads"
+	$threadsColumns = getTableColumns('threads');
+	if(!$threadsColumns) {
+		$db->query("CREATE TABLE `threads` (
+			`threadID` int(11) NOT NULL AUTO_INCREMENT,
+			`threadName` varchar(255) NOT NULL DEFAULT '',
+			`threadDesc` varchar(2048) NOT NULL DEFAULT '',
+			`threadIcon` varchar(50) NOT NULL DEFAULT '',
+			`threadOwner` int(11) NOT NULL DEFAULT 0,
+			`threadMembers` text NOT NULL DEFAULT '',
+			`invitedUsers` text NOT NULL DEFAULT '',
+			`formerMembers` text NOT NULL DEFAULT '',
+			`isDMThread` int(11) NOT NULL DEFAULT 0,
+			`isLocked` int(11) NOT NULL DEFAULT 0,
+			`isInviteLocked` int(11) NOT NULL DEFAULT 1,
+			`lastMessageID` int(11) NOT NULL DEFAULT 0,
+			`timestamp` int(11) NOT NULL DEFAULT 0,
+			PRIMARY KEY (`threadID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		
+		$threadsColumns = getTableColumns('threads');
+	}
+	
+	// Migrate table "threadevents"
+	$threadeventsColumns = getTableColumns('threadevents');
+	if(!$threadeventsColumns) {
+		$db->query("CREATE TABLE `threadevents` (
+			`eventID` int(11) NOT NULL AUTO_INCREMENT,
+			`threadID` int(11) NOT NULL DEFAULT 0,
+			`type` int(11) NOT NULL DEFAULT 0,
+			`value` int(11) NOT NULL DEFAULT 0,
+			`accountID` int(11) NOT NULL DEFAULT 0,
+			`timestamp` int(11) NOT NULL DEFAULT 0,
+			PRIMARY KEY (`eventID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		
+		$threadeventsColumns = getTableColumns('threadevents');
+	}
+	
+	// Migrate table "threadinvites"
+	$threadinvitesColumns = getTableColumns('threadinvites');
+	if(!$threadinvitesColumns) {
+		$db->query("CREATE TABLE `threadinvites` (
+			`inviteID` int(11) NOT NULL AUTO_INCREMENT,
+			`threadID` int(11) NOT NULL DEFAULT 0,
+			`accountID` int(11) NOT NULL DEFAULT 0,
+			`toAccountID` int(11) NOT NULL DEFAULT 0,
+			`isIgnored` int(11) NOT NULL DEFAULT 0,
+			`timestamp` int(11) NOT NULL DEFAULT 0,
+			PRIMARY KEY (`inviteID`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		
+		$threadinvitesColumns = getTableColumns('threadinvites');
 	}
 	
 	// Migrate table "udids"

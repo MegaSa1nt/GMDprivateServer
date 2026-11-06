@@ -129,7 +129,7 @@ class RatingItem {
 	const List = 4;
 }
 
-class Action { // Last action ID is 79
+class Action { // Last action ID is 99
 	const AccountRegister = 1;
 	const UserCreate = 51;
 	
@@ -151,6 +151,7 @@ class Action { // Last action ID is 79
 	
 	const ProfileStatsChange = 9;
 	const ProfileSettingsChange = 27;
+	const ProfileSocialsChange = 82;
 	const UsernameChange = 49;
 	const PasswordChange = 50;
 	
@@ -181,8 +182,10 @@ class Action { // Last action ID is 79
 	
 	const FriendRequestAccept = 28;
 	const FriendRequestDeny = 30;
+	const FriendRequestRemove = 81;
 	const FriendRemove = 31;
 	const FriendRequestSend = 33;
+	const UserFollow = 80;
 	
 	const BlockAccount = 29;
 	const UnblockAccount = 32;
@@ -233,6 +236,24 @@ class Action { // Last action ID is 79
 	const ClanTransfer = 75;
 	
 	const ItemReport = 76;
+	
+	const ThreadCreation = 84;
+	const ThreadChange = 85;
+	const ThreadLeave = 86;
+	const ThreadKick = 87;
+	const ThreadTransfer = 88;
+	const ThreadMute = 89;
+	const ThreadUnmute = 90;
+	const ThreadMessageDeletion = 91;
+	const ThreadInviteRemove = 92;
+	const ThreadInviteAccept = 93;
+	const ThreadInviteIgnore = 94;
+	const ThreadInvitePermissionChange = 95;
+	const ThreadMembersInvite = 96;
+	const ThreadMembersAdd = 97;
+	const DMSync = 83;
+	const DMCreate = 98;
+	const DMClearHistory = 99;
 	
 	// Unused
 	const LevelReport = 20;
@@ -414,7 +435,7 @@ class AutomodAction { // Last action ID is 17
 	const ClanPostsSpammerWarning = 17;
 }
 
-class Permission { // Last permission ID is 34
+class Permission { // Last permission ID is 35
 	const GameSuggestLevel = 1;
 	const GameRateLevel = 2;
 	const GameSetDifficulty = 3;
@@ -436,6 +457,7 @@ class Permission { // Last permission ID is 34
 	const GameSetDaily = 19;
 	const GameSetWeekly = 20;
 	const GameSetEvent = 21;
+	const GameAddMembersWithoutInvite = 35;
 	
 	const DashboardModeratorTools = 22;
 	const DashboardDeleteLeaderboards = 23;
@@ -473,6 +495,7 @@ class Permission { // Last permission ID is 34
 		'gameSetDaily',
 		'gameSetWeekly',
 		'gameSetEvent',
+		'gameAddMembersWithoutInvite',
 		
 		'dashboardModeratorTools',
 		'dashboardDeleteLeaderboards',
@@ -511,6 +534,7 @@ class Permission { // Last permission ID is 34
 		'gameSetDaily' => 19,
 		'gameSetWeekly' => 20,
 		'gameSetEvent' => 21,
+		'gameAddMembersWithoutInvite' => 35,
 		
 		'dashboardModeratorTools' => 22,
 		'dashboardDeleteLeaderboards' => 23,
