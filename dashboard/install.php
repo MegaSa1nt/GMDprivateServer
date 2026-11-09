@@ -431,6 +431,15 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'followersCount'");
 			$exist = $check->fetchAll();
 			if(empty($exist)) $db->query("ALTER TABLE `accounts` ADD `followersCount` INT NOT NULL DEFAULT '0' AFTER `friendsCount`");
+		$check = $db->query("SHOW TABLES LIKE 'news'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("CREATE TABLE `news` (
+				 `entryID` int(11) NOT NULL AUTO_INCREMENT,
+				 `entryTitle` varchar(255) NOT NULL,
+				 `entryDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				 `entryElements` TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
+				 PRIMARY KEY (`entryID`)
+				) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);
