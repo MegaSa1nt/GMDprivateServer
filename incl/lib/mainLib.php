@@ -2058,6 +2058,12 @@ class mainLib {
 			$syncThreads = $db->prepare("INSERT INTO threads (threadMembers, isDMThread, lastMessageID, timestamp) VALUES ".implode(",", $newDMThreadsArray));
 			$syncThreads->execute();
 		}
+		if(!empty($dmThreadsMembersArray)) {
+			$syncedThreads = $db->prepare("SELECT threadID, threadMembers FROM threads WHERE threadMembers IN ('".implode("','", $dmThreadsMembersArray)."') AND isDMThread = 1");
+			$syncedThreads->execute();
+			foreach($syncedThreads->fetchAll() AS $syncedThread)
+				$this->addThreadToAccounts($syncedThread["threadID"], explode(",", $syncedThread["threadMembers"]));
+		}
 		
 		$this->logAction($accountID, 83);
 	}
@@ -2071,6 +2077,24 @@ class mainLib {
 		$thread = $thread->fetch();
 		
 		return $thread;
+	}
+	public function getAccountThreadIDs($accountID) {
+		require_once __DIR__."/connection.php";
+		
+		$threadIDs = $db->prepare("SELECT threadIDs FROM accounts WHERE accountID = :accountID");
+		$threadIDs->execute([":accountID" => $accountID]);
+		$threadIDs = array_filter(explode(",", $threadIDs->fetchColumn()));
+		
+		return $threadIDs ? implode(",", $threadIDs) : "0";
+	}
+	public function addThreadToAccounts($threadID, $accountIDs) {
+		require_once __DIR__."/connection.php";
+		
+		$accountIDs = array_filter($accountIDs);
+		if(!$threadID || empty($accountIDs)) return;
+		
+		$update = $db->prepare("UPDATE accounts SET threadIDs = CONCAT_WS(',', NULLIF(threadIDs, ''), :threadIDValue) WHERE accountID IN (".implode(",", $accountIDs).") AND NOT FIND_IN_SET(:threadIDCheck, threadIDs)");
+		$update->execute([":threadIDValue" => $threadID, ":threadIDCheck" => $threadID]);
 	}
 	public function getDMThreadByMembersID($accountID, $targetAccountID) {
 		require __DIR__."/connection.php";
@@ -2251,6 +2275,7 @@ class mainLib {
 		
 		$addMembers = $db->prepare("UPDATE threads SET threadMembers = '".$actualThreadMembers."' WHERE threadID = :threadID");
 		$addMembers->execute([":threadID" => $threadID]);
+		$this->addThreadToAccounts($threadID, $actualAddedUsersArray);
 		if(!empty($sendMessagesInsertString) && $sendSystemMessage) {
 			$sendMessages = $db->prepare("INSERT INTO messages (userID, userName, subject, body, accID, toAccountID, timestamp, isThreadMessage) VALUES ".$sendMessagesInsertString);
 			$sendMessages->execute();
@@ -2387,6 +2412,7 @@ class mainLib {
 		$deleteInvite->execute([":threadID" => $threadID, ":accountID" => $accountID]);
 		$updateThread = $db->prepare("UPDATE threads SET threadMembers = '".$threadMembers."', invitedUsers = '".$invitedUsers."' WHERE threadID = :threadID");
 		$updateThread->execute([":threadID" => $threadID]);
+		$this->addThreadToAccounts($threadID, [$accountID]);
 		if(!$thread["isDMThread"]) $this->sendThreadSystemMessage($threadID, 2, $inviteAccountID, $accountID);
 		
 		return true;
