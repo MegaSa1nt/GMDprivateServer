@@ -440,6 +440,21 @@ if(!$installed) {
 				 `entryElements` TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
 				 PRIMARY KEY (`entryID`)
 				) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+		$check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'threadIDs'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) {
+				$db->query("ALTER TABLE `accounts` ADD `threadIDs` text NOT NULL DEFAULT '' AFTER `followersCount`");
+				
+				$accountThreads = [];
+				$allThreads = $db->query("SELECT threadID, threadMembers, formerMembers FROM threads")->fetchAll();
+				foreach($allThreads AS $thread) {
+					$members = array_filter(array_merge(explode(",", $thread["threadMembers"]), explode(",", $thread["formerMembers"])));
+					foreach($members AS $memberID) $accountThreads[(int)$memberID][] = $thread["threadID"];
+				}
+				
+				$fillThreadIDs = $db->prepare("UPDATE accounts SET threadIDs = :threadIDs WHERE accountID = :accountID");
+				foreach($accountThreads AS $memberID => $threadIDs) $fillThreadIDs->execute([":threadIDs" => implode(",", array_unique($threadIDs)), ":accountID" => $memberID]);
+			}
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

@@ -15,7 +15,9 @@ $page = ExploitPatch::number($_POST["page"]) ?: 0;
 $offset = $page * 20;
 $threadIDs = $usersArray = $threadValuesArray = $newMessagesCountArray = [];
 
-$filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)' OR formerMembers REGEXP '(\\\D|^)(".$accountID.")(\\\D|$)'";
+$gs->syncAccountDMThreads($accountID);
+
+$filtersArray[] = "threads.threadID IN (".$gs->getAccountThreadIDs($accountID).")";
 if($filter) $filtersArray[] = $filter == 1 ? "isDMThread = 1" : "isDMThread = 0";
 if($search) {
 	$userSearchFilter = [];
@@ -42,8 +44,6 @@ if($user) {
 	
 	$filtersArray[] = "threadMembers REGEXP '(\\\D|^)(".$userIDs.")(\\\D|$)'";
 }
-
-$gs->syncAccountDMThreads($accountID);
 
 $threads = $db->prepare("SELECT *, messages.timestamp AS lastMessageTimestamp FROM threads INNER JOIN messages ON threads.lastMessageID = messages.messageID ".($filtersArray ? " WHERE (".implode(") AND (", $filtersArray).")" : "")." ORDER BY lastMessageTimestamp DESC LIMIT 20 OFFSET ".$offset);
 $threads->execute();
@@ -122,9 +122,12 @@ foreach($threads AS &$thread) { // Retrieve users first
 }
 $threadMemberIDsArray = array_unique($threadMemberIDsArray);
 
-$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $threadMemberIDsArray).")");
-$users->execute();
-$users = $users->fetchAll();
+$users = [];
+if(!empty($threadMemberIDsArray)) {
+	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $threadMemberIDsArray).")");
+	$users->execute();
+	$users = $users->fetchAll();
+}
 foreach($users AS &$userData) {
 	$userData["userName"] = $gs->makeClanUsername($userData);
 	$usersArray[$userData["extID"]] = $userData;
