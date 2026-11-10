@@ -19,3 +19,4 @@ echo implode(",", [
     $info["gauntletVersion"],
     $info["latestGauntlet"]
 ]);
+?>
