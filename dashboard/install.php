@@ -440,6 +440,11 @@ if(!$installed) {
 				 `entryElements` TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
 				 PRIMARY KEY (`entryID`)
 				) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+		$check = $db->query("SELECT SUM(`followersCount`) FROM `accounts`");
+			$exist = $check->fetchColumn();
+		if (empty($exist)) $db->query("UPDATE accounts SET followersCount =
+			(SELECT COUNT(*) FROM follows WHERE follows.person2 = accounts.accountID)
+		");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

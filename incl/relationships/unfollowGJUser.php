@@ -20,6 +20,9 @@ $query = $db->prepare("DELETE FROM follows WHERE person1 = :accountID AND person
 $query->execute([':accountID' => $accountID, ':targetAccountID' => $targetAccountID]);
 
 if ($query->rowCount() > 0) {
+    $query = $db->prepare("UPDATE accounts SET followersCount = followersCount - 1 WHERE accountID = :targetAccountID");
+    $query->execute([':targetAccountID' => $targetAccountID]);
+    
     if ($automaticCron) Cron::updateFriendsCount($accountID, false);
     // $gs->logAction($accountID, SOMETHING_NOT_TAKEN, $targetAccountID);
 }

@@ -6,16 +6,25 @@ require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 require_once "../lib/cron.php";
+
 $gs = new mainLib();
 
-if(empty($_POST["targetAccountID"])) exit("-1");
+if (empty($_POST["targetAccountID"])) exit("-1");
 
 $accountID = GJPCheck::getAccountIDOrDie();
 $targetAccountID = ExploitPatch::remove($_POST["targetAccountID"]);
-if($accountID == $targetAccountID) exit("-1");
 
-$query = $db->prepare("INSERT INTO follows (person1, person2, timestamp) VALUES (:accountID, :targetAccountID, :timestamp)");
-$query->execute([':accountID' => $accountID, ':targetAccountID' => $targetAccountID, ":timestamp" => time()]);
-if($automaticCron) Cron::updateFriendsCount($accountID, false);
-$gs->logAction($accountID, 80, $targetAccountID);
+if(!$targetAccountID || $accountID == $targetAccountID) exit("-1");
+
+$query = $db->prepare("INSERT IGNORE INTO follows (person1, person2, timestamp) VALUES (:accountID, :targetAccountID, :timestamp)");
+$query->execute([':accountID' => $accountID, ':targetAccountID' => $targetAccountID, ':timestamp' => time()]);
+
+if($query->rowCount() > 0) {
+    $query = $db->prepare("UPDATE accounts SET followersCount = followersCount + 1 WHERE accountID = :targetAccountID");
+    $query->execute([':targetAccountID' => $targetAccountID]);
+
+    if ($automaticCron) Cron::updateFriendsCount($accountID, false);
+    $gs->logAction($accountID, 80, $targetAccountID);
+}
+
 echo 1;
