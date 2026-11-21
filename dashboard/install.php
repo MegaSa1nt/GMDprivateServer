@@ -442,9 +442,21 @@ if(!$installed) {
 				) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 		$check = $db->query("SELECT SUM(`followersCount`) FROM `accounts`");
 			$exist = $check->fetchColumn();
-		if (empty($exist)) $db->query("UPDATE accounts SET followersCount =
-			(SELECT COUNT(*) FROM follows WHERE follows.person2 = accounts.accountID)
-		");
+			if (empty($exist)) $db->query("UPDATE accounts SET followersCount =
+				(SELECT COUNT(*) FROM follows WHERE follows.person2 = accounts.accountID)
+			");
+		$check = $db->query("SHOW COLUMNS FROM `reports` LIKE 'levelID'");
+			$exist = $check->fetchAll();
+			if(!empty($exist)) $db->query("ALTER TABLE `reports` CHANGE `levelID` `targetID` INT NOT NULL");
+		$check = $db->query("SHOW COLUMNS FROM `reports` LIKE 'type'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `reports` ADD `type` INT NOT NULL DEFAULT 1 AFTER `targetID`");
+		$check = $db->query("SHOW COLUMNS FROM `reports` LIKE 'reasons'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `reports` ADD `reasons` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `type`");
+		$check = $db->query("SHOW COLUMNS FROM `reports` LIKE 'extraID'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("ALTER TABLE `reports` ADD `extraID` INT NOT NULL DEFAULT 0 AFTER `reasons`");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

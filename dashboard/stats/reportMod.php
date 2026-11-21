@@ -11,7 +11,7 @@ $dl->printFooter('../');
 $modcheck = $gs->checkPermission($_SESSION["accountID"], "dashboardModTools");
 if($modcheck) {
 $reported = '';
-$query = $db->prepare("SELECT levels.*, count(*) AS reportsCount FROM reports INNER JOIN levels ON reports.levelID = levels.levelID GROUP BY levels.levelID ORDER BY reportsCount DESC");
+$query = $db->prepare("SELECT levels.*, count(*) AS reportsCount FROM reports INNER JOIN levels ON reports.targetID = levels.levelID WHERE reports.type = 1 GROUP BY levels.levelID ORDER BY reportsCount DESC");
 $query->execute();
 $result = $query->fetchAll();
 $x = 1;
