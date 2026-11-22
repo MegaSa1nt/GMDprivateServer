@@ -40,7 +40,11 @@ class GJPCheck {
 			else exit('-1');
 		}
 
-		$accountID = ExploitPatch::remove($_POST["accountID"]);
+		$accountID = ExploitPatch::number($_POST["accountID"]);
+		if(empty($accountID)) {
+		    if($dontDie) return false;
+		    else exit('-1');
+		}
 
 		if(!empty($_POST['gjp'])) { if(self::validateGJPOrDie($_POST['gjp'], $accountID, $dontDie) === false) return false; }
 		elseif(!empty($_POST['gjp2'])) { if(self::validateGJP2OrDie($_POST['gjp2'], $accountID, $dontDie) === false) return false; }
