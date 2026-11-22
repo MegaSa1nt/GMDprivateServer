@@ -4,6 +4,27 @@ require __DIR__."/../".$dbPath."config/dashboard.php";
 require_once "auth.php";
 $au = new au();
 $dashCheck = $au->auth($dbPath);
+if(session_status() === PHP_SESSION_ACTIVE) {
+	$sessionParams = session_get_cookie_params();
+	setcookie(session_name(), session_id(), [
+		'expires' => 0,
+		'path' => $sessionParams['path'],
+		'domain' => $sessionParams['domain'],
+		'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? '') == 443,
+		'httponly' => true,
+		'samesite' => 'Strict'
+	]);
+}
+if(($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+	$requestSource = $_SERVER['HTTP_ORIGIN'] ?? '';
+	if($requestSource === '') $requestSource = $_SERVER['HTTP_REFERER'] ?? '';
+	$selfHost = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
+	$sourceHost = $requestSource !== '' ? parse_url($requestSource, PHP_URL_HOST) : null;
+	if($selfHost !== '' && $sourceHost !== null && (!is_string($sourceHost) || strcasecmp($sourceHost, $selfHost) !== 0)) {
+		http_response_code(403);
+		exit;
+	}
+}
 // Dashboard library
 class dashboardLib {
 	public function printHeader($isSubdirectory = true){

@@ -1,8 +1,6 @@
 <?php
 // Original Idea by Cirno
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET');
-header("Access-Control-Allow-Headers: X-Requested-With");
+require_once "../incl/cors.php";
 require_once "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/connection.php";
 // 2592000 seconds = 30d

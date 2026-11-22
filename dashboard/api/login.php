@@ -1,7 +1,5 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
+require_once "../incl/cors.php";
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/connection.php";
 require "../".$dbPath."config/security.php";
@@ -21,14 +19,9 @@ if(isset($_POST["userName"]) AND isset($_POST["password"])){
 	}
 	$accountID = $gs->getAccountIDFromName($userName);
 	if($accountID == 0) exit(json_encode(['success' => false, 'error' => '-3']));
-  	$query = $db->prepare("SELECT auth FROM accounts WHERE accountID = :accountID");
-  	$query->execute([':accountID' => $accountID]);
-  	$auth = $query->fetchColumn();
-    if($auth == 'none') {
-          $auth = $gs->randomString(8);
-          $query = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :accountID");
-          $query->execute([':auth' => $auth, ':accountID' => $accountID]);
-    }
+	$auth = $gs->randomString(16);
+	$query = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :accountID");
+	$query->execute([':auth' => $auth, ':accountID' => $accountID]);
 	$color = $gs->getAccountCommentColor($accountID);
 	$gs->logAction($accountID, 2);
 	$userID = $gs->getUserID($accountID, $userName);

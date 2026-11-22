@@ -10,16 +10,18 @@ class au {
     $check = $db->query("SHOW COLUMNS FROM `accounts` LIKE 'auth'");
     $exist = $check->fetchAll();
     if(empty($exist)) return 'no';
-    if($_SESSION["accountID"] != 0) {
+    $token = $_COOKIE["auth"] ?? '';
+    if(!is_string($token)) $token = '';
+    if(isset($_SESSION["accountID"]) AND $_SESSION["accountID"] != 0) {
         $query = $db->prepare("SELECT auth FROM accounts WHERE accountID = :id");
         $query->execute([':id' => $_SESSION["accountID"]]);
-        $auth = $query->fetch();
-        if($_COOKIE["auth"] != $auth["auth"]) $_SESSION["accountID"] = 0;
-    } else {
+        $auth = $query->fetchColumn();
+        if(empty($token) || empty($auth) || !hash_equals($auth, $token)) $_SESSION["accountID"] = 0;
+    } elseif($token !== '' && $token !== 'none') {
         $query = $db->prepare("SELECT accountID FROM accounts WHERE auth = :id AND auth != ''");
-        $query->execute([':id' => $_COOKIE["auth"]]);
-        $auth = $query->fetch();
-        if(!empty($auth) AND $_COOKIE["auth"] != 'none') $_SESSION["accountID"] = $auth["accountID"];
+        $query->execute([':id' => $token]);
+        $auth = $query->fetchColumn();
+        if(!empty($auth)) $_SESSION["accountID"] = $auth;
     }
 	return true;
   }

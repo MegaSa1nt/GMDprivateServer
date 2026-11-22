@@ -10,6 +10,7 @@ $sfxEnabled = 1; // 0 = SFX upload disabled, 1 = enabled
 $convertEnabled = 1; // 1 = Convert SFX to OGG enabled, 0 = disabled
 $songSize = 8; // Max song size in megabytes
 $sfxSize = 4.5; // Max SFX size in megabytes
+$addSongKey = "";
 $timeType = 1; // How time will show in-game, 0 - default Cvolton time, 1 - Dashboard-like time, 2 - RobTop-like time
 $dashboardIcon = '/dashboard/icon.png'; // Icon at the top left of dashboard, can be link
 $dashboardFavicon = '/dashboard/icon.png'; // Icon in browser's tab, can be link

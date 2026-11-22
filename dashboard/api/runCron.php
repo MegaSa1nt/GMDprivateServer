@@ -1,8 +1,6 @@
 <?php
 session_start();
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
+require_once "../incl/cors.php";
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/connection.php";
 require_once "../".$dbPath."incl/lib/cron.php";

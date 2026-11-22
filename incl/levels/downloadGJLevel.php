@@ -51,6 +51,7 @@ $query->execute([':levelID' => $levelID]);
 $result = $query->fetch();
 if($result) {
 	$isPlayerAnAdmin = false;
+	$accountID = 0;
 	if(!empty($_POST['accountID'])) {
 		$accountID = GJPCheck::getAccountIDOrDie();
 		if($unlistedLevelsForAdmins) {
@@ -75,7 +76,7 @@ if($result) {
 	$pass = $result["password"];
 	$desc = ExploitPatch::rucharclean(ExploitPatch::url_base64_decode($result["levelDesc"]));
 	if($_POST['binaryVersion'] < 51) $desc = ExploitPatch::translit($desc);
-	if($gs->checkModIPPermission("actionFreeCopy") == 1) $pass = "1";
+	if($gs->checkModIPPermission("actionFreeCopy", $accountID) == 1) $pass = "1";
 	$xorPass = $pass;
 	$levelstring = file_exists("../../data/levels/$levelID") ? file_get_contents("../../data/levels/$levelID") : $result["levelString"];
 	if($gameVersion > 18) {

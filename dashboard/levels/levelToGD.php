@@ -50,7 +50,8 @@ if(!empty($_POST["usertarg"]) AND !empty($_POST["passtarg"]) AND !empty($_POST["
 	$passtarg = GeneratePass::GJP2fromPassword($_POST["passtarg"]);
 	$levelID = ExploitPatch::number($_POST["levelID"]);
 	$server = trim($_POST["server"]);
-	if(mb_substr($server, 0, 4) != 'http') exit($dl->printSong('<div class="form">
+	$serverIP = null;
+	if(!$gs->resolvePublicUrl($server, $serverIP)) exit($dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 		<form class="form__inner" method="post" action="">
 		<p id="dashboard-error-text">'.$dl->getLocalizedString("invalidPost").'</p>
@@ -97,6 +98,7 @@ if(!empty($_POST["usertarg"]) AND !empty($_POST["passtarg"]) AND !empty($_POST["
 	if(!empty($auth)) { 
 		curl_setopt($ch, CURLOPT_PROXYUSERPWD, $auth); 
 	}
+	$gs->pinCurlHost($ch, $server . "/accounts/loginGJAccount.php", $serverIP);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
@@ -172,6 +174,7 @@ if(!empty($_POST["usertarg"]) AND !empty($_POST["passtarg"]) AND !empty($_POST["
 	if(!empty($auth)) { 
 	curl_setopt($ch, CURLOPT_PROXYUSERPWD, $auth); 
 	}
+	$gs->pinCurlHost($ch, $server . "/uploadGJLevel21.php", $serverIP);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);

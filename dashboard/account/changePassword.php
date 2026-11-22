@@ -53,7 +53,13 @@ if($pass == 1) {
 	$query->execute([':password' => $passhash, ':userName' => $userName, ':salt' => $salt, ':gjp' => $gjp2, ':auth' => $auth]);
 	$gs->sendLogsAccountChangeWebhook($_SESSION["accountID"], $_SESSION["accountID"], $getAccountData);
 	$_SESSION["accountID"] = 0;
-	setcookie('auth', 'no', 2147483647, '/');
+	setcookie('auth', 'no', [
+		'expires' => time() - 3600,
+		'path' => '/',
+		'secure' => true,
+		'httponly' => true,
+		'samesite' => 'Strict'
+	]);
 	$dl->printSong('<div class="form">
     <h1>'.$dl->getLocalizedString("changePassTitle").'</h1>
     <form class="form__inner" method="post" action="">

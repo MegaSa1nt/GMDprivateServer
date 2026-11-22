@@ -1,8 +1,21 @@
 <?php
 require_once __DIR__."/mainLib.php";
 class GeneratePass {
+	private static function gjp2Salt() {
+		static $salt = null;
+		if($salt === null) {
+			$salt = "mI29fmAnxgTs";
+			$file = __DIR__ . "/../../config/security.php";
+			if(file_exists($file)) {
+				$config = (static function($path) { include $path; return get_defined_vars(); })($file);
+				if(!empty($config['gjp2Salt'])) $salt = $config['gjp2Salt'];
+			}
+		}
+		return $salt;
+	}
+
 	public static function GJP2fromPassword($pass) {
-		return sha1($pass . "mI29fmAnxgTs");
+		return sha1($pass . self::gjp2Salt());
 	}
 
 	public static function GJP2hash($pass) {
@@ -98,7 +111,7 @@ class GeneratePass {
 		}
 		$result = $query->fetch();
 		if(password_verify($pass, $result["password"])) {
-			if(!$result["gjp2"]) self::assignGJP2($accid, $pass);
+			if(!$result["gjp2"] || !password_verify(self::GJP2fromPassword($pass), $result["gjp2"])) self::assignGJP2($accid, $pass);
 			$checkBan = $gs->getPersonBan($accid, $gs->getUserID($accid, $result['userName']), 4);
 			if($checkBan) {
 				self::logInvalidAttemptFromIP($accid);

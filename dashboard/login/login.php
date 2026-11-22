@@ -87,15 +87,16 @@ if(isset($_POST["userName"]) && isset($_POST["password"])) {
 	$accountID = $gs->getAccountIDFromName($userName);
   	$_SESSION["accountID"] = $accountID;
 	$gs->logAction($accountID, 2);
-  	$query = $db->prepare("SELECT auth FROM accounts WHERE accountID = :id");
-  	$query->execute([':id' => $accountID]);
-  	$auth = $query->fetch();
-    if(empty($auth["auth"]) || $auth["auth"] == 'none') {
-          $auth = $gs->randomString(8);
-          $query = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :id");
-          $query->execute([':auth' => $auth, ':id' => $accountID]);
-		  setcookie('auth', $auth, 2147483647, '/', '', true, true);
-    } else setcookie('auth', $auth["auth"], 2147483647, '/', '', true, true);
+	$auth = $gs->randomString(16);
+	$query = $db->prepare("UPDATE accounts SET auth = :auth WHERE accountID = :id");
+	$query->execute([':auth' => $auth, ':id' => $accountID]);
+	setcookie('auth', $auth, [
+		'expires' => 2147483647,
+		'path' => '/',
+		'secure' => true,
+		'httponly' => true,
+		'samesite' => 'Strict'
+	]);
 	if(!empty($_SERVER["HTTP_REFERER"])) header('Location: '.$_SERVER["HTTP_REFERER"]);
 	else header('Location: ../');
 } else {

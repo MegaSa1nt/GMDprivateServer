@@ -1,12 +1,19 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
+session_start();
+require_once "../incl/cors.php";
 require "../incl/dashboardLib.php";
 require "../".$dbPath."incl/lib/connection.php";
 require "../".$dbPath."incl/lib/mainLib.php";
 require_once "../".$dbPath."incl/lib/exploitPatch.php";
 $gs = new mainLib();
+if(!isset($addSongKey)) $addSongKey = '';
+$suppliedKey = (string)($_GET['key'] ?? '');
+$authorized = !empty($_SESSION['accountID']);
+if(!$authorized && $addSongKey !== '' && hash_equals($addSongKey, $suppliedKey)) $authorized = true;
+if(!$authorized) {
+	http_response_code(403);
+	exit(json_encode(['dashboard' => true, 'success' => false, 'error' => 403, 'message' => 'Not authorized.']));
+}
 if(!isset($_GET)) $_GET = json_decode(file_get_contents('php://input'), true);
 $name = ExploitPatch::rucharclean(urldecode($_GET['name']));
 $author = ExploitPatch::rucharclean(urldecode($_GET['author']));

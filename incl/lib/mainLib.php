@@ -695,18 +695,104 @@ class mainLib {
 	    }
 	    return false;
 	}
-	public function getIP(){
-		if (isset($_SERVER['HTTP_CF_CONNECTING_IP']) && $this->isCloudFlareIP($_SERVER['REMOTE_ADDR'])) //CLOUDFLARE REVERSE PROXY SUPPORT
-  			return $_SERVER['HTTP_CF_CONNECTING_IP'];
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && ipInRange::ipv4_in_range($_SERVER['REMOTE_ADDR'], '127.0.0.0/8')) //LOCALHOST REVERSE PROXY SUPPORT (7m.pl)
-			return $_SERVER['HTTP_X_FORWARDED_FOR'];
-		return $_SERVER['REMOTE_ADDR'];
+	private static function securityConfig() {
+		static $config = null;
+		if($config === null) {
+			$config = [];
+			$file = __DIR__ . "/../../config/security.php";
+			if(file_exists($file)) $config = (static function($path) { include $path; return get_defined_vars(); })($file);
+		}
+		return $config;
 	}
-	public function checkModIPPermission($permission){
+	public function getIP(){
+		$remote = $_SERVER['REMOTE_ADDR'] ?? '';
+		if(isset($_SERVER['HTTP_CF_CONNECTING_IP']) && $this->isCloudFlareIP($remote))
+			return $this->normalizeIP($_SERVER['HTTP_CF_CONNECTING_IP']);
+		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $this->isTrustedProxy($remote))
+			return $this->forwardedIP($_SERVER['HTTP_X_FORWARDED_FOR'], $remote);
+		return $remote ?: '0.0.0.0';
+	}
+	public function normalizeIP($ip) {
+		$ip = trim((string)$ip);
+		if(filter_var($ip, FILTER_VALIDATE_IP) !== false) return $ip;
+		return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+	}
+	public function isTrustedProxy($ip) {
+		if(filter_var($ip, FILTER_VALIDATE_IP) === false) return false;
+		if($ip === '::1') return true;
+		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false && ipInRange::ipv4_in_range($ip, '127.0.0.0/8')) return true;
+		$config = self::securityConfig();
+		$ranges = $config['trustedProxies'] ?? [];
+		if(!is_array($ranges)) return false;
+		foreach($ranges as $range) {
+			if(strpos($range, ':') !== false) {
+				if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false && ipInRange::ipv6_in_range($ip, $range)) return true;
+			} elseif(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false && ipInRange::ipv4_in_range($ip, $range)) return true;
+		}
+		return false;
+	}
+	public function forwardedIP($header, $remote) {
+		$hops = array_reverse(explode(',', (string)$header));
+		foreach($hops as $hop) {
+			$hop = trim($hop);
+			if(filter_var($hop, FILTER_VALIDATE_IP) === false) continue;
+			if($this->isTrustedProxy($hop)) continue;
+			return $hop;
+		}
+		return $remote ?: '0.0.0.0';
+	}
+	public function resolvePublicUrl($url, &$resolvedIP = null) {
+		$parts = parse_url((string)$url);
+		if(!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) return false;
+		$scheme = strtolower($parts['scheme']);
+		if($scheme !== 'http' && $scheme !== 'https') return false;
+		if(isset($parts['user']) || isset($parts['pass'])) return false;
+		$host = str_replace(['[', ']'], '', $parts['host']);
+		if(filter_var($host, FILTER_VALIDATE_IP) !== false) $ip = $host;
+		else {
+			$ip = gethostbyname($host);
+			if($ip === $host) return false;
+		}
+		if(filter_var($ip, FILTER_VALIDATE_IP) === false) return false;
+		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) return false;
+		$resolvedIP = $ip;
+		return true;
+	}
+	public function pinCurlHost($ch, $url, $ip = null) {
+		if($ip === null && !$this->resolvePublicUrl($url, $ip)) return false;
+		$parts = parse_url($url);
+		$host = str_replace(['[', ']'], '', $parts['host']);
+		$port = isset($parts['port']) ? (int)$parts['port'] : (strtolower($parts['scheme']) === 'https' ? 443 : 80);
+		$target = strpos($ip, ':') !== false ? '['.$ip.']' : $ip;
+		curl_setopt($ch, CURLOPT_RESOLVE, [$host.':'.$port.':'.$target]);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		return true;
+	}
+	public function isAllowedRedirectHost($url, $extraHosts = []) {
+		if(!preg_match('#^https?://#i', (string)$url)) return false;
+		$host = parse_url($url, PHP_URL_HOST);
+		if(!$host) return false;
+		$host = strtolower($host);
+		$config = self::securityConfig();
+		$allowed = $config['allowedRedirectHosts'] ?? [];
+		if(!is_array($allowed)) $allowed = [];
+		foreach((array)$extraHosts as $extra) {
+			if(!empty($extra)) $allowed[] = $extra;
+		}
+		foreach($allowed as $entry) {
+			$entry = strtolower(trim((string)$entry));
+			if($entry === '') continue;
+			if($host === $entry) return true;
+			if(strpos($entry, '*.') === 0 && substr($host, -strlen($entry) + 1) === substr($entry, 1)) return true;
+		}
+		$self = strtolower(explode(':', $_SERVER['HTTP_HOST'] ?? '')[0]);
+		return $self !== '' && $host === $self;
+	}
+	public function checkModIPPermission($permission, $accountID = 0){
 		require __DIR__ . "/connection.php";
 		$ip = $this->getIP();
-		$query=$db->prepare("SELECT modipCategory FROM modips WHERE IP = :ip");
-		$query->execute([':ip' => $ip]);
+		$query=$db->prepare("SELECT modipCategory FROM modips WHERE IP = :ip AND accountID = :accountID");
+		$query->execute([':ip' => $ip, ':accountID' => $accountID]);
 		$categoryID = $query->fetchColumn();
 		
 		$query=$db->prepare("SELECT $permission FROM modipperms WHERE categoryID = :id");
@@ -881,7 +967,7 @@ class mainLib {
 		require __DIR__ . "/../../incl/lib/connection.php";
 		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
 		$song = str_replace("www.dropbox.com","dl.dropboxusercontent.com",$url);
-		if(filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http") {
+		if(filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http" && $this->resolvePublicUrl($song)) {
 			$song = str_replace(["?dl=0","?dl=1"],"",$song);
 			$song = trim($song);
 			$query = $db->prepare("SELECT ID FROM songs WHERE download = :download");
@@ -912,19 +998,32 @@ class mainLib {
 		}
 	}
 	public function getFileInfo($url){
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_HEADER, TRUE);
-		//curl_setopt($ch, CURLOPT_NOBODY, TRUE);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-		curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-		$data = curl_exec($ch);
-		$size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-		$mime = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-		//$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-		curl_close($ch);
-		return ['size' => $size, 'type' => $mime];
+		$hops = 0;
+		while($hops < 4) {
+			$ip = null;
+			if(!$this->resolvePublicUrl($url, $ip)) return ['size' => 0, 'type' => ''];
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_HEADER, TRUE);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+			curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+			$this->pinCurlHost($ch, $url, $ip);
+			$data = curl_exec($ch);
+			$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+			$size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+			$mime = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+			$next = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+			curl_close($ch);
+			if($status >= 300 && $status < 400 && !empty($next)) {
+				$url = $next;
+				$hops++;
+				continue;
+			}
+			return ['size' => $size, 'type' => $mime];
+		}
+		return ['size' => 0, 'type' => ''];
 	}
 	public function suggestLevel($accountID, $levelID, $difficulty, $stars, $feat, $auto, $demon) {
 		if(!is_numeric($accountID)) return false;

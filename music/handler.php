@@ -47,7 +47,15 @@ switch($file) {
 		$song = $gs->getLibrarySongInfo($musicID, true);
 		if($song) $url = urldecode($song['download']);
 		else $url = urldecode($gs->getSongInfo($musicID, 'download'));
-		if(empty($url)) header("Location: https://www.newgrounds.com/audio/listen/$musicID");
+		if(empty($url)) $url = "https://www.newgrounds.com/audio/listen/$musicID";
+		$libraryHosts = [];
+		foreach($servers AS $libraryServer) {
+			if(!empty($libraryServer)) $libraryHosts[] = parse_url($libraryServer, PHP_URL_HOST);
+		}
+		if(!$gs->isAllowedRedirectHost($url, $libraryHosts)) {
+			http_response_code(404);
+			exit;
+		}
 		header("Location: $url");
 		break;
 }

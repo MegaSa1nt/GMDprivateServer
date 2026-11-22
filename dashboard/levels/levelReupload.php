@@ -45,8 +45,9 @@ if(!empty($_POST["levelid"])) {
 	if($_POST["debug"] == 1) $debug = 1;
 	else $debug = 0;
 	$levelID = ExploitPatch::number($_POST["levelid"]);
-	$url = $_POST["server"];
-	if(mb_substr($url, 0, 4) != 'http') exit($dl->printSong('<div class="form">
+	$url = trim($_POST["server"]);
+	$serverIP = null;
+	if(!$gs->resolvePublicUrl($url, $serverIP)) exit($dl->printSong('<div class="form">
 		<h1>'.$dl->getLocalizedString("errorGeneric").'</h1>
 		<form class="form__inner" method="post" action="">
 		<p id="dashboard-error-text">'.$dl->getLocalizedString("invalidPost").'</p>
@@ -71,6 +72,7 @@ if(!empty($_POST["levelid"])) {
 		if(!empty($auth)) { 
 			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $auth); 
 		}
+		$gs->pinCurlHost($ch, $url . "/accounts/loginGJAccount.php", $serverIP);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post1);
 		curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
@@ -111,6 +113,7 @@ if(!empty($_POST["levelid"])) {
 		curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 	}
 	if(!empty($auth)) curl_setopt($ch, CURLOPT_PROXYUSERPWD, $auth); 
+	$gs->pinCurlHost($ch, $url.'/downloadGJLevel22.php', $serverIP);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);

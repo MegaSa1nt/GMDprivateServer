@@ -2,6 +2,26 @@
 $unregisteredSubmissions = false; // false = green accounts can't upload levels, appear on the leaderboards etc; true = green accounts can do everything
 $preactivateAccounts = true; // false = accounts need to be activated at dashboard/login/activate.php; true = accounts can log in immediately
 
+$trustedProxies = [
+	'127.0.0.0/8',
+	'::1'
+];
+
+$allowedRedirectHosts = [
+	'newgrounds.com',
+	'*.newgrounds.com',
+	'geometrydashfiles.b-cdn.net',
+	'www.dropbox.com',
+	'dl.dropboxusercontent.com',
+	'drive.google.com',
+	'cdn.discordapp.com',
+	'media.discordapp.net',
+	'api.songfilehub.com',
+	'sfx.fhgdps.com'
+];
+
+$gjp2Salt = "mI29fmAnxgTs";
+
 $filterUsernames = 2; // 0 = Disabled, 1 = Checks if the username is word, 2 = Checks if the username contains word
 $bannedUsernames = [ // Add words to ban if it is a username/if it is in a username
 	'RobTop',

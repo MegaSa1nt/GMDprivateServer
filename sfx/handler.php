@@ -43,7 +43,15 @@ switch($file) {
 			$gs->updateLibraries($_GET['token'], $_GET['expires'], $time, 0);
 		}
 		$song = $gs->getLibrarySongInfo($sfxID, 'sfx');
-		$url = urldecode($song['download']);
+		$url = is_array($song) ? urldecode($song['download'] ?? '') : '';
+		$libraryHosts = [];
+		foreach($servers AS $libraryServer) {
+			if(!empty($libraryServer)) $libraryHosts[] = parse_url($libraryServer, PHP_URL_HOST);
+		}
+		if(!$gs->isAllowedRedirectHost($url, $libraryHosts)) {
+			http_response_code(404);
+			exit;
+		}
 		header("Location: $url");
 		break;
 }

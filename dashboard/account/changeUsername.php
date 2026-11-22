@@ -77,7 +77,13 @@ if($_POST["oldnickname"] != "" AND $_POST["newnickname"] != "" AND $_POST["passw
 		$gs->sendLogsAccountChangeWebhook($accID, $accID, $getAccountData);
 		if($automaticCron) Cron::fixUsernames($accID, false);
 		$_SESSION["accountID"] = 0;
-		setcookie('auth', 'no', 2147483647, '/');
+		setcookie('auth', 'no', [
+			'expires' => time() - 3600,
+			'path' => '/',
+			'secure' => true,
+			'httponly' => true,
+			'samesite' => 'Strict'
+		]);
 		$dl->printSong('<div class="form">
 			<h1>'.$dl->getLocalizedString("changeNickTitle").'</h1>
 			<form class="form__inner" method="post" action=".">
