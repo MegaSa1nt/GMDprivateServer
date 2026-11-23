@@ -1,9 +1,9 @@
 <?php
 header("X-Content-Type-Options: nosniff");
 
-require_once "../incl/lib/connection.php";
-require_once "../config/dashboard.php";
-require "../incl/lib/exploitPatch.php";
+require_once __DIR__ . "/../incl/lib/connection.php";
+require_once __DIR__ . "/../config/dashboard.php";
+require __DIR__ . "/../incl/lib/exploitPatch.php";
 
 $file = basename($_GET["request"] ?? "");
 
@@ -16,7 +16,7 @@ switch ($file) {
 
         // This will display a preview news entry
         if (empty($time)) {
-            $payload = "1,1|1:1;2:" . ExploitPatch::url_base64_encode("January 1, 1970") . ";3:" . ExploitPatch::url_base64_encode("Welcome to " . $gdps) . ";4:0," . ExploitPatch::url_base64_encode("Here, moderators of your GDPS can publish useful information for its playerbase! :eyes:");
+            $payload = "1,1|1:1;2:" . ExploitPatch::url_base64_encode(date("F j, Y")) . ";3:" . ExploitPatch::url_base64_encode("Welcome to " . $gdps) . ";4:0," . ExploitPatch::url_base64_encode("Here, moderators of your GDPS can publish useful information for its playerbase! :eyes:");
             $dat = ExploitPatch::url_base64_encode(gzencode($payload));
             header("Content-Length: " . strlen($dat));
             echo $dat;
@@ -34,15 +34,16 @@ switch ($file) {
             $entries[] = implode(";", [
                 "1:" . $entry["entryID"],
                 "2:" . ExploitPatch::url_base64_encode(date("F j, Y", strtotime($entry["entryDate"]))),
-                "3:" . $entry["entryTitle"],
+                // GD 2.2 expects the title to be URL-safe base64, just like the date.
+                "3:" . ExploitPatch::url_base64_encode($entry["entryTitle"]),
                 "4:" . $entry["entryElements"],
             ]);
         }
         $payload = $version . "," . count($news) . "|" . implode("|", $entries);
         $dat = ExploitPatch::url_base64_encode(gzencode($payload));
 
-        file_put_contents("news.dat", $dat, LOCK_EX);
-        file_put_contents("news_version.txt", $version, LOCK_EX);
+        file_put_contents(__DIR__ . "/news.dat", $dat, LOCK_EX);
+        file_put_contents(__DIR__ . "/news_version.txt", $version, LOCK_EX);
 
         header("Content-Length: " . strlen($dat));
         echo $dat;

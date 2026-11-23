@@ -1,39 +1,33 @@
 <?php
-chdir(dirname(__FILE__));
-require "../lib/connection.php";
-require_once "../lib/exploitPatch.php";
-require_once "../lib/GJPCheck.php";
-require_once "../lib/mainLib.php";
+require_once __DIR__ . '/../lib/connection.php';
+require_once __DIR__ . '/../lib/GJPCheck.php';
+require_once __DIR__ . '/../lib/exploitPatch.php';
+require_once __DIR__ . '/../lib/notification.php';
 
-$string = "1:1253292:2:13:3:party:4:Rmlyc3QgRm9sbG93ZXIh:5:U29tZW9uZSBpcyBub3cgPGN5PmZvbGxvd2luZzwvYz4geW91IQ==:6:34 minutes:7:1:8:0:9:0:10:geometry.ach.level01b:11:0:12:0:13:0:14:0:15:0:16:#1:0:10";
-$stringArray = explode(":", $string);
-$stringKeys = [];
+$accountID = GJPCheck::getAccountIDOrDie();
+ensureNotificationsTable($db);
 
-for($i = 1; $i < count($stringArray); $i += 2) {
-	$stringKeys[$stringArray[$i - 1]] = $stringArray[$i];
+$query = $db->prepare('SELECT notificationID, icon, title, description, notificationTime, isNew, achievementID, hasChest, chestType FROM notifications WHERE targetAccountID = :accountID AND claimed = 0 ORDER BY notificationID DESC LIMIT 100');
+$query->execute([':accountID' => $accountID]);
+$notifications = [];
+foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $notification) {
+    $notifications[] = implode(':', [
+        1, (int)$notification['notificationID'],
+        2, 0,
+        3, ExploitPatch::url_base64_encode($notification['icon']),
+        4, ExploitPatch::url_base64_encode($notification['title']),
+        5, ExploitPatch::url_base64_encode($notification['description']),
+        6, $notification['notificationTime'],
+        7, (int)$notification['isNew'],
+        8, 0,
+        9, 0,
+        10, ExploitPatch::url_base64_encode($notification['achievementID']),
+        11, 0,
+        12, 0,
+        13, (int)$notification['hasChest'],
+        14, (int)$notification['chestType'],
+        15, $accountID,
+    ]);
 }
+echo implode('|', $notifications) . '#1:0:10';
 
-$notificationID = "112321";
-$unknown2 = "0";
-$notificationIcon = "keydemon";
-$notificationTitle = ExploitPatch::url_base64_encode("Test notification");
-$notificationDescription = ExploitPatch::url_base64_encode("This is a test notification. авплроавлыогрвлодпва");
-$notificationTime = "15;55";
-$notificationIsNew = "1";
-$unknown8 = "0";
-$unknown9 = "0";
-$notificationAchievement = ""; // put achievement ID here to give this achievement to user
-$unknown11 = "0";
-$unknown12 = "0";
-$notificationHasChest = "1";
-$notificationChestType = "9"; // > 9 crashes game
-$notificationTargetAccountID = "1";
-
-$notificationsArray = [];
-
-for($i = 1; $i < 10; $i++) {
-	$notificationsArray[] = "1:".($notificationID + $i).":2:".$unknown2.":3:".$notificationIcon.":4:".$notificationTitle.":5:".$notificationDescription.":6:".$notificationTime.":7:".$notificationIsNew.":8:".$unknown8.":9:".$unknown9.":10:".$notificationAchievement.":11:".$unknown11.":12:".$unknown12.":13:".$notificationHasChest.":14:".$notificationChestType.":15:".$notificationTargetAccountID;
-}
-
-exit(implode("|", $notificationsArray)."#1:0:10");
-?>

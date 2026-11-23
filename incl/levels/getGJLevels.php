@@ -38,7 +38,7 @@ if(isset($_POST["original"]) && $_POST["original"] == 1) $params[] = "original =
 if(isset($_POST["coins"]) && $_POST["coins"] == 1) $params[] = "starCoins = 1 AND NOT levels.coins = 0";
 if((isset($_POST["uncompleted"]) || isset($_POST["onlyCompleted"])) && ($_POST["uncompleted"] == 1 || $_POST["onlyCompleted"] == 1)) {
 	$completedLevels = ExploitPatch::numbercolon($_POST["completedLevels"]);
-	$params[] = ($_POST['uncompleted'] == 1 ? 'NOT ' : '')."levelID IN ($completedLevels)";
+	$params[] = empty($completedLevels) ? (($_POST['uncompleted'] == 1) ? '1 = 1' : '1 = 0') : (($_POST['uncompleted'] == 1 ? 'NOT ' : '')."levelID IN ($completedLevels)");
 }
 if(isset($_POST["song"]) && $_POST["song"] > 0) {
 	$song = ExploitPatch::number($_POST["song"]);
@@ -154,7 +154,7 @@ switch($type){
 	case 10: // Map Packs
 	case 19: // Unknown, but same as Map Packs (on real GD type 10 has star rated filter and 19 doesn't)
 		$order = false;
-		$params[] = "levelID IN ($str)";
+		$params[] = empty($str) ? '1 = 0' : "levelID IN ($str)";
 		break;
 	case 11: // Awarded
 		$params[] = "NOT starStars = 0";
@@ -162,13 +162,13 @@ switch($type){
 		break;
 	case 12: // Followed
 		$followed = ExploitPatch::numbercolon($_POST["followed"]);
-		$params[] = "users.extID IN ($followed)";
+		$params[] = empty($followed) ? '1 = 0' : "users.extID IN ($followed)";
 		break;
 	case 13: // Friends
 		if(!isset($accountID)) $accountID = GJPCheck::getAccountIDOrDie();
 		$peoplearray = $gs->getFriends($accountID);
 		$whereor = implode(",", $peoplearray);
-		$params[] = "users.extID IN ($whereor)";
+		$params[] = empty($whereor) ? '1 = 0' : "users.extID IN ($whereor)";
 		break;
 	case 21: // Daily safe
 		$morejoins = "INNER JOIN dailyfeatures ON levels.levelID = dailyfeatures.levelID";
@@ -187,7 +187,7 @@ switch($type){
 		break;
 	case 25: // List levels
 		$listLevels = $gs->getListLevels($str);
-		$params = array("levelID IN (".$listLevels.")");
+		$params = array(empty($listLevels) ? '1 = 0' : "levelID IN (".$listLevels.")");
 		break;
 	case 27: // Sent levels
 		$suggestColumn = ", s.max_timestamp";
