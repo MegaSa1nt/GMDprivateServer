@@ -4,6 +4,7 @@ require "../incl/lib/connection.php";
 require "../incl/lib/generatePass.php";
 require_once "../incl/lib/exploitPatch.php";
 require_once "../incl/lib/mainLib.php";
+require_once "../incl/lib/notification.php";
 $gs = new mainLib();
 require_once "../config/security.php";
 require_once "../incl/lib/defuse-crypto.phar";
@@ -43,6 +44,7 @@ if($pass == 1) {
 			}
 		}
 	}
+	$saveData = applyPendingDemonKeysToSave($db, (int)$accountID, $saveData);
 	$gs->logAction($accountID, 10, $userName, strlen($saveData));
 	echo $saveData.";21;30;a;a";
 } else {
