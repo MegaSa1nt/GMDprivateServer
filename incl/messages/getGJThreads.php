@@ -122,9 +122,12 @@ foreach($threads AS &$thread) { // Retrieve users first
 }
 $threadMemberIDsArray = array_unique($threadMemberIDsArray);
 
-$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $threadMemberIDsArray).")");
-$users->execute();
-$users = $users->fetchAll();
+$users = [];
+if(!empty($threadMemberIDsArray)) {
+	$users = $db->prepare("SELECT * FROM users WHERE extID IN (".implode(",", $threadMemberIDsArray).")");
+	$users->execute();
+	$users = $users->fetchAll();
+}
 foreach($users AS &$userData) {
 	$userData["userName"] = $gs->makeClanUsername($userData);
 	$usersArray[$userData["extID"]] = $userData;

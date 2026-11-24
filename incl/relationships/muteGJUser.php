@@ -13,7 +13,7 @@ if (!$targetAccountID || $accountID == $targetAccountID) exit("-1");
 
 if ($mute) {
     $query = $db->prepare("SELECT 1 FROM accounts WHERE accountID = :targetAccountID");
-    $query->execute([":id" => $targetAccountID]);
+    $query->execute([":targetAccountID" => $targetAccountID]);
     if ($query->fetchColumn()) {
         $query = $db->prepare("INSERT IGNORE INTO mutes (person1, person2, timestamp) VALUES (:person1, :person2, :timestamp)");
         $query->execute([":person1" => $accountID, ":person2" => $targetAccountID, ":timestamp" => time()]);

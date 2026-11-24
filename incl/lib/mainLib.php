@@ -613,6 +613,13 @@ class mainLib {
 				$accountlist[] = $user["accountID"];
 			}
 		}
+		// Site owners are stored directly on accounts and do not need a role row.
+		// Include them in permission-based lookups so admin-only tools do not
+		// incorrectly report that no eligible account exists.
+		$query = $db->query("SELECT accountID FROM accounts WHERE isAdmin = 1");
+		foreach($query->fetchAll(PDO::FETCH_COLUMN) as $ownerID) {
+			if(!in_array($ownerID, $accountlist, true)) $accountlist[] = $ownerID;
+		}
 		return $accountlist;
 	}
 	public function checkPermission($accountID, $permission){
@@ -777,6 +784,13 @@ class mainLib {
 		if(!is_numeric($accountID)) return false;
 
 		require __DIR__ . "/connection.php";
+		// isAdmin is the server's highest privilege and intentionally bypasses
+		// role assignments in checkPermission(). Mirror that behavior here for
+		// numeric permissions such as modBadgeLevel and actionRequestMod.
+		$ownerCheck = $db->prepare("SELECT isAdmin FROM accounts WHERE accountID = :accountID");
+		$ownerCheck->execute([':accountID' => $accountID]);
+		if((int)$ownerCheck->fetchColumn() === 1) return 99999999;
+
 		$maxvalue = 0;
 		$query = $db->prepare("SELECT roleID FROM roleassign WHERE accountID = :accountID");
 		$query->execute([':accountID' => $accountID]);
@@ -2128,7 +2142,7 @@ class mainLib {
 			$invitedUsers = "";
 		} else $threadMembers = $accountID;
 		
-		$createGroupThread = $db->prepare("INSERT INTO threads (threadName, threadDesc, threadIcon, threadOwner, threadMembers, invitedUsers, isDMThread, timestamp) VALUES (:threadName, :threadDesc, :threadIcon, :threadOwner, '', '', 0, :timestamp)");
+		$createGroupThread = $db->prepare("INSERT INTO threads (threadName, threadDesc, threadIcon, threadOwner, threadMembers, invitedUsers, isDMThread, timestamp) VALUES (:threadName, :threadDesc, :threadIcon, :threadOwner, :threadOwner, '', 0, :timestamp)");
 		$createGroupThread->execute([":threadName" => $threadName, ":threadDesc" => $threadDesc, ":threadIcon" => $threadIcon, ":threadOwner" => $accountID, ":timestamp" => time()]);
 		$threadID = $db->lastInsertId();
 		
@@ -2168,8 +2182,8 @@ class mainLib {
 			$invitedUsers = $targetAccountID;
 		}
 		
-		$createDMThread = $db->prepare("INSERT INTO threads (threadMembers, invitedUsers, isDMThread, timestamp) VALUES ('', '', 1, :timestamp)");
-		$createDMThread->execute([":timestamp" => time()]);
+		$createDMThread = $db->prepare("INSERT INTO threads (threadMembers, invitedUsers, isDMThread, timestamp) VALUES (:accountID, '', 1, :timestamp)");
+		$createDMThread->execute([":accountID" => $accountID, ":timestamp" => time()]);
 		$threadID = $db->lastInsertId();
 		
 		if($createWithoutInvite) {

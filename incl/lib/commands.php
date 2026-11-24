@@ -151,6 +151,7 @@ class Commands {
 						} else $returnText = 'You successfully unfeatured '.$gs->getLevelName($levelID).'!';
 					}
 				}
+				$starFeatured = $starFeatured ?? 0;
 				if($starArray[$commentarray[0]] == 0 && $commentarray[1] == 0) $column = 'starFeatured = 0, starEpic';
 				$query = $db->prepare("UPDATE levels SET $column = :starFeatured WHERE levelID = :levelID");
 				$query->execute([':levelID' => $levelID, ':starFeatured' => $starFeatured]);

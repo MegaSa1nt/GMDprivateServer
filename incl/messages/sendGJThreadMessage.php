@@ -29,11 +29,10 @@ if(!$thread) {
 	$friends = $gs->getFriends($accountID);
 	
 	if($isDMThread) {
-		if($account["accountID"] == $accountID) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot create a conversation with yourself.")."##P##-1");
-		
 		$account = $db->prepare("SELECT * FROM accounts WHERE accountID = :accountID");
 		$account->execute([":accountID" => $accountID]);
 		$account = $account->fetch();
+		if(!$account || $toAccountID === $accountID) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot create a conversation with yourself.")."##P##-1");
 		
 		if($account["mS"] == 2) exit("##P##t=".ExploitPatch::url_base64_encode("Forbidden").":b=".ExploitPatch::url_base64_encode("You cannot create a conversation with this player.")."##P##-1");
 		
