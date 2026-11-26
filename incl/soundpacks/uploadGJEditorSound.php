@@ -13,8 +13,8 @@ $userName = $gs->getUserName($userID);
 
 $soundID = ExploitPatch::number($_POST["soundID"] ?? "");
 $soundName = ExploitPatch::remove($_POST["soundName"] ?? "");
-$soundData = $_POST["soundData"] ?? "";
-$soundDesc = $_POST["soundDesc"] ?? "";
+$soundData = ExploitPatch::remove($_POST["soundData"] ?? "");
+$soundDesc = ExploitPatch::remove($_POST["soundDesc"] ?? "");
 $actionCount = ExploitPatch::number($_POST["actionCount"] ?? "");
 $soundCount = ExploitPatch::number($_POST["soundCount"] ?? "");
 $emote = ExploitPatch::remove($_POST["emote"] ?? "");
