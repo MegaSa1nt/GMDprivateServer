@@ -457,6 +457,27 @@ if(!$installed) {
 		$check = $db->query("SHOW COLUMNS FROM `reports` LIKE 'extraID'");
 			$exist = $check->fetchAll();
 			if(empty($exist)) $db->query("ALTER TABLE `reports` ADD `extraID` INT NOT NULL DEFAULT 0 AFTER `reasons`");
+		$check = $db->query("SHOW TABLES LIKE 'soundpacks'");
+			$exist = $check->fetchAll();
+			if(empty($exist)) $db->query("CREATE TABLE `soundpacks` (
+			 `soundID` int(11) NOT NULL AUTO_INCREMENT,
+			 `soundName` varchar(255) NOT NULL DEFAULT '',
+			 `soundDesc` varchar(2048) NOT NULL DEFAULT '',
+			 `userName` varchar(255) NOT NULL DEFAULT '',
+			 `accountID` int(11) NOT NULL DEFAULT 0,
+			 `userID` int(11) NOT NULL DEFAULT 0,
+			 `actionCount` int(11) NOT NULL DEFAULT 0,
+			 `soundCount` int(11) NOT NULL DEFAULT 0,
+			 `emote` varchar(20) NOT NULL DEFAULT '',
+			 `version` int(11) NOT NULL DEFAULT 1,
+			 `downloads` int(11) NOT NULL DEFAULT 0,
+			 `likes` int(11) NOT NULL DEFAULT 0,
+			 `rated` tinyint(1) NOT NULL DEFAULT 0,
+			 `unlisted` int(1) NOT NULL DEFAULT 0,
+			 `uploadDate` int(11) NOT NULL DEFAULT 0,
+			 `updateDate` int(11) NOT NULL DEFAULT 0,
+			 PRIMARY KEY (`soundID`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 	$lines = file($dbPath.'config/dashboard.php');
 	$first_line = $lines[2];
 	$lines = array_slice($lines, 1 + 2);

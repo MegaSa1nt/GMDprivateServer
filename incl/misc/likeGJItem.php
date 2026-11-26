@@ -39,6 +39,10 @@ switch($type){
 		$table = "lists";
 		$column = "listID";
 		break;
+	case 5:
+		$table = "soundpacks";
+		$column = "soundID";
+		break;
 }
 
 $query=$db->prepare("SELECT likes FROM $table WHERE $column = :itemID LIMIT 1");
